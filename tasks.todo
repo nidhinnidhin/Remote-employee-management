@@ -1,0 +1,72 @@
+✔ Subscription @done (12/12/2025, 6:48:25 PM)
+☐ Role count
+☐ user count
+☐ features
+☐ Billing and payment =>Revenue dashboard
+☐ Company admin
+☐ role management and permission management
+☐ leave policy
+☐ per day allocation management
+☐ department management
+
+☐ Team lead
+☐ Project
+☐ backlog
+☐ user stories ->task
+☐ sprint user stories
+     
+☐ transcript -summarise by limit
+☐ Approach
+☐ Multitenant with shared db approach
+
+
+☐ department no need of headed
+☐ team
+☐ members with allocation and role
+☐ role collection
+☐ permission collection
+☐ discussion pool
+☐ chat add transcript
+☐ unwanted collection need to removed
+
+
+☐ next week
+
+☐ Update DB design 
+☐ API documentation-up to data based on API
+
+☐ OOPS
+☐ SOLID
+
+
+☐ Super admin
+☐ login
+☐ company listing
+
+Company admin
+☐ registration
+☐ login
+☐ otp verification
+☐ company policy
+☐ leave policy
+☐ working hours
+ 
+☐ role management
+☐ Add members with welcome
+☐ reset password
+
+☐ clean 
+☐ Multitenant approach
+
+☐ LLM  for auto assignment skill
+☐ summarise transcription
+
+☐ reusable components
+☐ table   
+☐ login
+☐ otp
+
+
+Note DB design need to verify
+
+communication looks fine

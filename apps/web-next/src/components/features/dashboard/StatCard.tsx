@@ -1,11 +1,4 @@
-import React, { ReactNode } from "react";
-
-interface StatCardProps {
-  label: string;
-  value: string;
-  icon: ReactNode;
-  className?: string; // For the icon background color
-}
+import { StatCardProps } from "@/packages/types/landing/super-admin-landing";
 
 export default function StatCard({ label, value, icon, className }: StatCardProps) {
   return (
