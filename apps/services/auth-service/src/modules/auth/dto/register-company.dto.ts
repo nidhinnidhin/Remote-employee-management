@@ -1,3 +1,5 @@
+import { BillingCycle } from '../../../types/company/billing-cycle.enum';
+
 export class RegisterCompanyDto {
   companyName: string;
   companyEmail: string;
@@ -8,5 +10,5 @@ export class RegisterCompanyDto {
   password: string;
 
   subscriptionPlanId: string;
-  billingCycle: 'MONTHLY' | 'YEARLY';
+  billingCycle: BillingCycle;
 }
