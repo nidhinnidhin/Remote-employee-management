@@ -1,3 +1,6 @@
 export enum SystemRoles {
+  SUPER_ADMIN = 'SUPER_ADMIN',
   COMPANY_ADMIN = 'COMPANY_ADMIN',
+  TEAM_LEAD = 'TEAM_LEAD',
+  EMPLOYEE = 'EMPLOYEE',
 }
