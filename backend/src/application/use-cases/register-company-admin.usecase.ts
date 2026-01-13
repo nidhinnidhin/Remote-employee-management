@@ -1,36 +1,34 @@
 import { Injectable, ConflictException, Inject } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { UserEntity } from '../../domain/entities/user.entity';
 import { randomUUID } from 'crypto';
-import type { UserRepository } from 'src/domain/repositories/user.repository';
+import { UserEntity } from '../../domain/entities/user.entity';
+import type { UserRepository } from '../../domain/repositories/user.repository';
+import { RegisterCompanyAdminDto } from 'src/presentation/dto/register-company-admin.dto';
+import { SendEmailOtpUseCase } from './send-email-otp.usecase';
 
 @Injectable()
 export class RegisterCompanyAdminUseCase {
   constructor(
     @Inject('UserRepository')
     private readonly userRepository: UserRepository,
+    private readonly sendEmailOtpUseCase: SendEmailOtpUseCase,
   ) {}
 
-  async execute(dto: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
-    password: string;
-  }): Promise<UserEntity> {
-    const existingUser = await this.userRepository.findByEmail(dto.email);
+  async execute(dto: RegisterCompanyAdminDto): Promise<UserEntity> {
+    const email = dto.email.toLowerCase();
 
+    const existingUser = await this.userRepository.findByEmail(email);
     if (existingUser) {
       throw new ConflictException('Email already registered');
     }
 
-    const passwordHash: string = await bcrypt.hash(dto.password, 10);
+    const passwordHash = await bcrypt.hash(dto.password, 10);
 
     const user = new UserEntity(
       randomUUID(),
       dto.firstName,
       dto.lastName,
-      dto.email.toLowerCase(),
+      email,
       dto.phone,
       passwordHash,
       'PENDING_VERIFICATION',
@@ -38,6 +36,11 @@ export class RegisterCompanyAdminUseCase {
       new Date(),
     );
 
-    return this.userRepository.create(user);
+    const createdUser = await this.userRepository.create(user);
+
+    //SEND OTP AFTER SUCCESSFUL REGISTRATION
+    await this.sendEmailOtpUseCase.execute(createdUser.id, createdUser.email);
+
+    return createdUser;
   }
 }
