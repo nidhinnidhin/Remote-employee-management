@@ -43,4 +43,10 @@ export class MongoUserRepository implements UserRepository {
       doc.updatedAt,
     );
   }
+  async updateStatusByEmail(
+    email: string,
+    status: 'ACTIVE' | 'SUSPENDED',
+  ): Promise<void> {
+    await this.userModel.updateOne({ email }, { status });
+  }
 }

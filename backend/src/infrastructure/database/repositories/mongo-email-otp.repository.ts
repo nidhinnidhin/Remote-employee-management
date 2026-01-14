@@ -20,4 +20,26 @@ export class MongoEmailOtpRepository implements EmailOtpRepository {
       verified: otp.verified,
     });
   }
+
+  async findLatestByEmail(email: string): Promise<EmailOtpEntity | null> {
+    const doc = await this.emailOtpModel
+      .findOne({ email, verified: false })
+      .sort({ createdAt: -1 });
+
+    return doc
+      ? new EmailOtpEntity(
+          doc._id.toString(),
+          doc.userId,
+          doc.email,
+          doc.otpHash,
+          doc.expiresAt,
+          doc.verified,
+          doc.createdAt,
+        )
+      : null;
+  }
+
+  async markAsVerified(id: string): Promise<void> {
+    await this.emailOtpModel.updateOne({ _id: id }, { verified: true });
+  }
 }

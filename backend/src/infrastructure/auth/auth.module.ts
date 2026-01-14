@@ -9,6 +9,8 @@ import { EmailService } from '../notifications/email.service';
 import { UserDocument } from '../database/mongoose/schemas/userSchema';
 import { UserSchema } from '../database/mongoose/schemas/userSchema';
 import { EmailOtpSchema } from '../database/mongoose/schemas/email-otp.schema';
+import { VerifyEmailOtpUseCase } from 'src/application/use-cases/verify-email-otp.usecase';
+import { JwtService } from './jwt.service';
 
 @Module({
   imports: [
@@ -21,7 +23,9 @@ import { EmailOtpSchema } from '../database/mongoose/schemas/email-otp.schema';
   providers: [
     RegisterCompanyAdminUseCase,
     SendEmailOtpUseCase,
+    VerifyEmailOtpUseCase,
     EmailService,
+    JwtService,
     {
       provide: 'UserRepository',
       useClass: MongoUserRepository,
