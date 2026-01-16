@@ -14,6 +14,7 @@ import { JwtService } from './jwt.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { TestController } from 'src/interfaces/http/controllers/test.controller';
 import { LoginCompanyAdminUseCase } from 'src/application/use-cases/login-company-admin.useCase';
+import { ResendEmailOtpUseCase } from 'src/application/use-cases/resend-email-otp.usecase';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { LoginCompanyAdminUseCase } from 'src/application/use-cases/login-compan
     LoginCompanyAdminUseCase,
     SendEmailOtpUseCase,
     VerifyEmailOtpUseCase,
+    ResendEmailOtpUseCase,
     EmailService,
     JwtService,
     {

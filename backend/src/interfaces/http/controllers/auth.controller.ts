@@ -7,6 +7,8 @@ import { RegisterCompanyAdminDto } from '../../../presentation/dto/register-comp
 import { VerifyEmailOtpDto } from '../../../presentation/dto/verify-email-otp.dto';
 import { LoginDto } from 'src/presentation/dto/login.dto';
 import { LoginCompanyAdminUseCase } from 'src/application/use-cases/login-company-admin.useCase';
+import { ResendOtpDto } from 'src/presentation/dto/resend-otp.dto';
+import { ResendEmailOtpUseCase } from 'src/application/use-cases/resend-email-otp.usecase';
 
 @Controller('auth')
 export class AuthController {
@@ -14,6 +16,7 @@ export class AuthController {
     private readonly registerCompanyAdminUseCase: RegisterCompanyAdminUseCase,
     private readonly verifyEmailOtpUseCase: VerifyEmailOtpUseCase,
     private readonly loginCompanyAdminUseCase: LoginCompanyAdminUseCase,
+    private readonly resendEmailOtpUseCase: ResendEmailOtpUseCase,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -73,6 +76,16 @@ export class AuthController {
 
     return {
       message: 'OTP verified successfully',
+    };
+  }
+
+  // Resend otp
+  @Post('resend-otp')
+  async resendOtp(@Body() dto: ResendOtpDto) {
+    await this.resendEmailOtpUseCase.execute(dto.email);
+
+    return {
+      message: 'OTP resent successfully',
     };
   }
 }

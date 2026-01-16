@@ -12,7 +12,7 @@ export class JwtAuthGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<Request>();
 
-    // 1️⃣ Read cookie
+    // Read cookie
     const token = request.cookies?.access_token;
 
     if (!token) {
