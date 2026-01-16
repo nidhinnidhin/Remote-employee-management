@@ -11,6 +11,8 @@ import { UserSchema } from '../database/mongoose/schemas/userSchema';
 import { EmailOtpSchema } from '../database/mongoose/schemas/email-otp.schema';
 import { VerifyEmailOtpUseCase } from 'src/application/use-cases/verify-email-otp.usecase';
 import { JwtService } from './jwt.service';
+import { JwtAuthGuard } from './jwt-auth.guard';
+import { TestController } from 'src/interfaces/http/controllers/test.controller';
 
 @Module({
   imports: [
@@ -19,8 +21,9 @@ import { JwtService } from './jwt.service';
       { name: 'EmailOtp', schema: EmailOtpSchema },
     ]),
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, TestController],
   providers: [
+    JwtAuthGuard,
     RegisterCompanyAdminUseCase,
     SendEmailOtpUseCase,
     VerifyEmailOtpUseCase,

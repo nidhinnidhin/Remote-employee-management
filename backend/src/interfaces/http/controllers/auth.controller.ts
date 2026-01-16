@@ -1,10 +1,10 @@
-import { Body, Controller, Post, Header } from '@nestjs/common';
-import { serialize } from 'cookie';
+import { Body, Controller, Post, Res } from '@nestjs/common';
+import type { Response } from 'express';
 import { RegisterCompanyAdminUseCase } from '../../../application/use-cases/register-company-admin.usecase';
 import { VerifyEmailOtpUseCase } from '../../../application/use-cases/verify-email-otp.usecase';
 import { JwtService } from '../../../infrastructure/auth/jwt.service';
 import { RegisterCompanyAdminDto } from '../../../presentation/dto/register-company-admin.dto';
-import { VerifyEmailOtpDto } from 'src/presentation/dto/verify-email-otp.dto';
+import { VerifyEmailOtpDto } from '../../../presentation/dto/verify-email-otp.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -14,7 +14,7 @@ export class AuthController {
     private readonly jwtService: JwtService,
   ) {}
 
-  // REGISTER
+  // Register
   @Post('register')
   async register(@Body() dto: RegisterCompanyAdminDto) {
     const user = await this.registerCompanyAdminUseCase.execute(dto);
@@ -25,25 +25,26 @@ export class AuthController {
     };
   }
 
-  // VERIFY OTP + SET JWT COOKIE
+  // Verify otp
   @Post('verify-otp')
-  @Header('Set-Cookie', '')
-  async verifyOtp(@Body() dto: VerifyEmailOtpDto) {
+  async verifyOtp(
+    @Body() dto: VerifyEmailOtpDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const userId = await this.verifyEmailOtpUseCase.execute(dto.email, dto.otp);
 
     const token = this.jwtService.generateToken({ userId });
 
-    const cookie = serialize('access_token', token, {
+    res.cookie('access_token', token, {
       httpOnly: true,
-      sameSite: 'strict',
+      sameSite: 'lax',
       secure: false,
-      maxAge: 60 * 60 * 24,
+      maxAge: 24 * 60 * 60 * 1000,
       path: '/',
     });
 
     return {
       message: 'OTP verified successfully',
-      cookie, // returned only so Nest can attach header
     };
   }
 }

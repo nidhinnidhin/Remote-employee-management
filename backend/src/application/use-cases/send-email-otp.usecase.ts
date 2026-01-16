@@ -14,11 +14,11 @@ export class SendEmailOtpUseCase {
   ) {}
 
   async execute(userId: string, email: string): Promise<void> {
-    console.log('✅ OTP FLOW STARTED');
-    console.log('📧 Target email:', email);
+    console.log('OTP FLOW STARTED');
+    console.log('Target email:', email);
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    console.log('🔢 GENERATED OTP (DEV ONLY):', otp);
+    console.log('GENERATED OTP (DEV ONLY):', otp);
 
     const otpHash = await bcrypt.hash(otp, 10);
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
@@ -34,9 +34,9 @@ export class SendEmailOtpUseCase {
     );
 
     await this.emailOtpRepository.create(otpEntity);
-    console.log('✅ OTP SAVED TO DB');
+    console.log('OTP SAVED TO DB');
 
     await this.emailService.sendOtp(email, otp);
-    console.log('📩 EMAIL SEND FUNCTION CALLED');
+    console.log('EMAIL SEND FUNCTION CALLED');
   }
 }
