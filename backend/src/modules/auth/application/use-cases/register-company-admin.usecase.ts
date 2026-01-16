@@ -3,8 +3,9 @@ import * as bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
 import { UserEntity } from '../../domain/entities/user.entity';
 import type { UserRepository } from '../../domain/repositories/user.repository';
-import { RegisterCompanyAdminDto } from 'src/presentation/dto/register-company-admin.dto';
+import { RegisterCompanyAdminDto } from 'src/modules/auth/presentation/dto/register-company-admin.dto';
 import { SendEmailOtpUseCase } from './send-email-otp.usecase';
+import { UserStatus } from '@shared';
 
 @Injectable()
 export class RegisterCompanyAdminUseCase {
@@ -31,7 +32,7 @@ export class RegisterCompanyAdminUseCase {
       email,
       dto.phone,
       passwordHash,
-      'PENDING_VERIFICATION',
+      UserStatus.PENDING_VERIFICATION,
       new Date(),
       new Date(),
     );

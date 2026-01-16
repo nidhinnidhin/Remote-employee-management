@@ -1,14 +1,14 @@
 import { Body, Controller, Post, Res } from '@nestjs/common';
 import type { Response } from 'express';
-import { RegisterCompanyAdminUseCase } from '../../../application/use-cases/register-company-admin.usecase';
-import { VerifyEmailOtpUseCase } from '../../../application/use-cases/verify-email-otp.usecase';
-import { JwtService } from '../../../infrastructure/auth/jwt.service';
-import { RegisterCompanyAdminDto } from '../../../presentation/dto/register-company-admin.dto';
-import { VerifyEmailOtpDto } from '../../../presentation/dto/verify-email-otp.dto';
-import { LoginDto } from 'src/presentation/dto/login.dto';
-import { LoginCompanyAdminUseCase } from 'src/application/use-cases/login-company-admin.useCase';
-import { ResendOtpDto } from 'src/presentation/dto/resend-otp.dto';
-import { ResendEmailOtpUseCase } from 'src/application/use-cases/resend-email-otp.usecase';
+import { RegisterCompanyAdminUseCase } from '../../application/use-cases/register-company-admin.usecase';
+import { VerifyEmailOtpUseCase } from '../../application/use-cases/verify-email-otp.usecase';
+import { JwtService } from '../../infrastructure/auth/jwt.service';
+import { RegisterCompanyAdminDto } from '../../presentation/dto/register-company-admin.dto';
+import { VerifyEmailOtpDto } from '../../presentation/dto/verify-email-otp.dto';
+import { LoginDto } from 'src/modules/auth/presentation/dto/login.dto';
+import { LoginCompanyAdminUseCase } from 'src/modules/auth/application/use-cases/login-company-admin.useCase';
+import { ResendOtpDto } from 'src/modules/auth/presentation/dto/resend-otp.dto';
+import { ResendEmailOtpUseCase } from 'src/modules/auth/application/use-cases/resend-email-otp.usecase';
 
 @Controller('auth')
 export class AuthController {

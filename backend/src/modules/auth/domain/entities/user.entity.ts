@@ -1,4 +1,4 @@
-import { UserStatus } from '../user/user-status.types';
+import { UserStatus } from '@shared';
 
 export class UserEntity {
   constructor(

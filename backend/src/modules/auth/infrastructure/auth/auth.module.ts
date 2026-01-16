@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { AuthController } from '../../interfaces/http/controllers/auth.controller';
+import { AuthController } from '../../interfaces/controllers/auth.controller';
 import { RegisterCompanyAdminUseCase } from '../../application/use-cases/register-company-admin.usecase';
 import { SendEmailOtpUseCase } from '../../application/use-cases/send-email-otp.usecase';
 import { MongoUserRepository } from '../database/repositories/mongo-user.repository';
@@ -9,12 +9,12 @@ import { EmailService } from '../notifications/email.service';
 import { UserDocument } from '../database/mongoose/schemas/userSchema';
 import { UserSchema } from '../database/mongoose/schemas/userSchema';
 import { EmailOtpSchema } from '../database/mongoose/schemas/email-otp.schema';
-import { VerifyEmailOtpUseCase } from 'src/application/use-cases/verify-email-otp.usecase';
+import { VerifyEmailOtpUseCase } from '../../application/use-cases/verify-email-otp.usecase';
 import { JwtService } from './jwt.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
-import { TestController } from 'src/interfaces/http/controllers/test.controller';
-import { LoginCompanyAdminUseCase } from 'src/application/use-cases/login-company-admin.useCase';
-import { ResendEmailOtpUseCase } from 'src/application/use-cases/resend-email-otp.usecase';
+import { TestController } from 'src/modules/auth/interfaces/controllers/test.controller';
+import { LoginCompanyAdminUseCase } from '../../application/use-cases/login-company-admin.useCase';
+import { ResendEmailOtpUseCase } from '../../application/use-cases/resend-email-otp.usecase';
 
 @Module({
   imports: [
