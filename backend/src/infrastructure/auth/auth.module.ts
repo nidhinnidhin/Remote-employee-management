@@ -13,6 +13,7 @@ import { VerifyEmailOtpUseCase } from 'src/application/use-cases/verify-email-ot
 import { JwtService } from './jwt.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { TestController } from 'src/interfaces/http/controllers/test.controller';
+import { LoginCompanyAdminUseCase } from 'src/application/use-cases/login-company-admin.useCase';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { TestController } from 'src/interfaces/http/controllers/test.controller'
   providers: [
     JwtAuthGuard,
     RegisterCompanyAdminUseCase,
+    LoginCompanyAdminUseCase,
     SendEmailOtpUseCase,
     VerifyEmailOtpUseCase,
     EmailService,

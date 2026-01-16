@@ -5,14 +5,42 @@ import { VerifyEmailOtpUseCase } from '../../../application/use-cases/verify-ema
 import { JwtService } from '../../../infrastructure/auth/jwt.service';
 import { RegisterCompanyAdminDto } from '../../../presentation/dto/register-company-admin.dto';
 import { VerifyEmailOtpDto } from '../../../presentation/dto/verify-email-otp.dto';
+import { LoginDto } from 'src/presentation/dto/login.dto';
+import { LoginCompanyAdminUseCase } from 'src/application/use-cases/login-company-admin.useCase';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly registerCompanyAdminUseCase: RegisterCompanyAdminUseCase,
     private readonly verifyEmailOtpUseCase: VerifyEmailOtpUseCase,
+    private readonly loginCompanyAdminUseCase: LoginCompanyAdminUseCase,
     private readonly jwtService: JwtService,
   ) {}
+
+  @Post('login')
+  async login(
+    @Body() dto: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { userId } = await this.loginCompanyAdminUseCase.execute(
+      dto.email,
+      dto.password,
+    );
+
+    const token = this.jwtService.generateToken({ userId });
+
+    res.cookie('access_token', token, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: false,
+      maxAge: 24 * 60 * 60 * 1000,
+      path: '/',
+    });
+
+    return {
+      message: 'Login successful',
+    };
+  }
 
   // Register
   @Post('register')
