@@ -4,6 +4,10 @@ import { Document } from 'mongoose';
 @Schema({ timestamps: true })
 export class UserDocument extends Document {
   @Prop({ required: true })
+  @Prop({ required: true })
+  companyId: string;
+
+  @Prop({ required: true })
   firstName: string;
 
   @Prop({ required: true })
@@ -14,6 +18,9 @@ export class UserDocument extends Document {
 
   @Prop({ required: true })
   phone: string;
+
+  @Prop({ required: true })
+  role: string;
 
   @Prop({ required: true })
   passwordHash: string;

@@ -13,7 +13,7 @@ export class RegisterCompanyAdminUseCase {
     @Inject('UserRepository')
     private readonly userRepository: UserRepository,
     private readonly sendEmailOtpUseCase: SendEmailOtpUseCase,
-  ) {}
+  ) { }
 
   async execute(dto: RegisterCompanyAdminDto): Promise<UserEntity> {
     const email = dto.email.toLowerCase();
@@ -27,10 +27,12 @@ export class RegisterCompanyAdminUseCase {
 
     const user = new UserEntity(
       randomUUID(),
+      randomUUID(),
       dto.firstName,
       dto.lastName,
       email,
       dto.phone,
+      'COMPANY_ADMIN',
       passwordHash,
       UserStatus.PENDING_VERIFICATION,
       new Date(),
