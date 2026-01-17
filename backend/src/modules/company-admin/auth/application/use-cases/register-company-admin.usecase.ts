@@ -3,7 +3,7 @@ import * as bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
 import { UserEntity } from '../../domain/entities/user.entity';
 import type { UserRepository } from '../../domain/repositories/user.repository';
-import { RegisterCompanyAdminDto } from 'src/modules/auth/presentation/dto/register-company-admin.dto';
+import { RegisterCompanyAdminDto } from 'src/modules/company-admin/auth/presentation/dto/register-company-admin.dto';
 import { SendEmailOtpUseCase } from './send-email-otp.usecase';
 import { UserStatus } from '@shared';
 

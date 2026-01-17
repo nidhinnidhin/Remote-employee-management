@@ -12,7 +12,7 @@ import { EmailOtpSchema } from '../database/mongoose/schemas/email-otp.schema';
 import { VerifyEmailOtpUseCase } from '../../application/use-cases/verify-email-otp.usecase';
 import { JwtService } from './jwt.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
-import { TestController } from 'src/modules/auth/interfaces/controllers/test.controller';
+import { TestController } from 'src/modules/company-admin/auth/interfaces/controllers/test.controller';
 import { LoginCompanyAdminUseCase } from '../../application/use-cases/login-company-admin.useCase';
 import { ResendEmailOtpUseCase } from '../../application/use-cases/resend-email-otp.usecase';
 import { RefreshTokenDocument, RefreshTokenSchema } from '../database/mongoose/schemas/refresh-token.schema';

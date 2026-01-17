@@ -1,14 +1,21 @@
-import { Body, Controller, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Req,
+  Res,
+  UnauthorizedException,
+} from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { RegisterCompanyAdminUseCase } from '../../application/use-cases/register-company-admin.usecase';
 import { VerifyEmailOtpUseCase } from '../../application/use-cases/verify-email-otp.usecase';
-import { LoginCompanyAdminUseCase } from 'src/modules/auth/application/use-cases/login-company-admin.useCase';
-import { ResendEmailOtpUseCase } from 'src/modules/auth/application/use-cases/resend-email-otp.usecase';
+import { LoginCompanyAdminUseCase } from 'src/modules/company-admin/auth/application/use-cases/login-company-admin.useCase';
+import { ResendEmailOtpUseCase } from 'src/modules/company-admin/auth/application/use-cases/resend-email-otp.usecase';
 
 import { RegisterCompanyAdminDto } from '../../presentation/dto/register-company-admin.dto';
 import { VerifyEmailOtpDto } from '../../presentation/dto/verify-email-otp.dto';
 import { LoginCompanyAdminDto } from '../../presentation/dto/login-company-admin.dto';
-import { ResendOtpDto } from 'src/modules/auth/presentation/dto/resend-otp.dto';
+import { ResendOtpDto } from 'src/modules/company-admin/auth/presentation/dto/resend-otp.dto';
 import { RefreshAccessTokenUseCase } from '../../application/use-cases/refresh-access-token.usecase';
 
 @Controller('auth')
@@ -19,7 +26,7 @@ export class AuthController {
     private readonly refreshAccessTokenUseCase: RefreshAccessTokenUseCase,
     private readonly loginCompanyAdminUseCase: LoginCompanyAdminUseCase,
     private readonly resendEmailOtpUseCase: ResendEmailOtpUseCase,
-  ) { }
+  ) {}
 
   // LOGIN with Access + Refresh Token
   @Post('login')
@@ -33,9 +40,9 @@ export class AuthController {
     // Store refresh token in HTTP-only cookie
     res.cookie('refresh_token', refreshToken, {
       httpOnly: true,
-      secure: true, // true in production (HTTPS)
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      path: '/auth/refresh', // only sent when refreshing token
+      path: '/api/auth/refresh',
       maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
     });
 
@@ -81,8 +88,9 @@ export class AuthController {
 
   @Post('refresh')
   async refresh(@Req() req: Request) {
+    console.log('Hitted', req.cookies);
     const refreshToken = req.cookies?.refresh_token;
-
+    console.log(refreshToken);
     if (!refreshToken) {
       throw new UnauthorizedException('Refresh token missing');
     }

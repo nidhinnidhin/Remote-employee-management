@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { AuthModule } from './modules/auth/infrastructure/auth/auth.module';
-import { MongoDatabaseModule } from './modules/auth/infrastructure/database/mongoose/schemas/mongoose.module';
+import { AuthModule } from './modules/company-admin/auth/infrastructure/auth/auth.module';
+import { MongoDatabaseModule } from './modules/company-admin/auth/infrastructure/database/mongoose/schemas/mongoose.module';
 
 @Module({
   imports: [
