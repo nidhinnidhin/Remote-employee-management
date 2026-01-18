@@ -51,5 +51,9 @@ import { MongoRefreshTokenRepository } from '../database/repositories/mongo-refr
       useClass: MongoRefreshTokenRepository,
     },
   ],
+  exports: [
+    JwtService,
+    'RefreshTokenRepository',
+  ],
 })
 export class AuthModule { }
