@@ -15,14 +15,20 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 import { TestController } from 'src/modules/company-admin/auth/interfaces/controllers/test.controller';
 import { LoginCompanyAdminUseCase } from '../../application/use-cases/login-company-admin.useCase';
 import { ResendEmailOtpUseCase } from '../../application/use-cases/resend-email-otp.usecase';
-import { RefreshTokenDocument, RefreshTokenSchema } from '../database/mongoose/schemas/refresh-token.schema';
+import {
+  RefreshTokenDocument,
+  RefreshTokenSchema,
+} from '../database/mongoose/schemas/refresh-token.schema';
 import { RefreshAccessTokenUseCase } from '../../application/use-cases/refresh-access-token.usecase';
 import { MongoRefreshTokenRepository } from '../database/repositories/mongo-refresh-token.repository';
+import { MongoCompanyRepository } from '../database/repositories/mongo-company.repository';
+import { CompanyDocument, CompanySchema } from '../database/mongoose/schemas/company.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: UserDocument.name, schema: UserSchema },
+      { name: CompanyDocument.name, schema: CompanySchema },
       { name: 'EmailOtp', schema: EmailOtpSchema },
       { name: RefreshTokenDocument.name, schema: RefreshTokenSchema },
     ]),
@@ -43,6 +49,10 @@ import { MongoRefreshTokenRepository } from '../database/repositories/mongo-refr
       useClass: MongoUserRepository,
     },
     {
+      provide: 'CompanyRepository',
+      useClass: MongoCompanyRepository,
+    },
+    {
       provide: 'EmailOtpRepository',
       useClass: MongoEmailOtpRepository,
     },
@@ -51,9 +61,6 @@ import { MongoRefreshTokenRepository } from '../database/repositories/mongo-refr
       useClass: MongoRefreshTokenRepository,
     },
   ],
-  exports: [
-    JwtService,
-    'RefreshTokenRepository',
-  ],
+  exports: [JwtService, 'RefreshTokenRepository'],
 })
-export class AuthModule { }
+export class AuthModule {}
