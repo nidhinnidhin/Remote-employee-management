@@ -1,6 +1,9 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
+import { CompanyRegistrationDto } from './company-registration.dto';
+import { IsNotEmpty, IsString, IsEmail, MinLength } from 'class-validator';
 
-export class RegisterCompanyAdminDto {
+class AdminDto {
   @IsString()
   @IsNotEmpty()
   firstName: string;
@@ -13,10 +16,18 @@ export class RegisterCompanyAdminDto {
   email: string;
 
   @IsString()
-  @IsNotEmpty()
   phone: string;
 
-  @IsString()
   @MinLength(8)
   password: string;
+}
+
+export class RegisterCompanyAdminDto {
+  @ValidateNested()
+  @Type(() => CompanyRegistrationDto)
+  company: CompanyRegistrationDto;
+
+  @ValidateNested()
+  @Type(() => AdminDto)
+  admin: AdminDto;
 }
