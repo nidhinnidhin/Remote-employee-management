@@ -1,15 +1,26 @@
 import { Module } from '@nestjs/common';
-import { SuperAdminAuthController } from './interfaces/controllers/super-admin-auth.controller';
-import { LoginSuperAdminUseCase } from './application/use-cases/login-super-admin.usecase';
-import { AuthModule } from '../company-admin/auth/infrastructure/auth/auth.module';
+import { MongooseModule } from '@nestjs/mongoose';
+
+import { SuperAdminCompanyController } from './interfaces/controllers/super-admin-company.controller';
+import { COMPANY_READ_REPOSITORY } from './domain/tokens/company-read.tokens';
+import { CompanyReadRepositoryImpl } from './domain/repositories/company-read.repository.impl';
+import { CompanyDocument, CompanySchema } from '../company-admin/auth/infrastructure/database/mongoose/schemas/company.schema';
+  import { ListCompaniesUseCase } from './application/use-cases/list-companies.usecase';
+
 
 @Module({
   imports: [
-    AuthModule,
+    MongooseModule.forFeature([
+      { name: CompanyDocument.name, schema: CompanySchema },
+    ]),
   ],
-  controllers: [SuperAdminAuthController],
+  controllers: [SuperAdminCompanyController],
   providers: [
-    LoginSuperAdminUseCase,
+    ListCompaniesUseCase,
+    {
+      provide: COMPANY_READ_REPOSITORY,
+      useClass: CompanyReadRepositoryImpl,
+    },
   ],
 })
-export class SuperAdminModule { }
+export class SuperAdminModule {}
