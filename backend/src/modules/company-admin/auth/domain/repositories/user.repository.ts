@@ -8,4 +8,9 @@ export interface UserRepository {
     email: string,
     status: 'ACTIVE' | 'SUSPENDED',
   ): Promise<void>;
+
+  updatePasswordByEmail(
+    email: string,
+    passwordHash: string,
+  ): Promise<void>;
 }

@@ -17,6 +17,12 @@ import { VerifyEmailOtpDto } from '../../presentation/dto/verify-email-otp.dto';
 import { LoginCompanyAdminDto } from '../../presentation/dto/login-company-admin.dto';
 import { ResendOtpDto } from 'src/modules/company-admin/auth/presentation/dto/resend-otp.dto';
 import { RefreshAccessTokenUseCase } from '../../application/use-cases/refresh-access-token.usecase';
+import { ForgotPasswordUseCase } from '../../application/use-cases/forgot-password.usecase';
+import { ResetPasswordUseCase } from '../../application/use-cases/reset-password.usecase';
+import { VerifyResetPasswordOtpUseCase } from '../../application/use-cases/verify-reset-password-otp.usecase';
+import { ResetPasswordDto } from '../../presentation/dto/reset-password.dto';
+import { VerifyResetPasswordOtpDto } from '../../presentation/dto/verify-reset-password-otp.dto';
+import { ForgotPasswordDto } from '../../presentation/dto/forgot-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -26,6 +32,9 @@ export class AuthController {
     private readonly refreshAccessTokenUseCase: RefreshAccessTokenUseCase,
     private readonly loginCompanyAdminUseCase: LoginCompanyAdminUseCase,
     private readonly resendEmailOtpUseCase: ResendEmailOtpUseCase,
+    private readonly forgotPasswordUseCase: ForgotPasswordUseCase,
+    private readonly verifyResetPasswordOtpUseCase: VerifyResetPasswordOtpUseCase,
+    private readonly resetPasswordUseCase: ResetPasswordUseCase,
   ) {}
 
   // LOGIN with Access + Refresh Token
@@ -99,5 +108,20 @@ export class AuthController {
       await this.refreshAccessTokenUseCase.execute(refreshToken);
 
     return { accessToken };
+  }
+
+  @Post('forgot-password')
+  forgotPassword(@Body() dto: ForgotPasswordDto) {
+    return this.forgotPasswordUseCase.execute(dto.email);
+  }
+
+  @Post('verify-reset-password-otp')
+  verifyResetOtp(@Body() dto: VerifyResetPasswordOtpDto) {
+    return this.verifyResetPasswordOtpUseCase.execute(dto.email, dto.otp);
+  }
+
+  @Post('reset-password')
+  resetPassword(@Body() dto: ResetPasswordDto) {
+    return this.resetPasswordUseCase.execute(dto.email, dto.newPassword);
   }
 }

@@ -10,7 +10,7 @@ export class MongoUserRepository implements UserRepository {
   constructor(
     @InjectModel(UserDocument.name)
     private readonly userModel: Model<UserDocument>,
-  ) { }
+  ) {}
 
   async findByEmail(email: string): Promise<UserEntity | null> {
     const user = await this.userModel.findOne({ email });
@@ -35,6 +35,13 @@ export class MongoUserRepository implements UserRepository {
     });
 
     return this.toEntity(created);
+  }
+
+  async updatePasswordByEmail(
+    email: string,
+    passwordHash: string,
+  ): Promise<void> {
+    await this.userModel.updateOne({ email }, { password: passwordHash });
   }
 
   private toEntity(doc: UserDocument): UserEntity {

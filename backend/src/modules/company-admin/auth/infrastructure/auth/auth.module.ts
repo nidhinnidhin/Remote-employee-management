@@ -11,7 +11,7 @@ import { UserSchema } from '../database/mongoose/schemas/userSchema';
 import { EmailOtpSchema } from '../database/mongoose/schemas/email-otp.schema';
 import { VerifyEmailOtpUseCase } from '../../application/use-cases/verify-email-otp.usecase';
 import { JwtService } from './jwt.service';
-import { JwtAuthGuard } from './jwt-auth.guard';
+import { JwtAuthGuard } from '../../../../../shared/guards/jwt-auth.guard';
 import { TestController } from 'src/modules/company-admin/auth/interfaces/controllers/test.controller';
 import { LoginCompanyAdminUseCase } from '../../application/use-cases/login-company-admin.useCase';
 import { ResendEmailOtpUseCase } from '../../application/use-cases/resend-email-otp.usecase';
@@ -22,7 +22,13 @@ import {
 import { RefreshAccessTokenUseCase } from '../../application/use-cases/refresh-access-token.usecase';
 import { MongoRefreshTokenRepository } from '../database/repositories/mongo-refresh-token.repository';
 import { MongoCompanyRepository } from '../database/repositories/mongo-company.repository';
-import { CompanyDocument, CompanySchema } from '../database/mongoose/schemas/company.schema';
+import {
+  CompanyDocument,
+  CompanySchema,
+} from '../database/mongoose/schemas/company.schema';
+import { ForgotPasswordUseCase } from '../../application/use-cases/forgot-password.usecase';
+import { VerifyResetPasswordOtpUseCase } from '../../application/use-cases/verify-reset-password-otp.usecase';
+import { ResetPasswordUseCase } from '../../application/use-cases/reset-password.usecase';
 
 @Module({
   imports: [
@@ -44,6 +50,9 @@ import { CompanyDocument, CompanySchema } from '../database/mongoose/schemas/com
     RefreshAccessTokenUseCase,
     EmailService,
     JwtService,
+    ForgotPasswordUseCase,
+    VerifyResetPasswordOtpUseCase,
+    ResetPasswordUseCase,
     {
       provide: 'UserRepository',
       useClass: MongoUserRepository,

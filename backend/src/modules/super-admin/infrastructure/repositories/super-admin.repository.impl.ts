@@ -21,4 +21,5 @@ export class SuperAdminRepositoryImpl implements SuperAdminRepository {
       doc.isActive,
     );
   }
+  
 }
