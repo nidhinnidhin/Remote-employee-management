@@ -7,11 +7,20 @@ import StepIndicator from "./StepIndicator";
 import StepOne from "./StepOne";
 import StepTwo from "./StepTwo";
 import Button from "./Button";
+import { registerAction } from "@/app/actions/auth.actions";
+import {
+  validateStepOne,
+  validateStepTwo,
+} from "@/lib/validations/client/auth/register.validation";
+import OtpModal from "./OtpModal";
+import { verifyOtpAction } from "@/app/actions/otp.action";
 
 const RegistrationStepper = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState("");
   const [formData, setFormData] = useState({
     companyName: "",
     companyEmail: "",
@@ -25,59 +34,25 @@ const RegistrationStepper = () => {
     password: "",
   });
 
-  const validateStepOne = () => {
-    const newErrors = {};
-    if (!formData.companyName.trim())
-      newErrors.companyName = "Company name is required";
-    if (!formData.companyEmail.trim()) {
-      newErrors.companyEmail = "Company email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.companyEmail)) {
-      newErrors.companyEmail = "Invalid email format";
-    }
-    if (!formData.employeeSize)
-      newErrors.employeeSize = "Employee size is required";
-    if (!formData.industry) newErrors.industry = "Industry is required";
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const validateStepTwo = () => {
-    const newErrors = {};
-    if (!formData.firstName.trim())
-      newErrors.firstName = "First name is required";
-    if (!formData.lastName.trim()) newErrors.lastName = "Last name is required";
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Invalid email format";
-    }
-    if (!formData.phone.trim()) newErrors.phone = "Phone is required";
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    } else if (formData.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   const handleContinue = async () => {
     if (currentStep === 1) {
-      if (validateStepOne()) {
-        setIsLoading(true);
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        setIsLoading(false);
+      const stepErrors = validateStepOne(formData);
+      if (Object.keys(stepErrors).length === 0) {
         setCurrentStep(2);
+        setErrors({});
+      } else {
+        setErrors(stepErrors);
       }
-    } else if (currentStep === 2) {
-      if (validateStepTwo()) {
-        setIsLoading(true);
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-        setIsLoading(false);
-        alert("Registration successful!");
-        console.log("Form submitted:", formData);
+    } else {
+      const stepErrors = validateStepTwo(formData);
+      if (Object.keys(stepErrors).length === 0) {
+        const result = await registerAction(formData);
+        if (result?.success) {
+          setRegisteredEmail(formData.email);
+          setShowOtpModal(true);
+        }
+      } else {
+        setErrors(stepErrors);
       }
     }
   };
@@ -197,6 +172,24 @@ const RegistrationStepper = () => {
           </Button>
         </div>
       </div>
+      <OtpModal
+        isOpen={showOtpModal}
+        onClose={() => setShowOtpModal(false)}
+        onVerify={async (otp) => {
+          const result = await verifyOtpAction({
+            email: registeredEmail,
+            otp,
+          });
+
+          if (result?.success) {
+            // OTP verified successfully
+            // window.location.href = "/dashboard";
+            alert("Successfully verified")
+          } else {
+            alert(result.error);
+          }
+        }}
+      />
     </div>
   );
 };

@@ -13,8 +13,12 @@
 
 // export default config
 
-module.exports = {
-  content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}"],
+const config = {
+  content: [
+    "./src/app/**/*.{js,ts,jsx,tsx}",
+    "./src/components/**/*.{js,ts,jsx,tsx}",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
   theme: {
     extend: {
       keyframes: {
@@ -30,4 +34,6 @@ module.exports = {
   },
   plugins: [],
 };
+
+export default config;
 
