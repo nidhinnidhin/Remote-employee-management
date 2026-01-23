@@ -1,15 +1,14 @@
-export interface CompanyRegistrationFormData {
-  companyName: string
-  companyEmail: string
-  companySize: string
-  industry: string
-  website: string
-  firstName: string
-  lastName: string
-  email: string
-  phoneNumber: string
-  password: string
-  confirmPassword: string
+export interface FormData {
+  companyName: string;
+  companyEmail: string;
+  employeeSize: string;
+  industry: string;
+  websiteUrl: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  password: string;
 }
 
-export type FormErrors = Record<string, string>
+export type Errors = Partial<Record<keyof FormData, string>>;

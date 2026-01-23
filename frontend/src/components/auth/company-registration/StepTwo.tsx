@@ -1,28 +1,76 @@
-'use client';
-import { motion } from 'framer-motion';
-import FormInput from './FormInput';
+"use client";
 
-const StepTwo = ({ formData, setFormData, errors, setErrors }) => {
-  const handleChange = (e) => {
+import { motion } from "framer-motion";
+import FormInput from "./FormInput";
+import React from "react";
+
+import {
+  FormData,
+  Errors,
+} from "@/types/auth/company-registeration/company-registration.types";
+
+interface StepTwoProps {
+  formData: FormData;
+  setFormData: React.Dispatch<React.SetStateAction<FormData>>;
+  errors: Errors;
+  setErrors: React.Dispatch<React.SetStateAction<Errors>>;
+}
+
+interface PasswordStrength {
+  strength: number;
+  label: string;
+  color: string;
+}
+
+const StepTwo: React.FC<StepTwoProps> = ({
+  formData,
+  setFormData,
+  errors,
+  setErrors,
+}) => {
+  const handleChange = (
+    e:
+      | React.ChangeEvent<HTMLInputElement>
+      | { target: { name: string; value: string } }
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    if (errors[name as keyof FormData]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: "",
+      }));
     }
   };
 
-  const getPasswordStrength = (password) => {
-    if (!password) return { strength: 0, label: '', color: '' };
+  const getPasswordStrength = (password: string): PasswordStrength => {
+    if (!password) return { strength: 0, label: "", color: "" };
+
     let strength = 0;
     if (password.length >= 8) strength++;
     if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
     if (/\d/.test(password)) strength++;
     if (/[^a-zA-Z\d]/.test(password)) strength++;
 
-    const labels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
-    const colors = ['', 'bg-red-500', 'bg-yellow-500', 'bg-blue-500', 'bg-green-500'];
-    
-    return { strength: (strength / 4) * 100, label: labels[strength], color: colors[strength] };
+    const labels = ["", "Weak", "Fair", "Good", "Strong"];
+    const colors = [
+      "",
+      "bg-red-500",
+      "bg-yellow-500",
+      "bg-blue-500",
+      "bg-green-500",
+    ];
+
+    return {
+      strength: (strength / 4) * 100,
+      label: labels[strength],
+      color: colors[strength],
+    };
   };
 
   const passwordStrength = getPasswordStrength(formData.password);
@@ -35,8 +83,12 @@ const StepTwo = ({ formData, setFormData, errors, setErrors }) => {
       transition={{ duration: 0.3 }}
       className="bg-neutral-800 p-8"
     >
-      <h2 className="text-2xl font-bold text-white mb-2">Admin Account Setup</h2>
-      <p className="text-neutral-400 mb-8">Create your administrator account</p>
+      <h2 className="text-2xl font-bold text-white mb-2">
+        Admin Account Setup
+      </h2>
+      <p className="text-neutral-400 mb-8">
+        Create your administrator account
+      </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FormInput
@@ -93,6 +145,7 @@ const StepTwo = ({ formData, setFormData, errors, setErrors }) => {
           required
           placeholder="••••••••"
         />
+
         {formData.password && (
           <div className="mt-2">
             <div className="flex items-center justify-between mb-1">
@@ -105,7 +158,13 @@ const StepTwo = ({ formData, setFormData, errors, setErrors }) => {
                 />
               </div>
             </div>
-            <p className={`text-xs ${passwordStrength.color.replace('bg-', 'text-')}`}>
+            <p
+              className={`text-xs ${
+                passwordStrength.color
+                  ? passwordStrength.color.replace("bg-", "text-")
+                  : ""
+              }`}
+            >
               {passwordStrength.label}
             </p>
           </div>

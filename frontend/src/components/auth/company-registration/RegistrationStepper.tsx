@@ -1,27 +1,36 @@
 "use client";
+
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Building2, User } from "lucide-react";
+
 import ProgressBar from "./ProgressBar";
 import StepIndicator from "./StepIndicator";
 import StepOne from "./StepOne";
 import StepTwo from "./StepTwo";
 import Button from "./Button";
+import OtpModal from "./OtpModal";
+
 import { registerAction } from "@/app/actions/auth.actions";
+import { verifyOtpAction } from "@/app/actions/otp.action";
 import {
   validateStepOne,
   validateStepTwo,
 } from "@/lib/validations/client/auth/register.validation";
-import OtpModal from "./OtpModal";
-import { verifyOtpAction } from "@/app/actions/otp.action";
+
+import {
+  FormData,
+  Errors,
+} from "@/types/auth/company-registeration/company-registration.types";
 
 const RegistrationStepper = () => {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState({});
-  const [showOtpModal, setShowOtpModal] = useState(false);
-  const [registeredEmail, setRegisteredEmail] = useState("");
-  const [formData, setFormData] = useState({
+  const [currentStep, setCurrentStep] = useState<number>(1);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [errors, setErrors] = useState<Errors>({});
+  const [showOtpModal, setShowOtpModal] = useState<boolean>(false);
+  const [registeredEmail, setRegisteredEmail] = useState<string>("");
+
+  const [formData, setFormData] = useState<FormData>({
     companyName: "",
     companyEmail: "",
     employeeSize: "",
@@ -35,31 +44,41 @@ const RegistrationStepper = () => {
   });
 
   const handleContinue = async () => {
+    setIsLoading(true);
+
     if (currentStep === 1) {
       const stepErrors = validateStepOne(formData);
+
       if (Object.keys(stepErrors).length === 0) {
         setCurrentStep(2);
         setErrors({});
       } else {
         setErrors(stepErrors);
       }
-    } else {
-      const stepErrors = validateStepTwo(formData);
-      if (Object.keys(stepErrors).length === 0) {
-        const result = await registerAction(formData);
-        if (result?.success) {
-          setRegisteredEmail(formData.email);
-          setShowOtpModal(true);
-        }
-      } else {
-        setErrors(stepErrors);
-      }
+
+      setIsLoading(false);
+      return;
     }
+
+    const stepErrors = validateStepTwo(formData);
+
+    if (Object.keys(stepErrors).length === 0) {
+      const result = await registerAction(formData);
+
+      if (result?.success) {
+        setRegisteredEmail(formData.email);
+        setShowOtpModal(true);
+      }
+    } else {
+      setErrors(stepErrors);
+    }
+
+    setIsLoading(false);
   };
 
   const handleBack = () => {
     if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
+      setCurrentStep((prev) => prev - 1);
       setErrors({});
     }
   };
@@ -119,6 +138,7 @@ const RegistrationStepper = () => {
               setErrors={setErrors}
             />
           )}
+
           {currentStep === 2 && (
             <StepTwo
               key="step2"
@@ -139,6 +159,7 @@ const RegistrationStepper = () => {
           >
             Back
           </Button>
+
           <Button
             variant="primary"
             onClick={handleContinue}
@@ -172,21 +193,22 @@ const RegistrationStepper = () => {
           </Button>
         </div>
       </div>
+
+      {/* OTP Modal */}
       <OtpModal
         isOpen={showOtpModal}
         onClose={() => setShowOtpModal(false)}
-        onVerify={async (otp) => {
+        onVerify={async (otp: string) => {
           const result = await verifyOtpAction({
             email: registeredEmail,
             otp,
           });
 
           if (result?.success) {
-            // OTP verified successfully
+            alert("Successfully verified");
             // window.location.href = "/dashboard";
-            alert("Successfully verified")
           } else {
-            alert(result.error);
+            alert(result?.error);
           }
         }}
       />

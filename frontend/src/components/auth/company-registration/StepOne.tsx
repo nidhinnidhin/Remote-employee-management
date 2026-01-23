@@ -1,17 +1,55 @@
-'use client';
-import { motion } from 'framer-motion';
-import FormInput from './FormInput';
-import FormDropdown from './FormDropdown';
+"use client";
 
-const StepOne = ({ formData, setFormData, errors, setErrors }) => {
-  const employeeSizeOptions = ['1–10', '11–50', '51–200', '201–500', '500+'];
-  const industryOptions = ['Technology', 'Healthcare', 'Finance', 'Education', 'Manufacturing', 'Other'];
+import { motion } from "framer-motion";
+import FormInput from "./FormInput";
+import FormDropdown from "./FormDropdown";
+import React from "react";
 
-  const handleChange = (e) => {
+import {
+  FormData,
+  Errors,
+} from "@/types/auth/company-registeration/company-registration.types";
+
+interface StepOneProps {
+  formData: FormData;
+  setFormData: React.Dispatch<React.SetStateAction<FormData>>;
+  errors: Errors;
+  setErrors: React.Dispatch<React.SetStateAction<Errors>>;
+}
+
+const StepOne: React.FC<StepOneProps> = ({
+  formData,
+  setFormData,
+  errors,
+  setErrors,
+}) => {
+  const employeeSizeOptions = ["1–10", "11–50", "51–200", "201–500", "500+"];
+  const industryOptions = [
+    "Technology",
+    "Healthcare",
+    "Finance",
+    "Education",
+    "Manufacturing",
+    "Other",
+  ];
+
+  const handleChange = (
+    e:
+      | React.ChangeEvent<HTMLInputElement>
+      | { target: { name: string; value: string } }
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    if (errors[name as keyof FormData]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: "",
+      }));
     }
   };
 
@@ -23,8 +61,12 @@ const StepOne = ({ formData, setFormData, errors, setErrors }) => {
       transition={{ duration: 0.3 }}
       className="bg-neutral-800 p-8"
     >
-      <h2 className="text-2xl font-bold text-white mb-2">Company Information</h2>
-      <p className="text-neutral-400 mb-8">Tell us about your organization</p>
+      <h2 className="text-2xl font-bold text-white mb-2">
+        Company Information
+      </h2>
+      <p className="text-neutral-400 mb-8">
+        Tell us about your organization
+      </p>
 
       <FormInput
         label="Company Name"
