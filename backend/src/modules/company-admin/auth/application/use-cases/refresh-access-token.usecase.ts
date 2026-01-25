@@ -1,48 +1,47 @@
-import {
-  Inject,
-  Injectable,
-  UnauthorizedException,
-  ForbiddenException,
-} from '@nestjs/common';
-import type { RefreshTokenRepository } from '../../domain/repositories/refresh-token.repository';
+import { Injectable, Inject, UnauthorizedException, ForbiddenException } from '@nestjs/common';
+import * as jwt from 'jsonwebtoken';
 import { JwtService } from '../../infrastructure/auth/jwt.service';
 import type { UserRepository } from '../../domain/repositories/user.repository';
+import { RefreshTokenPayload } from 'src/shared/types/jwt/jwt-payload.type';
+import { RefreshAccessTokenResponse } from 'src/shared/types/jwt/refresh-access-token-response.type';
+import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 
 @Injectable()
 export class RefreshAccessTokenUseCase {
   constructor(
-    @Inject('RefreshTokenRepository')
-    private readonly refreshTokenRepo: RefreshTokenRepository,
     @Inject('UserRepository')
     private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {}
 
-  async execute(refreshTokenValue: string): Promise<string> {
-    const token = await this.refreshTokenRepo.findByToken(refreshTokenValue);
+  async execute(refreshToken: string): Promise<RefreshAccessTokenResponse> {
+    let payload: RefreshTokenPayload;
 
-    if (!token || token.revoked) {
-      throw new UnauthorizedException('Invalid refresh token');
+    try {
+      payload = jwt.verify(
+        refreshToken,
+        process.env.JWT_REFRESH_SECRET!,
+      ) as RefreshTokenPayload;
+    } catch {
+      throw new UnauthorizedException(AUTH_MESSAGES.INVALID_REFRESH_TOKEN);
     }
 
-    if (new Date() > new Date(token.expiresAt)) {
-      throw new UnauthorizedException('Refresh token expired');
-    }
-
-    const user = await this.userRepository.findById(token.userId);
+    const user = await this.userRepository.findById(payload.userId);
 
     if (!user) {
-      throw new UnauthorizedException('User not found');
+      throw new UnauthorizedException(AUTH_MESSAGES.USER_NOT_FOUND);
     }
 
     if (user.status !== 'ACTIVE') {
-      throw new ForbiddenException('Account is not active');
+      throw new ForbiddenException(AUTH_MESSAGES.ACCOUNT_NOT_ACTIVE);
     }
 
-    return this.jwtService.generateAccessToken({
+    const accessToken = this.jwtService.generateAccessToken({
       userId: user.id,
       role: user.role,
       companyId: user.companyId,
     });
+
+    return { accessToken };
   }
 }

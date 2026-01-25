@@ -6,7 +6,8 @@ import {
 } from '@nestjs/common';
 import type { UserRepository } from '../../domain/repositories/user.repository';
 import { SendEmailOtpUseCase } from './send-email-otp.usecase';
-import { UserStatus } from '@shared';
+import { UserStatus } from 'src/shared/enums/user/user-status.enum';
+import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 
 @Injectable()
 export class ForgotPasswordUseCase {
@@ -16,25 +17,20 @@ export class ForgotPasswordUseCase {
     private readonly sendEmailOtpUseCase: SendEmailOtpUseCase,
   ) {}
 
-  async execute(email: string) {
-    const user = await this.userRepository.findByEmail(
-      email.toLowerCase(),
-    );
+  async execute({ email }: { email: string }): Promise<void> {
+    const user = await this.userRepository.findByEmail(email.toLowerCase());
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException(AUTH_MESSAGES.USER_NOT_FOUND);
     }
 
     if (user.status !== UserStatus.ACTIVE) {
-      throw new ForbiddenException('User is not active');
+      throw new ForbiddenException(AUTH_MESSAGES.USER_NOT_ACTIVE);
     }
 
-    // ✅ Reuse existing OTP logic (same as registration)
-    await this.sendEmailOtpUseCase.execute(
-      user.id,
-      user.email,
-    );
-
-    return { message: 'OTP sent to registered email' };
+    await this.sendEmailOtpUseCase.execute({
+      userId: user.id,
+      email: user.email,
+    });
   }
 }

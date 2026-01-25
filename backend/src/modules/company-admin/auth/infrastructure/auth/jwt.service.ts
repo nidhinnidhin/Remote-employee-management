@@ -1,19 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
+import {
+  JwtPayload,
+  RefreshTokenPayload,
+} from 'src/shared/types/jwt/jwt-payload.type';
 
 @Injectable()
 export class JwtService {
-  generateAccessToken(payload: {
-    userId: string;
-    role?: string;
-    companyId?: string;
-  }) {
-    return jwt.sign(payload, process.env.JWT_SECRET!, {
+  generateAccessToken(payload: JwtPayload) {
+    return jwt.sign(payload, process.env.JWT_ACCESS_SECRET!, {
       expiresIn: '15m',
     });
   }
 
-  generateRefreshToken(payload: { userId: string }) {
+  generateRefreshToken(payload: RefreshTokenPayload) {
     return jwt.sign(payload, process.env.JWT_REFRESH_SECRET!, {
       expiresIn: '30d',
     });

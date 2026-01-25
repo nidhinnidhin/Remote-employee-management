@@ -1,3 +1,4 @@
+import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 import { UserEntity } from '../entities/user.entity';
 
 export interface UserRepository {
@@ -6,11 +7,8 @@ export interface UserRepository {
   create(user: UserEntity): Promise<UserEntity>;
   updateStatusByEmail(
     email: string,
-    status: 'ACTIVE' | 'SUSPENDED',
+    status: UserStatus
   ): Promise<void>;
 
-  updatePasswordByEmail(
-    email: string,
-    passwordHash: string,
-  ): Promise<void>;
+  updatePasswordByEmail(email: string, passwordHash: string): Promise<void>;
 }

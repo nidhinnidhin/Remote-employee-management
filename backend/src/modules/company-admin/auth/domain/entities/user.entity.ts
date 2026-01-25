@@ -1,4 +1,5 @@
-import { UserStatus } from '@shared';
+import { UserStatus } from "src/shared/enums/user/user-status.enum";
+
 
 export class UserEntity {
   constructor(

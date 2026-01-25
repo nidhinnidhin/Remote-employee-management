@@ -5,6 +5,7 @@ import { EmailService } from '../../infrastructure/notifications/email.service';
 import type { EmailOtpRepository } from '../../domain/repositories/email-otp.repository';
 import { EmailOtpEntity } from '../../domain/entities/email-otp.entity';
 import { OtpPurpose } from 'src/shared/enums/reset-password/otp-purpose.enum';
+import { SendEmailOtpInput } from 'src/shared/types/company-auth/otp/send-email-otp-input.type';
 
 @Injectable()
 export class SendEmailOtpUseCase {
@@ -14,20 +15,17 @@ export class SendEmailOtpUseCase {
     private readonly emailService: EmailService,
   ) {}
 
-  async execute(userId: string, email: string, purpose: OtpPurpose = OtpPurpose.EMAIL_VERIFICATION,): Promise<void> {
-    console.log('OTP FLOW STARTED');
-    console.log('Target email:', email);
+  async execute(input: SendEmailOtpInput): Promise<void> {
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    console.log('GENERATED OTP (DEV ONLY):', otp);
 
     const otpHash = await bcrypt.hash(otp, 10);
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
     const otpEntity = new EmailOtpEntity(
       randomUUID(),
-      userId,
-      email,
+      input.userId,
+      input.email,
       otpHash,
       expiresAt,
       false,
@@ -35,9 +33,6 @@ export class SendEmailOtpUseCase {
     );
 
     await this.emailOtpRepository.create(otpEntity);
-    console.log('OTP SAVED TO DB');
-
-    await this.emailService.sendOtp(email, otp);
-    console.log('EMAIL SEND FUNCTION CALLED');
+    await this.emailService.sendOtp(input.email, otp);
   }
 }

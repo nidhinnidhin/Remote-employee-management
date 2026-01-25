@@ -1,42 +1,35 @@
-import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { AuthController } from '../../interfaces/controllers/auth.controller';
-import { RegisterCompanyAdminUseCase } from '../../application/use-cases/register-company-admin.usecase';
-import { SendEmailOtpUseCase } from '../../application/use-cases/send-email-otp.usecase';
-import { MongoUserRepository } from '../database/repositories/mongo-user.repository';
-import { MongoEmailOtpRepository } from '../database/repositories/mongo-email-otp.repository';
-import { EmailService } from '../notifications/email.service';
-import { UserDocument } from '../database/mongoose/schemas/userSchema';
-import { UserSchema } from '../database/mongoose/schemas/userSchema';
-import { EmailOtpSchema } from '../database/mongoose/schemas/email-otp.schema';
-import { VerifyEmailOtpUseCase } from '../../application/use-cases/verify-email-otp.usecase';
-import { JwtService } from './jwt.service';
-import { JwtAuthGuard } from '../../../../../shared/guards/jwt-auth.guard';
-import { TestController } from 'src/modules/company-admin/auth/interfaces/controllers/test.controller';
-import { LoginCompanyAdminUseCase } from '../../application/use-cases/login-company-admin.useCase';
-import { ResendEmailOtpUseCase } from '../../application/use-cases/resend-email-otp.usecase';
-import {
-  RefreshTokenDocument,
-  RefreshTokenSchema,
-} from '../database/mongoose/schemas/refresh-token.schema';
-import { RefreshAccessTokenUseCase } from '../../application/use-cases/refresh-access-token.usecase';
-import { MongoRefreshTokenRepository } from '../database/repositories/mongo-refresh-token.repository';
-import { MongoCompanyRepository } from '../database/repositories/mongo-company.repository';
-import {
-  CompanyDocument,
-  CompanySchema,
-} from '../database/mongoose/schemas/company.schema';
+import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import { ForgotPasswordUseCase } from '../../application/use-cases/forgot-password.usecase';
-import { VerifyResetPasswordOtpUseCase } from '../../application/use-cases/verify-reset-password-otp.usecase';
+import { LoginCompanyAdminUseCase } from '../../application/use-cases/login-company-admin.useCase';
+import { RefreshAccessTokenUseCase } from '../../application/use-cases/refresh-access-token.usecase';
+import { RegisterCompanyAdminUseCase } from '../../application/use-cases/register-company-admin.usecase';
+import { ResendEmailOtpUseCase } from '../../application/use-cases/resend-email-otp.usecase';
 import { ResetPasswordUseCase } from '../../application/use-cases/reset-password.usecase';
+import { SendEmailOtpUseCase } from '../../application/use-cases/send-email-otp.usecase';
+import { VerifyEmailOtpUseCase } from '../../application/use-cases/verify-email-otp.usecase';
+import { VerifyResetPasswordOtpUseCase } from '../../application/use-cases/verify-reset-password-otp.usecase';
+import { RedisPendingRegistrationRepository } from '../cache/auth/pending-registration-repository-infra';
+import { AppRedisModule } from '../cache/redis.module';
+import { MongoCompanyRepository } from '../database/repositories/mongo-company.repository';
+import { MongoEmailOtpRepository } from '../database/repositories/mongo-email-otp.repository';
+import { MongoUserRepository } from '../database/repositories/mongo-user.repository';
+import { EmailService } from '../notifications/email.service';
+import { JwtService } from './jwt.service';
+import { AuthController } from '../../interfaces/controllers/auth.controller';
+import { TestController } from '../../interfaces/controllers/test.controller';
+import { EmailOtpSchema } from '../database/mongoose/schemas/email-otp.schema';
+import { CompanyDocument, CompanySchema } from '../database/mongoose/schemas/company.schema';
+import { UserDocument, UserSchema } from '../database/mongoose/schemas/userSchema';
+import { MongooseModule } from '@nestjs/mongoose';
+import { Module } from '@nestjs/common';
 
 @Module({
   imports: [
+    AppRedisModule,
     MongooseModule.forFeature([
       { name: UserDocument.name, schema: UserSchema },
       { name: CompanyDocument.name, schema: CompanySchema },
       { name: 'EmailOtp', schema: EmailOtpSchema },
-      { name: RefreshTokenDocument.name, schema: RefreshTokenSchema },
     ]),
   ],
   controllers: [AuthController, TestController],
@@ -53,6 +46,11 @@ import { ResetPasswordUseCase } from '../../application/use-cases/reset-password
     ForgotPasswordUseCase,
     VerifyResetPasswordOtpUseCase,
     ResetPasswordUseCase,
+
+    {
+      provide: 'PendingRegistrationRepository',
+      useClass: RedisPendingRegistrationRepository,
+    },
     {
       provide: 'UserRepository',
       useClass: MongoUserRepository,
@@ -65,11 +63,7 @@ import { ResetPasswordUseCase } from '../../application/use-cases/reset-password
       provide: 'EmailOtpRepository',
       useClass: MongoEmailOtpRepository,
     },
-    {
-      provide: 'RefreshTokenRepository',
-      useClass: MongoRefreshTokenRepository,
-    },
   ],
-  exports: [JwtService, 'RefreshTokenRepository'],
+  exports: [JwtService],
 })
 export class AuthModule {}

@@ -1,37 +1,70 @@
 import { Injectable, Inject, UnauthorizedException } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
-import type { EmailOtpRepository } from '../../domain/repositories/email-otp.repository';
 import type { UserRepository } from '../../domain/repositories/user.repository';
+import { randomUUID } from 'crypto';
+import { UserEntity } from '../../domain/entities/user.entity';
+import { CompanyEntity } from '../../domain/entities/company.entity';
+import type { CompanyRepository } from '../../domain/repositories/company.repository';
+import type { PendingRegistrationRepository } from '../../domain/repositories/cache/auth-repository/pending-registration.repository';
+import { VerifyEmailOtpInput } from 'src/shared/types/company-auth/otp/verify-email-otp-input.type';
+import { VerifyEmailOtpResponse } from 'src/shared/types/company-auth/otp/verify-email-otp-response.type';
+import { UserStatus } from 'src/shared/enums/user/user-status.enum';
+import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
 
 @Injectable()
 export class VerifyEmailOtpUseCase {
   constructor(
-    @Inject('EmailOtpRepository')
-    private readonly emailOtpRepository: EmailOtpRepository,
+    @Inject('PendingRegistrationRepository')
+    private readonly pendingRepository: PendingRegistrationRepository,
+
+    @Inject('CompanyRepository')
+    private readonly companyRepository: CompanyRepository,
 
     @Inject('UserRepository')
     private readonly userRepository: UserRepository,
   ) {}
 
-  async execute(email: string, otp: string): Promise<string> {
-    const latestOtp = await this.emailOtpRepository.findLatestByEmail(email);
+  async execute(input: VerifyEmailOtpInput): Promise<VerifyEmailOtpResponse> {
+    const pending = await this.pendingRepository.find(input.email);
+    if (!pending) throw new UnauthorizedException(OTP_MESSAGES.OTP_EXPIRED);
 
-    if (!latestOtp) {
-      throw new UnauthorizedException('OTP not found');
-    }
+    if (pending.otp !== input.otp)
+      throw new UnauthorizedException(OTP_MESSAGES.OTP_INVALID);
 
-    if (latestOtp.expiresAt < new Date()) {
-      throw new UnauthorizedException('OTP expired');
-    }
+    const dto = pending;
 
-    const isValid = await bcrypt.compare(otp, latestOtp.otpHash);
-    if (!isValid) {
-      throw new UnauthorizedException('Invalid OTP');
-    }
+    const company = new CompanyEntity(
+      randomUUID(),
+      dto.company.name,
+      dto.company.email,
+      dto.company.size,
+      dto.company.industry,
+      dto.company.website,
+      new Date(),
+      new Date(),
+    );
 
-    await this.emailOtpRepository.markAsVerified(latestOtp.id);
-    await this.userRepository.updateStatusByEmail(email, 'ACTIVE');
+    const createdCompany = await this.companyRepository.create(company);
 
-    return latestOtp.userId;
+    const user = new UserEntity(
+      randomUUID(),
+      createdCompany.id,
+      dto.admin.firstName,
+      dto.admin.lastName,
+      dto.admin.email.toLowerCase(),
+      dto.admin.phone,
+      'COMPANY_ADMIN',
+      dto.admin.password,
+      UserStatus.ACTIVE,
+      new Date(),
+      new Date(),
+    );
+
+    await this.userRepository.create(user);
+
+    await this.pendingRepository.delete(input.email);
+
+    return {
+      userId: user.id,
+    };
   }
 }

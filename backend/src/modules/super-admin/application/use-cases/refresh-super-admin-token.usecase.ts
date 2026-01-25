@@ -1,40 +1,38 @@
 import {
-    Inject,
-    Injectable,
-    UnauthorizedException,
+  Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
-import type { RefreshTokenRepository } from '../../../company-admin/auth/domain/repositories/refresh-token.repository';
+import * as jwt from 'jsonwebtoken';
 import { JwtService } from 'src/modules/company-admin/auth/infrastructure/auth/jwt.service';
+import { RefreshTokenPayload } from 'src/shared/types/jwt/jwt-payload.type';
+import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 
 @Injectable()
 export class RefreshSuperAdminTokenUseCase {
-    constructor(
-        @Inject('RefreshTokenRepository')
-        private readonly refreshTokenRepo: RefreshTokenRepository,
-        private readonly jwtService: JwtService,
-    ) { }
+  constructor(
+    private readonly jwtService: JwtService,
+  ) {}
 
-    async execute(refreshTokenValue: string): Promise<string> {
-        const token = await this.refreshTokenRepo.findByToken(refreshTokenValue);
+  async execute(refreshToken: string): Promise<string> {
+    let payload: RefreshTokenPayload;
 
-        if (!token || token.revoked) {
-            throw new UnauthorizedException('Invalid refresh token');
-        }
-
-        if (new Date() > new Date(token.expiresAt)) {
-            throw new UnauthorizedException('Refresh token expired');
-        }
-
-        if (token.userId !== 'super-admin-id') {
-            throw new UnauthorizedException('Invalid token owner');
-        }
-
-        // Since Super Admin is environment-based, we don't check a user repository.
-        // We assume the environment variables are still set and valid (checked at login).
-
-        return this.jwtService.generateAccessToken({
-            userId: 'super-admin-id',
-            role: 'SUPER_ADMIN',
-        });
+    try {
+      payload = jwt.verify(
+        refreshToken,
+        process.env.JWT_REFRESH_SECRET!,
+      ) as RefreshTokenPayload;
+    } catch {
+      throw new UnauthorizedException(AUTH_MESSAGES.INVALID_REFRESH_TOKEN);
     }
+
+    // Validate that this refresh token really belongs to Super Admin
+    if (payload.userId !== 'super-admin-id') {
+      throw new UnauthorizedException(AUTH_MESSAGES.INVALID_REFRESH_TOKEN);
+    }
+
+    return this.jwtService.generateAccessToken({
+      userId: 'super-admin-id',
+      role: 'SUPER_ADMIN',
+    });
+  }
 }

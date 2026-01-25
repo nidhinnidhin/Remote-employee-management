@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import type { UserRepository } from '../../domain/repositories/user.repository';
 import { SendEmailOtpUseCase } from './send-email-otp.usecase';
+import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 
 @Injectable()
 export class ResendEmailOtpUseCase {
@@ -19,14 +20,17 @@ export class ResendEmailOtpUseCase {
     const user = await this.userRepository.findByEmail(email.toLowerCase());
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException(AUTH_MESSAGES.USER_NOT_FOUND);
     }
 
     if (user.status === 'ACTIVE') {
-      throw new BadRequestException('User already verified');
+      throw new BadRequestException(AUTH_MESSAGES.USER_ALEADY_VERIFIED);
     }
 
-    // 🔁 Reuse existing OTP sending logic
-    await this.sendEmailOtpUseCase.execute(user.id, user.email);
+    // Reuse existing OTP sending logic
+    await this.sendEmailOtpUseCase.execute({
+      userId: user.id,
+      email: user.email,
+    });
   }
 }

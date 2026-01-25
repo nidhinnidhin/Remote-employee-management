@@ -23,6 +23,12 @@ import { VerifyResetPasswordOtpUseCase } from '../../application/use-cases/verif
 import { ResetPasswordDto } from '../../presentation/dto/reset-password.dto';
 import { VerifyResetPasswordOtpDto } from '../../presentation/dto/verify-reset-password-otp.dto';
 import { ForgotPasswordDto } from '../../presentation/dto/forgot-password.dto';
+import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
+import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
+import {
+  REFRESH_TOKEN_COOKIE_NAME,
+  REFRESH_TOKEN_COOKIE_OPTIONS,
+} from 'src/shared/config/cookies.config';
 
 @Controller('auth')
 export class AuthController {
@@ -37,52 +43,40 @@ export class AuthController {
     private readonly resetPasswordUseCase: ResetPasswordUseCase,
   ) {}
 
-  // LOGIN with Access + Refresh Token
+  // LOGIN
   @Post('login')
   async login(
     @Body() dto: LoginCompanyAdminDto,
     @Res({ passthrough: true }) res: Response,
   ) {
     const { accessToken, refreshToken } =
-      await this.loginCompanyAdminUseCase.execute(dto.email, dto.password);
+      await this.loginCompanyAdminUseCase.execute({
+        email: dto.email,
+        password: dto.password,
+      });
 
-    // Store refresh token in HTTP-only cookie
-    res.cookie('refresh_token', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      path: '/api/auth/refresh',
-      maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
-    });
+    res.cookie(
+      REFRESH_TOKEN_COOKIE_NAME,
+      refreshToken,
+      REFRESH_TOKEN_COOKIE_OPTIONS,
+    );
 
-    return {
-      accessToken,
-    };
+    return { accessToken };
   }
 
   // Register
   @Post('register')
   async register(@Body() dto: RegisterCompanyAdminDto) {
-    const user = await this.registerCompanyAdminUseCase.execute(dto);
-
-    return {
-      message: 'Registration successful. Please verify OTP.',
-      userId: user.id,
-    };
+    return this.registerCompanyAdminUseCase.execute(dto);
   }
 
-  // Verify OTP
+  // Verify Email OTP
   @Post('verify-otp')
-  async verifyOtp(
-    @Body() dto: VerifyEmailOtpDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
-    const userId = await this.verifyEmailOtpUseCase.execute(dto.email, dto.otp);
-
-    return {
-      message: 'OTP verified successfully',
-      userId,
-    };
+  async verifyOtp(@Body() dto: VerifyEmailOtpDto) {
+    return this.verifyEmailOtpUseCase.execute({
+      email: dto.email,
+      otp: dto.otp,
+    });
   }
 
   // Resend OTP
@@ -90,38 +84,45 @@ export class AuthController {
   async resendOtp(@Body() dto: ResendOtpDto) {
     await this.resendEmailOtpUseCase.execute(dto.email);
 
-    return {
-      message: 'OTP resent successfully',
-    };
+    return { message: OTP_MESSAGES.OTP_RESENT };
   }
 
+  // Refresh Access Token
   @Post('refresh')
   async refresh(@Req() req: Request) {
-    console.log('Hitted', req.cookies);
     const refreshToken = req.cookies?.refresh_token;
-    console.log(refreshToken);
     if (!refreshToken) {
-      throw new UnauthorizedException('Refresh token missing');
+      throw new UnauthorizedException(AUTH_MESSAGES.MISSING_REFRESH_TOKEN);
     }
 
-    const accessToken =
+    const { accessToken } =
       await this.refreshAccessTokenUseCase.execute(refreshToken);
 
     return { accessToken };
   }
 
+  // Forgot Password
   @Post('forgot-password')
-  forgotPassword(@Body() dto: ForgotPasswordDto) {
-    return this.forgotPasswordUseCase.execute(dto.email);
+  async forgotPassword(@Body() dto: ForgotPasswordDto) {
+    await this.forgotPasswordUseCase.execute({ email: dto.email });
+    return { message: OTP_MESSAGES.OTP_SENT };
   }
 
+  // Verify Reset Password OTP
   @Post('verify-reset-password-otp')
   verifyResetOtp(@Body() dto: VerifyResetPasswordOtpDto) {
-    return this.verifyResetPasswordOtpUseCase.execute(dto.email, dto.otp);
+    return this.verifyResetPasswordOtpUseCase.execute({
+      email: dto.email,
+      otp: dto.otp,
+    });
   }
 
+  // Reset Password
   @Post('reset-password')
   resetPassword(@Body() dto: ResetPasswordDto) {
-    return this.resetPasswordUseCase.execute(dto.email, dto.newPassword);
+    return this.resetPasswordUseCase.execute({
+      email: dto.email,
+      newPassword: dto.newPassword,
+    });
   }
 }
