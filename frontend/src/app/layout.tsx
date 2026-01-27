@@ -1,21 +1,22 @@
-import type { Metadata } from 'next'
-import '../globals.css'
+import type { Metadata } from "next";
+import "../globals.css";
+import ClientLayout from "./client-layout";
 
 export const metadata: Metadata = {
-  title: 'Employee Management System',
-  description: 'SaaS Employee Management Application',
-}
+  title: "Employee Management Tool",
+  description: "SaaS Employee Management Application",
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en">
       <body className="bg-white text-gray-900">
-        {children}
+        <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
-  )
+  );
 }

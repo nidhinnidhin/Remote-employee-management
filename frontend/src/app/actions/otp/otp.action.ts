@@ -1,7 +1,7 @@
 "use server";
 
 import { api } from "@/lib/axiosInstance";
-import { cookies } from "next/headers";
+import { getSession } from "@/lib/iron-session/getSession";
 
 export async function verifyOtpAction(payload: {
   email: string;
@@ -9,23 +9,31 @@ export async function verifyOtpAction(payload: {
 }) {
   try {
     console.log("verifyOtpAction: Calling backend /auth/verify-otp with:", payload);
+
     const response = await api.post("/auth/verify-otp", payload);
+
     console.log("verifyOtpAction: Backend raw response data:", response.data);
 
     const { accessToken } = response.data;
-    console.log("verifyOtpAction: Extracted accessToken:", accessToken ? "FOUND" : "MISSING");
 
-    if (accessToken) {
-      (await cookies()).set("access_token", accessToken, {
-        httpOnly: false,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-      });
-      console.log("verifyOtpAction: Cookie 'access_token' set successfully");
+    if (!accessToken) {
+      return {
+        error: "No access token returned from backend",
+      };
     }
 
-    return { success: true, data: response.data };
+    // Save access token into Iron Session (Server-side)
+    const session = await getSession();
+    session.accessToken = accessToken;
+    await session.save();
+    
+    console.log("SESSION CONTENT:", session);
+    console.log("verifyOtpAction: Access token saved into iron-session");
+
+    return {
+      success: true,
+      data: response.data,
+    };
 
   } catch (e: any) {
     return {

@@ -3,16 +3,15 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Building2, User } from "lucide-react";
-
 import ProgressBar from "./ProgressBar";
 import StepIndicator from "./StepIndicator";
 import StepOne from "./StepOne";
 import StepTwo from "./StepTwo";
 import Button from "./Button";
 import OtpModal from "./OtpModal";
-
-import { registerAction } from "@/app/actions/auth.actions";
-import { verifyOtpAction } from "@/app/actions/otp.action";
+import { useAuthStore } from "@/store/auth.store";
+import { registerAction } from "@/app/actions/auth/auth.actions";
+import { verifyOtpAction } from "@/app/actions/otp/otp.action";
 import {
   validateStepOne,
   validateStepTwo,
@@ -29,6 +28,7 @@ const RegistrationStepper = () => {
   const [errors, setErrors] = useState<Errors>({});
   const [showOtpModal, setShowOtpModal] = useState<boolean>(false);
   const [registeredEmail, setRegisteredEmail] = useState<string>("");
+  const setAuth = useAuthStore((s) => s.setAuth);
 
   const [formData, setFormData] = useState<FormData>({
     companyName: "",
@@ -92,6 +92,20 @@ const RegistrationStepper = () => {
     if (currentStep > 1) {
       setCurrentStep((prev) => prev - 1);
       setErrors({});
+    }
+  };
+
+  const handleOtpVerify = async (otp: string) => {
+    const result = await verifyOtpAction({
+      email: registeredEmail,
+      otp,
+    });
+
+    if (result?.success && result.data?.accessToken) {
+      setAuth(result.data.accessToken);
+      window.location.href = "/dashboard";
+    } else {
+      alert(result?.error || "Verification failed");
     }
   };
 
@@ -212,23 +226,7 @@ const RegistrationStepper = () => {
       <OtpModal
         isOpen={showOtpModal}
         onClose={() => setShowOtpModal(false)}
-        onVerify={async (otp: string) => {
-          console.log("onVerify triggered in Stepper for OTP:", otp);
-          const result = await verifyOtpAction({
-            email: registeredEmail,
-            otp,
-          });
-          console.log("verifyOtpAction result in Stepper:", result);
-
-          if (result?.success && result.data?.accessToken) {
-            alert("Successfully verified! Redirecting...");
-            window.location.href = "/dashboard";
-          } else if (result?.success) {
-            alert("OTP Verified but No Access Token Received. Check backend.");
-          } else {
-            alert(result?.error || "Verification failed");
-          }
-        }}
+        onVerify={handleOtpVerify}
       />
     </>
   );
