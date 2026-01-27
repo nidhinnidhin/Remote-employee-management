@@ -41,7 +41,7 @@ export class AuthController {
     private readonly forgotPasswordUseCase: ForgotPasswordUseCase,
     private readonly verifyResetPasswordOtpUseCase: VerifyResetPasswordOtpUseCase,
     private readonly resetPasswordUseCase: ResetPasswordUseCase,
-  ) {}
+  ) { }
 
   // LOGIN
   @Post('login')
@@ -49,7 +49,7 @@ export class AuthController {
     @Body() dto: LoginCompanyAdminDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    console.log('Login Hitted');
+    console.log('Login Hitted', dto.email);
     const { accessToken, refreshToken } =
       await this.loginCompanyAdminUseCase.execute({
         email: dto.email,
@@ -62,7 +62,8 @@ export class AuthController {
       REFRESH_TOKEN_COOKIE_OPTIONS,
     );
 
-    return { accessToken };
+    console.log('Login successful for user, returning tokens');
+    return { accessToken, refreshToken };
   }
 
   // Register
@@ -77,6 +78,7 @@ export class AuthController {
     @Body() dto: VerifyEmailOtpDto,
     @Res({ passthrough: true }) res: Response,
   ) {
+    console.log('!!! ABSOLUTE FINGERPRINT: VERIFY_OTP_CONTROLLER_CALLED_98765 !!!');
     console.log('VERIFY OTP CONTROLLER HIT', dto);
 
     const { accessToken, refreshToken } =
@@ -91,7 +93,8 @@ export class AuthController {
       REFRESH_TOKEN_COOKIE_OPTIONS,
     );
 
-    return { accessToken };
+    console.log('OTP Verification successful, returning tokens');
+    return { accessToken, refreshToken };
   }
 
   // Resend OTP

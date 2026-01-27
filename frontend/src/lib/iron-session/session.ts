@@ -2,6 +2,7 @@ import type { SessionOptions } from "iron-session";
 
 export interface SessionData {
   accessToken?: string;
+  refreshToken?: string;
 }
 
 export const sessionOptions: SessionOptions = {

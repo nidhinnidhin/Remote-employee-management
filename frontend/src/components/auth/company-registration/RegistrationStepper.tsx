@@ -96,16 +96,18 @@ const RegistrationStepper = () => {
   };
 
   const handleOtpVerify = async (otp: string) => {
+    console.log("handleOtpVerify: Calling verifyOtpAction with OTP:", otp);
     const result = await verifyOtpAction({
       email: registeredEmail,
       otp,
     });
+    console.log("handleOtpVerify: Action result:", result);
 
     if (result?.success && result.data?.accessToken) {
       setAuth(result.data.accessToken);
       window.location.href = "/dashboard";
     } else {
-      alert(result?.error || "Verification failed");
+      alert(result?.error || "Verification failed. Check console.");
     }
   };
 
