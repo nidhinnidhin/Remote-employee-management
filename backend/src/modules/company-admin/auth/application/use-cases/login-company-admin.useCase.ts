@@ -17,9 +17,10 @@ export class LoginCompanyAdminUseCase {
     @Inject('UserRepository')
     private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async execute(input: LoginCompanyAdminInput): Promise<LoginResponse> {
+    console.log("Login hited")
     const user = await this.userRepository.findByEmail(
       input.email.toLowerCase(),
     );
@@ -54,6 +55,7 @@ export class LoginCompanyAdminUseCase {
     return {
       accessToken,
       refreshToken,
+      userId: user.id,
     };
   }
 }

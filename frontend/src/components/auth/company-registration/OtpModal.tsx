@@ -51,10 +51,10 @@ const OtpModal = ({ isOpen, onClose, onVerify }: OtpModalProps) => {
         {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
 
         <div className="flex justify-between mt-6">
-          <Button variant="secondary" onClick={onClose} disabled={false}>
+          <Button variant="secondary" type="button" onClick={onClose} disabled={false}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={handleVerify} disabled={false}>
+          <Button variant="primary" type="button" onClick={handleVerify} disabled={false}>
             Verify
           </Button>
         </div>

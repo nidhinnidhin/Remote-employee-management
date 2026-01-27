@@ -49,6 +49,7 @@ export class AuthController {
     @Body() dto: LoginCompanyAdminDto,
     @Res({ passthrough: true }) res: Response,
   ) {
+    console.log('Login Hitted');
     const { accessToken, refreshToken } =
       await this.loginCompanyAdminUseCase.execute({
         email: dto.email,
@@ -72,11 +73,25 @@ export class AuthController {
 
   // Verify Email OTP
   @Post('verify-otp')
-  async verifyOtp(@Body() dto: VerifyEmailOtpDto) {
-    return this.verifyEmailOtpUseCase.execute({
-      email: dto.email,
-      otp: dto.otp,
-    });
+  async verifyOtp(
+    @Body() dto: VerifyEmailOtpDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    console.log('VERIFY OTP CONTROLLER HIT', dto);
+
+    const { accessToken, refreshToken } =
+      await this.verifyEmailOtpUseCase.execute({
+        email: dto.email,
+        otp: dto.otp,
+      });
+
+    res.cookie(
+      REFRESH_TOKEN_COOKIE_NAME,
+      refreshToken,
+      REFRESH_TOKEN_COOKIE_OPTIONS,
+    );
+
+    return { accessToken };
   }
 
   // Resend OTP
@@ -90,7 +105,7 @@ export class AuthController {
   // Refresh Access Token
   @Post('refresh')
   async refresh(@Req() req: Request) {
-    const refreshToken = req.cookies?.refresh_token;
+    const refreshToken = req.cookies?.[REFRESH_TOKEN_COOKIE_NAME];
     if (!refreshToken) {
       throw new UnauthorizedException(AUTH_MESSAGES.MISSING_REFRESH_TOKEN);
     }

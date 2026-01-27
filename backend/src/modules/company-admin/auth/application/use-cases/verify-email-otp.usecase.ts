@@ -6,9 +6,11 @@ import { CompanyEntity } from '../../domain/entities/company.entity';
 import type { CompanyRepository } from '../../domain/repositories/company.repository';
 import type { PendingRegistrationRepository } from '../../domain/repositories/cache/auth-repository/pending-registration.repository';
 import { VerifyEmailOtpInput } from 'src/shared/types/company-auth/otp/verify-email-otp-input.type';
-import { VerifyEmailOtpResponse } from 'src/shared/types/company-auth/otp/verify-email-otp-response.type';
+// import { VerifyEmailOtpResponse } from 'src/shared/types/company-auth/otp/verify-email-otp-response.type';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
+import { LoginResponse } from 'src/shared/types/company-auth/login/login-response.type';
+import { JwtService } from '../../infrastructure/auth/jwt.service';
 
 @Injectable()
 export class VerifyEmailOtpUseCase {
@@ -21,9 +23,12 @@ export class VerifyEmailOtpUseCase {
 
     @Inject('UserRepository')
     private readonly userRepository: UserRepository,
-  ) {}
 
-  async execute(input: VerifyEmailOtpInput): Promise<VerifyEmailOtpResponse> {
+    private readonly jwtService: JwtService,
+  ) { }
+
+  async execute(input: VerifyEmailOtpInput): Promise<LoginResponse> {
+    console.log("VERIFY OTP USE CASE HIT - TOKEN MODE");
     const pending = await this.pendingRepository.find(input.email);
     if (!pending) throw new UnauthorizedException(OTP_MESSAGES.OTP_EXPIRED);
 
@@ -60,10 +65,26 @@ export class VerifyEmailOtpUseCase {
     );
 
     await this.userRepository.create(user);
-
     await this.pendingRepository.delete(input.email);
 
+    const accessToken = this.jwtService.generateAccessToken({
+      userId: user.id,
+      role: user.role,
+      companyId: user.companyId,
+    });
+
+    const refreshToken = this.jwtService.generateRefreshToken({
+      userId: user.id,
+    });
+
+    console.log("GENERATED TOKENS:", {
+      accessToken: accessToken ? "YES (length: " + accessToken.length + ")" : "NO",
+      refreshToken: refreshToken ? "YES" : "NO"
+    });
+
     return {
+      accessToken,
+      refreshToken,
       userId: user.id,
     };
   }
