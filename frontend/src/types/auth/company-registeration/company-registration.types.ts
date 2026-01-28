@@ -1,4 +1,4 @@
-export interface FormData {
+export type FormData = {
   companyName: string;
   companyEmail: string;
   employeeSize: string;
@@ -9,6 +9,8 @@ export interface FormData {
   email: string;
   phone: string;
   password: string;
-}
+};
 
-export type Errors = Partial<Record<keyof FormData, string>>;
+export type Errors = {
+  [key: string]: string;
+};

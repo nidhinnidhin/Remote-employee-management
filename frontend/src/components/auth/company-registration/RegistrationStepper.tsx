@@ -10,13 +10,12 @@ import StepTwo from "./StepTwo";
 import Button from "./Button";
 import OtpModal from "./OtpModal";
 import { useAuthStore } from "@/store/auth.store";
-import { registerAction } from "@/app/actions/auth/auth.actions";
+import { registerAction } from "@/app/actions/auth/company/register.actions";
 import { verifyOtpAction } from "@/app/actions/otp/otp.action";
 import {
   validateStepOne,
   validateStepTwo,
 } from "@/lib/validations/client/auth/register.validation";
-
 import {
   FormData,
   Errors,

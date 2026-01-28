@@ -1,6 +1,6 @@
 "use client";
 
-import Button from "../../ui/LoginButton";
+import Button from "./LoginButton";
 
 const SocialLoginButtons = () => {
   return (

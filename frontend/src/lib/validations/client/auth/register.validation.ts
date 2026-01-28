@@ -1,8 +1,18 @@
-export const validateStepOne = (formData: any) => {
-  const errors: any = {};
+import {
+  StepOneErrors,
+  StepOneFormData,
+} from "@/types/auth/company-registeration/step-one-formdata.type";
+import {
+  StepTwoErrors,
+  StepTwoFormData,
+} from "@/types/auth/company-registeration/step-two-formdata.type";
 
-  if (!formData.companyName.trim())
+export const validateStepOne = (formData: StepOneFormData): StepOneErrors => {
+  const errors: StepOneErrors = {};
+
+  if (!formData.companyName.trim()) {
     errors.companyName = "Company name is required";
+  }
 
   if (!formData.companyEmail.trim()) {
     errors.companyEmail = "Company email is required";
@@ -10,31 +20,34 @@ export const validateStepOne = (formData: any) => {
     errors.companyEmail = "Invalid email format";
   }
 
-  if (!formData.employeeSize)
+  if (!formData.employeeSize) {
     errors.employeeSize = "Employee size is required";
+  }
 
-  if (!formData.industry)
+  if (!formData.industry) {
     errors.industry = "Industry is required";
+  }
 
   if (formData.websiteUrl.trim() !== "") {
     const urlRegex = /^https?:\/\/.+\..+/;
     if (!urlRegex.test(formData.websiteUrl)) {
-      errors.websiteUrl =
-        "Website must start with http:// or https://";
+      errors.websiteUrl = "Website must start with http:// or https://";
     }
   }
 
   return errors;
 };
 
-export const validateStepTwo = (formData: any) => {
-  const errors: any = {};
+export const validateStepTwo = (formData: StepTwoFormData): StepTwoErrors => {
+  const errors: StepTwoErrors = {};
 
-  if (!formData.firstName.trim())
+  if (!formData.firstName.trim()) {
     errors.firstName = "First name is required";
+  }
 
-  if (!formData.lastName.trim())
+  if (!formData.lastName.trim()) {
     errors.lastName = "Last name is required";
+  }
 
   if (!formData.email.trim()) {
     errors.email = "Email is required";
@@ -42,8 +55,9 @@ export const validateStepTwo = (formData: any) => {
     errors.email = "Invalid email format";
   }
 
-  if (!formData.phone.trim())
+  if (!formData.phone.trim()) {
     errors.phone = "Phone is required";
+  }
 
   if (!formData.password) {
     errors.password = "Password is required";

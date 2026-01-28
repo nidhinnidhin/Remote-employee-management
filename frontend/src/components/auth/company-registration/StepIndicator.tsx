@@ -1,15 +1,9 @@
 "use client";
 
+import { StepIndicatorProps } from "@/types/auth/company-registeration/step-indicator-props.type";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import React from "react";
-
-interface StepIndicatorProps {
-  step: number;
-  currentStep: number;
-  label: string;
-  icon: React.ComponentType<{ className?: string; size?: number }>;
-}
 
 const StepIndicator: React.FC<StepIndicatorProps> = ({
   step,
@@ -27,8 +21,8 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({
           isCompleted
             ? "bg-red-600 border-red-600"
             : isActive
-            ? "bg-transparent border-red-600"
-            : "bg-transparent border-neutral-600"
+              ? "bg-transparent border-red-600"
+              : "bg-transparent border-neutral-600"
         }`}
         whileHover={{ scale: 1.05 }}
       >

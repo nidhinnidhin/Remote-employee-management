@@ -4,23 +4,12 @@ import { motion } from "framer-motion";
 import FormInput from "./FormInput";
 import React from "react";
 
+import { FormData } from "@/types/auth/company-registeration/company-registration.types";
 import {
-  FormData,
-  Errors,
-} from "@/types/auth/company-registeration/company-registration.types";
-
-interface StepTwoProps {
-  formData: FormData;
-  setFormData: React.Dispatch<React.SetStateAction<FormData>>;
-  errors: Errors;
-  setErrors: React.Dispatch<React.SetStateAction<Errors>>;
-}
-
-interface PasswordStrength {
-  strength: number;
-  label: string;
-  color: string;
-}
+  PasswordStrength,
+  StepTwoProps,
+} from "@/types/auth/company-registeration/step-two-props.type";
+import { getPasswordStrength } from "@/lib/validations/client/auth/password-strength.validation";
 
 const StepTwo: React.FC<StepTwoProps> = ({
   formData,
@@ -31,7 +20,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
   const handleChange = (
     e:
       | React.ChangeEvent<HTMLInputElement>
-      | { target: { name: string; value: string } }
+      | { target: { name: string; value: string } },
   ) => {
     const { name, value } = e.target;
 
@@ -48,31 +37,6 @@ const StepTwo: React.FC<StepTwoProps> = ({
     }
   };
 
-  const getPasswordStrength = (password: string): PasswordStrength => {
-    if (!password) return { strength: 0, label: "", color: "" };
-
-    let strength = 0;
-    if (password.length >= 8) strength++;
-    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
-    if (/\d/.test(password)) strength++;
-    if (/[^a-zA-Z\d]/.test(password)) strength++;
-
-    const labels = ["", "Weak", "Fair", "Good", "Strong"];
-    const colors = [
-      "",
-      "bg-red-500",
-      "bg-yellow-500",
-      "bg-blue-500",
-      "bg-green-500",
-    ];
-
-    return {
-      strength: (strength / 4) * 100,
-      label: labels[strength],
-      color: colors[strength],
-    };
-  };
-
   const passwordStrength = getPasswordStrength(formData.password);
 
   return (
@@ -86,9 +50,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
       <h2 className="text-2xl font-bold text-white mb-2">
         Admin Account Setup
       </h2>
-      <p className="text-neutral-400 mb-8">
-        Create your administrator account
-      </p>
+      <p className="text-neutral-400 mb-8">Create your administrator account</p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FormInput

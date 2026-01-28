@@ -2,18 +2,7 @@
 
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-
-interface FormInputProps {
-  label: string;
-  name: string;
-  type?: React.HTMLInputTypeAttribute;
-  value: string;
-  onChange: React.ChangeEventHandler<HTMLInputElement>;
-  error?: string;
-  required?: boolean;
-  placeholder?: string;
-}
-
+import { FormInputProps } from "@/types/auth/company-registeration/form-input-props.type";
 
 const FormInput: React.FC<FormInputProps> = ({
   label,
@@ -27,8 +16,7 @@ const FormInput: React.FC<FormInputProps> = ({
 }) => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
-  const inputType =
-    type === "password" && showPassword ? "text" : type;
+  const inputType = type === "password" && showPassword ? "text" : type;
 
   return (
     <div className="mb-6">

@@ -2,12 +2,8 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import Button from "./Button";
-
-interface OtpModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onVerify: (otp: string) => void;
-}
+import { OtpModalProps } from "@/types/otp/otp-modal-props";
+import { OTP_MESSAGES } from "@/shared/constants/otp.messages";
 
 const OtpModal = ({ isOpen, onClose, onVerify }: OtpModalProps) => {
   const [otp, setOtp] = useState("");
@@ -17,7 +13,7 @@ const OtpModal = ({ isOpen, onClose, onVerify }: OtpModalProps) => {
 
   const handleVerify = () => {
     if (otp.length !== 6) {
-      setError("OTP must be 6 digits");
+      setError(OTP_MESSAGES.OTP_DIGIT_ERROR);
       return;
     }
     setError("");
@@ -51,10 +47,20 @@ const OtpModal = ({ isOpen, onClose, onVerify }: OtpModalProps) => {
         {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
 
         <div className="flex justify-between mt-6">
-          <Button variant="secondary" type="button" onClick={onClose} disabled={false}>
+          <Button
+            variant="secondary"
+            type="button"
+            onClick={onClose}
+            disabled={false}
+          >
             Cancel
           </Button>
-          <Button variant="primary" type="button" onClick={handleVerify} disabled={false}>
+          <Button
+            variant="primary"
+            type="button"
+            onClick={handleVerify}
+            disabled={false}
+          >
             Verify
           </Button>
         </div>

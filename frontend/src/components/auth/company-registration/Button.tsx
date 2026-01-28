@@ -1,18 +1,11 @@
 "use client";
 
+import {
+  ButtonProps,
+  ButtonVariant,
+} from "@/types/auth/company-login/button.types";
 import { motion } from "framer-motion";
 import React from "react";
-
-type ButtonVariant = "primary" | "secondary";
-
-interface ButtonProps {
-  children: React.ReactNode;
-  variant?: ButtonVariant;
-  onClick?: React.MouseEventHandler<HTMLButtonElement>;
-  disabled?: boolean;
-  type?: "button" | "submit" | "reset";
-  className?: string;
-}
 
 const Button: React.FC<ButtonProps> = ({
   children,

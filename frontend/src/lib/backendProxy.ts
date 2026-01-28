@@ -8,9 +8,10 @@ export async function proxyToBackend(
   method: "GET" | "POST" | "PUT" | "DELETE" = "POST"
 ) {
   const body = method !== "GET" ? await req.json() : undefined;
+  const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   const backendRes = await axios({
-    url: `http://localhost:4000${path}`,
+    url: `${BACKEND_URL}${path}`,
     method,
     data: body,
     withCredentials: true,

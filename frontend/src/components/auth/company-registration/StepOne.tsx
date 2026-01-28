@@ -9,13 +9,7 @@ import {
   FormData,
   Errors,
 } from "@/types/auth/company-registeration/company-registration.types";
-
-interface StepOneProps {
-  formData: FormData;
-  setFormData: React.Dispatch<React.SetStateAction<FormData>>;
-  errors: Errors;
-  setErrors: React.Dispatch<React.SetStateAction<Errors>>;
-}
+import { StepOneProps } from "@/types/auth/company-registeration/step-one-props.type";
 
 const StepOne: React.FC<StepOneProps> = ({
   formData,
@@ -36,7 +30,7 @@ const StepOne: React.FC<StepOneProps> = ({
   const handleChange = (
     e:
       | React.ChangeEvent<HTMLInputElement>
-      | { target: { name: string; value: string } }
+      | { target: { name: string; value: string } },
   ) => {
     const { name, value } = e.target;
 
@@ -64,9 +58,7 @@ const StepOne: React.FC<StepOneProps> = ({
       <h2 className="text-2xl font-bold text-white mb-2">
         Company Information
       </h2>
-      <p className="text-neutral-400 mb-8">
-        Tell us about your organization
-      </p>
+      <p className="text-neutral-400 mb-8">Tell us about your organization</p>
 
       <FormInput
         label="Company Name"

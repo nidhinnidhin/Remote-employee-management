@@ -2,17 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-
-interface FormDropdownProps {
-  label: string;
-  name: string;
-  value: string;
-  onChange: (e: { target: { name: string; value: string } }) => void;
-  options: string[];
-  error?: string;
-  required?: boolean;
-  placeholder?: string;
-}
+import { FormDropdownProps } from "@/types/auth/company-registeration/form-dropdown.type";
 
 const FormDropdown: React.FC<FormDropdownProps> = ({
   label,

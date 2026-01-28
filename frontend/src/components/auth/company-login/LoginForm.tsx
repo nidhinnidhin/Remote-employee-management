@@ -6,12 +6,13 @@ import { Lock, Mail } from "lucide-react";
 import Link from "next/link";
 
 import FormInput from "../../ui/FormInput";
-import SocialLoginButtons from "./SocialLoginButtons";
+import SocialLoginButtons from "../../ui/SocialLoginButtons";
 import {
   LoginFormData,
   LoginErrors,
 } from "@/types/auth/company-login/company-login.types";
 import LoginButton from "../../ui/LoginButton";
+import { AUTH_MESSAGES } from "@/shared/constants/auth.messages";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState<LoginFormData>({
@@ -35,8 +36,8 @@ const LoginForm = () => {
 
     // Basic validation
     const newErrors: LoginErrors = {};
-    if (!formData.email) newErrors.email = "Email is required";
-    if (!formData.password) newErrors.password = "Password is required";
+    if (!formData.email) newErrors.email = AUTH_MESSAGES.EMAIL_MISSING;
+    if (!formData.password) newErrors.password = AUTH_MESSAGES.PASSWORD_REQUIRED;
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);

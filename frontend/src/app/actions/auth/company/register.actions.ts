@@ -1,7 +1,8 @@
 "use server";
 
-import { api } from "@/lib/axiosInstance";
 import { registerSchema } from "@/lib/validations/schemas/auth.schema";
+import { registerUser } from "@/services/company/auth/register.service";
+import { AUTH_MESSAGES } from "@/shared/constants/auth.messages";
 
 export async function registerAction(formData: any) {
   const payload = {
@@ -21,28 +22,17 @@ export async function registerAction(formData: any) {
     },
   };
 
-  // Optional Zod validation
   const parsed = registerSchema.safeParse(payload);
   if (!parsed.success) {
-    return {
-      error: parsed.error.flatten().fieldErrors,
-    };
+    return { error: parsed.error.flatten().fieldErrors };
   }
 
   try {
-    const response = await api.post("/auth/register", parsed.data);
-
-    // Backend should send OTP here
-    console.log("Register API success:", response.data);
-
-    return {
-      success: true,
-      data: response.data,
-    };
+    const data = await registerUser(parsed.data);
+    return { success: true, data };
   } catch (e: any) {
-    console.error("Register API failed:", e.response?.data || e.message);
     return {
-      error: e.response?.data?.message || "Registration failed",
+      error: e.response?.data?.message || AUTH_MESSAGES.REGISTRATION_FAILED,
     };
   }
 }

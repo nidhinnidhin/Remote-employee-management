@@ -49,8 +49,8 @@ export class AuthController {
     @Body() dto: LoginCompanyAdminDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    console.log('Login Hitted', dto.email);
-    const { accessToken, refreshToken } =
+    console.log('!!! FINGERPRINT: LOGIN_CALLED_v5 !!!');
+    const { accessToken, refreshToken, userId } =
       await this.loginCompanyAdminUseCase.execute({
         email: dto.email,
         password: dto.password,
@@ -62,8 +62,8 @@ export class AuthController {
       REFRESH_TOKEN_COOKIE_OPTIONS,
     );
 
-    console.log('Login successful for user, returning tokens');
-    return { accessToken, refreshToken };
+    console.log('Login successful for user:', userId);
+    return { accessToken, refreshToken, userId };
   }
 
   // Register
@@ -78,23 +78,24 @@ export class AuthController {
     @Body() dto: VerifyEmailOtpDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    console.log('!!! ABSOLUTE FINGERPRINT: VERIFY_OTP_CONTROLLER_CALLED_98765 !!!');
-    console.log('VERIFY OTP CONTROLLER HIT', dto);
-
-    const { accessToken, refreshToken } =
-      await this.verifyEmailOtpUseCase.execute({
-        email: dto.email,
-        otp: dto.otp,
-      });
+    console.log('!!! FINGERPRINT: VERIFY_OTP_CALLED_v5 !!!');
+    const result = await this.verifyEmailOtpUseCase.execute({
+      email: dto.email,
+      otp: dto.otp,
+    });
 
     res.cookie(
       REFRESH_TOKEN_COOKIE_NAME,
-      refreshToken,
+      result.refreshToken,
       REFRESH_TOKEN_COOKIE_OPTIONS,
     );
 
-    console.log('OTP Verification successful, returning tokens');
-    return { accessToken, refreshToken };
+    console.log('OTP Verification successful for user:', result.userId);
+    return {
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+      userId: result.userId
+    };
   }
 
   // Resend OTP
