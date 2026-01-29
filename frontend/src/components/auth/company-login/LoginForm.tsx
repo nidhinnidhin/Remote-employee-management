@@ -10,9 +10,12 @@ import SocialLoginButtons from "../../ui/SocialLoginButtons";
 import {
   LoginFormData,
   LoginErrors,
-} from "@/types/auth/company-login/company-login.types";
+} from "@/types/auth/company-login/login.type";
 import LoginButton from "../../ui/LoginButton";
 import { AUTH_MESSAGES } from "@/shared/constants/auth.messages";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/auth.store";
+import { loginAction } from "@/app/actions/auth/company/login.action";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState<LoginFormData>({
@@ -21,6 +24,9 @@ const LoginForm = () => {
   });
   const [errors, setErrors] = useState<LoginErrors>({});
   const [isLoading, setIsLoading] = useState(false);
+
+  const router = useRouter();
+  const setAuth = useAuthStore((state) => state.setAuth);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -45,11 +51,24 @@ const LoginForm = () => {
       return;
     }
 
-    // Simulated login
+    const result = await loginAction(formData);
+
+    setIsLoading(false);
+
+    if (!result?.success) {
+      setErrors({ form: result?.error || "Login failed" });
+      return;
+    }
+
+    const { accessToken, userId } = result.data;
+
+    setAuth(accessToken, userId);
+
+    router.push("/dashboard");
+
     console.log("Login data:", formData);
     setTimeout(() => {
       setIsLoading(false);
-      // Handle login logic here
     }, 1500);
   };
 

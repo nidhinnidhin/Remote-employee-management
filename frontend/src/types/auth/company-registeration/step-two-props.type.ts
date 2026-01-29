@@ -1,4 +1,4 @@
-import { Errors, FormData } from "./company-registration.types";
+import { Errors, FormData } from "./company-registration.type";
 
 export interface StepTwoProps {
   formData: FormData;

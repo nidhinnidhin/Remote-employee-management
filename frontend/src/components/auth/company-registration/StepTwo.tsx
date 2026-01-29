@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import FormInput from "./FormInput";
 import React from "react";
 
-import { FormData } from "@/types/auth/company-registeration/company-registration.types";
+import { FormData } from "@/types/auth/company-registeration/company-registration.type";
 import {
   PasswordStrength,
   StepTwoProps,

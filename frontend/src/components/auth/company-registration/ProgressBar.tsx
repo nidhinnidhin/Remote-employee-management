@@ -1,6 +1,6 @@
 "use client";
 
-import { ProgressBarProps } from "@/types/auth/company-registeration/progress-bar-props";
+import { ProgressBarProps } from "@/types/auth/company-registeration/progress-bar-props.type";
 import { motion } from "framer-motion";
 
 const ProgressBar: React.FC<ProgressBarProps> = ({

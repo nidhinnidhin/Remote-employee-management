@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { Building2, User } from "lucide-react";
 import ProgressBar from "./ProgressBar";
 import StepIndicator from "./StepIndicator";
@@ -17,9 +17,9 @@ import {
   validateStepTwo,
 } from "@/lib/validations/client/auth/register.validation";
 import {
-  FormData,
+  RegisterFormData,
   Errors,
-} from "@/types/auth/company-registeration/company-registration.types";
+} from "@/types/auth/company-registeration/company-registration.type";
 
 const RegistrationStepper = () => {
   const [currentStep, setCurrentStep] = useState<number>(1);
@@ -29,7 +29,7 @@ const RegistrationStepper = () => {
   const [registeredEmail, setRegisteredEmail] = useState<string>("");
   const setAuth = useAuthStore((s) => s.setAuth);
 
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<RegisterFormData>({
     companyName: "",
     companyEmail: "",
     employeeSize: "",
@@ -103,7 +103,7 @@ const RegistrationStepper = () => {
     console.log("handleOtpVerify: Action result:", result);
 
     if (result?.success && result.data?.accessToken) {
-      setAuth(result.data.accessToken);
+      setAuth(result.data.accessToken, '');
       window.location.href = "/dashboard";
     } else {
       alert(result?.error || "Verification failed. Check console.");

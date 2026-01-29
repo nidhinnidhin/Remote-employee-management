@@ -6,7 +6,11 @@ export const registerSchema = z.object({
     email: z.string().email(),
     size: z.string(),
     industry: z.string(),
-    website: z.string().url().optional().or(z.literal("")),
+    website: z
+      .string()
+      .url()
+      .optional()
+      .transform((val) => (val === "" || val === undefined ? null : val)),
   }),
   admin: z.object({
     firstName: z.string().min(2),
