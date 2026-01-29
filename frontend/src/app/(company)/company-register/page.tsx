@@ -1,4 +1,4 @@
-import RegistrationStepper from "@/components/auth/company-registration/RegistrationStepper";
+import RegistrationStepper from "@/components/company/auth/company-registration/RegistrationStepper";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {

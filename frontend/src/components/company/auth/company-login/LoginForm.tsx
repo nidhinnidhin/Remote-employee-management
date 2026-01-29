@@ -5,13 +5,13 @@ import { motion } from "framer-motion";
 import { Lock, Mail } from "lucide-react";
 import Link from "next/link";
 
-import FormInput from "../../ui/FormInput";
-import SocialLoginButtons from "../../ui/SocialLoginButtons";
+import FormInput from "../../../ui/FormInput";
+import SocialLoginButtons from "../../../ui/SocialLoginButtons";
 import {
   LoginFormData,
   LoginErrors,
 } from "@/types/auth/company-login/login.type";
-import LoginButton from "../../ui/LoginButton";
+import LoginButton from "../../../ui/LoginButton";
 import { AUTH_MESSAGES } from "@/shared/constants/auth.messages";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
@@ -101,7 +101,7 @@ const LoginForm = () => {
         </div>
 
         {/* Form Container */}
-        <div className="bg-neutral-800/50 backdrop-blur-xl border border-neutral-700/50 p-8 rounded-2xl shadow-2xl">
+        <div className="bg-neutral-800/50 backdrop-blur-xl border border-neutral-700/50 p-8 shadow-2xl">
           <form onSubmit={handleSubmit} className="space-y-4">
             <FormInput
               label="Email Address"
