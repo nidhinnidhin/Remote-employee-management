@@ -5,11 +5,11 @@ import { getSession } from "@/lib/iron-session/getSession";
 import { setRefreshTokenCookie } from "@/lib/auth/cookies";
 import { AUTH_MESSAGES } from "@/shared/constants/auth.messages";
 import { loginUser } from "@/services/company/auth/login.service";
-import { LoginPayload } from "@/types/auth/company-login/login-payload.type";
+import { LoginPayload } from "@/types/company/auth/company-login/login-payload.type";
 import {
   AuthActionResult,
   LoginResponse,
-} from "@/types/auth/company-login/login-response.type";
+} from "@/types/company/auth/company-login/login-response.type";
 
 export async function loginAction(
   payload: LoginPayload,

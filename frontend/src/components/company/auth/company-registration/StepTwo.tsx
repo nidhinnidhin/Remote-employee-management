@@ -4,11 +4,11 @@ import { motion } from "framer-motion";
 import FormInput from "./FormInput";
 import React from "react";
 
-import { FormData } from "@/types/auth/company-registeration/company-registration.type";
+import { FormData } from "@/types/company/auth/company-registeration/company-registration.type";
 import {
   PasswordStrength,
   StepTwoProps,
-} from "@/types/auth/company-registeration/step-two-props.type";
+} from "@/types/company/auth/company-registeration/step-two-props.type";
 import { getPasswordStrength } from "@/lib/validations/client/auth/password-strength.validation";
 
 const StepTwo: React.FC<StepTwoProps> = ({

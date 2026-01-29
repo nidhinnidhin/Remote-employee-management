@@ -1,4 +1,4 @@
-import { PasswordStrength } from "@/types/auth/company-registeration/step-two-props.type";
+import { PasswordStrength } from "@/types/company/auth/company-registeration/step-two-props.type";
 
 export function getPasswordStrength(password: string): PasswordStrength {
   if (!password) return { strength: 0, label: "", color: "" };

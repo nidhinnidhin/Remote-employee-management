@@ -8,8 +8,8 @@ import React from "react";
 import {
   FormData,
   Errors,
-} from "@/types/auth/company-registeration/company-registration.type";
-import { StepOneProps } from "@/types/auth/company-registeration/step-one-props.type";
+} from "@/types/company/auth/company-registeration/company-registration.type";
+import { StepOneProps } from "@/types/company/auth/company-registeration/step-one-props.type";
 
 const StepOne: React.FC<StepOneProps> = ({
   formData,

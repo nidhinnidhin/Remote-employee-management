@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FormDropdownProps } from "@/types/auth/company-registeration/form-dropdown.type";
+import { FormDropdownProps } from "@/types/company/auth/company-registeration/form-dropdown.type";
 
 const FormDropdown: React.FC<FormDropdownProps> = ({
   label,

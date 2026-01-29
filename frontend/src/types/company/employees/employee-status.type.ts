@@ -1,0 +1,1 @@
+export type EmployeeStatus = "Active" | "Inactive";

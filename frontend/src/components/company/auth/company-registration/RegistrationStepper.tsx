@@ -19,7 +19,7 @@ import {
 import {
   RegisterFormData,
   Errors,
-} from "@/types/auth/company-registeration/company-registration.type";
+} from "@/types/company/auth/company-registeration/company-registration.type";
 
 const RegistrationStepper = () => {
   const [currentStep, setCurrentStep] = useState<number>(1);

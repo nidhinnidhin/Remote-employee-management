@@ -1,6 +1,6 @@
 "use client";
 
-import { StepIndicatorProps } from "@/types/auth/company-registeration/step-indicator-props.type";
+import { StepIndicatorProps } from "@/types/company/auth/company-registeration/step-indicator-props.type";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import React from "react";

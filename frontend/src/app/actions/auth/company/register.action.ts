@@ -3,8 +3,8 @@
 import { registerSchema } from "@/lib/validations/schemas/auth.schema";
 import { registerUser } from "@/services/company/auth/register.service";
 import { AUTH_MESSAGES } from "@/shared/constants/auth.messages";
-import { RegisterFormData } from "@/types/auth/company-registeration/company-registration.type";
-import { RegisterCompanyPayload } from "@/types/auth/company-registeration/register-company-payload.type";
+import { RegisterFormData } from "@/types/company/auth/company-registeration/company-registration.type";
+import { RegisterCompanyPayload } from "@/types/company/auth/company-registeration/register-company-payload.type";
 
 export async function registerAction(formData: RegisterFormData) {
   const payload: RegisterCompanyPayload = {

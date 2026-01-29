@@ -3,7 +3,7 @@
 import {
   ButtonProps,
   ButtonVariant,
-} from "@/types/auth/company-login/button.types";
+} from "@/types/components/button.types";
 import { motion } from "framer-motion";
 import React from "react";
 

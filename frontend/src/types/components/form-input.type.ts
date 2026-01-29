@@ -1,4 +1,4 @@
-// src/types/formInput.ts
+
 import React from "react";
 
 export interface FormInputProps {
