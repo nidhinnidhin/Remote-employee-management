@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { FormInputProps } from "@/types/components/form-input.type";
+import { FormInputProps } from "@/types/ui/form-input.type";
 
 const FormInput: React.FC<FormInputProps> = ({
   label,

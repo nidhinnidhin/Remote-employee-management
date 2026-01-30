@@ -1,9 +1,7 @@
 "use client";
 
-import {
-  ButtonProps,
-  ButtonVariant,
-} from "@/types/components/button.types";
+import { ButtonVariant } from "@/types/ui/button-variant.type";
+import { ButtonProps } from "@/types/ui/button.type";
 import { motion } from "framer-motion";
 import React from "react";
 
@@ -19,9 +17,11 @@ const Button: React.FC<ButtonProps> = ({
 
   const variants: Record<ButtonVariant, string> = {
     primary:
-      "bg-red-600 text-white hover:bg-red-700 active:scale-95 rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
+      "bg-red-600 text-white hover:bg-red-700 active:scale-95 rounded cursor-pointer disabled:opacity-50",
     secondary:
-      "bg-neutral-700 text-white hover:bg-neutral-600 active:scale-95 rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
+      "bg-neutral-700 text-white hover:bg-neutral-600 active:scale-95 rounded cursor-pointer disabled:opacity-50",
+    outline:
+      "border border-red-600 text-red-600 hover:bg-red-600 hover:text-white active:scale-95 rounded disabled:opacity-50",
   };
 
   return (

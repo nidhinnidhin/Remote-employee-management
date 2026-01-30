@@ -2,11 +2,11 @@
 
 import { motion } from "framer-motion";
 import FormInput from "./FormInput";
-import FormDropdown from "./FormDropdown";
+import FormDropdown from "../../../ui/FormDropdown";
 import React from "react";
 
 import {
-  FormData,
+  RegisterFormData,
   Errors,
 } from "@/types/company/auth/company-registeration/company-registration.type";
 import { StepOneProps } from "@/types/company/auth/company-registeration/step-one-props.type";
@@ -39,7 +39,7 @@ const StepOne: React.FC<StepOneProps> = ({
       [name]: value,
     }));
 
-    if (errors[name as keyof FormData]) {
+    if (errors[name as keyof RegisterFormData]) {
       setErrors((prev) => ({
         ...prev,
         [name]: "",

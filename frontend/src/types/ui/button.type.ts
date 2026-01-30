@@ -1,6 +1,5 @@
 import React from "react";
-
-export type ButtonVariant = "primary" | "secondary" | "outline";
+import { ButtonVariant } from "./button-variant.type";
 
 export interface ButtonProps {
   children: React.ReactNode;

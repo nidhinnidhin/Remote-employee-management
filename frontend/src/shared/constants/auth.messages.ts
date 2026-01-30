@@ -15,4 +15,5 @@ export const AUTH_MESSAGES = {
     NO_ACCESS_TOKEN_RETURNED: 'No access token returned',
     EMAIL_MISSING: 'Email is required',
     PASSWORD_REQUIRED: 'Password is required',
+    EMAIL_AND_PASSWORD_REQUIRED: 'Email and password are required'
 };

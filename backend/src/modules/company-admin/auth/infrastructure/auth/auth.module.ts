@@ -15,8 +15,8 @@ import { MongoEmailOtpRepository } from '../database/repositories/mongo-email-ot
 import { MongoUserRepository } from '../database/repositories/mongo-user.repository';
 import { EmailService } from '../notifications/email.service';
 import { JwtService } from './jwt.service';
-import { AuthController } from '../../interfaces/controllers/auth.controller';
-import { TestController } from '../../interfaces/controllers/test.controller';
+import { AuthController } from '../../interface/controllers/auth.controller';
+import { TestController } from '../../interface/controllers/test.controller';
 import { EmailOtpSchema } from '../database/mongoose/schemas/email-otp.schema';
 import { CompanyDocument, CompanySchema } from '../database/mongoose/schemas/company.schema';
 import { UserDocument, UserSchema } from '../database/mongoose/schemas/userSchema';

@@ -1,9 +1,17 @@
 import { Filter, UserPlus, Users } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import EmployeeStats from "./EmployeeStats";
-import Button from "../auth/company-registration/Button";
+import Button from "../../ui/Button";
+import InviteEmployeeModal from "../modals/InviteEmployeeModal";
 
 const Header = () => {
+   const [isInviteOpen, setIsInviteOpen] = useState(false);
+
+   const handleInvite = (data: { email: string; password: string }) => {
+    console.log("Inviting employee:", data);
+
+    setIsInviteOpen(false);
+  };
   return (
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
@@ -17,7 +25,11 @@ const Header = () => {
             <Users size={18} />
             <span>Bulk Invite</span>
           </button>
-          <Button variant="primary" className="flex items-center gap-2">
+          <Button
+            variant="primary"
+            className="flex items-center gap-2"
+            onClick={() => setIsInviteOpen(true)}
+          >
             <UserPlus size={18} />
             <span>Add Employee</span>
           </Button>
@@ -37,6 +49,12 @@ const Header = () => {
           <span>Filters</span>
         </button>
       </div>
+      <InviteEmployeeModal
+        isOpen={isInviteOpen}
+        onClose={() => setIsInviteOpen(false)}
+        loginUrl="https://yourapp.com/login"
+        onInvite={handleInvite}
+      />
     </div>
   );
 };
