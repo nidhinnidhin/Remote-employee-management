@@ -1,8 +1,8 @@
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import type { EmailOtpRepository } from '../../domain/repositories/email-otp.repository';
-import { VerifyResetPasswordOtpInput } from 'src/shared/types/company-auth/otp/verify-reset-password-otp-input.type';
-import { VerifyResetPasswordOtpResponse } from 'src/shared/types/company-auth/otp/verify-reset-password-otp-response.type';
+import { VerifyResetPasswordOtpInput } from 'src/shared/types/company/otp/verify-reset-password-otp-input.type';
+import { VerifyResetPasswordOtpResponse } from 'src/shared/types/company/otp/verify-reset-password-otp-response.type';
 import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
 
 @Injectable()

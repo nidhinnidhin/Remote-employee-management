@@ -1,6 +1,6 @@
 import { UnauthorizedException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { JwtService } from 'src/modules/company-admin/auth/infrastructure/auth/jwt.service';
+import { JwtService } from 'src/shared/services/jwt.service';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 
 @Injectable()

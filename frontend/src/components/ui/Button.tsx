@@ -17,9 +17,9 @@ const Button: React.FC<ButtonProps> = ({
 
   const variants: Record<ButtonVariant, string> = {
     primary:
-      "bg-red-600 text-white hover:bg-red-700 active:scale-95 rounded cursor-pointer disabled:opacity-50",
+      "bg-red-600 text-white hover:bg-red-700 active:scale-95 cursor-pointer disabled:opacity-50",
     secondary:
-      "bg-neutral-700 text-white hover:bg-neutral-600 active:scale-95 rounded cursor-pointer disabled:opacity-50",
+      "bg-neutral-700 text-white hover:bg-neutral-600 active:scale-95 cursor-pointer disabled:opacity-50",
     outline:
       "border border-red-600 text-red-600 hover:bg-red-600 hover:text-white active:scale-95 rounded disabled:opacity-50",
   };

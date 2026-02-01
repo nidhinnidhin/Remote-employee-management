@@ -3,27 +3,64 @@
 import { useState } from "react";
 import BaseModal from "@/components/ui/BaseModal";
 import Button from "@/components/ui/Button";
-import { InviteEmployeeModalProps } from "@/types/otp/invite-employee-modal-props.type";
-import { AUTH_MESSAGES } from "@/shared/constants/auth.messages";
+import FormInput from "@/components/ui/FormInput";
+import FormDropdown from "@/components/ui/FormDropdown";
+
+type InviteEmployeePayload = {
+  name: string;
+  email: string;
+  role: string;
+  department: string;
+};
+
+type InviteEmployeeModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  onInvite: (data: InviteEmployeePayload) => void;
+};
+
+const ROLE_OPTIONS = ["ADMIN", "MANAGER", "EMPLOYEE"];
+
+const DEPARTMENT_OPTIONS = [
+  "Engineering",
+  "Design",
+  "Product",
+  "Marketing",
+  "Sales",
+  "HR",
+  "Finance",
+  "Operations",
+];
 
 const InviteEmployeeModal = ({
   isOpen,
   onClose,
-  loginUrl,
   onInvite,
 }: InviteEmployeeModalProps) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    role: "",
+    department: "",
+  });
+
   const [error, setError] = useState("");
 
+  const handleChange = (e: any) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
   const handleInvite = () => {
-    if (!email || !password) {
-      setError(AUTH_MESSAGES.EMAIL_AND_PASSWORD_REQUIRED)
+    const { name, email, role, department } = form;
+
+    if (!name || !email || !role || !department) {
+      setError("All fields are required");
       return;
     }
 
     setError("");
-    onInvite({ email, password });
+    onInvite(form);
   };
 
   return (
@@ -31,7 +68,7 @@ const InviteEmployeeModal = ({
       isOpen={isOpen}
       onClose={onClose}
       title="Invite Employee"
-      description="Send login credentials to your employee via email"
+      description="Send a secure access link to the employee’s email"
       footer={
         <div className="flex justify-end gap-3">
           <Button variant="secondary" onClick={onClose}>
@@ -43,29 +80,44 @@ const InviteEmployeeModal = ({
         </div>
       }
     >
-      {/* Email */}
-      <div className="mb-4">
-        <label className="text-sm text-neutral-400">Employee Email</label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="employee@company.com"
-          className="w-full mt-1 bg-neutral-800 text-white p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-        />
-      </div>
+      <FormInput
+        label="Full Name"
+        name="name"
+        value={form.name}
+        onChange={handleChange}
+        placeholder="John Doe"
+        required
+      />
 
-      {/* Temporary Password */}
-      <div className="mb-4">
-        <label className="text-sm text-neutral-400">Temporary Password</label>
-        <input
-          type="text"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Auto-generated or custom"
-          className="w-full mt-1 bg-neutral-800 text-white p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-        />
-      </div>
+      <FormInput
+        label="Work Email"
+        name="email"
+        type="email"
+        value={form.email}
+        onChange={handleChange}
+        placeholder="employee@company.com"
+        required
+      />
+
+      <FormDropdown
+        label="Role"
+        name="role"
+        value={form.role}
+        onChange={handleChange}
+        options={ROLE_OPTIONS}
+        placeholder="Select role"
+        required
+      />
+
+      <FormDropdown
+        label="Department"
+        name="department"
+        value={form.department}
+        onChange={handleChange}
+        options={DEPARTMENT_OPTIONS}
+        placeholder="Select department"
+        required
+      />
 
       {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
     </BaseModal>

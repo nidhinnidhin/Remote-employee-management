@@ -3,7 +3,7 @@ import * as bcrypt from 'bcrypt';
 import type { UserRepository } from '../../domain/repositories/user.repository';
 import { RegisterCompanyAdminDto } from 'src/modules/company-admin/auth/presentation/dto/register-company-admin.dto';
 import type { CompanyRepository } from '../../domain/repositories/company.repository';
-import { EmailService } from '../../infrastructure/notifications/email.service';
+import { EmailService } from '../../../../../shared/services/email.service';
 import type { PendingRegistrationRepository } from '../../domain/repositories/cache/auth-repository/pending-registration.repository';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';

@@ -3,7 +3,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
-import { JwtService } from 'src/modules/company-admin/auth/infrastructure/auth/jwt.service';
+import { JwtService } from 'src/shared/services/jwt.service';
 import { RefreshTokenPayload } from 'src/shared/types/jwt/jwt-payload.type';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 

@@ -6,9 +6,9 @@ import {
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import type { UserRepository } from '../../domain/repositories/user.repository';
-import { JwtService } from '../../infrastructure/auth/jwt.service';
-import { LoginResponse } from 'src/shared/types/company-auth/login/login-response.type';
-import { LoginCompanyAdminInput } from 'src/shared/types/company-auth/login/login-company-admin-input.type';
+import { JwtService } from '../../../../../shared/services/jwt.service';
+import { LoginResponse } from 'src/shared/types/company/login/login-response.type';
+import { LoginCompanyAdminInput } from 'src/shared/types/company/login/login-company-admin-input.type';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 
 @Injectable()

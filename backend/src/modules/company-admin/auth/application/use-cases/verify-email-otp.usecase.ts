@@ -5,12 +5,12 @@ import { UserEntity } from '../../domain/entities/user.entity';
 import { CompanyEntity } from '../../domain/entities/company.entity';
 import type { CompanyRepository } from '../../domain/repositories/company.repository';
 import type { PendingRegistrationRepository } from '../../domain/repositories/cache/auth-repository/pending-registration.repository';
-import { VerifyEmailOtpInput } from 'src/shared/types/company-auth/otp/verify-email-otp-input.type';
+import { VerifyEmailOtpInput } from 'src/shared/types/company/otp/verify-email-otp-input.type';
 // import { VerifyEmailOtpResponse } from 'src/shared/types/company-auth/otp/verify-email-otp-response.type';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
-import { LoginResponse } from 'src/shared/types/company-auth/login/login-response.type';
-import { JwtService } from '../../infrastructure/auth/jwt.service';
+import { LoginResponse } from 'src/shared/types/company/login/login-response.type';
+import { JwtService } from '../../../../../shared/services/jwt.service';
 
 @Injectable()
 export class VerifyEmailOtpUseCase {

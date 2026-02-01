@@ -24,7 +24,7 @@ const BaseModal = ({
           initial={{ scale: 0.85, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.85, opacity: 0 }}
-          className="bg-neutral-900 w-full max-w-md p-8 rounded-lg border border-neutral-700"
+          className="bg-neutral-900 w-full max-w-md p-8 border border-neutral-700"
         >
           {title && (
             <h2 className="text-2xl font-bold text-white mb-2 text-center">

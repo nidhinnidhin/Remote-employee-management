@@ -1,11 +1,11 @@
 import { Injectable, Inject } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
-import { EmailService } from '../../infrastructure/notifications/email.service';
+import { EmailService } from '../../../../../shared/services/email.service';
 import type { EmailOtpRepository } from '../../domain/repositories/email-otp.repository';
 import { EmailOtpEntity } from '../../domain/entities/email-otp.entity';
 import { OtpPurpose } from 'src/shared/enums/reset-password/otp-purpose.enum';
-import { SendEmailOtpInput } from 'src/shared/types/company-auth/otp/send-email-otp-input.type';
+import { SendEmailOtpInput } from 'src/shared/types/company/otp/send-email-otp-input.type';
 
 @Injectable()
 export class SendEmailOtpUseCase {
