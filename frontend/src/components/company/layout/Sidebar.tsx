@@ -18,7 +18,7 @@ import {
   ChevronRight,
   X,
 } from "lucide-react";
-import { SidebarProps } from "@/types/company/layout/sidebar-props.type";
+import { SidebarProps } from "@/shared/types/company/layout/sidebar-props.type";
 
 const Sidebar: React.FC<SidebarProps> = ({
   isCollapsed,

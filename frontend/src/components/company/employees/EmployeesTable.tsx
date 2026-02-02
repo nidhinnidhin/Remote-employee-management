@@ -5,8 +5,8 @@ import Table, { Column } from "@/components/ui/Table";
 import Pagination from "@/components/ui/Pagination";
 import { MoreVertical, Edit2, Trash2 } from "lucide-react";
 import Image from "next/image";
-import { Employee } from "@/types/company/employees/employee-listing.type";
-import { EmployeeStatus } from "@/types/company/employees/employee-status.type";
+import { Employee } from "@/shared/types/company/employees/employee-listing.type";
+import { EmployeeStatus } from "@/shared/types/company/employees/employee-status.type";
 
 // Mock data
 const mockEmployees: Employee[] = [

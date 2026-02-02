@@ -16,6 +16,7 @@ import { InviteLinkRepositoryImpl } from '../../infrastructure/repository/invite
 import { Module } from '@nestjs/common';
 import { SetPasswordUseCase } from '../../application/use-cases/set-password.usecase';
 import { RedisService } from 'src/shared/services/redis.service';
+import { JwtService } from 'src/shared/services/jwt.service';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { RedisService } from 'src/shared/services/redis.service';
     SetPasswordUseCase,
     EmailService,
     RedisService,
+    JwtService,
     {
       provide: 'EmployeeRepository',
       useClass: EmployeeRepositoryImpl,

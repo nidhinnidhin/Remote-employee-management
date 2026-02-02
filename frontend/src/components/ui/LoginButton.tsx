@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import React from "react";
-import { ButtonProps, ButtonVariant } from "@/types/ui/button.type";
+import { ButtonProps, ButtonVariant } from "@/shared/types/ui/button.type";
 
 const LoginButton: React.FC<ButtonProps> = ({
   children,

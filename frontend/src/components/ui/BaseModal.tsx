@@ -1,6 +1,6 @@
 "use client";
 
-import { BaseModalProps } from "@/types/otp/base-modal-props.type";
+import { BaseModalProps } from "@/shared/types/otp/base-modal-props.type";
 import { motion, AnimatePresence } from "framer-motion";
 
 const BaseModal = ({

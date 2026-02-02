@@ -1,11 +1,11 @@
 import {
   StepOneErrors,
   StepOneFormData,
-} from "@/types/company/auth/company-registeration/step-one-formdata.type";
+} from "@/shared/types/company/auth/company-registeration/step-one-formdata.type";
 import {
   StepTwoErrors,
   StepTwoFormData,
-} from "@/types/company/auth/company-registeration/step-two-formdata.type";
+} from "@/shared/types/company/auth/company-registeration/step-two-formdata.type";
 
 export const validateStepOne = (formData: StepOneFormData): StepOneErrors => {
   const errors: StepOneErrors = {};

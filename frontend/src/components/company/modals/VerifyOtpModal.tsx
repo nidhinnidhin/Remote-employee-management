@@ -4,7 +4,7 @@ import { useState } from "react";
 import BaseModal from "@/components/ui/BaseModal";
 import Button from "../../ui/Button";
 import { OTP_MESSAGES } from "@/shared/constants/otp.messages";
-import { OtpModalProps } from "@/types/otp/otp-modal-props.type";
+import { OtpModalProps } from "@/shared/types/otp/otp-modal-props.type";
 
 const OtpModal = ({ isOpen, onClose, onVerify }: OtpModalProps) => {
   const [otp, setOtp] = useState("");

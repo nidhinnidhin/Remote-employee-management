@@ -3,12 +3,12 @@
 import { motion } from "framer-motion";
 import FormInput from "./FormInput";
 import React from "react";
-
-import { FormData } from "@/types/company/auth/company-registeration/company-registration.type";
 import {
-  PasswordStrength,
+  RegisterFormData,
+} from "@/shared/types/company/auth/company-registeration/company-registration.type";
+import {
   StepTwoProps,
-} from "@/types/company/auth/company-registeration/step-two-props.type";
+} from "@/shared/types/company/auth/company-registeration/step-two-props.type";
 import { getPasswordStrength } from "@/lib/validations/client/auth/password-strength.validation";
 
 const StepTwo: React.FC<StepTwoProps> = ({
@@ -29,7 +29,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
       [name]: value,
     }));
 
-    if (errors[name as keyof FormData]) {
+    if (errors[name as keyof RegisterFormData]) {
       setErrors((prev) => ({
         ...prev,
         [name]: "",

@@ -5,32 +5,16 @@ import BaseModal from "@/components/ui/BaseModal";
 import Button from "@/components/ui/Button";
 import FormInput from "@/components/ui/FormInput";
 import FormDropdown from "@/components/ui/FormDropdown";
+import { InviteEmployeePayload } from "@/shared/types/company/employees/auth/invite-employee-payload.type";
+import {
+  EmployeeDepartment,
+  EmployeeRole,
+} from "@/shared/enum/company/auth/employee.enum";
+import { InviteEmployeeModalProps } from "@/shared/types/company/employees/auth/invite-employee-mopdal-props.type";
 
-type InviteEmployeePayload = {
-  name: string;
-  email: string;
-  role: string;
-  department: string;
-};
+const ROLE_OPTIONS = Object.values(EmployeeRole);
 
-type InviteEmployeeModalProps = {
-  isOpen: boolean;
-  onClose: () => void;
-  onInvite: (data: InviteEmployeePayload) => void;
-};
-
-const ROLE_OPTIONS = ["ADMIN", "MANAGER", "EMPLOYEE"];
-
-const DEPARTMENT_OPTIONS = [
-  "Engineering",
-  "Design",
-  "Product",
-  "Marketing",
-  "Sales",
-  "HR",
-  "Finance",
-  "Operations",
-];
+const DEPARTMENT_OPTIONS = Object.values(EmployeeDepartment);
 
 const InviteEmployeeModal = ({
   isOpen,

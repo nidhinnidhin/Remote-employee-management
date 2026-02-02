@@ -22,19 +22,19 @@ export default function InviteVerifier({ token }: Props) {
         );
 
         if (!res.ok) {
-          router.replace("/employees/invite-invalid");
+          router.replace("/employees/auth/invite-invalid");
           return;
         }
 
         const data = await res.json();
 
         if (data.nextStep === "SET_PASSWORD") {
-          router.replace("/employees/set-password");
+          router.replace("/employees/auth/set-password");
         } else {
-          router.replace("/employees/login");
+          router.replace("/employees/auth/login");
         }
       } catch (err) {
-        router.replace("/employees/invite-invalid");
+        router.replace("/employees/auth/invite-invalid");
       }
     };
 

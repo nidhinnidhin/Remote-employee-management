@@ -10,12 +10,12 @@ import SocialLoginButtons from "../../../ui/SocialLoginButtons";
 import {
   LoginFormData,
   LoginErrors,
-} from "@/types/company/auth/company-login/login.type";
+} from "@/shared/types/company/auth/company-login/login.type";
 import LoginButton from "../../../ui/LoginButton";
 import { AUTH_MESSAGES } from "@/shared/constants/auth.messages";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
-import { loginAction } from "@/app/actions/auth/company/login.action";
+import { loginAction } from "@/app/actions/company/auth/login.action";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState<LoginFormData>({

@@ -1,6 +1,6 @@
 "use client";
 
-import { StatCardProps } from "@/types/company/employees/stat-cart-props.type";
+import { StatCardProps } from "@/shared/types/company/employees/stat-cart-props.type";
 import React from "react";
 
 const StatCard: React.FC<StatCardProps> = ({

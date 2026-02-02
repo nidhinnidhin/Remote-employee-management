@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Menu, Bell, Search } from "lucide-react";
-import { HeaderProps } from "@/types/company/layout/header-props.type";
+import { HeaderProps } from "@/shared/types/company/layout/header-props.type";
 
 const Header: React.FC<HeaderProps> = ({ onMobileMenuDatas }) => {
   return (

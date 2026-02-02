@@ -1,7 +1,7 @@
 "use client";
 
-import { ButtonVariant } from "@/types/ui/button-variant.type";
-import { ButtonProps } from "@/types/ui/button.type";
+import { ButtonVariant } from "@/shared/types/ui/button-variant.type";
+import { ButtonProps } from "@/shared/types/ui/button.type";
 import { motion } from "framer-motion";
 import React from "react";
 

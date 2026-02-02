@@ -30,7 +30,7 @@ export default function SetPasswordPage() {
       return;
     }
 
-    router.replace("/employees/dashboard");
+    router.replace("/dashboard");
   };
 
   return (

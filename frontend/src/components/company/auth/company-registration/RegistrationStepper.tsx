@@ -10,7 +10,7 @@ import StepTwo from "./StepTwo";
 import Button from "../../../ui/Button";
 import OtpModal from "../../modals/VerifyOtpModal";
 import { useAuthStore } from "@/store/auth.store";
-import { registerAction } from "@/app/actions/auth/company/register.action";
+import { registerAction } from "@/app/actions/company/auth/register.action";
 import { verifyOtpAction } from "@/app/actions/otp/otp.action";
 import {
   validateStepOne,
@@ -19,7 +19,7 @@ import {
 import {
   RegisterFormData,
   Errors,
-} from "@/types/company/auth/company-registeration/company-registration.type";
+} from "@/shared/types/company/auth/company-registeration/company-registration.type";
 
 const RegistrationStepper = () => {
   const [currentStep, setCurrentStep] = useState<number>(1);
@@ -103,8 +103,8 @@ const RegistrationStepper = () => {
     console.log("handleOtpVerify: Action result:", result);
 
     if (result?.success && result.data?.accessToken) {
-      setAuth(result.data.accessToken, '');
-      window.location.href = "/dashboard";
+      setAuth(result.data.accessToken, "");
+      window.location.href = "/employees/dashboard";
     } else {
       alert(result?.error || "Verification failed. Check console.");
     }
