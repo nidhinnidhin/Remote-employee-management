@@ -1,11 +1,10 @@
 import { Injectable, Inject } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
 import { EmailService } from '../../../../../shared/services/email.service';
 import type { EmailOtpRepository } from '../../domain/repositories/email-otp.repository';
 import { EmailOtpEntity } from '../../domain/entities/email-otp.entity';
-import { OtpPurpose } from 'src/shared/enums/reset-password/otp-purpose.enum';
 import { SendEmailOtpInput } from 'src/shared/types/company/otp/send-email-otp-input.type';
+import { OtpService } from 'src/shared/services/otp.service';
 
 @Injectable()
 export class SendEmailOtpUseCase {
@@ -13,14 +12,13 @@ export class SendEmailOtpUseCase {
     @Inject('EmailOtpRepository')
     private readonly emailOtpRepository: EmailOtpRepository,
     private readonly emailService: EmailService,
+    private readonly otpService: OtpService,
   ) {}
 
   async execute(input: SendEmailOtpInput): Promise<void> {
-
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-    const otpHash = await bcrypt.hash(otp, 10);
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+    const otp = this.otpService.generateOtp();
+    const otpHash = await this.otpService.hashOtp(otp);
+    const expiresAt = this.otpService.getExpiryDate();
 
     const otpEntity = new EmailOtpEntity(
       randomUUID(),

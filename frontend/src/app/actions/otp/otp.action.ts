@@ -23,13 +23,18 @@ export async function verifyOtpAction(payload: { email: string; otp: string }) {
     }
 
     const { accessToken } = response.data;
-    if (!accessToken) throw new Error(AUTH_MESSAGES.NO_ACCESS_TOKEN_RETURNED);
+    if (!accessToken) {
+      throw new Error(AUTH_MESSAGES.NO_ACCESS_TOKEN_RETURNED);
+    }
 
     const session = await getSession();
     session.accessToken = accessToken;
     await session.save();
 
-    return { success: true, data: response.data };
+    return {
+      success: true,
+      data: response.data,
+    };
   } catch (error: any) {
     return {
       success: false,

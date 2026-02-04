@@ -7,4 +7,5 @@ export const OTP_MESSAGES = {
   OTP_NOT_VERIFIED: 'OTP not verified',
   OTP_RESENT: 'OTP resent successfully',
   OTP_SENT: 'OTP sent to your email',
+  OTP_ALREADY_VERIFIED: 'Otp is already verified.'
 };

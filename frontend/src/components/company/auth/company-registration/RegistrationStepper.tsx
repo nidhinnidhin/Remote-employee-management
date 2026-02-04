@@ -20,7 +20,7 @@ import {
   RegisterFormData,
   Errors,
 } from "@/shared/types/company/auth/company-registeration/company-registration.type";
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation";
 
 const RegistrationStepper = () => {
   const [currentStep, setCurrentStep] = useState<number>(1);
@@ -29,6 +29,8 @@ const RegistrationStepper = () => {
   const [showOtpModal, setShowOtpModal] = useState<boolean>(false);
   const [registeredEmail, setRegisteredEmail] = useState<string>("");
   const setAuth = useAuthStore((s) => s.setAuth);
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [otpError, setOtpError] = useState("");
 
   const [formData, setFormData] = useState<RegisterFormData>({
     companyName: "",
@@ -44,7 +46,7 @@ const RegistrationStepper = () => {
     confirmPassword: "",
   });
 
-  const router = useRouter()
+  const router = useRouter();
   const handleContinue = async () => {
     console.log(
       "handleContinue called. currentStep:",
@@ -98,18 +100,27 @@ const RegistrationStepper = () => {
   };
 
   const handleOtpVerify = async (otp: string) => {
-    console.log("handleOtpVerify: Calling verifyOtpAction with OTP:", otp);
-    const result = await verifyOtpAction({
-      email: registeredEmail,
-      otp,
-    });
-    console.log("handleOtpVerify: Action result:", result);
+    try {
+      setOtpLoading(true);
+      setOtpError("");
 
-    if (result?.success && result.data?.accessToken) {
+      const result = await verifyOtpAction({
+        email: registeredEmail,
+        otp,
+      });
+
+      if (!result.success) {
+        alert(result.error || "Wrong OTP");
+        setOtpError(result.error || "Wrong OTP");
+        return;
+      }
+
+      // ✅ success
       setAuth(result.data.accessToken, "");
+      setShowOtpModal(false);
       router.replace("/employees/dashboard");
-    } else {
-      alert(result?.error || "Verification failed. Check console.");
+    } finally {
+      setOtpLoading(false);
     }
   };
 
@@ -231,6 +242,8 @@ const RegistrationStepper = () => {
         isOpen={showOtpModal}
         onClose={() => setShowOtpModal(false)}
         onVerify={handleOtpVerify}
+        loading={otpLoading}
+        error={otpError}
       />
     </>
   );

@@ -1,36 +1,40 @@
-import {
-  Injectable,
-  Inject,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
-import type { UserRepository } from '../../domain/repositories/user.repository';
-import { SendEmailOtpUseCase } from './send-email-otp.usecase';
-import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
+import { Injectable, Inject, BadRequestException } from '@nestjs/common';
+import type { PendingRegistrationRepository } from '../../domain/repositories/cache/auth-repository/pending-registration.repository';
+import { EmailService } from '../../../../../shared/services/email.service';
+import { OtpService } from 'src/shared/services/otp.service';
+import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
 
 @Injectable()
 export class ResendEmailOtpUseCase {
   constructor(
-    @Inject('UserRepository')
-    private readonly userRepository: UserRepository,
-    private readonly sendEmailOtpUseCase: SendEmailOtpUseCase,
+    @Inject('PendingRegistrationRepository')
+    private readonly pendingRepository: PendingRegistrationRepository,
+
+    private readonly emailService: EmailService,
+    private readonly otpService: OtpService,
   ) {}
 
   async execute(email: string): Promise<void> {
-    const user = await this.userRepository.findByEmail(email.toLowerCase());
+    const pending = await this.pendingRepository.find(email);
 
-    if (!user) {
-      throw new NotFoundException(AUTH_MESSAGES.USER_NOT_FOUND);
+    if (!pending) {
+      throw new BadRequestException(OTP_MESSAGES.OTP_EXPIRED);
     }
 
-    if (user.status === 'ACTIVE') {
-      throw new BadRequestException(AUTH_MESSAGES.USER_ALEADY_VERIFIED);
-    }
+    const otp = this.otpService.generateOtp();
+    const otpHash = await this.otpService.hashOtp(otp);
+    const expiresAt = new Date(Date.now() + 60_000); 
 
-    // Reuse existing OTP sending logic
-    await this.sendEmailOtpUseCase.execute({
-      userId: user.id,
-      email: user.email,
-    });
+    await this.pendingRepository.save(
+      email,
+      {
+        ...pending,
+        otpHash,
+        expiresAt,
+      },
+      60,
+    );
+
+    await this.emailService.sendOtp(email, otp);
   }
 }

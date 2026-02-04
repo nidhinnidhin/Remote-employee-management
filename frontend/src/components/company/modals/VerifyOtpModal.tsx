@@ -6,17 +6,24 @@ import Button from "../../ui/Button";
 import { OTP_MESSAGES } from "@/shared/constants/otp.messages";
 import { OtpModalProps } from "@/shared/types/otp/otp-modal-props.type";
 
-const OtpModal = ({ isOpen, onClose, onVerify }: OtpModalProps) => {
+const OtpModal = ({
+  isOpen,
+  onClose,
+  onVerify,
+  loading = false,
+  error,
+}: OtpModalProps) => {
   const [otp, setOtp] = useState("");
-  const [error, setError] = useState("");
+  const [localError, setLocalError] = useState("");
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     if (otp.length !== 6) {
-      setError(OTP_MESSAGES.OTP_DIGIT_ERROR);
+      setLocalError(OTP_MESSAGES.OTP_DIGIT_ERROR);
       return;
     }
-    setError("");
-    onVerify(otp);
+
+    setLocalError("");
+    await onVerify(otp);
   };
 
   return (
@@ -27,11 +34,21 @@ const OtpModal = ({ isOpen, onClose, onVerify }: OtpModalProps) => {
       description="Enter the 6-digit OTP sent to your email"
       footer={
         <div className="flex justify-between">
-          <Button variant="secondary" onClick={onClose}>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={onClose}
+            disabled={loading}
+          >
             Cancel
           </Button>
-          <Button variant="primary" onClick={handleVerify}>
-            Verify
+          <Button
+            type="button"
+            variant="primary"
+            onClick={handleVerify}
+            disabled={loading}
+          >
+            {loading ? "Verifying..." : "Verify"}
           </Button>
         </div>
       }
@@ -45,6 +62,7 @@ const OtpModal = ({ isOpen, onClose, onVerify }: OtpModalProps) => {
         placeholder="______"
       />
 
+      {localError && <p className="text-red-500 text-sm mt-2">{localError}</p>}
       {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
     </BaseModal>
   );

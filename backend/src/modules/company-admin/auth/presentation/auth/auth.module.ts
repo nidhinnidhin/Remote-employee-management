@@ -13,6 +13,7 @@ import { AppRedisModule } from '../../infrastructure/cache/redis.module';
 import { MongoCompanyRepository } from '../../infrastructure/database/repositories/mongo-company.repository';
 import { MongoEmailOtpRepository } from '../../infrastructure/database/repositories/mongo-email-otp.repository';
 import { MongoUserRepository } from '../../infrastructure/database/repositories/mongo-user.repository';
+import { OtpService } from 'src/shared/services/otp.service';
 import { EmailService } from '../../../../../shared/services/email.service';
 import { JwtService } from '../../../../../shared/services/jwt.service';
 import { AuthController } from '../controllers/auth.controller';
@@ -42,6 +43,7 @@ import { Module } from '@nestjs/common';
     ResendEmailOtpUseCase,
     RefreshAccessTokenUseCase,
     EmailService,
+    OtpService,
     JwtService,
     ForgotPasswordUseCase,
     VerifyResetPasswordOtpUseCase,
@@ -66,4 +68,4 @@ import { Module } from '@nestjs/common';
   ],
   exports: [JwtService],
 })
-export class AuthModule {}
+export class AuthModule { }

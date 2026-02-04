@@ -10,5 +10,6 @@ export const AUTH_MESSAGES = {
     COMPANY_ALREADY_EXIST: 'Company already exists',
     USER_ALEADY_VERIFIED: 'User already verified',
     PASSWORD_RESET_SUCCESS: 'Password reset successful',
-    MISSING_REFRESH_TOKEN: 'Refresh token missing'
+    MISSING_REFRESH_TOKEN: 'Refresh token missing',
+    USER_ALREADY_EXIST: 'User already exist'
 };
