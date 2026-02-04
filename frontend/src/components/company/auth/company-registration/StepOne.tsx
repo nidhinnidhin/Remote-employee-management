@@ -19,13 +19,24 @@ const StepOne: React.FC<StepOneProps> = ({
 }) => {
   const employeeSizeOptions = ["1–10", "11–50", "51–200", "201–500", "500+"];
   const industryOptions = [
-    "Technology",
-    "Healthcare",
-    "Finance",
-    "Education",
-    "Manufacturing",
-    "Other",
-  ];
+  "Information Technology",
+  "Software Development",
+  "Web Development",
+  "Mobile App Development",
+  "Cloud Computing",
+  "Cybersecurity",
+  "Data Science & Analytics",
+  "Artificial Intelligence & Machine Learning",
+  "IT Services & Consulting",
+  "DevOps & Infrastructure",
+  "Networking & Systems Administration",
+  "Enterprise Software (ERP, CRM)",
+  "Gaming & Interactive Media",
+  "Blockchain & Web3",
+  "E-commerce Technology",
+  "IT Support & Managed Services",
+  "Other",
+];
 
   const handleChange = (
     e:

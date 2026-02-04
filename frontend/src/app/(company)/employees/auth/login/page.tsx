@@ -1,4 +1,4 @@
-import InviteVerifier from "./InviteVerifier";
+import InviteVerifier from "../verification/InviteVerifier";
 
 type Props = {
   searchParams: {
@@ -16,7 +16,7 @@ export default function LoginPage({ searchParams }: Props) {
   return (
     <div className="min-h-screen flex items-center justify-center">
       <h1 className="text-xl font-semibold">Login</h1>
-      {/* your normal email + password login form */}
+      {/* email + password login form */}
     </div>
   );
 }

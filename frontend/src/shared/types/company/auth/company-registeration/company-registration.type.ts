@@ -9,6 +9,7 @@ export type RegisterFormData = {
   email: string;
   phone: string;
   password: string;
+  confirmPassword: string;
 };
 
 export type Errors = {

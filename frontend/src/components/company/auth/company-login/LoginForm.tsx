@@ -64,7 +64,7 @@ const LoginForm = () => {
 
     setAuth(accessToken, userId);
 
-    router.push("/dashboard");
+    router.replace("employees/dashboard");
 
     console.log("Login data:", formData);
     setTimeout(() => {

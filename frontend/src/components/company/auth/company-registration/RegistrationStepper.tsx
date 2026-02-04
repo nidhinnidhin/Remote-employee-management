@@ -20,6 +20,7 @@ import {
   RegisterFormData,
   Errors,
 } from "@/shared/types/company/auth/company-registeration/company-registration.type";
+import { useRouter } from 'next/navigation'
 
 const RegistrationStepper = () => {
   const [currentStep, setCurrentStep] = useState<number>(1);
@@ -40,8 +41,10 @@ const RegistrationStepper = () => {
     email: "",
     phone: "",
     password: "",
+    confirmPassword: "",
   });
 
+  const router = useRouter()
   const handleContinue = async () => {
     console.log(
       "handleContinue called. currentStep:",
@@ -104,7 +107,7 @@ const RegistrationStepper = () => {
 
     if (result?.success && result.data?.accessToken) {
       setAuth(result.data.accessToken, "");
-      window.location.href = "/employees/dashboard";
+      router.replace("/employees/dashboard");
     } else {
       alert(result?.error || "Verification failed. Check console.");
     }

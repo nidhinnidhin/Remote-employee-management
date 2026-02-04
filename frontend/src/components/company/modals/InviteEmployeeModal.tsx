@@ -10,7 +10,7 @@ import {
   EmployeeDepartment,
   EmployeeRole,
 } from "@/shared/enum/company/auth/employee.enum";
-import { InviteEmployeeModalProps } from "@/shared/types/company/employees/auth/invite-employee-mopdal-props.type";
+import { InviteEmployeeModalProps } from "@/shared/types/company/employees/auth/invite-employee-modal-props.type";
 
 const ROLE_OPTIONS = Object.values(EmployeeRole);
 

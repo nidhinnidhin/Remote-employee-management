@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "../globals.css";
 import ClientLayout from "./client-layout";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Employee Management Tool",
@@ -15,7 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-white text-gray-900">
-        <ClientLayout>{children}</ClientLayout>
+        <ClientLayout>{children}<Toaster /></ClientLayout>
       </body>
     </html>
   );

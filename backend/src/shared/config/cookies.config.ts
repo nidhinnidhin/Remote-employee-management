@@ -18,7 +18,7 @@ export const REFRESH_TOKEN_COOKIE_NAME = 'refresh_token';
 
 export const REFRESH_TOKEN_COOKIE_OPTIONS: CookieOptions = {
   httpOnly: true,
-  secure: false, // true in production
+  secure: false, 
   sameSite: 'lax',
   path: '/',
   maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days

@@ -50,7 +50,9 @@ const StepTwo: React.FC<StepTwoProps> = ({
       <h2 className="text-2xl font-bold text-white mb-2">
         Admin Account Setup
       </h2>
-      <p className="text-neutral-400 mb-8">Create your administrator account</p>
+      <p className="text-neutral-400 mb-8">
+        Create your administrator account
+      </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FormInput
@@ -96,6 +98,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
         placeholder="+1 (555) 000-0000"
       />
 
+      {/* Password */}
       <div className="mb-6">
         <FormInput
           label="Password"
@@ -110,18 +113,16 @@ const StepTwo: React.FC<StepTwoProps> = ({
 
         {formData.password && (
           <div className="mt-2">
-            <div className="flex items-center justify-between mb-1">
-              <div className="w-full bg-neutral-700 h-1">
-                <motion.div
-                  className={`h-full ${passwordStrength.color}`}
-                  initial={{ width: 0 }}
-                  animate={{ width: `${passwordStrength.strength}%` }}
-                  transition={{ duration: 0.3 }}
-                />
-              </div>
+            <div className="w-full bg-neutral-700 h-1">
+              <motion.div
+                className={`h-full ${passwordStrength.color}`}
+                initial={{ width: 0 }}
+                animate={{ width: `${passwordStrength.strength}%` }}
+                transition={{ duration: 0.3 }}
+              />
             </div>
             <p
-              className={`text-xs ${
+              className={`text-xs mt-1 ${
                 passwordStrength.color
                   ? passwordStrength.color.replace("bg-", "text-")
                   : ""
@@ -132,6 +133,17 @@ const StepTwo: React.FC<StepTwoProps> = ({
           </div>
         )}
       </div>
+
+      <FormInput
+        label="Confirm Password"
+        name="confirmPassword"
+        type="password"
+        value={formData.confirmPassword}
+        onChange={handleChange}
+        error={errors.confirmPassword}
+        required
+        placeholder="••••••••"
+      />
     </motion.div>
   );
 };

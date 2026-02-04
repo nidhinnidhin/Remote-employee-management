@@ -57,7 +57,7 @@ export class InviteEmployeeUseCase {
     await this.inviteLinkRepo.create(inviteLink);
 
     // 7️⃣ Send email with RAW token
-    const inviteUrl = `${process.env.FRONTEND_URL}/employees/login?token=${rawToken}`;
+    const inviteUrl = `${process.env.FRONTEND_URL}/employees/auth/login?token=${rawToken}`;
 
     await this.emailService.sendEmployeeInvite(employee.email, inviteUrl);
   }

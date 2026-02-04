@@ -2,38 +2,23 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { verifyEmployeeInvite } from "@/services/employee/auth/employee-verify-invite.service";
+import { InviteVerifierProps } from "@/shared/types/company/employees/auth/invite-employee-verifier-props.type";
 
-type Props = {
-  token: string;
-};
-
-export default function InviteVerifier({ token }: Props) {
+export default function InviteVerifier({ token }: InviteVerifierProps) {
   const router = useRouter();
 
   useEffect(() => {
     const verifyInvite = async () => {
       try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/company/employees/verify-invite?token=${token}`,
-          {
-            method: "GET",
-            credentials: "include", // 🔥 important for cookies
-          }
-        );
-
-        if (!res.ok) {
-          router.replace("/employees/auth/invite-invalid");
-          return;
-        }
-
-        const data = await res.json();
+        const data = await verifyEmployeeInvite(token);
 
         if (data.nextStep === "SET_PASSWORD") {
           router.replace("/employees/auth/set-password");
         } else {
           router.replace("/employees/auth/login");
         }
-      } catch (err) {
+      } catch {
         router.replace("/employees/auth/invite-invalid");
       }
     };

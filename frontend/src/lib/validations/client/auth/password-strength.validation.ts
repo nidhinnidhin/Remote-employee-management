@@ -1,6 +1,4 @@
-import { PasswordStrength } from "@/shared/types/company/auth/company-registeration/step-two-props.type";
-
-export function getPasswordStrength(password: string): PasswordStrength {
+export function getPasswordStrength(password: string) {
   if (!password) return { strength: 0, label: "", color: "" };
 
   let strength = 0;
