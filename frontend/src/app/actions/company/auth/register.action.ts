@@ -34,7 +34,7 @@ export async function registerAction(formData: RegisterFormData) {
     return { success: true, data };
   } catch (e: any) {
     return {
-      error: e.response?.data?.message || AUTH_MESSAGES.REGISTRATION_FAILED,
+      error: e.message || AUTH_MESSAGES.REGISTRATION_FAILED,
     };
   }
 }

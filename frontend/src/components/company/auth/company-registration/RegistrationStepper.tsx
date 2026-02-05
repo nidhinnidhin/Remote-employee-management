@@ -53,17 +53,16 @@ const RegistrationStepper = () => {
 
   const router = useRouter();
   const handleContinue = async () => {
-    if (showOtpModal) {
-      return;
-    }
+    if (showOtpModal) return;
+
     setIsLoading(true);
+    setErrors({}); // clear previous errors
 
     if (currentStep === 1) {
       const stepErrors = validateStepOne(formData);
 
       if (Object.keys(stepErrors).length === 0) {
         setCurrentStep(2);
-        setErrors({});
       } else {
         setErrors(stepErrors);
       }
@@ -74,24 +73,36 @@ const RegistrationStepper = () => {
 
     const stepErrors = validateStepTwo(formData);
 
-    if (Object.keys(stepErrors).length === 0) {
-      console.log("Calling registerAction with data:", formData.email);
-      const result = await registerAction(formData);
-      console.log("registerAction result:", result);
-
-      if (result?.success) {
-        setRegisteredEmail(formData.email);
-        setShowOtpModal(true);
-        localStorage.setItem(
-          LOCAL_STORAGE_KEYS.OTP_TIMER_EXPIRY_KEY,
-          (Date.now() + 60_000).toString(),
-        );
-      }
-    } else {
+    if (Object.keys(stepErrors).length > 0) {
       setErrors(stepErrors);
+      setIsLoading(false);
+      return;
     }
 
-    setIsLoading(false);
+    try {
+      const result = await registerAction(formData);
+
+      if (!result?.success) {
+        setErrors({
+          form: result?.error || "Registration failed",
+        });
+        return;
+      }
+
+      setRegisteredEmail(formData.email);
+      setShowOtpModal(true);
+
+      localStorage.setItem(
+        LOCAL_STORAGE_KEYS.OTP_TIMER_EXPIRY_KEY,
+        (Date.now() + 60_000).toString(),
+      );
+    } catch (err: any) {
+      setErrors({
+        form: err.message || "Registration failed",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleBack = () => {
@@ -158,7 +169,7 @@ const RegistrationStepper = () => {
             <p className="text-neutral-400">
               Already have an account?{" "}
               <a
-                href="#"
+                href="/company-login"
                 className="text-red-500 hover:text-red-400 transition-colors"
               >
                 Sign in

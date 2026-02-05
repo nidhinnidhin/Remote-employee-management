@@ -13,11 +13,8 @@ const FormInput: React.FC<FormInputProps> = ({
   error,
   required = false,
   placeholder,
-  maxLength,
-  inputMode,
-  className = "",
 }) => {
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const inputType = type === "password" && showPassword ? "text" : type;
 
@@ -34,20 +31,16 @@ const FormInput: React.FC<FormInputProps> = ({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          maxLength={maxLength}
-          inputMode={inputMode}
           className={`w-full bg-neutral-900 border ${
             error ? "border-red-500" : "border-neutral-700"
-          } text-white px-4 py-3 text-center tracking-widest text-xl
-          focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500
-          transition-all duration-200 ${className}`}
+          } text-white px-4 py-3 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all duration-200`}
         />
 
         {type === "password" && (
           <button
             type="button"
             onClick={() => setShowPassword((prev) => !prev)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white transition-colors"
           >
             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
           </button>

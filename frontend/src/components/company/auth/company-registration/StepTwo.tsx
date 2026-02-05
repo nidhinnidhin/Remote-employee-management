@@ -3,12 +3,8 @@
 import { motion } from "framer-motion";
 import FormInput from "./FormInput";
 import React from "react";
-import {
-  RegisterFormData,
-} from "@/shared/types/company/auth/company-registeration/company-registration.type";
-import {
-  StepTwoProps,
-} from "@/shared/types/company/auth/company-registeration/step-two-props.type";
+import { RegisterFormData } from "@/shared/types/company/auth/company-registeration/company-registration.type";
+import { StepTwoProps } from "@/shared/types/company/auth/company-registeration/step-two-props.type";
 import { getPasswordStrength } from "@/lib/validations/client/auth/password-strength.validation";
 
 const StepTwo: React.FC<StepTwoProps> = ({
@@ -50,9 +46,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
       <h2 className="text-2xl font-bold text-white mb-2">
         Admin Account Setup
       </h2>
-      <p className="text-neutral-400 mb-8">
-        Create your administrator account
-      </p>
+      <p className="text-neutral-400 mb-8">Create your administrator account</p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FormInput
@@ -144,6 +138,10 @@ const StepTwo: React.FC<StepTwoProps> = ({
         required
         placeholder="••••••••"
       />
+      
+      {errors.form && (
+        <p className="text-red-500 text-sm text-center mt-2">{errors.form}</p>
+      )}
     </motion.div>
   );
 };

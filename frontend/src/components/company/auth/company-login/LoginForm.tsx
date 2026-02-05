@@ -16,6 +16,13 @@ import { AUTH_MESSAGES } from "@/shared/constants/messages/auth.messages";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
 import { loginAction } from "@/app/actions/company/auth/login.action";
+import { ForgotStep } from "@/shared/types/otp/forgot-step.type";
+import ForgotPasswordOtpModal from "../forgot-password/ForgotPasswordOtpModal";
+import ResetPasswordModal from "../forgot-password/ResetPasswordModal";
+import ForgotPasswordEmailModal from "../forgot-password/ForgotPasswordEmailModal";
+import { forgotPasswordAction } from "@/app/actions/company/forgot-password/forgot-password.action";
+import { verifyResetPasswordOtpAction } from "@/app/actions/company/forgot-password/verify-reset-password-otp.action";
+import { resetPasswordAction } from "@/app/actions/company/forgot-password/reset-password.action";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState<LoginFormData>({
@@ -24,6 +31,8 @@ const LoginForm = () => {
   });
   const [errors, setErrors] = useState<LoginErrors>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [forgotStep, setForgotStep] = useState<ForgotStep>("closed");
+  const [forgotEmail, setForgotEmail] = useState("");
 
   const router = useRouter();
   const setAuth = useAuthStore((state) => state.setAuth);
@@ -39,11 +48,12 @@ const LoginForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrors({}); // clear previous errors
 
-    // Basic validation
     const newErrors: LoginErrors = {};
     if (!formData.email) newErrors.email = AUTH_MESSAGES.EMAIL_MISSING;
-    if (!formData.password) newErrors.password = AUTH_MESSAGES.PASSWORD_REQUIRED;
+    if (!formData.password)
+      newErrors.password = AUTH_MESSAGES.PASSWORD_REQUIRED;
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -51,25 +61,56 @@ const LoginForm = () => {
       return;
     }
 
-    const result = await loginAction(formData);
+    try {
+      const result = await loginAction(formData);
 
-    setIsLoading(false);
+      if (!result?.success) {
+        setErrors({ form: result?.error || AUTH_MESSAGES.LOGIN_FAILED });
+        return;
+      }
 
-    if (!result?.success) {
-      setErrors({ form: result?.error || AUTH_MESSAGES.LOGIN_FAILED });
-      return;
+      const { accessToken, userId } = result.data;
+
+      setAuth(accessToken, userId);
+      router.replace("employees/dashboard");
+    } catch (err: any) {
+      setErrors({
+        form: err.message || AUTH_MESSAGES.LOGIN_FAILED,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleForgotPasswordSend = async (email: string) => {
+    const result = await forgotPasswordAction(email);
+
+    if (!result.success) {
+      throw new Error(result.error);
     }
 
-    const { accessToken, userId } = result.data;
+    setForgotEmail(email);
+    setForgotStep("otp");
+  };
 
-    setAuth(accessToken, userId);
+  const handleOtpVerify = async (otp: string) => {
+    const result = await verifyResetPasswordOtpAction(forgotEmail, otp);
 
-    router.replace("employees/dashboard");
+    if (!result.success) {
+      throw new Error(result.error);
+    }
 
-    console.log("Login data:", formData);
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
+    setForgotStep("reset");
+  };
+
+  const handlePasswordReset = async (password: string) => {
+    const result = await resetPasswordAction(forgotEmail, password);
+
+    if (!result.success) {
+      throw new Error(result.error);
+    }
+
+    setForgotStep("closed");
   };
 
   return (
@@ -126,14 +167,20 @@ const LoginForm = () => {
                 required
               />
               <div className="flex justify-end">
-                <Link
-                  href="/forgot-password"
+                <button
+                  type="button"
+                  onClick={() => setForgotStep("email")}
                   className="text-sm text-neutral-400 hover:text-red-500 transition-colors"
                 >
                   Forgot password?
-                </Link>
+                </button>
               </div>
             </div>
+
+            {/* FORM ERROR */}
+            {errors.form && (
+              <p className="text-red-500 text-sm text-center">{errors.form}</p>
+            )}
 
             <LoginButton
               type="submit"
@@ -189,6 +236,24 @@ const LoginForm = () => {
           .
         </p>
       </motion.div>
+      <ForgotPasswordEmailModal
+        isOpen={forgotStep === "email"}
+        onClose={() => setForgotStep("closed")}
+        onSend={handleForgotPasswordSend}
+      />
+
+      <ForgotPasswordOtpModal
+        isOpen={forgotStep === "otp"}
+        email={forgotEmail}
+        onClose={() => setForgotStep("closed")}
+        onVerified={handleOtpVerify}
+      />
+
+      <ResetPasswordModal
+        isOpen={forgotStep === "reset"}
+        onClose={() => setForgotStep("closed")}
+        onReset={handlePasswordReset}
+      />
     </div>
   );
 };

@@ -7,6 +7,7 @@ import FormInput from "@/components/ui/FormInput";
 import { OTP_MESSAGES } from "@/shared/constants/messages/otp.messages";
 import { OtpModalProps } from "@/shared/types/otp/otp-modal-props.type";
 import { useOtpTimer } from "@/hooks/otp/use-otp-timer";
+import OtpInput from "@/components/ui/OtpInput";
 
 const OtpModal = ({
   isOpen,
@@ -61,14 +62,11 @@ const OtpModal = ({
         </div>
       }
     >
-      <FormInput
-        label="OTP Code"
-        name="otp"
+      <OtpInput
+        length={6}
         value={otp}
-        maxLength={6}
-        inputMode="numeric"
+        onChange={setOtp}
         error={localError || error}
-        onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
       />
 
       <div className="mt-3 text-sm text-center">
