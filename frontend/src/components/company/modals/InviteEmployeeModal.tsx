@@ -11,6 +11,7 @@ import {
   EmployeeRole,
 } from "@/shared/enum/company/auth/employee.enum";
 import { InviteEmployeeModalProps } from "@/shared/types/company/employees/auth/invite-employee-modal-props.type";
+import { AUTH_MESSAGES } from "@/shared/constants/messages/auth.messages";
 
 const ROLE_OPTIONS = Object.values(EmployeeRole);
 
@@ -39,7 +40,7 @@ const InviteEmployeeModal = ({
     const { name, email, role, department } = form;
 
     if (!name || !email || !role || !department) {
-      setError("All fields are required");
+      setError(AUTH_MESSAGES.ALL_FIELDS_REQUIRED);
       return;
     }
 

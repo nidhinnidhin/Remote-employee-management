@@ -8,4 +8,5 @@ export const OTP_MESSAGES = {
   OTP_RESENT: 'OTP has been resent successfully.',
   OTP_SENT: 'OTP has been sent to your email address.',
   OTP_DIGIT_ERROR: 'OTP must be 6 digits',
+  FAILED_TO_RESEND_OTP: 'Failed to resend OTP'
 };

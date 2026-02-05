@@ -10,4 +10,8 @@ export interface FormInputProps {
   error?: string;
   required?: boolean;
   placeholder?: string;
+  maxLength?: number;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
+  className?: string;
 }
+

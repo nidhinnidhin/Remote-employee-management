@@ -9,7 +9,7 @@ export function useHydrateAuth() {
   useEffect(() => {
     async function hydrate() {
       const token = await getSessionToken();
-      if (token) setAuth(token);
+      if (token) setAuth(token, '');
     }
     hydrate();
   }, []);

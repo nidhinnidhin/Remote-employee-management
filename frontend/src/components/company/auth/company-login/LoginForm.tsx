@@ -12,7 +12,7 @@ import {
   LoginErrors,
 } from "@/shared/types/company/auth/company-login/login.type";
 import LoginButton from "../../../ui/LoginButton";
-import { AUTH_MESSAGES } from "@/shared/constants/auth.messages";
+import { AUTH_MESSAGES } from "@/shared/constants/messages/auth.messages";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
 import { loginAction } from "@/app/actions/company/auth/login.action";
@@ -56,7 +56,7 @@ const LoginForm = () => {
     setIsLoading(false);
 
     if (!result?.success) {
-      setErrors({ form: result?.error || "Login failed" });
+      setErrors({ form: result?.error || AUTH_MESSAGES.LOGIN_FAILED });
       return;
     }
 

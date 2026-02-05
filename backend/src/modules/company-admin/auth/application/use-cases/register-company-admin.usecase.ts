@@ -23,7 +23,7 @@ export class RegisterCompanyAdminUseCase {
 
     private readonly emailService: EmailService,
     private readonly otpService: OtpService,
-  ) {}
+  ) { }
 
   async execute(dto: RegisterCompanyAdminDto) {
     const existingCompany = await this.companyRepository.findByEmail(
@@ -42,7 +42,7 @@ export class RegisterCompanyAdminUseCase {
 
     const otp = this.otpService.generateOtp();
     const otpHash = await this.otpService.hashOtp(otp);
-    const expiresAt = new Date(Date.now() + 60_000); 
+    const expiresAt = new Date(Date.now() + 60_000);
 
     const passwordHash = await bcrypt.hash(dto.admin.password, 10);
 
@@ -60,7 +60,7 @@ export class RegisterCompanyAdminUseCase {
     await this.pendingRepository.save(
       dto.admin.email,
       payload,
-      60,
+      900, // 15 minutes TTL for SESSION to allow resend
     );
 
     await this.emailService.sendOtp(dto.admin.email, otp);

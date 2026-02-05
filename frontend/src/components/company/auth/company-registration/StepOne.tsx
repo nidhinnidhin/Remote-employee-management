@@ -10,6 +10,8 @@ import {
   Errors,
 } from "@/shared/types/company/auth/company-registeration/company-registration.type";
 import { StepOneProps } from "@/shared/types/company/auth/company-registeration/step-one-props.type";
+import { employeeSizeOptionsData } from "@/shared/constants/datas/company-register-employee-size-options";
+import { industryOptionsData } from "@/shared/constants/datas/company-register-industry-options";
 
 const StepOne: React.FC<StepOneProps> = ({
   formData,
@@ -17,26 +19,8 @@ const StepOne: React.FC<StepOneProps> = ({
   errors,
   setErrors,
 }) => {
-  const employeeSizeOptions = ["1–10", "11–50", "51–200", "201–500", "500+"];
-  const industryOptions = [
-  "Information Technology",
-  "Software Development",
-  "Web Development",
-  "Mobile App Development",
-  "Cloud Computing",
-  "Cybersecurity",
-  "Data Science & Analytics",
-  "Artificial Intelligence & Machine Learning",
-  "IT Services & Consulting",
-  "DevOps & Infrastructure",
-  "Networking & Systems Administration",
-  "Enterprise Software (ERP, CRM)",
-  "Gaming & Interactive Media",
-  "Blockchain & Web3",
-  "E-commerce Technology",
-  "IT Support & Managed Services",
-  "Other",
-];
+  const employeeSizeOptions = employeeSizeOptionsData;
+  const industryOptions = industryOptionsData;
 
   const handleChange = (
     e:
@@ -78,7 +62,7 @@ const StepOne: React.FC<StepOneProps> = ({
         onChange={handleChange}
         error={errors.companyName}
         required
-        placeholder="Acme Inc."
+        placeholder="Company Inc."
       />
 
       <FormInput
@@ -89,7 +73,7 @@ const StepOne: React.FC<StepOneProps> = ({
         onChange={handleChange}
         error={errors.companyEmail}
         required
-        placeholder="contact@acme.com"
+        placeholder="contact@gmail.com"
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

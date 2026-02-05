@@ -2,7 +2,7 @@
 
 import { registerSchema } from "@/lib/validations/schemas/auth.schema";
 import { registerUser } from "@/services/company/auth/register.service";
-import { AUTH_MESSAGES } from "@/shared/constants/auth.messages";
+import { AUTH_MESSAGES } from "@/shared/constants/messages/auth.messages";
 import { RegisterFormData } from "@/shared/types/company/auth/company-registeration/company-registration.type";
 import { RegisterCompanyPayload } from "@/shared/types/company/auth/company-registeration/register-company-payload.type";
 

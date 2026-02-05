@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { setEmployeePassword } from "@/services/employee/auth/set-employee-password.service";
 import FormInput from "@/components/ui/FormInput";
 import Button from "@/components/ui/Button";
+import { AUTH_MESSAGES } from "@/shared/constants/messages/auth.messages";
 
 const SetPasswordCard = () => {
   const router = useRouter();
@@ -16,7 +17,7 @@ const SetPasswordCard = () => {
 
   const handleSubmit = async () => {
     if (!password || password !== confirmPassword) {
-      setError("Passwords do not match");
+      setError(AUTH_MESSAGES.PASSWORD_DO_NOT_MATCH);
       return;
     }
 
@@ -28,7 +29,7 @@ const SetPasswordCard = () => {
 
       router.replace("/dashboard");
     } catch {
-      setError("Unable to set password");
+      setError(AUTH_MESSAGES.UNABLE_TO_SET_PASSWORD);
     } finally {
       setLoading(false);
     }

@@ -21,6 +21,9 @@ import {
   Errors,
 } from "@/shared/types/company/auth/company-registeration/company-registration.type";
 import { useRouter } from "next/navigation";
+import { resendOtp } from "@/services/company/otp/resend-otp.service";
+import { OTP_MESSAGES } from "@/shared/constants/messages/otp.messages";
+import { LOCAL_STORAGE_KEYS } from "@/shared/constants/temp/local-storage-keys";
 
 const RegistrationStepper = () => {
   const [currentStep, setCurrentStep] = useState<number>(1);
@@ -31,6 +34,8 @@ const RegistrationStepper = () => {
   const setAuth = useAuthStore((s) => s.setAuth);
   const [otpLoading, setOtpLoading] = useState(false);
   const [otpError, setOtpError] = useState("");
+  const [otpVerifying, setOtpVerifying] = useState(false);
+  const [otpResending, setOtpResending] = useState(false);
 
   const [formData, setFormData] = useState<RegisterFormData>({
     companyName: "",
@@ -48,14 +53,7 @@ const RegistrationStepper = () => {
 
   const router = useRouter();
   const handleContinue = async () => {
-    console.log(
-      "handleContinue called. currentStep:",
-      currentStep,
-      "showOtpModal:",
-      showOtpModal,
-    );
     if (showOtpModal) {
-      console.log("Blocking handleContinue because OtpModal is open");
       return;
     }
     setIsLoading(true);
@@ -84,6 +82,10 @@ const RegistrationStepper = () => {
       if (result?.success) {
         setRegisteredEmail(formData.email);
         setShowOtpModal(true);
+        localStorage.setItem(
+          LOCAL_STORAGE_KEYS.OTP_TIMER_EXPIRY_KEY,
+          (Date.now() + 60_000).toString(),
+        );
       }
     } else {
       setErrors(stepErrors);
@@ -101,7 +103,7 @@ const RegistrationStepper = () => {
 
   const handleOtpVerify = async (otp: string) => {
     try {
-      setOtpLoading(true);
+      setOtpVerifying(true);
       setOtpError("");
 
       const result = await verifyOtpAction({
@@ -110,17 +112,31 @@ const RegistrationStepper = () => {
       });
 
       if (!result.success) {
-        alert(result.error || "Wrong OTP");
-        setOtpError(result.error || "Wrong OTP");
+        setOtpError(result.error || OTP_MESSAGES.OTP_INVALID);
         return;
       }
 
-      // ✅ success
+      localStorage.removeItem("otp_expiry_time");
       setAuth(result.data.accessToken, "");
       setShowOtpModal(false);
       router.replace("/employees/dashboard");
     } finally {
-      setOtpLoading(false);
+      setOtpVerifying(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    try {
+      setOtpResending(true);
+      setOtpError("");
+
+      await resendOtp({ email: registeredEmail });
+    } catch (err: any) {
+      setOtpError(
+        err?.response?.data?.error || OTP_MESSAGES.FAILED_TO_RESEND_OTP,
+      );
+    } finally {
+      setOtpResending(false);
     }
   };
 
@@ -242,8 +258,10 @@ const RegistrationStepper = () => {
         isOpen={showOtpModal}
         onClose={() => setShowOtpModal(false)}
         onVerify={handleOtpVerify}
-        loading={otpLoading}
+        onResend={handleResendOtp}
+        loading={otpVerifying}
         error={otpError}
+        resending={otpResending}
       />
     </>
   );

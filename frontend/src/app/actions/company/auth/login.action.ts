@@ -3,13 +3,14 @@
 import { api } from "@/lib/axiosInstance";
 import { getSession } from "@/lib/iron-session/getSession";
 import { setRefreshTokenCookie } from "@/lib/auth/cookies";
-import { AUTH_MESSAGES } from "@/shared/constants/auth.messages";
+import { AUTH_MESSAGES } from "@/shared/constants/messages/auth.messages";
 import { loginUser } from "@/services/company/auth/login.service";
 import { LoginPayload } from "@/shared/types/company/auth/company-login/login-payload.type";
 import {
   AuthActionResult,
   LoginResponse,
 } from "@/shared/types/company/auth/company-login/login-response.type";
+import { COOKIE_KEYS } from "@/shared/constants/temp/cookie-keys";
 
 export async function loginAction(
   payload: LoginPayload,
@@ -23,7 +24,7 @@ export async function loginAction(
         const [nameValue] = cookieStr.split(";");
         const [name, value] = nameValue.split("=");
 
-        if (name.trim() === "refresh_token") {
+        if (name.trim() === COOKIE_KEYS.REFRESH_TOKEN) {
           await setRefreshTokenCookie(value);
         }
       }
@@ -45,7 +46,7 @@ export async function loginAction(
   } catch (e: any) {
     return {
       success: false,
-      error: e.response?.data?.message || "Login failed",
+      error: e.response?.data?.message || AUTH_MESSAGES.LOGIN_FAILED,
     };
   }
 }
