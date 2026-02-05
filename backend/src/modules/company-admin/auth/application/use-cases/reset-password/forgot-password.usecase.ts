@@ -4,8 +4,8 @@ import {
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
-import type { UserRepository } from '../../domain/repositories/user.repository';
-import { SendEmailOtpUseCase } from './send-email-otp.usecase';
+import type { UserRepository } from '../../../domain/repositories/user.repository';
+import { SendEmailOtpUseCase } from '../otp/send-email-otp.usecase';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 
@@ -17,7 +17,7 @@ export class ForgotPasswordUseCase {
     private readonly sendEmailOtpUseCase: SendEmailOtpUseCase,
   ) {}
 
-  async execute({ email }: { email: string }): Promise<void> {
+  async execute({ email }: { email: string }) {
     const user = await this.userRepository.findByEmail(email.toLowerCase());
 
     if (!user) {

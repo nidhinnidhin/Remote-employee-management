@@ -1,7 +1,7 @@
 import { Injectable, Inject, UnauthorizedException, ForbiddenException } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
-import { JwtService } from '../../../../../shared/services/jwt.service';
-import type { UserRepository } from '../../domain/repositories/user.repository';
+import { JwtService } from 'src/shared/services/jwt.service';
+import type { UserRepository } from '../../../domain/repositories/user.repository';
 import { RefreshTokenPayload } from 'src/shared/types/jwt/jwt-payload.type';
 import { RefreshAccessTokenResponse } from 'src/shared/types/jwt/refresh-access-token-response.type';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';

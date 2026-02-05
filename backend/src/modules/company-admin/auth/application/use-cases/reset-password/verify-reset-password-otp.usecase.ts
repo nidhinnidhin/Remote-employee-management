@@ -1,20 +1,20 @@
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import type { EmailOtpRepository } from '../../domain/repositories/email-otp.repository';
+import type { EmailOtpRepository } from '../../../domain/repositories/email-otp.repository';
 import { VerifyResetPasswordOtpInput } from 'src/shared/types/company/otp/verify-reset-password-otp-input.type';
-import { VerifyResetPasswordOtpResponse } from 'src/shared/types/company/otp/verify-reset-password-otp-response.type';
 import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
+import { RedisService } from 'src/shared/services/redis.service';
 
 @Injectable()
 export class VerifyResetPasswordOtpUseCase {
   constructor(
     @Inject('EmailOtpRepository')
     private readonly otpRepository: EmailOtpRepository,
+
+    private readonly redisService: RedisService,
   ) {}
 
-  async execute(
-    input: VerifyResetPasswordOtpInput,
-  ): Promise<VerifyResetPasswordOtpResponse> {
+  async execute(input: VerifyResetPasswordOtpInput) {
     const record = await this.otpRepository.findLatestByEmail(
       input.email.toLowerCase(),
     );
@@ -32,13 +32,17 @@ export class VerifyResetPasswordOtpUseCase {
     }
 
     const isValidOtp = await bcrypt.compare(input.otp, record.otpHash);
-
     if (!isValidOtp) {
       throw new BadRequestException(OTP_MESSAGES.OTP_INVALID);
     }
 
+    // ✅ Mark OTP verified
     await this.otpRepository.markAsVerified(record.id);
 
-    return { message: OTP_MESSAGES.OTP_NOT_VERIFIED };
+    // 🔐 Create reset session
+    const resetSessionKey = `reset-password:${input.email.toLowerCase()}`;
+    await this.redisService.set(resetSessionKey, 'true', 10 * 60); // 10 min
+
+    return { message: OTP_MESSAGES.OTP_VERIFIED };
   }
 }

@@ -1,8 +1,7 @@
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
-import type { PendingRegistrationRepository } from '../../domain/repositories/cache/auth-repository/pending-registration.repository';
-import { EmailService } from '../../../../../shared/services/email.service';
+import type { PendingRegistrationRepository } from '../../../domain/repositories/cache/auth-repository/pending-registration.repository';
+import { EmailService } from 'src/shared/services/email.service';
 import { OtpService } from 'src/shared/services/otp.service';
-import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
 
 @Injectable()
 export class ResendEmailOtpUseCase {

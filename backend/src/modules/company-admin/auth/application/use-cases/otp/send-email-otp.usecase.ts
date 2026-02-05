@@ -1,8 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { randomUUID } from 'crypto';
-import { EmailService } from '../../../../../shared/services/email.service';
-import type { EmailOtpRepository } from '../../domain/repositories/email-otp.repository';
-import { EmailOtpEntity } from '../../domain/entities/email-otp.entity';
+import { EmailService } from 'src/shared/services/email.service';
+import type { EmailOtpRepository } from '../../../domain/repositories/email-otp.repository';
+import { EmailOtpEntity } from '../../../domain/entities/email-otp.entity';
 import { SendEmailOtpInput } from 'src/shared/types/company/otp/send-email-otp-input.type';
 import { OtpService } from 'src/shared/services/otp.service';
 

@@ -7,19 +7,19 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
-import { RegisterCompanyAdminUseCase } from '../../application/use-cases/register-company-admin.usecase';
-import { VerifyEmailOtpUseCase } from '../../application/use-cases/verify-email-otp.usecase';
-import { LoginCompanyAdminUseCase } from 'src/modules/company-admin/auth/application/use-cases/login-company-admin.useCase';
-import { ResendEmailOtpUseCase } from 'src/modules/company-admin/auth/application/use-cases/resend-email-otp.usecase';
+import { RegisterCompanyAdminUseCase } from '../../application/use-cases/register/register-company-admin.usecase';
+import { VerifyEmailOtpUseCase } from '../../application/use-cases/otp/verify-email-otp.usecase';
+import { LoginCompanyAdminUseCase } from '../../application/use-cases/login/login-company-admin.useCase';
+import { ResendEmailOtpUseCase } from '../../application/use-cases/otp/resend-email-otp.usecase';
 
 import { RegisterCompanyAdminDto } from '../../presentation/dto/register-company-admin.dto';
 import { VerifyEmailOtpDto } from '../../presentation/dto/verify-email-otp.dto';
 import { LoginCompanyAdminDto } from '../../presentation/dto/login-company-admin.dto';
 import { ResendOtpDto } from 'src/modules/company-admin/auth/presentation/dto/resend-otp.dto';
-import { RefreshAccessTokenUseCase } from '../../application/use-cases/refresh-access-token.usecase';
-import { ForgotPasswordUseCase } from '../../application/use-cases/forgot-password.usecase';
-import { ResetPasswordUseCase } from '../../application/use-cases/reset-password.usecase';
-import { VerifyResetPasswordOtpUseCase } from '../../application/use-cases/verify-reset-password-otp.usecase';
+import { RefreshAccessTokenUseCase } from '../../application/use-cases/token/refresh-access-token.usecase';
+import { ForgotPasswordUseCase } from '../../application/use-cases/reset-password/forgot-password.usecase';
+import { ResetPasswordUseCase } from '../../application/use-cases/reset-password/reset-password.usecase';
+import { VerifyResetPasswordOtpUseCase } from '../../application/use-cases/reset-password/verify-reset-password-otp.usecase';
 import { ResetPasswordDto } from '../../presentation/dto/reset-password.dto';
 import { VerifyResetPasswordOtpDto } from '../../presentation/dto/verify-reset-password-otp.dto';
 import { ForgotPasswordDto } from '../../presentation/dto/forgot-password.dto';

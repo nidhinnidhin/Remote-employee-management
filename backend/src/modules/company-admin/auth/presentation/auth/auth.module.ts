@@ -1,13 +1,13 @@
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
-import { ForgotPasswordUseCase } from '../../application/use-cases/forgot-password.usecase';
-import { LoginCompanyAdminUseCase } from '../../application/use-cases/login-company-admin.useCase';
-import { RefreshAccessTokenUseCase } from '../../application/use-cases/refresh-access-token.usecase';
-import { RegisterCompanyAdminUseCase } from '../../application/use-cases/register-company-admin.usecase';
-import { ResendEmailOtpUseCase } from '../../application/use-cases/resend-email-otp.usecase';
-import { ResetPasswordUseCase } from '../../application/use-cases/reset-password.usecase';
-import { SendEmailOtpUseCase } from '../../application/use-cases/send-email-otp.usecase';
-import { VerifyEmailOtpUseCase } from '../../application/use-cases/verify-email-otp.usecase';
-import { VerifyResetPasswordOtpUseCase } from '../../application/use-cases/verify-reset-password-otp.usecase';
+import { ForgotPasswordUseCase } from '../../application/use-cases/reset-password/forgot-password.usecase';
+import { LoginCompanyAdminUseCase } from '../../application/use-cases/login/login-company-admin.useCase';
+import { RefreshAccessTokenUseCase } from '../../application/use-cases/token/refresh-access-token.usecase';
+import { RegisterCompanyAdminUseCase } from '../../application/use-cases/register/register-company-admin.usecase';
+import { ResendEmailOtpUseCase } from '../../application/use-cases/otp/resend-email-otp.usecase';
+import { ResetPasswordUseCase } from '../../application/use-cases/reset-password/reset-password.usecase';
+import { SendEmailOtpUseCase } from '../../application/use-cases/otp/send-email-otp.usecase';
+import { VerifyEmailOtpUseCase } from '../../application/use-cases/otp/verify-email-otp.usecase';
+import { VerifyResetPasswordOtpUseCase } from '../../application/use-cases/reset-password/verify-reset-password-otp.usecase';
 import { RedisPendingRegistrationRepository } from '../../infrastructure/cache/auth/pending-registration-repository-infra';
 import { AppRedisModule } from '../../infrastructure/cache/redis.module';
 import { MongoCompanyRepository } from '../../infrastructure/database/repositories/mongo-company.repository';
@@ -48,7 +48,6 @@ import { Module } from '@nestjs/common';
     ForgotPasswordUseCase,
     VerifyResetPasswordOtpUseCase,
     ResetPasswordUseCase,
-
     {
       provide: 'PendingRegistrationRepository',
       useClass: RedisPendingRegistrationRepository,

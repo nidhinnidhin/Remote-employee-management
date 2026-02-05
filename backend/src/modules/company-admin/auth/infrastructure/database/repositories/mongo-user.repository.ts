@@ -11,7 +11,7 @@ export class MongoUserRepository implements UserRepository {
   constructor(
     @InjectModel(UserDocument.name)
     private readonly userModel: Model<UserDocument>,
-  ) { }
+  ) {}
 
   async findByEmail(email: string): Promise<UserEntity | null> {
     const user = await this.userModel.findOne({ email });
@@ -42,7 +42,18 @@ export class MongoUserRepository implements UserRepository {
     email: string,
     passwordHash: string,
   ): Promise<void> {
-    await this.userModel.updateOne({ email }, { password: passwordHash });
+    const result = await this.userModel.updateOne(
+      { email: email.toLowerCase() },
+      {
+        $set: {
+          passwordHash: passwordHash, // 🔥 MUST MATCH LOGIN
+        },
+      },
+    );
+
+    if (result.matchedCount === 0) {
+      throw new Error(`User not found for email ${email}`);
+    }
   }
 
   private toEntity(doc: UserDocument): UserEntity {
@@ -60,10 +71,7 @@ export class MongoUserRepository implements UserRepository {
       doc.updatedAt,
     );
   }
-  async updateStatusByEmail(
-    email: string,
-    status: UserStatus,
-  ): Promise<void> {
+  async updateStatusByEmail(email: string, status: UserStatus): Promise<void> {
     await this.userModel.updateOne({ email }, { status });
   }
 }

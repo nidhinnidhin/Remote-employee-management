@@ -1,0 +1,11 @@
+git add .
+git commit -m "Latest changes"
+
+git checkout develop
+git pull origin develop
+git merge feature/company-auth
+git push origin develop
+
+git checkout feature/company-admin-reset-password
+git merge develop
+git push origin feature/company-admin-reset-password

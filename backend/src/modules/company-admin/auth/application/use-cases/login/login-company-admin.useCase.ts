@@ -5,8 +5,8 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import type { UserRepository } from '../../domain/repositories/user.repository';
-import { JwtService } from '../../../../../shared/services/jwt.service';
+import type { UserRepository } from '../../../domain/repositories/user.repository';
+import { JwtService } from 'src/shared/services/jwt.service';
 import { LoginResponse } from 'src/shared/types/company/login/login-response.type';
 import { LoginCompanyAdminInput } from 'src/shared/types/company/login/login-company-admin-input.type';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';

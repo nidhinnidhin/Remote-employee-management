@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { RedisModule } from '@nestjs-modules/ioredis';
 
+import { RedisService } from 'src/shared/services/redis.service';
+
 @Module({
   imports: [
     RedisModule.forRoot({
@@ -8,6 +10,7 @@ import { RedisModule } from '@nestjs-modules/ioredis';
       url: process.env.REDIS_URL,
     }),
   ],
-  exports: [RedisModule],
+  providers: [RedisService],
+  exports: [RedisModule, RedisService],
 })
-export class AppRedisModule {}
+export class AppRedisModule { }
