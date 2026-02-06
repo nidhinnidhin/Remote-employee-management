@@ -130,7 +130,7 @@ const RegistrationStepper = () => {
       localStorage.removeItem("otp_expiry_time");
       setAuth(result.data.accessToken, "");
       setShowOtpModal(false);
-      router.replace("/employees/dashboard");
+      router.replace("/company/employees/dashboard");
     } finally {
       setOtpVerifying(false);
     }

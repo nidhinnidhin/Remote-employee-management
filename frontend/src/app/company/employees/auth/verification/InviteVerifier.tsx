@@ -14,12 +14,12 @@ export default function InviteVerifier({ token }: InviteVerifierProps) {
         const data = await verifyEmployeeInvite(token);
 
         if (data.nextStep === "SET_PASSWORD") {
-          router.replace("/employees/auth/set-password");
+          router.replace("/company/employees/auth/set-password");
         } else {
-          router.replace("/employees/auth/login");
+          router.replace("/company/employees/auth/login");
         }
       } catch {
-        router.replace("/employees/auth/invite-invalid");
+        router.replace("/company/employees/auth/invite-invalid");
       }
     };
 

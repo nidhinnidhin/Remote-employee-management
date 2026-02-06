@@ -5,7 +5,6 @@ import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 @Schema({ timestamps: true })
 export class UserDocument extends Document {
   @Prop({ required: true })
-  @Prop({ required: true })
   companyId: string;
 
   @Prop({ required: true })
