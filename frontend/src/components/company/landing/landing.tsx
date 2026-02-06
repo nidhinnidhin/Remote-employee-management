@@ -1,12 +1,12 @@
 "use client";
 
-import Navbar from "./components/Navbar";
-import Hero from "./components/Hero";
-import Features from "./components/Features";
-import Stats from "./components/Stats";
-import TargetAudience from "./components/TargetAudience";
-import CTA from "./components/CTA";
-import Footer from "./components/Footer";
+import Navbar from "./Navbar";
+import Hero from "./Hero";
+import Features from "./Features";
+import Stats from "./Stats";
+import TargetAudience from "./TargetAudience";
+import CTA from "./CTA";
+import Footer from "./Footer";
 
 export default function Landing() {
   return (
