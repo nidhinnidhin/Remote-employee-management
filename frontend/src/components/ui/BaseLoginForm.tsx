@@ -5,6 +5,7 @@ import Link from "next/link";
 import FormInput from "@/components/ui/FormInput";
 import LoginButton from "@/components/ui/LoginButton";
 import SocialLoginButtons from "@/components/ui/SocialLoginButtons";
+import BackgroundEffect from "@/components/ui/BackgroundEffect";
 import { BaseLoginFormProps } from "@/shared/types/ui/base-login-form-type";
 
 export default function BaseLoginForm({
@@ -18,11 +19,12 @@ export default function BaseLoginForm({
   onForgotPassword,
 }: BaseLoginFormProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-neutral-950 flex items-center justify-center p-4 relative overflow-hidden">
+      <BackgroundEffect />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md"
+        className="w-full max-w-md relative z-10"
       >
         {/* Header */}
         <div className="text-center mb-8">

@@ -41,7 +41,6 @@ const StepTwo: React.FC<StepTwoProps> = ({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
       transition={{ duration: 0.3 }}
-      className="bg-neutral-800 p-8"
     >
       <h2 className="text-2xl font-bold text-white mb-2">
         Admin Account Setup
@@ -116,11 +115,10 @@ const StepTwo: React.FC<StepTwoProps> = ({
               />
             </div>
             <p
-              className={`text-xs mt-1 ${
-                passwordStrength.color
+              className={`text-xs mt-1 ${passwordStrength.color
                   ? passwordStrength.color.replace("bg-", "text-")
                   : ""
-              }`}
+                }`}
             >
               {passwordStrength.label}
             </p>
@@ -138,7 +136,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
         required
         placeholder="••••••••"
       />
-      
+
       {errors.form && (
         <p className="text-red-500 text-sm text-center mt-2">{errors.form}</p>
       )}

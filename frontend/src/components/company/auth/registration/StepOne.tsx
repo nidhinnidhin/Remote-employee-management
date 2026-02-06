@@ -48,7 +48,6 @@ const StepOne: React.FC<StepOneProps> = ({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
       transition={{ duration: 0.3 }}
-      className="bg-neutral-800 p-8"
     >
       <h2 className="text-2xl font-bold text-white mb-2">
         Company Information

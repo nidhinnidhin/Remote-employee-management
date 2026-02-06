@@ -24,6 +24,7 @@ import { useRouter } from "next/navigation";
 import { resendOtp } from "@/services/company/otp/resend-otp.service";
 import { OTP_MESSAGES } from "@/shared/constants/messages/otp.messages";
 import { LOCAL_STORAGE_KEYS } from "@/shared/constants/temp/local-storage-keys";
+import BackgroundEffect from "@/components/ui/BackgroundEffect";
 
 const RegistrationStepper = () => {
   const [currentStep, setCurrentStep] = useState<number>(1);
@@ -153,8 +154,9 @@ const RegistrationStepper = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 flex items-center justify-center p-4">
-        <div className="w-full max-w-3xl">
+      <div className="min-h-screen bg-neutral-950 flex items-center justify-center p-4 relative overflow-hidden">
+        <BackgroundEffect />
+        <div className="w-full max-w-3xl relative z-10">
           {/* Header */}
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-2 mb-4">
@@ -196,70 +198,72 @@ const RegistrationStepper = () => {
             />
           </div>
 
-          {/* Form Steps */}
-          <AnimatePresence mode="wait">
-            {currentStep === 1 && (
-              <StepOne
-                key="step1"
-                formData={formData}
-                setFormData={setFormData}
-                errors={errors}
-                setErrors={setErrors}
-              />
-            )}
-
-            {currentStep === 2 && (
-              <StepTwo
-                key="step2"
-                formData={formData}
-                setFormData={setFormData}
-                errors={errors}
-                setErrors={setErrors}
-              />
-            )}
-          </AnimatePresence>
-
-          {/* Navigation Buttons */}
-          <div className="flex justify-between mt-8">
-            <Button
-              variant="secondary"
-              onClick={handleBack}
-              disabled={currentStep === 1 || isLoading}
-            >
-              Back
-            </Button>
-
-            <Button
-              variant="primary"
-              onClick={handleContinue}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <div className="flex items-center gap-2">
-                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                      fill="none"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    />
-                  </svg>
-                  <span>Processing...</span>
-                </div>
-              ) : currentStep === 2 ? (
-                "Create Account"
-              ) : (
-                "Continue"
+          {/* Form Card */}
+          <div className="bg-neutral-800/50 border border-neutral-700/50 p-8 shadow-2xl backdrop-blur-sm">
+            <AnimatePresence mode="wait">
+              {currentStep === 1 && (
+                <StepOne
+                  key="step1"
+                  formData={formData}
+                  setFormData={setFormData}
+                  errors={errors}
+                  setErrors={setErrors}
+                />
               )}
-            </Button>
+
+              {currentStep === 2 && (
+                <StepTwo
+                  key="step2"
+                  formData={formData}
+                  setFormData={setFormData}
+                  errors={errors}
+                  setErrors={setErrors}
+                />
+              )}
+            </AnimatePresence>
+
+            {/* Navigation Buttons */}
+            <div className="flex justify-between mt-8">
+              <Button
+                variant="secondary"
+                onClick={handleBack}
+                disabled={currentStep === 1 || isLoading}
+              >
+                Back
+              </Button>
+
+              <Button
+                variant="primary"
+                onClick={handleContinue}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        fill="none"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
+                    </svg>
+                    <span>Processing...</span>
+                  </div>
+                ) : currentStep === 2 ? (
+                  "Create Account"
+                ) : (
+                  "Continue"
+                )}
+              </Button>
+            </div>
           </div>
         </div>
 
