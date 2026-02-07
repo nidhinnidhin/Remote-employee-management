@@ -4,12 +4,38 @@ import React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { PaginationProps } from "@/shared/types/ui/pagination-props.type";
 
-const Pagination: React.FC<PaginationProps> = ({
+const Pagination: React.FC<PaginationProps & { theme?: "dark" | "light" }> = ({
     currentPage,
     totalPages,
     onPageChange,
     className = "",
+    theme = "dark",
 }) => {
+    const themeStyles = {
+        dark: {
+            container: "border-neutral-800",
+            text: "text-neutral-400",
+            activeText: "text-white",
+            button: {
+                base: "text-neutral-400 ring-neutral-700 hover:bg-neutral-800",
+                active: "z-10 bg-red-600 text-white focus-visible:outline-red-600 border-red-600 ring-red-600",
+                disabled: "disabled:opacity-50 disabled:cursor-not-allowed",
+            },
+        },
+        light: {
+            container: "border-purple-100 bg-white",
+            text: "text-gray-500",
+            activeText: "text-gray-900",
+            button: {
+                base: "text-gray-500 ring-purple-100 hover:bg-purple-50 hover:text-purple-700",
+                active: "z-10 bg-purple-600 text-white focus-visible:outline-purple-600 ring-purple-600",
+                disabled: "disabled:opacity-40 disabled:cursor-not-allowed text-gray-300",
+            },
+        },
+    };
+
+    const styles = themeStyles[theme];
+
     const getPageNumbers = () => {
         const pages = [];
         const maxVisiblePages = 5;
@@ -34,12 +60,12 @@ const Pagination: React.FC<PaginationProps> = ({
     if (totalPages <= 1) return null;
 
     return (
-        <div className={`flex items-center justify-between border-t border-neutral-800 px-4 py-3 sm:px-6 ${className}`}>
+        <div className={`flex items-center justify-between border-t px-4 py-3 sm:px-6 ${styles.container} ${className}`}>
             <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
                 <div>
-                    <p className="text-sm text-neutral-400">
-                        Showing page <span className="font-medium text-white">{currentPage}</span> of{" "}
-                        <span className="font-medium text-white">{totalPages}</span>
+                    <p className={`text-sm ${styles.text}`}>
+                        Showing page <span className={`font-medium ${styles.activeText}`}>{currentPage}</span> of{" "}
+                        <span className={`font-medium ${styles.activeText}`}>{totalPages}</span>
                     </p>
                 </div>
                 <div>
@@ -50,7 +76,7 @@ const Pagination: React.FC<PaginationProps> = ({
                         <button
                             onClick={() => onPageChange(currentPage - 1)}
                             disabled={currentPage === 1}
-                            className="relative inline-flex items-center rounded-l-md px-2 py-2 text-neutral-400 ring-1 ring-inset ring-neutral-700 hover:bg-neutral-800 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            className={`relative inline-flex items-center rounded-l-md px-2 py-2 ring-1 ring-inset focus:z-20 focus:outline-offset-0 transition-colors ${styles.button.base} ${styles.button.disabled}`}
                         >
                             <span className="sr-only">Previous</span>
                             <ChevronLeft className="h-4 w-4" aria-hidden="true" />
@@ -60,9 +86,9 @@ const Pagination: React.FC<PaginationProps> = ({
                                 <button
                                     key={index}
                                     onClick={() => onPageChange(page)}
-                                    className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold focus:z-20 focus:outline-offset-0 ring-1 ring-inset ring-neutral-700 ${currentPage === page
-                                            ? "z-10 bg-red-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 border-red-600"
-                                            : "text-neutral-400 hover:bg-neutral-800 transition-colors"
+                                    className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold focus:z-20 focus:outline-offset-0 ring-1 ring-inset transition-colors ${currentPage === page
+                                        ? styles.button.active
+                                        : styles.button.base
                                         }`}
                                 >
                                     {page}
@@ -70,7 +96,7 @@ const Pagination: React.FC<PaginationProps> = ({
                             ) : (
                                 <span
                                     key={index}
-                                    className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-neutral-400 ring-1 ring-inset ring-neutral-700 focus:outline-offset-0"
+                                    className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ring-1 ring-inset focus:outline-offset-0 ${styles.button.base} ring-opacity-50`}
                                 >
                                     ...
                                 </span>
@@ -79,7 +105,7 @@ const Pagination: React.FC<PaginationProps> = ({
                         <button
                             onClick={() => onPageChange(currentPage + 1)}
                             disabled={currentPage === totalPages}
-                            className="relative inline-flex items-center rounded-r-md px-2 py-2 text-neutral-400 ring-1 ring-inset ring-neutral-700 hover:bg-neutral-800 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            className={`relative inline-flex items-center rounded-r-md px-2 py-2 ring-1 ring-inset focus:z-20 focus:outline-offset-0 transition-colors ${styles.button.base} ${styles.button.disabled}`}
                         >
                             <span className="sr-only">Next</span>
                             <ChevronRight className="h-4 w-4" aria-hidden="true" />

@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import Table, { Column } from "@/components/ui/Table";
+import Table from "@/components/ui/Table";
+import { Column } from "@/shared/types/ui/table-props.type";
 import Pagination from "@/components/ui/Pagination";
 import { MoreVertical, Edit2, Trash2 } from "lucide-react";
 import Image from "next/image";
@@ -96,7 +97,7 @@ const EmployeesTable = () => {
   const columns: Column<Employee>[] = [
     {
       header: "Employee",
-      accessor: (employee) => (
+      accessor: (employee: Employee) => (
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-full bg-gradient-to-br from-pink-500 to-red-600 flex items-center justify-center text-white font-medium text-sm">
             {employee.avatar ? (
@@ -111,7 +112,7 @@ const EmployeesTable = () => {
               <span>
                 {employee.name
                   .split(" ")
-                  .map((n) => n[0])
+                  .map((n: string) => n[0])
                   .join("")}
               </span>
             )}
@@ -133,7 +134,7 @@ const EmployeesTable = () => {
     },
     {
       header: "Role",
-      accessor: (employee) => (
+      accessor: (employee: Employee) => (
         <span className="px-2 py-1 rounded-md bg-neutral-800 border border-neutral-700 text-xs font-medium text-neutral-300">
           {employee.role}
         </span>
@@ -141,7 +142,7 @@ const EmployeesTable = () => {
     },
     {
       header: "Status",
-      accessor: (employee) => (
+      accessor: (employee: Employee) => (
         <span
           className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(employee.status)}`}
         >

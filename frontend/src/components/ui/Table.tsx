@@ -10,13 +10,35 @@ const Table = <T,>({
     keyExtractor,
     isLoading = false,
     emptyMessage = "No data available",
-}: TableProps<T>) => {
+    theme = "dark", // Default to dark for backward compatibility
+}: TableProps<T> & { theme?: "dark" | "light" }) => {
+    const themeStyles = {
+        dark: {
+            container: "border-neutral-800 bg-neutral-900/50",
+            header: "bg-neutral-800/50 text-neutral-400",
+            row: "hover:bg-neutral-800/30",
+            text: "text-neutral-200",
+            divider: "divide-neutral-800",
+            loading: "bg-neutral-900/50 border-neutral-800",
+        },
+        light: {
+            container: "border-purple-100 bg-white shadow-sm",
+            header: "bg-purple-50 text-purple-900 font-semibold",
+            row: "hover:bg-purple-50/50 border-b border-purple-50",
+            text: "text-gray-700",
+            divider: "divide-purple-50",
+            loading: "bg-white border-purple-100",
+        },
+    };
+
+    const styles = themeStyles[theme];
+
     if (isLoading) {
         return (
-            <div className="w-full h-64 flex items-center justify-center bg-neutral-900/50 rounded-lg border border-neutral-800">
+            <div className={`w-full h-64 flex items-center justify-center rounded-lg border ${styles.loading}`}>
                 <div className="flex flex-col items-center gap-2">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
-                    <span className="text-neutral-400 text-sm">Loading data...</span>
+                    <div className={`animate-spin rounded-full h-8 w-8 border-b-2 ${theme === "dark" ? "border-red-600" : "border-purple-600"}`}></div>
+                    <span className={`${theme === "dark" ? "text-neutral-400" : "text-purple-500"} text-sm`}>Loading data...</span>
                 </div>
             </div>
         );
@@ -24,16 +46,16 @@ const Table = <T,>({
 
     if (!data || data.length === 0) {
         return (
-            <div className="w-full h-64 flex items-center justify-center bg-neutral-900/50 rounded-lg border border-neutral-800">
-                <p className="text-neutral-400">{emptyMessage}</p>
+            <div className={`w-full h-64 flex items-center justify-center rounded-lg border ${styles.loading}`}>
+                <p className={`${theme === "dark" ? "text-neutral-400" : "text-gray-400"}`}>{emptyMessage}</p>
             </div>
         );
     }
 
     return (
-        <div className="w-full overflow-x-auto rounded-lg border border-neutral-800 bg-neutral-900/50">
+        <div className={`w-full overflow-x-auto rounded-lg border ${styles.container}`}>
             <table className="w-full text-left text-sm">
-                <thead className="bg-neutral-800/50 text-neutral-400 uppercase text-xs font-medium">
+                <thead className={`${styles.header} uppercase text-xs`}>
                     <tr>
                         {columns.map((col, index) => (
                             <th
@@ -46,16 +68,16 @@ const Table = <T,>({
                         ))}
                     </tr>
                 </thead>
-                <tbody className="divide-y divide-neutral-800">
+                <tbody className={`divide-y ${styles.divider}`}>
                     {data.map((item, rowIndex) => (
                         <tr
                             key={keyExtractor(item)}
-                            className="hover:bg-neutral-800/30 transition-colors"
+                            className={`${styles.row} transition-colors`}
                         >
                             {columns.map((col, colIndex) => (
                                 <td
                                     key={colIndex}
-                                    className={`px-6 py-4 whitespace-nowrap text-neutral-200 ${col.className || ""
+                                    className={`px-6 py-4 whitespace-nowrap ${styles.text} ${col.className || ""
                                         }`}
                                 >
                                     {typeof col.accessor === "function"

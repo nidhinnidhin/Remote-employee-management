@@ -1,15 +1,28 @@
 import { Module } from '@nestjs/common';
-import { SuperAdminAuthController } from './presentation/controllers/super-admin-auth.controller';
-import { LoginSuperAdminUseCase } from './application/use-cases/auth/login-super-admin.usecase';
+import { SuperAdminAuthController } from './auth/presentation/controllers/super-admin-auth.controller';
+import { SuperAdminCompanyController } from './companies/presentation/controllers/super-admin-company.controller';
+import { LoginSuperAdminUseCase } from './auth/application/use-cases/auth/login-super-admin.usecase';
 import { AuthModule } from '../company-admin/auth/presentation/auth/auth.module';
+import { ListCompaniesUseCase } from './companies/application/use-cases/list-companies-use-case';
+import { MongoCompanyRepository } from './companies/infrastructure/repositories/mongo-company.repository';
+import { MongooseModule } from '@nestjs/mongoose';
+import { CompanyDocument, CompanySchema } from '../company-admin/auth/infrastructure/database/mongoose/schemas/company.schema';
 
 @Module({
   imports: [
     AuthModule,
+    MongooseModule.forFeature([
+      { name: CompanyDocument.name, schema: CompanySchema },
+    ]),
   ],
-  controllers: [SuperAdminAuthController],
+  controllers: [SuperAdminAuthController, SuperAdminCompanyController],
   providers: [
     LoginSuperAdminUseCase,
+    ListCompaniesUseCase,
+    {
+      provide: 'CompanyRepository',
+      useClass: MongoCompanyRepository,
+    },
   ],
 })
 export class SuperAdminModule { }
