@@ -65,6 +65,6 @@ import { Module } from '@nestjs/common';
       useClass: MongoEmailOtpRepository,
     },
   ],
-  exports: [JwtService],
+  exports: [JwtService, 'UserRepository', 'CompanyRepository', 'EmailOtpRepository'],
 })
 export class AuthModule { }

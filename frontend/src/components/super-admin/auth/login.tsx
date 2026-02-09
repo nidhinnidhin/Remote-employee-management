@@ -5,11 +5,11 @@ import { useRouter } from "next/navigation";
 import BaseLoginForm from "@/components/ui/BaseLoginForm";
 
 import { AUTH_MESSAGES } from "@/shared/constants/messages/auth.messages";
-import { superAdminLoginAction } from "@/app/actions/superadmin/auth/login.action";
 import {
   AdminLoginErrors,
   AdminLoginFormData,
 } from "@/shared/types/superadmin/auth/login-form-data.type";
+import { superAdminLoginAction } from "@/app/actions/superadmin/auth/login.action";
 
 export default function SuperAdminLoginForm() {
   const [formData, setFormData] = useState<AdminLoginFormData>({
@@ -71,7 +71,7 @@ export default function SuperAdminLoginForm() {
         return;
       }
 
-      router.replace("/super-admin/dashboard");
+      router.replace("/super-admin/companies");
     } catch (err: any) {
       setErrors({ form: err.message || AUTH_MESSAGES.LOGIN_FAILED });
     } finally {

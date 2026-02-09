@@ -1,17 +1,17 @@
 "use server";
 
-import { superAdminLogin } from "@/services/super-admin/auth/login.service";
 import { getSession } from "@/lib/iron-session/getSession";
 import { setRefreshTokenCookie } from "@/lib/auth/cookies";
 import { AUTH_MESSAGES } from "@/shared/constants/messages/auth.messages";
 import { COOKIE_KEYS } from "@/shared/constants/temp/cookie-keys";
+import superAdminLogin from "@/services/super-admin/auth/login.service";
 
 export async function superAdminLoginAction(payload: {
   email: string;
   password: string;
 }) {
   try {
-    const response = await superAdminLogin(payload);
+    const response = await superAdminLogin(payload.email, payload.password);
 
     // Handle refresh token from set-cookie header
     const setCookieHeader = response.headers["set-cookie"];
@@ -37,6 +37,8 @@ export async function superAdminLoginAction(payload: {
     const session = await getSession();
     session.accessToken = accessToken;
     await session.save();
+
+    console.log("SESSION SAVED:", session.accessToken);
 
     return {
       success: true,

@@ -9,17 +9,14 @@ import {
 
 @Controller('super-admin/auth')
 export class SuperAdminAuthController {
-  constructor(private readonly loginUseCase: LoginSuperAdminUseCase) {}
+  constructor(private readonly loginUseCase: LoginSuperAdminUseCase) { }
 
   @Post('login')
   async login(
     @Body() dto: LoginSuperAdminDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const { accessToken, refreshToken } = await this.loginUseCase.execute(
-      dto.email,
-      dto.password,
-    );
+    const { accessToken, refreshToken, user } = await this.loginUseCase.execute(dto);
 
     res.cookie(
       REFRESH_TOKEN_COOKIE_NAME,
@@ -27,6 +24,6 @@ export class SuperAdminAuthController {
       REFRESH_TOKEN_COOKIE_OPTIONS,
     );
 
-    return { accessToken, refreshToken };
+    return { accessToken, refreshToken, user };
   }
 }
