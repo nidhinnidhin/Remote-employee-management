@@ -1,4 +1,4 @@
-import { api } from "@/lib/axiosInstance";
+import { api } from "@/lib/axios/axiosInstance";
 import { RegisterCompanyResponse } from "@/shared/types/company/auth/company-registeration/reegister-response.type";
 import { RegisterCompanyPayload } from "@/shared/types/company/auth/company-registeration/register-company-payload.type";
 import { AxiosError } from "axios";

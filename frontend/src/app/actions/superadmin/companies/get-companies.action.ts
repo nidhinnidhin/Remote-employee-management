@@ -4,7 +4,7 @@ import { getSession } from "@/lib/iron-session/getSession";
 import { CompanyApi } from "@/shared/types/superadmin/companies/company.type";
 
 // Backend API URL - hardcoded since NEXT_PUBLIC_ vars might not be available in server actions
-const BACKEND_URL = process.env.BACKEND_API_URL || "http://localhost:4000/api";
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
 
 export async function getCompaniesAction(): Promise<CompanyApi[]> {
     try {

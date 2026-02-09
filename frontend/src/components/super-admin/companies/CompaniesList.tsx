@@ -9,7 +9,7 @@ import CompaniesTable from "./CompaniesTable";
 
 import { CompanyApi } from "@/shared/types/superadmin/companies/company.type";
 import { CompanyRow } from "./companiesColumns";
-import { getCompaniesAction } from "@/actions/super-admin/companies/get-companies.action";
+import { getCompaniesAction } from "@/app/actions/superadmin/companies/get-companies.action";
 
 const mapApiToRow = (company: CompanyApi): CompanyRow => ({
   id: company.id,

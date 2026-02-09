@@ -6,7 +6,7 @@ import EmployeeStats from "./EmployeeStats";
 import Button from "../../ui/Button";
 import InviteEmployeeModal from "../modals/InviteEmployeeModal";
 import { InviteEmployeePayload } from "@/shared/types/company/employees/auth/invite-employee-payload.type";
-import { api } from "@/lib/axiosInstance";
+import { api } from "@/lib/axios/axiosInstance";
 
 const Header = () => {
   const [isInviteOpen, setIsInviteOpen] = useState(false);

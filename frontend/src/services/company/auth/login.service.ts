@@ -1,4 +1,4 @@
-import { api } from "@/lib/axiosInstance";
+import { api } from "@/lib/axios/axiosInstance";
 import { LoginPayload } from "@/shared/types/company/auth/company-login/login-payload.type";
 
 export async function loginUser(payload: LoginPayload) {

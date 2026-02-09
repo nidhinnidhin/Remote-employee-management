@@ -1,4 +1,4 @@
-import { api } from "@/lib/axiosInstance";
+import { api } from "@/lib/axios/axiosInstance";
 import { VerifyEmployeeInviteResponse } from "@/shared/types/company/employees/auth/invite-employee-verifier-props.type";
 
 export const verifyEmployeeInvite = async (token: string) => {

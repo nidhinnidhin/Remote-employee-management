@@ -1,6 +1,6 @@
 "use server";
 
-import { api } from "@/lib/axiosInstance";
+import { api } from "@/lib/axios/axiosInstance";
 import { getSession } from "@/lib/iron-session/getSession";
 import { setRefreshTokenCookie } from "@/lib/auth/cookies";
 import { AUTH_MESSAGES } from "@/shared/constants/messages/auth.messages";

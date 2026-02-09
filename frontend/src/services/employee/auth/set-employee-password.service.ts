@@ -1,4 +1,4 @@
-import { api } from "@/lib/axiosInstance";
+import { api } from "@/lib/axios/axiosInstance";
 
 export const setEmployeePassword = async (password: string) => {
   const response = await api.post(
