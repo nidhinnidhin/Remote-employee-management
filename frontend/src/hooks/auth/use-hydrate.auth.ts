@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import { useAuthStore } from "@/store/auth.store";
-import { getSessionToken } from "@/app/actions/session/get-session-token";
+import { getSessionToken } from "@/actions/session/get-session-token";
 
 export function useHydrateAuth() {
   const setAuth = useAuthStore((s) => s.setAuth);

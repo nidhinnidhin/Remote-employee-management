@@ -17,9 +17,9 @@ import ForgotPasswordOtpModal from "../forgot-password/ForgotPasswordOtpModal";
 import ResetPasswordModal from "../forgot-password/ResetPasswordModal";
 import ForgotPasswordEmailModal from "../forgot-password/ForgotPasswordEmailModal";
 
-import { forgotPasswordAction } from "@/app/actions/company/forgot-password/forgot-password.action";
-import { verifyResetPasswordOtpAction } from "@/app/actions/company/forgot-password/verify-reset-password-otp.action";
-import { resetPasswordAction } from "@/app/actions/company/forgot-password/reset-password.action";
+import { forgotPasswordAction } from "@/actions/company/forgot-password/forgot-password.action";
+import { verifyResetPasswordOtpAction } from "@/actions/company/forgot-password/verify-reset-password-otp.action";
+import { resetPasswordAction } from "@/actions/company/forgot-password/reset-password.action";
 
 export default function LoginForm() {
   const [formData, setFormData] = useState<LoginFormData>({

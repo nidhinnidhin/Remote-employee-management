@@ -10,8 +10,8 @@ import StepTwo from "./StepTwo";
 import Button from "../../../ui/Button";
 import OtpModal from "../../modals/VerifyOtpModal";
 import { useAuthStore } from "@/store/auth.store";
-import { registerAction } from "@/app/actions/company/auth/register.action";
-import { verifyOtpAction } from "@/app/actions/otp/otp.action";
+import { registerAction } from "@/actions/company/auth/register.action";
+import { verifyOtpAction } from "@/actions/otp/otp.action";
 import {
   validateStepOne,
   validateStepTwo,

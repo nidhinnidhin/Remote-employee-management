@@ -9,7 +9,7 @@ import {
   AdminLoginErrors,
   AdminLoginFormData,
 } from "@/shared/types/superadmin/auth/login-form-data.type";
-import { superAdminLoginAction } from "@/app/actions/superadmin/auth/login.action";
+import { superAdminLoginAction } from "@/actions/super-admin/auth/login.action";
 
 export default function SuperAdminLoginForm() {
   const [formData, setFormData] = useState<AdminLoginFormData>({

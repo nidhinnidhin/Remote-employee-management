@@ -6,8 +6,7 @@ import EmployeeStats from "./EmployeeStats";
 import Button from "../../ui/Button";
 import InviteEmployeeModal from "../modals/InviteEmployeeModal";
 import { InviteEmployeePayload } from "@/shared/types/company/employees/auth/invite-employee-payload.type";
-import { api } from "@/lib/axios/axiosClient";
-
+import { clientApi } from "@/lib/axios/axiosClient";
 const Header = () => {
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -16,7 +15,7 @@ const Header = () => {
     try {
       setLoading(true);
 
-      await api.post("/company/employees/invite", data);
+      await clientApi.post("/company/employees/invite", data);
 
       setIsInviteOpen(false);
       // ✅ optional: toast success
