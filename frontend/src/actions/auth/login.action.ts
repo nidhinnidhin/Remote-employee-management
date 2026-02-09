@@ -1,7 +1,7 @@
 "use server";
 
 import { getSession } from "@/lib/iron-session/getSession";
-import { setRefreshTokenCookie } from "@/lib/auth/cookies";
+import { setRefreshTokenCookie, setAccessTokenCookie } from "@/lib/auth/cookies";
 import { clientApi as api } from "@/lib/axios/axiosClient";
 import { getRedirectForRole } from "@/lib/auth/auth-constants";
 import { redirect } from "next/navigation";
@@ -29,15 +29,18 @@ export async function loginAction(email: string, password: string) {
 
         const { accessToken, refreshToken, user } = response.data;
 
-        // Handle refresh token cookie
+        // Handle cookies from response headers
         const setCookieHeader = response.headers["set-cookie"];
         if (setCookieHeader) {
             for (const cookieStr of setCookieHeader) {
                 const [nameValue] = cookieStr.split(";");
                 const [name, value] = nameValue.split("=");
+                const trimmedName = name.trim();
 
-                if (name.trim() === "refresh_token") {
+                if (trimmedName === "refresh_token") {
                     await setRefreshTokenCookie(value);
+                } else if (trimmedName === "access_token") {
+                    await setAccessTokenCookie(value);
                 }
             }
         }

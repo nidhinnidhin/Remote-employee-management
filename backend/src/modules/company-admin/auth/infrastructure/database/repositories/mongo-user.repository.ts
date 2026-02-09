@@ -11,7 +11,7 @@ export class MongoUserRepository implements UserRepository {
   constructor(
     @InjectModel(UserDocument.name)
     private readonly userModel: Model<UserDocument>,
-  ) {}
+  ) { }
 
   async findByEmail(email: string): Promise<UserEntity | null> {
     const user = await this.userModel.findOne({ email });
@@ -33,6 +33,9 @@ export class MongoUserRepository implements UserRepository {
       role: user.role,
       passwordHash: user.passwordHash,
       status: user.status,
+      department: user.department,
+      inviteStatus: user.inviteStatus,
+      hasPassword: user.hasPassword,
     });
 
     return this.toEntity(created);
@@ -47,6 +50,7 @@ export class MongoUserRepository implements UserRepository {
       {
         $set: {
           passwordHash: passwordHash, // 🔥 MUST MATCH LOGIN
+          hasPassword: true,
         },
       },
     );
@@ -59,7 +63,6 @@ export class MongoUserRepository implements UserRepository {
   private toEntity(doc: UserDocument): UserEntity {
     return new UserEntity(
       doc._id.toString(),
-      doc.companyId,
       doc.firstName,
       doc.lastName,
       doc.email,
@@ -69,6 +72,10 @@ export class MongoUserRepository implements UserRepository {
       doc.status as any,
       doc.createdAt,
       doc.updatedAt,
+      doc.companyId,
+      doc.department,
+      doc.inviteStatus,
+      doc.hasPassword,
     );
   }
   async updateStatusByEmail(email: string, status: UserStatus): Promise<void> {

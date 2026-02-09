@@ -4,7 +4,6 @@ import { UserStatus } from "src/shared/enums/user/user-status.enum";
 export class UserEntity {
   constructor(
     public readonly id: string,
-    public readonly companyId: string,
     public readonly firstName: string,
     public readonly lastName: string,
     public readonly email: string,
@@ -14,5 +13,9 @@ export class UserEntity {
     public readonly status: UserStatus,
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
-  ) {}
+    public readonly companyId?: string,
+    public readonly department?: string,
+    public readonly inviteStatus?: 'PENDING' | 'USED',
+    public readonly hasPassword: boolean = true,
+  ) { }
 }

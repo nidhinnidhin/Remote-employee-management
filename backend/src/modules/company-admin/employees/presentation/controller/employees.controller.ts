@@ -7,13 +7,14 @@ import {
   Req,
   Res,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { InviteEmployeeUseCase } from '../../application/use-cases/invite-employee.usecase';
 import { VerifyInviteUseCase } from '../../application/use-cases/verify-invite.usecase';
 import { SetPasswordUseCase } from '../../application/use-cases/set-password.usecase';
 import { RedisService } from 'src/shared/services/redis.service';
 import { randomBytes } from 'crypto';
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 import { JwtService } from 'src/shared/services/jwt.service';
 import {
   ACCESS_TOKEN_COOKIE_NAME,
@@ -21,6 +22,8 @@ import {
   REFRESH_TOKEN_COOKIE_NAME,
   REFRESH_TOKEN_COOKIE_OPTIONS,
 } from 'src/shared/config/cookies.config';
+import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
+import { InviteEmployeeDto } from '../dto/invite-employee.dto';
 
 @Controller('company/employees')
 export class EmployeesController {
@@ -30,12 +33,21 @@ export class EmployeesController {
     private readonly setPasswordUseCase: SetPasswordUseCase,
     private readonly redisService: RedisService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   @Post('invite')
-  async invite(@Body() body) {
-    console.log('Hited invitation');
-    await this.inviteEmployee.execute(body);
+  @UseGuards(JwtAuthGuard)
+  async invite(@Req() req: Request, @Body() dto: InviteEmployeeDto) {
+    const companyId = req.user?.companyId;
+    if (!companyId) {
+      throw new UnauthorizedException('Company ID not found in token');
+    }
+
+    console.log('Hited invitation for company:', companyId);
+    await this.inviteEmployee.execute({
+      ...dto,
+      companyId,
+    });
     return { message: 'Invitation sent successfully' };
   }
 
@@ -82,15 +94,17 @@ export class EmployeesController {
     }
 
     // 1️⃣ Set password
-    await this.setPasswordUseCase.execute(employeeId, password);
+    const employee = await this.setPasswordUseCase.execute(employeeId, password);
 
     // 2️⃣ Generate JWT tokens
     const accessToken = this.jwtService.generateAccessToken({
-      userId: employeeId,
+      userId: employee.id,
+      role: employee.role,
+      companyId: employee.companyId,
     });
 
     const refreshToken = this.jwtService.generateRefreshToken({
-      userId: employeeId,
+      userId: employee.id,
     });
 
     // 3️⃣ Store JWTs in cookies

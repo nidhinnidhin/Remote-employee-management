@@ -8,5 +8,6 @@ export class Employee {
     public readonly isActive: boolean,
     public readonly hasPassword: boolean,
     public readonly inviteStatus: 'PENDING' | 'USED',
-  ) {}
+    public readonly companyId?: string,
+  ) { }
 }

@@ -26,6 +26,8 @@ import { ForgotPasswordDto } from '../../presentation/dto/forgot-password.dto';
 import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import {
+  ACCESS_TOKEN_COOKIE_NAME,
+  ACCESS_TOKEN_COOKIE_OPTIONS,
   REFRESH_TOKEN_COOKIE_NAME,
   REFRESH_TOKEN_COOKIE_OPTIONS,
 } from 'src/shared/config/cookies.config';
@@ -57,6 +59,12 @@ export class AuthController {
       });
 
     res.cookie(
+      ACCESS_TOKEN_COOKIE_NAME,
+      accessToken,
+      ACCESS_TOKEN_COOKIE_OPTIONS,
+    );
+
+    res.cookie(
       REFRESH_TOKEN_COOKIE_NAME,
       refreshToken,
       REFRESH_TOKEN_COOKIE_OPTIONS,
@@ -85,6 +93,12 @@ export class AuthController {
     });
 
     res.cookie(
+      ACCESS_TOKEN_COOKIE_NAME,
+      result.accessToken,
+      ACCESS_TOKEN_COOKIE_OPTIONS,
+    );
+
+    res.cookie(
       REFRESH_TOKEN_COOKIE_NAME,
       result.refreshToken,
       REFRESH_TOKEN_COOKIE_OPTIONS,
@@ -108,7 +122,10 @@ export class AuthController {
 
   // Refresh Access Token
   @Post('refresh')
-  async refresh(@Req() req: Request) {
+  async refresh(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const refreshToken = req.cookies?.[REFRESH_TOKEN_COOKIE_NAME];
     if (!refreshToken) {
       throw new UnauthorizedException(AUTH_MESSAGES.MISSING_REFRESH_TOKEN);
@@ -116,6 +133,12 @@ export class AuthController {
 
     const { accessToken } =
       await this.refreshAccessTokenUseCase.execute(refreshToken);
+
+    res.cookie(
+      ACCESS_TOKEN_COOKIE_NAME,
+      accessToken,
+      ACCESS_TOKEN_COOKIE_OPTIONS,
+    );
 
     return { accessToken };
   }

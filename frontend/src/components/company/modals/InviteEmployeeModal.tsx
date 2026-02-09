@@ -27,6 +27,7 @@ const InviteEmployeeModal = ({
     email: "",
     role: "",
     department: "",
+    phone: "",
   });
 
   const [error, setError] = useState("");
@@ -37,9 +38,9 @@ const InviteEmployeeModal = ({
   };
 
   const handleInvite = () => {
-    const { name, email, role, department } = form;
+    const { name, email, role, department, phone } = form;
 
-    if (!name || !email || !role || !department) {
+    if (!name || !email || !role || !department || !phone) {
       setError(AUTH_MESSAGES.ALL_FIELDS_REQUIRED);
       return;
     }
@@ -81,6 +82,16 @@ const InviteEmployeeModal = ({
         value={form.email}
         onChange={handleChange}
         placeholder="employee@company.com"
+        required
+      />
+
+      <FormInput
+        label="Phone Number"
+        name="phone"
+        type="tel"
+        value={form.phone}
+        onChange={handleChange}
+        placeholder="+1 234 567 8900"
         required
       />
 

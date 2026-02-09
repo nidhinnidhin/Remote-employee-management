@@ -4,13 +4,13 @@ import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 
 @Schema({ timestamps: true })
 export class UserDocument extends Document {
-  @Prop({ required: true })
-  companyId: string;
+  @Prop({ required: false })
+  companyId?: string;
 
   @Prop({ required: true })
   firstName: string;
 
-  @Prop({ required: true })
+  @Prop({ required: false, default: '' })
   lastName: string;
 
   @Prop({ required: true, unique: true })
@@ -22,15 +22,28 @@ export class UserDocument extends Document {
   @Prop({ required: true })
   role: string;
 
-  @Prop({ required: true })
+  @Prop({
+    required: function (this: any) {
+      return this.role !== 'EMPLOYEE';
+    },
+  })
   passwordHash: string;
 
   @Prop({
     required: true,
     enum: UserStatus,
-    default: UserStatus.PENDING_VERIFICATION
+    default: UserStatus.PENDING_VERIFICATION,
   })
   status: string;
+
+  @Prop()
+  department?: string;
+
+  @Prop({ enum: ['PENDING', 'USED'] })
+  inviteStatus?: 'PENDING' | 'USED';
+
+  @Prop({ default: true })
+  hasPassword: boolean;
 
   createdAt: Date;
   updatedAt: Date;

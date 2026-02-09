@@ -31,12 +31,14 @@ export class JwtAuthGuard implements CanActivate {
       const payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET!) as {
         userId: string;
         role?: string;
+        companyId?: string;
       };
 
-      // Attach user info to request (include role for guards)
+      // Attach user info to request (include role and companyId for guards)
       request.user = {
         userId: payload.userId,
         role: payload.role,
+        companyId: payload.companyId,
       };
 
       return true;

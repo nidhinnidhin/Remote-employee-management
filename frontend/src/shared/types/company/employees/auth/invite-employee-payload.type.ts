@@ -3,4 +3,5 @@ export interface InviteEmployeePayload {
   email: string;
   role: string;
   department: string;
+  phone: string;
 }

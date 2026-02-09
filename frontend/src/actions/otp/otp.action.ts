@@ -2,7 +2,7 @@
 
 import { verifyOtp } from "@/services/company/otp/verify-otp.service";
 import { getSession } from "@/lib/iron-session/getSession";
-import { setRefreshTokenCookie } from "@/lib/auth/cookies";
+import { setRefreshTokenCookie, setAccessTokenCookie } from "@/lib/auth/cookies";
 import { OTP_MESSAGES } from "@/shared/constants/messages/otp.messages";
 import { AUTH_MESSAGES } from "@/shared/constants/messages/auth.messages";
 import { COOKIE_KEYS } from "@/shared/constants/temp/cookie-keys";
@@ -16,9 +16,12 @@ export async function verifyOtpAction(payload: { email: string; otp: string }) {
       for (const cookieStr of setCookieHeader) {
         const [nameValue] = cookieStr.split(";");
         const [name, value] = nameValue.split("=");
+        const trimmedName = name.trim();
 
-        if (name.trim() === COOKIE_KEYS.REFRESH_TOKEN) {
+        if (trimmedName === COOKIE_KEYS.REFRESH_TOKEN) {
           await setRefreshTokenCookie(value);
+        } else if (trimmedName === COOKIE_KEYS.ACCESS_TOKEN) {
+          await setAccessTokenCookie(value);
         }
       }
     }

@@ -14,13 +14,15 @@ export class InviteEmployeeUseCase {
     private readonly inviteLinkRepo: InviteLinkRepository,
 
     private readonly emailService: EmailService,
-  ) {}
+  ) { }
 
   async execute(input: {
     name: string;
     email: string;
     role: string;
     department: string;
+    phone: string;
+    companyId: string;
   }) {
     // 1️⃣ Prevent duplicate employee
     const existing = await this.employeeRepo.findByEmail(input.email);

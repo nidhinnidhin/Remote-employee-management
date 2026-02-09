@@ -12,7 +12,7 @@ export class SetPasswordUseCase {
   constructor(
     @Inject('EmployeeRepository')
     private readonly employeeRepo: EmployeeRepository,
-  ) {}
+  ) { }
 
   async execute(employeeId: string, password: string) {
     if (!password || password.length < 8) {
@@ -37,8 +37,6 @@ export class SetPasswordUseCase {
 
     await this.employeeRepo.setPassword(employee.id, passwordHash);
 
-    return {
-      message: 'Password set successfully',
-    };
+    return employee;
   }
 }

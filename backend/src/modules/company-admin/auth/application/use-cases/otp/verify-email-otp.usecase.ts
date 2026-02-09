@@ -24,7 +24,7 @@ export class VerifyEmailOtpUseCase {
     private readonly userRepository: UserRepository,
 
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async execute(input: VerifyEmailOtpInput) {
     const pending = await this.pendingRepository.find(input.email);
@@ -60,7 +60,6 @@ export class VerifyEmailOtpUseCase {
     // 👤 Create user
     const user = new UserEntity(
       randomUUID(),
-      createdCompany.id,
       pending.admin.firstName,
       pending.admin.lastName,
       pending.admin.email.toLowerCase(),
@@ -70,6 +69,7 @@ export class VerifyEmailOtpUseCase {
       UserStatus.ACTIVE,
       new Date(),
       new Date(),
+      createdCompany.id,
     );
 
     await this.userRepository.create(user);
