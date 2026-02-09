@@ -9,12 +9,12 @@ import {
 import type { Request, Response } from 'express';
 import { RegisterCompanyAdminUseCase } from '../../application/use-cases/register/register-company-admin.usecase';
 import { VerifyEmailOtpUseCase } from '../../application/use-cases/otp/verify-email-otp.usecase';
-import { LoginCompanyAdminUseCase } from '../../application/use-cases/login/login-company-admin.useCase';
+import { LoginUseCase } from '../../application/use-cases/login/login.usecase';
 import { ResendEmailOtpUseCase } from '../../application/use-cases/otp/resend-email-otp.usecase';
 
 import { RegisterCompanyAdminDto } from '../../presentation/dto/register-company-admin.dto';
 import { VerifyEmailOtpDto } from '../../presentation/dto/verify-email-otp.dto';
-import { LoginCompanyAdminDto } from '../../presentation/dto/login-company-admin.dto';
+import { LoginDto } from '../../presentation/dto/login.dto';
 import { ResendOtpDto } from 'src/modules/company-admin/auth/presentation/dto/resend-otp.dto';
 import { RefreshAccessTokenUseCase } from '../../application/use-cases/token/refresh-access-token.usecase';
 import { ForgotPasswordUseCase } from '../../application/use-cases/reset-password/forgot-password.usecase';
@@ -36,7 +36,7 @@ export class AuthController {
     private readonly registerCompanyAdminUseCase: RegisterCompanyAdminUseCase,
     private readonly verifyEmailOtpUseCase: VerifyEmailOtpUseCase,
     private readonly refreshAccessTokenUseCase: RefreshAccessTokenUseCase,
-    private readonly loginCompanyAdminUseCase: LoginCompanyAdminUseCase,
+    private readonly loginUseCase: LoginUseCase,
     private readonly resendEmailOtpUseCase: ResendEmailOtpUseCase,
     private readonly forgotPasswordUseCase: ForgotPasswordUseCase,
     private readonly verifyResetPasswordOtpUseCase: VerifyResetPasswordOtpUseCase,
@@ -46,12 +46,12 @@ export class AuthController {
   // LOGIN
   @Post('login')
   async login(
-    @Body() dto: LoginCompanyAdminDto,
+    @Body() dto: LoginDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    console.log('!!! FINGERPRINT: LOGIN_CALLED_v5 !!!');
-    const { accessToken, refreshToken, userId } =
-      await this.loginCompanyAdminUseCase.execute({
+    console.log('!!! Unified Login Called !!!');
+    const { accessToken, refreshToken, user } =
+      await this.loginUseCase.execute({
         email: dto.email,
         password: dto.password,
       });
@@ -62,8 +62,8 @@ export class AuthController {
       REFRESH_TOKEN_COOKIE_OPTIONS,
     );
 
-    console.log('Login successful for user:', userId);
-    return { accessToken, refreshToken, userId };
+    console.log('Login successful for user:', user.id, 'Role:', user.role);
+    return { accessToken, refreshToken, user };
   }
 
   // Register

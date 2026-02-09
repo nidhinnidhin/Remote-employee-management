@@ -1,6 +1,6 @@
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import { ForgotPasswordUseCase } from '../../application/use-cases/reset-password/forgot-password.usecase';
-import { LoginCompanyAdminUseCase } from '../../application/use-cases/login/login-company-admin.useCase';
+import { LoginUseCase } from '../../application/use-cases/login/login.usecase';
 import { RefreshAccessTokenUseCase } from '../../application/use-cases/token/refresh-access-token.usecase';
 import { RegisterCompanyAdminUseCase } from '../../application/use-cases/register/register-company-admin.usecase';
 import { ResendEmailOtpUseCase } from '../../application/use-cases/otp/resend-email-otp.usecase';
@@ -37,7 +37,7 @@ import { Module } from '@nestjs/common';
   providers: [
     JwtAuthGuard,
     RegisterCompanyAdminUseCase,
-    LoginCompanyAdminUseCase,
+    LoginUseCase,
     SendEmailOtpUseCase,
     VerifyEmailOtpUseCase,
     ResendEmailOtpUseCase,

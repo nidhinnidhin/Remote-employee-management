@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
-import { SuperAdminAuthController } from './auth/presentation/controllers/super-admin-auth.controller';
 import { SuperAdminCompanyController } from './companies/presentation/controllers/super-admin-company.controller';
-import { LoginSuperAdminUseCase } from './auth/application/use-cases/auth/login-super-admin.usecase';
 import { SuperAdminSeedService } from './services/super-admin-seed.service';
 import { AuthModule } from '../company-admin/auth/presentation/auth/auth.module';
 import { ListCompaniesUseCase } from './companies/application/use-cases/list-companies-use-case';
@@ -16,9 +14,8 @@ import { CompanyDocument, CompanySchema } from '../company-admin/auth/infrastruc
       { name: CompanyDocument.name, schema: CompanySchema },
     ]),
   ],
-  controllers: [SuperAdminAuthController, SuperAdminCompanyController],
+  controllers: [SuperAdminCompanyController],
   providers: [
-    LoginSuperAdminUseCase,
     ListCompaniesUseCase,
     SuperAdminSeedService,
     {

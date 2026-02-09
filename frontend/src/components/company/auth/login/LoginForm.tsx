@@ -10,7 +10,7 @@ import {
 } from "@/shared/types/company/auth/company-login/login.type";
 import { AUTH_MESSAGES } from "@/shared/constants/messages/auth.messages";
 import { useAuthStore } from "@/store/auth.store";
-import { loginAction } from "@/app/actions/company/auth/login.action";
+import { loginAction } from "@/actions/auth/login.action";
 
 import { ForgotStep } from "@/shared/types/otp/forgot-step.type";
 import ForgotPasswordOtpModal from "../forgot-password/ForgotPasswordOtpModal";
@@ -61,17 +61,14 @@ export default function LoginForm() {
     }
 
     try {
-      const result = await loginAction(formData);
+      const result = await loginAction(formData.email, formData.password);
 
-      if (!result?.success) {
-        setErrors({ form: result?.error || AUTH_MESSAGES.LOGIN_FAILED });
+      if (result && !result.success) {
+        setErrors({ form: result.error || AUTH_MESSAGES.LOGIN_FAILED });
         return;
       }
 
-      const { accessToken, userId } = result.data;
-      setAuth(accessToken, userId);
-
-      router.replace("/company/employees/dashboard");
+      // Note: server-side loginAction handles the redirect via redirect()
     } catch (err: any) {
       setErrors({ form: err.message || AUTH_MESSAGES.LOGIN_FAILED });
     } finally {

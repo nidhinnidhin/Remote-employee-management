@@ -1,0 +1,72 @@
+"use server";
+
+import { getSession } from "@/lib/iron-session/getSession";
+import { setRefreshTokenCookie } from "@/lib/auth/cookies";
+import { clientApi as api } from "@/lib/axios/axiosClient";
+import { getRedirectForRole } from "@/lib/auth/auth-constants";
+import { redirect } from "next/navigation";
+
+interface LoginResponse {
+    accessToken: string;
+    refreshToken: string;
+    user: {
+        id: string;
+        email: string;
+        firstName: string;
+        lastName: string;
+        role: string;
+        companyId?: string;
+    };
+}
+
+export async function loginAction(email: string, password: string) {
+    try {
+        // Call unified login endpoint (company admin/employee)
+        const response = await api.post<LoginResponse>("/auth/login", {
+            email,
+            password,
+        });
+
+        const { accessToken, refreshToken, user } = response.data;
+
+        // Handle refresh token cookie
+        const setCookieHeader = response.headers["set-cookie"];
+        if (setCookieHeader) {
+            for (const cookieStr of setCookieHeader) {
+                const [nameValue] = cookieStr.split(";");
+                const [name, value] = nameValue.split("=");
+
+                if (name.trim() === "refresh_token") {
+                    await setRefreshTokenCookie(value);
+                }
+            }
+        }
+
+        // Save to session with role and user info
+        const session = await getSession();
+        session.accessToken = accessToken;
+        session.userId = user.id;
+        session.role = user.role;
+        session.email = user.email;
+        await session.save();
+
+        console.log("-----------------------------------------");
+        console.log("🔵 NEW LOGIN SUCCESSFUL");
+        console.log("📧 Email:", user.email);
+        console.log("👤 Role:", user.role);
+        console.log("-----------------------------------------");
+
+        // Redirect based on role
+        const redirectUrl = getRedirectForRole(user.role);
+        redirect(redirectUrl);
+    } catch (error: any) {
+        console.error("[loginAction] Error:", error);
+        return {
+            success: false,
+            error:
+                error.response?.data?.message ||
+                error.message ||
+                "Login failed. Please try again.",
+        };
+    }
+}

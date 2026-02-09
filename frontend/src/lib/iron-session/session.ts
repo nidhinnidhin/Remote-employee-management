@@ -3,6 +3,9 @@ import type { SessionOptions } from "iron-session";
 export interface SessionData {
   accessToken?: string;
   refreshToken?: string;
+  userId?: string;
+  role?: string;    // For role-based routing
+  email?: string;   // For display purposes
 }
 
 export const sessionOptions: SessionOptions = {
