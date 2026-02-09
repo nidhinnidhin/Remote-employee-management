@@ -1,4 +1,4 @@
-import { api } from "@/lib/axios/axiosInstance";
+import { clientApi } from "@/lib/axios/axiosClient";
 import { RegisterCompanyResponse } from "@/shared/types/company/auth/company-registeration/reegister-response.type";
 import { RegisterCompanyPayload } from "@/shared/types/company/auth/company-registeration/register-company-payload.type";
 import { AxiosError } from "axios";
@@ -7,7 +7,7 @@ export async function registerUser(
   payload: RegisterCompanyPayload,
 ): Promise<RegisterCompanyResponse> {
   try {
-    const response = await api.post<RegisterCompanyResponse>(
+    const response = await clientApi.post<RegisterCompanyResponse>(
       "/auth/register",
       payload,
     );

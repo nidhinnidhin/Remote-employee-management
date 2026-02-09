@@ -1,6 +1,6 @@
-import { api } from "@/lib/axios/axiosInstance";
+import { clientApi } from "@/lib/axios/axiosClient";
 
 export async function forgotPasswordService(payload: { email: string }) {
-  return api.post("/auth/forgot-password", payload);
+  return clientApi.post("/auth/forgot-password", payload);
 }
 

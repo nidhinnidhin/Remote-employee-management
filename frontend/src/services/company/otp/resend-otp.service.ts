@@ -1,5 +1,5 @@
-import { api } from "@/lib/axios/axiosInstance";
+import { clientApi } from "@/lib/axios/axiosClient";
 
 export async function resendOtp(payload: { email: string }) {
-  return api.post("/auth/resend-otp", payload);
+  return clientApi.post("/auth/resend-otp", payload);
 }

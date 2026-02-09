@@ -1,14 +1,8 @@
+import { getServerApi } from "@/lib/axios/axiosSeriver";
 import { CompanyApi } from "@/shared/types/superadmin/companies/company.type";
 
-export const getCompanies = async (): Promise<CompanyApi[]> => {
-  const res = await fetch("/api/super-admin/companies", {
-    credentials: "include",
-  });
-
-  if (!res.ok) {
-    throw new Error("Unauthorized");
-  }
-
-  const data = await res.json();
-  return data.data;
-};
+export async function fetchCompanies(): Promise<CompanyApi[]> {
+  const api = await getServerApi();
+  const res = await api.get("/super-admin/companies");
+  return res.data.data;
+}

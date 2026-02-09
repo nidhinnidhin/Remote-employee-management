@@ -1,8 +1,8 @@
-import { api } from "@/lib/axios/axiosInstance";
+import { clientApi } from "@/lib/axios/axiosClient";
 
 export async function verifyResetPasswordOtpService(payload: {
   email: string;
   otp: string;
 }) {
-  return api.post("/auth/verify-reset-password-otp", payload);
+  return clientApi.post("/auth/verify-reset-password-otp", payload);
 }

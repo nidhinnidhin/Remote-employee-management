@@ -9,7 +9,7 @@ export async function getServerApi() {
   }
 
   return axios.create({
-    baseURL: process.env.BACKEND_API_URL,
+    baseURL: process.env.NEXT_PUBLIC_API_URL,
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },

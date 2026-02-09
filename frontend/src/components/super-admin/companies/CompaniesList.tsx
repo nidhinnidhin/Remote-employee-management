@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import SuperAdminLayout from "../common/Layout";
 import CompaniesHeader from "./CompaniesHeader";
 import CompaniesStats from "./CompaniesStats";
@@ -9,7 +9,10 @@ import CompaniesTable from "./CompaniesTable";
 
 import { CompanyApi } from "@/shared/types/superadmin/companies/company.type";
 import { CompanyRow } from "./companiesColumns";
-import { getCompaniesAction } from "@/app/actions/superadmin/companies/get-companies.action";
+
+type CompaniesListingProps = {
+  initialCompanies: CompanyApi[];
+};
 
 const mapApiToRow = (company: CompanyApi): CompanyRow => ({
   id: company.id,
@@ -24,26 +27,13 @@ const mapApiToRow = (company: CompanyApi): CompanyRow => ({
   created: new Date(company.createdAt).toLocaleDateString(),
 });
 
-export default function CompaniesListing() {
-  const [companies, setCompanies] = useState<CompanyRow[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function CompaniesListing({
+  initialCompanies,
+}: CompaniesListingProps) {
+  const [companies] = useState<CompanyRow[]>(
+    initialCompanies.map(mapApiToRow)
+  );
   const [currentPage, setCurrentPage] = useState(1);
-
-  useEffect(() => {
-    const fetchCompanies = async () => {
-      try {
-        setLoading(true);
-        const apiData = await getCompaniesAction();
-        setCompanies(apiData.map(mapApiToRow));
-      } catch (err) {
-        console.error("Failed to fetch companies:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCompanies();
-  }, []);
 
   return (
     <SuperAdminLayout>
@@ -53,7 +43,7 @@ export default function CompaniesListing() {
 
       <CompaniesTable
         data={companies}
-        isLoading={loading}
+        isLoading={false}
         currentPage={currentPage}
         onPageChange={setCurrentPage}
       />

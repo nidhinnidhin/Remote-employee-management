@@ -1,8 +1,8 @@
-import { api } from "@/lib/axios/axiosInstance";
+import { clientApi } from "@/lib/axios/axiosClient";
 
 export async function resetPasswordService(payload: {
   email: string;
   newPassword: string;
 }) {
-  return api.post("/auth/reset-password", payload);
+  return clientApi.post("/auth/reset-password", payload);
 }

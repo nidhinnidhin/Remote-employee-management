@@ -1,7 +1,7 @@
-import { api } from "@/lib/axios/axiosInstance";
+import { clientApi } from "@/lib/axios/axiosClient";
 
 const superAdminLogin = async (email: string, password: string) => {
-  return api.post("/super-admin/auth/login", {
+  return clientApi.post("/super-admin/auth/login", {
     email,
     password,
   });
