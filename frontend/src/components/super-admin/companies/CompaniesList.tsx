@@ -9,6 +9,7 @@ import CompaniesTable from "./CompaniesTable";
 
 import { CompanyApi } from "@/shared/types/superadmin/companies/company.type";
 import { CompanyRow } from "./companiesColumns";
+import { formatDateISO } from "@/lib/date/date-format";
 
 type CompaniesListingProps = {
   initialCompanies: CompanyApi[];
@@ -24,8 +25,9 @@ const mapApiToRow = (company: CompanyApi): CompanyRow => ({
   employees: 0,
   status: "Active",
   mrr: "—",
-  created: new Date(company.createdAt).toLocaleDateString(),
+  created: formatDateISO(company.createdAt),
 });
+
 
 export default function CompaniesListing({
   initialCompanies,

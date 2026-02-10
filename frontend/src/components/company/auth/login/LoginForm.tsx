@@ -9,7 +9,6 @@ import {
   LoginErrors,
 } from "@/shared/types/company/auth/company-login/login.type";
 import { AUTH_MESSAGES } from "@/shared/constants/messages/auth.messages";
-import { useAuthStore } from "@/store/auth.store";
 import { loginAction } from "@/actions/auth/login.action";
 
 import { ForgotStep } from "@/shared/types/otp/forgot-step.type";
@@ -33,7 +32,6 @@ export default function LoginForm() {
   const [forgotEmail, setForgotEmail] = useState("");
 
   const router = useRouter();
-  const setAuth = useAuthStore((state) => state.setAuth);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
