@@ -21,7 +21,7 @@ clientApi.interceptors.response.use(
         return clientApi(originalRequest);
       } catch {
         if (typeof window !== "undefined") {
-          window.location.href = "/login";
+          window.location.href = "/company/login";
         }
       }
     }

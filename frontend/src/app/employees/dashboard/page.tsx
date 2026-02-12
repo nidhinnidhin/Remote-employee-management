@@ -1,10 +1,10 @@
 import { requireRole } from "@/lib/auth/unified-auth";
-import { DashboardLayout } from "@/components/employees/DashboardLayout";
-import { GreetingHeader } from "@/components/employees/GreetingHeader";
-import { StatCards } from "@/components/employees/StatCards";
-import { QuickActions } from "@/components/employees/QuickActions";
-import { TaskList } from "@/components/employees/TaskList";
-import { TeamPresence } from "@/components/employees/TeamPresence";
+import { DashboardLayout } from "@/components/employees/dashboard/DashboardLayout";
+import { GreetingHeader } from "@/components/employees/dashboard/GreetingHeader";
+import { StatCards } from "@/components/employees/dashboard/StatCards";
+import { QuickActions } from "@/components/employees/dashboard/QuickActions";
+import { TaskList } from "@/components/employees/dashboard/TaskList";
+import { TeamPresence } from "@/components/employees/dashboard/TeamPresence";
 
 export default async function EmployeeDashboardPage() {
   // Protect the route - only allow EMPLOYEE

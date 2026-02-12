@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Sidebar } from "./Sidebar";
+import { Sidebar } from "../common/Sidebar";
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
     return (

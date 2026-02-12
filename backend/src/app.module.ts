@@ -4,6 +4,7 @@ import { AuthModule } from './modules/company-admin/auth/presentation/auth/auth.
 import { MongoDatabaseModule } from './shared/config/mongoose.module';
 import { SuperAdminModule } from './modules/super-admin/super-admin.module';
 import { EmployeesModule } from './modules/company-admin/employees/presentation/employee/employees.module';
+import { CompanyPolicyModule } from './modules/company-admin/company-policy/company-policy.module';
 
 @Module({
   imports: [
@@ -11,7 +12,8 @@ import { EmployeesModule } from './modules/company-admin/employees/presentation/
     MongoDatabaseModule,
     AuthModule,
     SuperAdminModule,
-    EmployeesModule
+    EmployeesModule,
+    CompanyPolicyModule
   ],
 })
 export class AppModule {}
