@@ -1,44 +1,84 @@
+// import {
+//   Controller,
+//   Post,
+//   Body,
+//   Get,
+//   UseGuards,
+//   Req,
+// } from '@nestjs/common';
+// import { CompanyPolicyUseCase } from '../../application/use-case/company-policy.usecase';
+// import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
+// import { CompanyAdminGuard } from 'src/shared/guards/company-admin.guard';
+// import { UpsertCompanyPoliciesDto } from '../dto/upsert-company-policy-dto';
+
+// @Controller('company-policies')
+// @UseGuards(JwtAuthGuard)
+// export class CompanyPolicyController {
+//   constructor(private readonly useCase: CompanyPolicyUseCase) {}
+
+//   // 🔐 COMPANY ADMIN ONLY
+//   @Post()
+//   @UseGuards(CompanyAdminGuard)
+//   createOrUpdatePolicies(
+//     @Body() dto: UpsertCompanyPoliciesDto,
+//     @Req() req,
+//   ) {
+//     const companyId = req.user.companyId;
+
+//     return this.useCase.createOrUpdatePolicies(
+//       companyId,
+//       dto.policies,
+//     );
+//   }
+
+//   // 🔒 Any authenticated company user
+//   @Get()
+//   getPolicies(@Req() req) {
+//     const companyId = req.user.companyId;
+
+//     return this.useCase.getPolicies(companyId);
+//   }
+// }
+
+
 import {
   Controller,
   Post,
   Body,
   Get,
-  Param,
   UseGuards,
   Req,
 } from '@nestjs/common';
 import { CompanyPolicyUseCase } from '../../application/use-case/company-policy.usecase';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
+import { CompanyAdminGuard } from 'src/shared/guards/company-admin.guard';
 import { UpsertCompanyPoliciesDto } from '../dto/upsert-company-policy-dto';
-import { SuperAdminGuard } from 'src/modules/super-admin/guards/super-admin.guard';
 
 @Controller('company-policies')
-@UseGuards(JwtAuthGuard) // Apply once globally
+@UseGuards(JwtAuthGuard)
 export class CompanyPolicyController {
   constructor(private readonly useCase: CompanyPolicyUseCase) {}
 
-  // 👑 Super Admin can create/update policies
-  @UseGuards(SuperAdminGuard)
+  // 🔐 COMPANY ADMIN - ADD / UPDATE
   @Post()
-  createOrUpdatePolicies(@Body() dto: UpsertCompanyPoliciesDto) {
-    return this.useCase.createOrUpdatePolicies(
-      dto.companyId,
-      dto.policies,
-    );
+  @UseGuards(CompanyAdminGuard)
+  createOrUpdatePolicies(@Body() dto: UpsertCompanyPoliciesDto, @Req() req) {
+    const companyId = req.user.companyId;
+    return this.useCase.createOrUpdatePolicies(companyId, dto.policies);
   }
 
-  // 👩‍💻 Company users fetch their own company policies
+  // 🔐 COMPANY ADMIN - GET FOR EDITING
+  @Get('/admin')
+  @UseGuards(CompanyAdminGuard)
+  getPoliciesForAdmin(@Req() req) {
+    const companyId = req.user.companyId;
+    return this.useCase.getPolicies(companyId);
+  }
+
+  // 🔒 EMPLOYEES - READ ONLY
   @Get()
-  getMyCompanyPolicies(@Req() req) {
-    return this.useCase.getPolicies(
-      req.user.companyId,
-    );
-  }
-
-  // 👑 Super Admin can fetch specific company policies
-  @UseGuards(SuperAdminGuard)
-  @Get(':companyId')
-  getPoliciesForCompany(@Param('companyId') companyId: string) {
+  getPoliciesForEmployees(@Req() req) {
+    const companyId = req.user.companyId;
     return this.useCase.getPolicies(companyId);
   }
 }

@@ -6,29 +6,29 @@ import { PolicyType } from 'src/shared/enums/company-policy/policy-type.enum';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class CompanyPolicyRepositoryImpl
-  implements CompanyPolicyRepository {
+export class CompanyPolicyRepositoryImpl implements CompanyPolicyRepository {
   constructor(
     @InjectModel(CompanyPolicy.name)
     private readonly model: Model<CompanyPolicy>,
-  ) { }
+  ) {}
 
-  async upsertCompanyPolicies(
-    companyId: string,
-    policies: any[],
-  ) {
-    return this.model.findOneAndUpdate(
-      { companyId },
-      { $set: { policies } },
-      { new: true, upsert: true },
-    ).lean();
+  async upsertCompanyPolicies(companyId: string, policies: any[]) {
+    return this.model
+      .findOneAndUpdate(
+        { companyId },
+        { $set: { policies } },
+        { new: true, upsert: true },
+      )
+      .lean();
   }
 
   async getCompanyPolicies(companyId: string) {
-    const doc = await this.model
-      .findOne({ companyId })
-      .lean();
+    const doc = await this.model.findOne({ companyId }).lean();
 
-    return doc?.policies || [];
+    if (!doc) {
+      return [];
+    }
+
+    return doc.policies || [];
   }
 }

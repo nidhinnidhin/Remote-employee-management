@@ -5,6 +5,7 @@ import {
   IsEnum,
   IsString,
   IsObject,
+  IsOptional,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { PolicyType } from 'src/shared/enums/company-policy/policy-type.enum';
@@ -15,14 +16,13 @@ class PolicyItemDto {
 
   @IsString()
   title: string;
-
+  
+  @IsOptional()
   @IsObject()
   content: Record<string, any>;
 }
 
 export class UpsertCompanyPoliciesDto {
-  @IsMongoId()
-  companyId: string;
 
   @IsArray()
   @ValidateNested({ each: true })
