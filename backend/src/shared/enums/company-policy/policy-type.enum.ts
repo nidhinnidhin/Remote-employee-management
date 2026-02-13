@@ -1,4 +1,4 @@
 export enum PolicyType {
-  LEAVE = 'LEAVE',
   WORKING_HOURS = 'WORKING_HOURS',
+  LEAVE_POLICY = 'LEAVE_POLICY',
 }

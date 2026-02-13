@@ -30,17 +30,15 @@ const FormDropdown: React.FC<FormDropdownProps> = ({
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className={`w-full bg-neutral-900 border ${
-          error ? "border-red-500" : "border-neutral-700"
-        } text-left text-white px-4 py-3 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all duration-200 flex justify-between items-center`}
+        className={`w-full bg-neutral-900 border ${error ? "border-red-500" : "border-neutral-700"
+          } text-left text-white px-4 py-3 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all duration-200 flex justify-between items-center`}
       >
         <span className={value ? "text-white" : "text-neutral-500"}>
           {value || placeholder}
         </span>
         <svg
-          className={`w-4 h-4 transition-transform duration-200 ${
-            isOpen ? "rotate-180" : ""
-          }`}
+          className={`w-4 h-4 transition-transform duration-200 ${isOpen ? "rotate-180" : ""
+            }`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"

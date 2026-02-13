@@ -1,14 +1,13 @@
 import { requireRole } from "@/lib/auth/unified-auth";
+import EmployeesPage from "@/components/company/employees/EmployeePage";
 
-const Dashboard = async () => {
+const Employees = async () => {
   // Protect the route - only allow COMPANY_ADMIN
   await requireRole("COMPANY_ADMIN");
 
   return (
-    <div>
-      Dashboard
-    </div>
+    <EmployeesPage />
   );
 }
 
-export default Dashboard;
+export default Employees;

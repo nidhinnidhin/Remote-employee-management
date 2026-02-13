@@ -6,7 +6,7 @@ import { HeaderProps } from "@/shared/types/company/layout/header-props.type";
 
 const Header: React.FC<HeaderProps> = ({ onMobileMenuDatas }) => {
   return (
-    <header className="sticky top-0 z-40 flex h-16 items-center border-b border-neutral-800 bg-neutral-900/50 backdrop-blur-md px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-40 flex h-16 items-center border-b border-pink-50 bg-white/80 backdrop-blur-md px-4 sm:px-6 lg:px-8">
       {/* Mobile Menu Button */}
       <button
         type="button"
@@ -25,7 +25,7 @@ const Header: React.FC<HeaderProps> = ({ onMobileMenuDatas }) => {
             <input
               type="text"
               placeholder="Search..."
-              className="bg-neutral-900 border border-neutral-800 rounded-lg pl-3 pr-10 py-1.5 text-sm text-white focus:outline-none focus:border-red-500 transition-colors w-64"
+              className="bg-gray-50 border border-gray-100 rounded-lg pl-3 pr-10 py-1.5 text-sm text-gray-900 focus:outline-none focus:border-pink-500 transition-colors w-64"
             />
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 w-4 h-4" />
           </div>
@@ -38,8 +38,8 @@ const Header: React.FC<HeaderProps> = ({ onMobileMenuDatas }) => {
           </button>
 
           {/* User Profile */}
-          <div className="pl-4 border-l border-neutral-800">
-            <div className="h-8 w-8 rounded-full bg-red-600 flex items-center justify-center text-white text-xs font-bold ring-2 ring-neutral-800 cursor-pointer">
+          <div className="pl-4 border-l border-gray-100">
+            <div className="h-8 w-8 rounded-full bg-pink-500 flex items-center justify-center text-white text-xs font-bold ring-2 ring-white cursor-pointer">
               CA
             </div>
           </div>

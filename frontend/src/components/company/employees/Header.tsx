@@ -32,12 +32,12 @@ const Header = () => {
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-red-500 mb-1">Employees</h1>
-          <p className="text-neutral-400">Manage your team members</p>
+          <h1 className="text-3xl font-bold text-pink-500 mb-1">Employees</h1>
+          <p className="text-gray-500">Manage your team members</p>
         </div>
 
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 rounded bg-neutral-900 border border-neutral-800 text-white hover:bg-neutral-800 transition-colors">
+          <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors font-medium">
             <Users size={18} />
             <span>Bulk Invite</span>
           </button>

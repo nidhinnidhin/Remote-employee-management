@@ -23,12 +23,12 @@ const Pagination: React.FC<PaginationProps & { theme?: "dark" | "light" }> = ({
             },
         },
         light: {
-            container: "border-purple-100 bg-white",
+            container: "border-gray-100 bg-white",
             text: "text-gray-500",
             activeText: "text-gray-900",
             button: {
-                base: "text-gray-500 ring-purple-100 hover:bg-purple-50 hover:text-purple-700",
-                active: "z-10 bg-purple-600 text-white focus-visible:outline-purple-600 ring-purple-600",
+                base: "text-gray-500 ring-gray-100 hover:bg-gray-50 hover:text-pink-500",
+                active: "z-10 bg-pink-500 text-white focus-visible:outline-pink-500 ring-pink-500",
                 disabled: "disabled:opacity-40 disabled:cursor-not-allowed text-gray-300",
             },
         },

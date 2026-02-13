@@ -86,11 +86,11 @@ const EmployeesTable = () => {
   const getStatusColor = (status: EmployeeStatus) => {
     switch (status) {
       case "Active":
-        return "bg-purple-500/10 text-purple-400 border border-purple-500/20";
+        return "bg-purple-500/10 text-purple-600";
       case "Inactive":
-        return "bg-pink-500/10 text-pink-400 border border-pink-500/20";
+        return "bg-pink-500/10 text-pink-600";
       default:
-        return "bg-neutral-500/10 text-neutral-400";
+        return "bg-gray-500/10 text-gray-400";
     }
   };
 
@@ -99,7 +99,7 @@ const EmployeesTable = () => {
       header: "Employee",
       accessor: (employee: Employee) => (
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-pink-500 to-red-600 flex items-center justify-center text-white font-medium text-sm">
+          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center text-white font-medium text-sm">
             {employee.avatar ? (
               <Image
                 src={employee.avatar}
@@ -118,8 +118,8 @@ const EmployeesTable = () => {
             )}
           </div>
           <div className="flex flex-col">
-            <span className="text-white font-medium">{employee.name}</span>
-            <span className="text-neutral-400 text-xs">{employee.email}</span>
+            <span className="text-gray-900 font-medium">{employee.name}</span>
+            <span className="text-gray-500 text-xs">{employee.email}</span>
           </div>
         </div>
       ),
@@ -130,12 +130,16 @@ const EmployeesTable = () => {
     },
     {
       header: "Team",
-      accessor: "team",
+      accessor: (employee: Employee) => (
+        <span className="text-gray-900">
+          {employee.team}
+        </span>
+      ),
     },
     {
       header: "Role",
       accessor: (employee: Employee) => (
-        <span className="px-2 py-1 rounded-md bg-neutral-800 border border-neutral-700 text-xs font-medium text-neutral-300">
+        <span className="px-3 py-1 rounded-lg bg-gray-100 text-xs font-medium text-gray-700">
           {employee.role}
         </span>
       ),
@@ -158,7 +162,7 @@ const EmployeesTable = () => {
       header: "Actions",
       accessor: () => (
         <div className="flex justify-end">
-          <button className="text-neutral-400 hover:text-white transition-colors">
+          <button className="text-gray-400 hover:text-gray-900 transition-colors">
             <MoreVertical size={18} />
           </button>
         </div>
@@ -173,6 +177,7 @@ const EmployeesTable = () => {
         data={paginatedData}
         columns={columns}
         keyExtractor={(item) => item.id}
+        theme="light"
       />
       <Pagination
         currentPage={currentPage}

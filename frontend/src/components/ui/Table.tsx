@@ -21,12 +21,12 @@ const Table = <T,>({
       loading: "bg-neutral-900/50 border-neutral-800",
     },
     light: {
-      container: "border-purple-100 bg-white shadow-sm",
-      header: "bg-purple-50 text-purple-900 font-semibold",
-      row: "hover:bg-purple-50/50 border-b border-purple-50",
-      text: "text-gray-700",
-      divider: "divide-purple-50",
-      loading: "bg-white border-purple-100",
+      container: "border-gray-100 bg-white shadow-sm",
+      header: "bg-gray-50/30 text-gray-400 font-medium",
+      row: "hover:bg-gray-50/50 border-b border-gray-50",
+      text: "text-gray-900",
+      divider: "divide-gray-50",
+      loading: "bg-white border-gray-100",
     },
   };
 
@@ -70,7 +70,7 @@ const Table = <T,>({
       className={`w-full overflow-x-auto rounded-lg border ${styles.container}`}
     >
       <table className="w-full text-left text-sm">
-        <thead className={`${styles.header} uppercase text-xs`}>
+        <thead className={`${styles.header} text-xs`}>
           <tr>
             {columns.map((col, index) => (
               <th
@@ -92,9 +92,8 @@ const Table = <T,>({
               {columns.map((col, colIndex) => (
                 <td
                   key={colIndex}
-                  className={`px-6 py-4 whitespace-nowrap ${styles.text} ${
-                    col.className || ""
-                  }`}
+                  className={`px-6 py-4 whitespace-nowrap ${styles.text} ${col.className || ""
+                    }`}
                 >
                   {typeof col.accessor === "function"
                     ? col.accessor(item)

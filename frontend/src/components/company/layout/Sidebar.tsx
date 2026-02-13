@@ -17,6 +17,7 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
+  Shield
 } from "lucide-react";
 import { SidebarProps } from "@/shared/types/company/layout/sidebar-props.type";
 
@@ -32,9 +33,9 @@ const Sidebar: React.FC<SidebarProps> = ({
     {
       label: "Dashboard",
       icon: LayoutDashboard,
-      href: "/company-admin/dashboard",
+      href: "/company/employees/dashboard",
     },
-    { label: "Employees", icon: Users, href: "/company-admin/employees" },
+    { label: "Employees", icon: Users, href: "/company/employees/employees" },
     {
       label: "Departments & Teams",
       icon: Building2,
@@ -63,6 +64,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       href: "/company-admin/profile",
     },
     { label: "Audit Logs", icon: FileText, href: "/company-admin/audit-logs" },
+    { label: "Company policy", icon: Shield, href: "/company/employees/company-policy" },
   ];
 
   return (
@@ -77,7 +79,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed top-0 left-0 h-full z-50 bg-neutral-900 border-r border-neutral-800 transition-all duration-300 ease-in-out
+        className={`fixed top-0 left-0 h-full z-50 bg-white border-r border-pink-50 transition-all duration-300 ease-in-out
           ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
           lg:translate-x-0
           ${isCollapsed ? "lg:w-20" : "lg:w-64"}
@@ -87,7 +89,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         {/* Header */}
         <div className="h-16 flex items-center justify-between px-4 border-b border-neutral-800/50">
           {!isCollapsed && (
-            <span className="text-xl font-bold text-white truncate">
+            <span className="text-xl font-bold text-pink-600 truncate">
               Workspace Admin
             </span>
           )}
@@ -120,17 +122,16 @@ const Sidebar: React.FC<SidebarProps> = ({
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group
-                  ${
-                    isActive
-                      ? "bg-red-500/10 text-red-500"
-                      : "text-neutral-400 hover:bg-neutral-800 hover:text-white"
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group shadow-sm
+                  ${isActive
+                    ? "bg-pink-500 text-white"
+                    : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
                   }
                 `}
                 title={isCollapsed ? item.label : ""}
               >
                 <div
-                  className={`${isActive ? "text-red-500" : "text-neutral-400 group-hover:text-white"}`}
+                  className={`${isActive ? "text-white" : "text-gray-400 group-hover:text-gray-900"}`}
                 >
                   <item.icon size={20} strokeWidth={1.5} />
                 </div>
