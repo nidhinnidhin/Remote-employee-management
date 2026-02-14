@@ -1,147 +1,97 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import FormInput from "@/components/ui/FormInput";
 
 interface Props {
-  onChange?: (data: any) => void;
+  onChange: (data: any) => void;
+  initialData?: any;
 }
 
-const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const WorkingHoursConfiguration: React.FC<Props> = ({
+  onChange,
+  initialData,
+}) => {
+  const [coreHours, setCoreHours] = useState("");
+  const [flexiblePolicy, setFlexiblePolicy] = useState("");
+  const [timeTracking, setTimeTracking] = useState("");
 
-const WorkingHoursConfiguration: React.FC<Props> = ({ onChange }) => {
-  const [selectedDays, setSelectedDays] = useState(["Mon", "Tue", "Wed", "Thu", "Fri"]);
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
-  const [breakDuration, setBreakDuration] = useState("");
-  const [overtimeRate, setOvertimeRate] = useState("");
+  // Prefill
+  useEffect(() => {
+    if (!initialData) return;
 
-  const toggleDay = (day: string) => {
-    setSelectedDays(prev =>
-      prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
-    );
-  };
+    const sections = initialData.sections || [];
+
+    const getSection = (title: string) =>
+      sections.find((s: any) => s.title === title)?.points.join("\n") || "";
+
+    setCoreHours(getSection("Core Working Hours"));
+    setFlexiblePolicy(getSection("Flexible Timing Policy"));
+    setTimeTracking(getSection("Time Tracking Expectations"));
+  }, [initialData]);
 
   useEffect(() => {
-    if (!onChange) return;
-
-    const mapDay = (day: string) =>
-      ({
-        Mon: "MON",
-        Tue: "TUE",
-        Wed: "WED",
-        Thu: "THU",
-        Fri: "FRI",
-        Sat: "SAT",
-        Sun: "SUN",
-      } as any)[day];
-
     onChange({
-      configuration: {
-        workWeekDays: selectedDays.map(mapDay),
-        startTime,
-        endTime,
-        breakDurationMinutes: Number(breakDuration),
-        overtimeRateMultiplier: Number(overtimeRate),
-      },
-      description: "",
-      coreWorkingHoursPoints: [],
-      flexibleTimingPoints: [],
-      timeTrackingPoints: [],
+      sections: [
+        {
+          title: "Core Working Hours",
+          points: coreHours.split("\n").filter(Boolean),
+        },
+        {
+          title: "Flexible Timing Policy",
+          points: flexiblePolicy.split("\n").filter(Boolean),
+        },
+        {
+          title: "Time Tracking Expectations",
+          points: timeTracking.split("\n").filter(Boolean),
+        },
+      ],
     });
-  }, [selectedDays, startTime, endTime, breakDuration, overtimeRate]);
+  }, [coreHours, flexiblePolicy, timeTracking]);
 
   return (
     <div className="bg-white rounded-3xl p-8 shadow-sm border border-pink-50/50">
       <h2 className="text-xl font-bold text-gray-900 mb-8">
-        Working Hours Configuration
+        Working Hours Policy
       </h2>
 
-      <div className="space-y-8">
-        {/* Work Week Days */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-4">
-            Work Week Days
-          </label>
-          <div className="flex flex-wrap gap-6">
-            {days.map(day => (
-              <label key={day} className="flex items-center gap-2 cursor-pointer group">
-                <div
-                  onClick={() => toggleDay(day)}
-                  className={`w-5 h-5 rounded border transition-all flex items-center justify-center ${
-                    selectedDays.includes(day)
-                      ? "bg-pink-500 border-pink-500"
-                      : "border-gray-300 group-hover:border-pink-300"
-                  }`}
-                >
-                  {selectedDays.includes(day) && (
-                    <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                  )}
-                </div>
-                <span className={`text-sm ${
-                  selectedDays.includes(day)
-                    ? "text-gray-900 font-medium"
-                    : "text-gray-500"
-                }`}>
-                  {day}
-                </span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        {/* Times */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Start Time</label>
-            <input
-              type="text"
-              placeholder="09:00 AM"
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-              className="w-full bg-gray-50/50 border border-gray-100 rounded-xl px-4 py-3"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">End Time</label>
-            <input
-              type="text"
-              placeholder="06:00 PM"
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
-              className="w-full bg-gray-50/50 border border-gray-100 rounded-xl px-4 py-3"
-            />
-          </div>
-        </div>
-
-        {/* Break */}
+      <div className="space-y-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Break Duration (minutes)
+            Core Working Hours
           </label>
-          <input
-            type="text"
-            placeholder="60"
-            value={breakDuration}
-            onChange={(e) => setBreakDuration(e.target.value)}
-            className="w-full bg-gray-50/50 border border-gray-100 rounded-xl px-4 py-3"
+          <textarea
+            placeholder="e.g., Core hours are 10 AM - 4 PM (one per line)"
+            value={coreHours}
+            onChange={(e) => setCoreHours(e.target.value)}
+            className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-4 py-3 h-32 focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 transition-all text-gray-900 placeholder:text-gray-400"
           />
+          <p className="mt-1.5 text-xs text-gray-500">Define the mandatory hours when all employees must be available.</p>
         </div>
 
-        {/* Overtime */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Overtime Rate Multiplier
+            Flexible Timing Policy
           </label>
-          <input
-            type="text"
-            placeholder="1.5"
-            value={overtimeRate}
-            onChange={(e) => setOvertimeRate(e.target.value)}
-            className="w-full bg-gray-50/50 border border-gray-100 rounded-xl px-4 py-3"
+          <textarea
+            placeholder="e.g., Start between 7 AM - 11 AM (one per line)"
+            value={flexiblePolicy}
+            onChange={(e) => setFlexiblePolicy(e.target.value)}
+            className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-4 py-3 h-32 focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 transition-all text-gray-900 placeholder:text-gray-400"
           />
+          <p className="mt-1.5 text-xs text-gray-500">Detail rules regarding flexible start and end times.</p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Time Tracking Expectations
+          </label>
+          <textarea
+            placeholder="e.g., Log hours daily in the portal (one per line)"
+            value={timeTracking}
+            onChange={(e) => setTimeTracking(e.target.value)}
+            className="w-full bg-gray-50 border border-gray-100 rounded-2xl px-4 py-3 h-32 focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 transition-all text-gray-900 placeholder:text-gray-400"
+          />
+          <p className="mt-1.5 text-xs text-gray-500">Explain how attendance and work hours should be recorded.</p>
         </div>
       </div>
     </div>

@@ -4,31 +4,29 @@ import { PolicyType } from 'src/shared/enums/company-policy/policy-type.enum';
 
 @Schema({ timestamps: true })
 export class CompanyPolicy {
-  @Prop({
-    type: Types.ObjectId,
-    ref: 'Company',
-    required: true,
-    unique: true,
-  })
-  companyId: Types.ObjectId;
+  @Prop({ required: true, unique: true })
+  companyId: string;
 
   @Prop({
     type: [
       {
-        type: { type: String, enum: PolicyType, required: true },
+        type: { type: String, required: true },
         title: { type: String, required: true },
-        content: { type: Object, required: true },
+        content: {
+          sections: [
+            {
+              title: { type: String },
+              points: [{ type: String }],
+            },
+          ],
+        },
         isActive: { type: Boolean, default: true },
       },
     ],
     default: [],
   })
-  policies: {
-    type: PolicyType;
-    title: string;
-    content: Record<string, any>;
-    isActive: boolean;
-  }[];
+  policies: any[];
 }
 
-export const CompanyPolicySchema = SchemaFactory.createForClass(CompanyPolicy);
+export const CompanyPolicySchema =
+  SchemaFactory.createForClass(CompanyPolicy);

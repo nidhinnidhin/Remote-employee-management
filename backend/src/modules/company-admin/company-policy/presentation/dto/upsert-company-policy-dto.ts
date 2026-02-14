@@ -1,31 +1,41 @@
 import {
-  IsMongoId,
   IsArray,
   ValidateNested,
-  IsEnum,
   IsString,
-  IsObject,
-  IsOptional,
-} from 'class-validator';
-import { Type } from 'class-transformer';
-import { PolicyType } from 'src/shared/enums/company-policy/policy-type.enum';
+} from "class-validator";
+import { Type } from "class-transformer";
 
-class PolicyItemDto {
-  @IsEnum(PolicyType)
-  type: PolicyType;
+class PolicySectionDto {
+  @IsString()
+  title: string;
+
+  @IsArray()
+  @IsString({ each: true })
+  points: string[];
+}
+
+class PolicyContentDto {
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => PolicySectionDto)
+  sections: PolicySectionDto[];
+}
+
+class PolicyDto {
+  @IsString()
+  type: string;
 
   @IsString()
   title: string;
-  
-  @IsOptional()
-  @IsObject()
-  content: Record<string, any>;
+
+  @ValidateNested()
+  @Type(() => PolicyContentDto)
+  content: PolicyContentDto;
 }
 
 export class UpsertCompanyPoliciesDto {
-
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => PolicyItemDto)
-  policies: PolicyItemDto[];
+  @Type(() => PolicyDto)
+  policies: PolicyDto[];
 }
