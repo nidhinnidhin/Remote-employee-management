@@ -53,6 +53,7 @@ import { CompanyPolicyUseCase } from '../../application/use-case/company-policy.
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import { CompanyAdminGuard } from 'src/shared/guards/company-admin.guard';
 import { UpsertCompanyPoliciesDto } from '../dto/upsert-company-policy-dto';
+import { CompanyAdminOrEmployeeGuard } from 'src/shared/guards/company-admin-or-employee-access.guard';
 
 @Controller('company-policies')
 @UseGuards(JwtAuthGuard)
@@ -67,17 +68,10 @@ export class CompanyPolicyController {
     return this.useCase.createOrUpdatePolicies(companyId, dto.policies);
   }
 
-  // 🔐 COMPANY ADMIN - GET FOR EDITING
-  @Get('/admin')
-  @UseGuards(CompanyAdminGuard)
-  getPoliciesForAdmin(@Req() req) {
-    const companyId = req.user.companyId;
-    return this.useCase.getPolicies(companyId);
-  }
-
-  // 🔒 EMPLOYEES - READ ONLY
+  // 🔐 COMPANY ADMIN OR EMPLOYEE - GET 
   @Get()
-  getPoliciesForEmployees(@Req() req) {
+  @UseGuards(CompanyAdminOrEmployeeGuard)
+  getPoliciesForAdmin(@Req() req) {
     const companyId = req.user.companyId;
     return this.useCase.getPolicies(companyId);
   }

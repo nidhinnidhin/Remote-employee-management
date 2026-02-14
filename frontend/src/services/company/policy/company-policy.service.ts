@@ -6,6 +6,6 @@ export const createOrUpdateCompanyPolicies = async (payload: any) => {
 };
 
 export const getAdminCompanyPolicies = async () => {
-  const res = await clientApi.get("/company-policies/admin");
+  const res = await clientApi.get("/company-policies");
   return res.data;
 };
