@@ -1,3 +1,4 @@
+import { InviteStatus } from 'src/shared/enums/user/user-invite-status.enum';
 import { Employee } from '../entities/employee.entity';
 
 export interface EmployeeRepository {
@@ -8,7 +9,7 @@ export interface EmployeeRepository {
     department: string;
     isActive: boolean;
     hasPassword: boolean;
-    inviteStatus: 'PENDING' | 'USED';
+    inviteStatus: InviteStatus;
   }): Promise<Employee>;
 
   findByEmail(email: string): Promise<Employee | null>;

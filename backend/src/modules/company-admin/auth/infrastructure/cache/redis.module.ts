@@ -13,4 +13,4 @@ import { RedisService } from 'src/shared/services/redis.service';
   providers: [RedisService],
   exports: [RedisModule, RedisService],
 })
-export class AppRedisModule { }
+export class AppRedisModule {}

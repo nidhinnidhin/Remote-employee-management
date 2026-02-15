@@ -1,3 +1,4 @@
+import { InviteStatus } from "src/shared/enums/user/user-invite-status.enum";
 import { UserStatus } from "src/shared/enums/user/user-status.enum";
 
 
@@ -15,7 +16,7 @@ export class UserEntity {
     public readonly updatedAt: Date,
     public readonly companyId?: string,
     public readonly department?: string,
-    public readonly inviteStatus?: 'PENDING' | 'USED',
+    public readonly inviteStatus?: InviteStatus,
     public readonly hasPassword: boolean = true,
   ) { }
 }

@@ -1,3 +1,5 @@
+import { InviteStatus } from "src/shared/enums/user/user-invite-status.enum";
+
 export class Employee {
   constructor(
     public readonly id: string,
@@ -7,7 +9,7 @@ export class Employee {
     public readonly department: string,
     public readonly isActive: boolean,
     public readonly hasPassword: boolean,
-    public readonly inviteStatus: 'PENDING' | 'USED',
+    public readonly inviteStatus: InviteStatus,
     public readonly companyId?: string,
   ) { }
 }

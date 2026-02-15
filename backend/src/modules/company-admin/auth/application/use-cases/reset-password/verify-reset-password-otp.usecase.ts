@@ -36,10 +36,10 @@ export class VerifyResetPasswordOtpUseCase {
       throw new BadRequestException(OTP_MESSAGES.OTP_INVALID);
     }
 
-    // ✅ Mark OTP verified
+    // Mark OTP verified
     await this.otpRepository.markAsVerified(record.id);
 
-    // 🔐 Create reset session
+    // Create reset session
     const resetSessionKey = `reset-password:${input.email.toLowerCase()}`;
     await this.redisService.set(resetSessionKey, 'true', 10 * 60); // 10 min
 

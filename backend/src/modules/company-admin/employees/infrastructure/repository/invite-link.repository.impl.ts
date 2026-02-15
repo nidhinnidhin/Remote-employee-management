@@ -32,9 +32,6 @@ export class InviteLinkRepositoryImpl implements InviteLinkRepository {
   }
 
   async markAsUsed(token: string): Promise<void> {
-    await this.model.updateOne(
-      { token },
-      { $set: { used: true } },
-    );
+    await this.model.updateOne({ token }, { $set: { used: true } });
   }
 }

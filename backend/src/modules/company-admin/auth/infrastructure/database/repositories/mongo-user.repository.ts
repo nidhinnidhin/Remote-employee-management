@@ -5,13 +5,14 @@ import { UserRepository } from '../../../domain/repositories/user.repository';
 import { UserEntity } from '../../../domain/entities/user.entity';
 import { UserDocument } from '../mongoose/schemas/userSchema';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
+import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 
 @Injectable()
 export class MongoUserRepository implements UserRepository {
   constructor(
     @InjectModel(UserDocument.name)
     private readonly userModel: Model<UserDocument>,
-  ) { }
+  ) {}
 
   async findByEmail(email: string): Promise<UserEntity | null> {
     const user = await this.userModel.findOne({ email });
@@ -56,7 +57,7 @@ export class MongoUserRepository implements UserRepository {
     );
 
     if (result.matchedCount === 0) {
-      throw new Error(`User not found for email ${email}`);
+      throw new Error(`${AUTH_MESSAGES.USER_NOT_FOUND_FOR_EMAIL} ${email}`);
     }
   }
 

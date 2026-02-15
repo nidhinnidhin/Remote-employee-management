@@ -13,17 +13,22 @@ import { InviteEmployeeUseCase } from '../../application/use-cases/invite-employ
 import { VerifyInviteUseCase } from '../../application/use-cases/verify-invite.usecase';
 import { SetPasswordUseCase } from '../../application/use-cases/set-password.usecase';
 import { RedisService } from 'src/shared/services/redis.service';
-import { randomBytes } from 'crypto';
 import type { Request, Response } from 'express';
 import { JwtService } from 'src/shared/services/jwt.service';
 import {
   ACCESS_TOKEN_COOKIE_NAME,
   ACCESS_TOKEN_COOKIE_OPTIONS,
+  INVITE_SESSION_COOKIE_NAME,
+  INVITE_SESSION_COOKIE_OPTIONS,
   REFRESH_TOKEN_COOKIE_NAME,
   REFRESH_TOKEN_COOKIE_OPTIONS,
 } from 'src/shared/config/cookies.config';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import { InviteEmployeeDto } from '../dto/invite-employee.dto';
+import { EMPLOYEE_MESSAGES } from 'src/shared/constants/messages/employee/employee.messages';
+import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
+import { POLICY_MESSAGES } from 'src/shared/constants/messages/company-policy/company-policy.message';
+import { generateSecureToken } from 'src/shared/utils/token.util';
 
 @Controller('company/employees')
 export class EmployeesController {
@@ -33,22 +38,21 @@ export class EmployeesController {
     private readonly setPasswordUseCase: SetPasswordUseCase,
     private readonly redisService: RedisService,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {}
 
   @Post('invite')
   @UseGuards(JwtAuthGuard)
   async invite(@Req() req: Request, @Body() dto: InviteEmployeeDto) {
     const companyId = req.user?.companyId;
     if (!companyId) {
-      throw new UnauthorizedException('Company ID not found in token');
+      throw new UnauthorizedException(POLICY_MESSAGES.COMPANY_ID_NOT_FOUND);
     }
 
-    console.log('Hited invitation for company:', companyId);
     await this.inviteEmployee.execute({
       ...dto,
       companyId,
     });
-    return { message: 'Invitation sent successfully' };
+    return { message: EMPLOYEE_MESSAGES.INVITATION_SENT };
   }
 
   @Get('verify-invite')
@@ -58,18 +62,18 @@ export class EmployeesController {
   ) {
     const { employeeId } = await this.verifyInviteUseCase.execute(token);
 
-    // 🔐 Create temp session
-    const sessionId = randomBytes(32).toString('hex');
+    // Create temp session
+    const { rawToken: sessionId } = generateSecureToken();
     const redisKey = `invite:temp:${sessionId}`;
 
     await this.redisService.set(redisKey, employeeId, 10 * 60); // 10 min
 
-    // 🍪 Store temp session id
-    res.cookie('invite_session', sessionId, {
-      httpOnly: true,
-      sameSite: 'lax',
-      maxAge: 10 * 60 * 1000,
-    });
+    // Store temp session id
+    res.cookie(
+      INVITE_SESSION_COOKIE_NAME,
+      sessionId,
+      INVITE_SESSION_COOKIE_OPTIONS,
+    );
 
     return { nextStep: 'SET_PASSWORD' };
   }
@@ -80,21 +84,24 @@ export class EmployeesController {
     @Res({ passthrough: true }) res: Response,
     @Body('password') password: string,
   ) {
-    const sessionId = req.cookies?.invite_session;
+    const sessionId = req.cookies?.[INVITE_SESSION_COOKIE_NAME];
 
     if (!sessionId) {
-      throw new UnauthorizedException('Invite session expired');
+      throw new UnauthorizedException(EMPLOYEE_MESSAGES.INVITE_SESSION_EXPIRED);
     }
 
     const redisKey = `invite:temp:${sessionId}`;
     const employeeId = await this.redisService.get(redisKey);
 
     if (!employeeId) {
-      throw new UnauthorizedException('Invite session expired');
+      throw new UnauthorizedException(EMPLOYEE_MESSAGES.INVITE_SESSION_EXPIRED);
     }
 
     // 1️⃣ Set password
-    const employee = await this.setPasswordUseCase.execute(employeeId, password);
+    const employee = await this.setPasswordUseCase.execute(
+      employeeId,
+      password,
+    );
 
     // 2️⃣ Generate JWT tokens
     const accessToken = this.jwtService.generateAccessToken({
@@ -122,10 +129,10 @@ export class EmployeesController {
 
     // 4️⃣ Cleanup temp invite session
     await this.redisService.del(redisKey);
-    res.clearCookie('invite_session');
+    res.clearCookie(INVITE_SESSION_COOKIE_NAME);
 
     return {
-      message: 'Password set & logged in successfully',
+      message: AUTH_MESSAGES.PASSWORD_SET,
     };
   }
 }

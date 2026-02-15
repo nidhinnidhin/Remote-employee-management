@@ -1,36 +1,13 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import type { CompanyPolicyRepository } from '../../domain/repositories/company-policy.repository';
-import { COMPANY_POLICY_REPOSITORY } from '../../domain/repositories/company-policy.repository.token';
-import { LeavePolicyContentDto } from '../../presentation/dto/leave-policy.dto';
-import { plainToInstance } from 'class-transformer';
-import { PolicyType } from 'src/shared/enums/company-policy/policy-type.enum';
-import { validate } from 'class-validator';
-import { WorkingHoursContentDto } from '../../presentation/dto/working-hours.dto';
+import { POLICY_MESSAGES } from 'src/shared/constants/messages/company-policy/company-policy.message';
 
 @Injectable()
 export class CompanyPolicyUseCase {
   constructor(
-    @Inject(COMPANY_POLICY_REPOSITORY)
+    @Inject(POLICY_MESSAGES.COMPANY_POLICY_REPOSITORY)
     private readonly repo: CompanyPolicyRepository,
   ) {}
-
-  // async createOrUpdatePolicies(companyId: string, policies: any[]) {
-  //   for (const policy of policies) {
-  //     if (policy.type === PolicyType.WORKING_HOURS) {
-  //       const dto = plainToInstance(WorkingHoursContentDto, policy.content);
-  //       const errors = await validate(dto);
-  //       if (errors.length) throw new BadRequestException(errors);
-  //     }
-
-  //     if (policy.type === PolicyType.LEAVE_POLICY) {
-  //       const dto = plainToInstance(LeavePolicyContentDto, policy.content);
-  //       const errors = await validate(dto);
-  //       if (errors.length) throw new BadRequestException(errors);
-  //     }
-  //   }
-
-  //   return this.repo.upsertCompanyPolicies(companyId, policies);
-  // }
 
   async createOrUpdatePolicies(companyId: string, policies: any[]) {
     const validPolicies = policies.filter(
@@ -38,7 +15,7 @@ export class CompanyPolicyUseCase {
     );
 
     if (validPolicies.length === 0) {
-      return { message: 'No valid policies provided' };
+      return { message: POLICY_MESSAGES.NO_POLICY_PROVIDED };
     }
 
     return this.repo.upsertCompanyPolicies(companyId, validPolicies);

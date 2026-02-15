@@ -4,7 +4,7 @@ import { Document, Types } from 'mongoose';
 @Schema({ timestamps: true })
 export class InviteLinkDocument extends Document {
   @Prop({ required: true, index: true })
-  token: string; // HASHED
+  token: string;
 
   @Prop({ type: Types.ObjectId, required: true })
   employeeId: Types.ObjectId;

@@ -11,7 +11,6 @@ import { RegisterCompanyAdminUseCase } from '../../application/use-cases/registe
 import { VerifyEmailOtpUseCase } from '../../application/use-cases/otp/verify-email-otp.usecase';
 import { LoginUseCase } from '../../application/use-cases/login/login.usecase';
 import { ResendEmailOtpUseCase } from '../../application/use-cases/otp/resend-email-otp.usecase';
-
 import { RegisterCompanyAdminDto } from '../../presentation/dto/register-company-admin.dto';
 import { VerifyEmailOtpDto } from '../../presentation/dto/verify-email-otp.dto';
 import { LoginDto } from '../../presentation/dto/login.dto';
@@ -43,7 +42,7 @@ export class AuthController {
     private readonly forgotPasswordUseCase: ForgotPasswordUseCase,
     private readonly verifyResetPasswordOtpUseCase: VerifyResetPasswordOtpUseCase,
     private readonly resetPasswordUseCase: ResetPasswordUseCase,
-  ) { }
+  ) {}
 
   // LOGIN
   @Post('login')
@@ -51,12 +50,13 @@ export class AuthController {
     @Body() dto: LoginDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    console.log('!!! Unified Login Called !!!');
-    const { accessToken, refreshToken, user } =
-      await this.loginUseCase.execute({
+    console.log('!!! Login Called !!!');
+    const { accessToken, refreshToken, user } = await this.loginUseCase.execute(
+      {
         email: dto.email,
         password: dto.password,
-      });
+      },
+    );
 
     res.cookie(
       ACCESS_TOKEN_COOKIE_NAME,
@@ -108,7 +108,7 @@ export class AuthController {
     return {
       accessToken: result.accessToken,
       refreshToken: result.refreshToken,
-      userId: result.userId
+      userId: result.userId,
     };
   }
 

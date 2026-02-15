@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
-import { PolicyType } from 'src/shared/enums/company-policy/policy-type.enum';
 
 @Schema({ timestamps: true })
 export class CompanyPolicy {
@@ -28,5 +27,4 @@ export class CompanyPolicy {
   policies: any[];
 }
 
-export const CompanyPolicySchema =
-  SchemaFactory.createForClass(CompanyPolicy);
+export const CompanyPolicySchema = SchemaFactory.createForClass(CompanyPolicy);

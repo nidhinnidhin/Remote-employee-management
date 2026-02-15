@@ -1,6 +1,13 @@
-import { Type } from "class-transformer";
-import { IsArray, IsEnum, IsInt, IsString, Matches, ValidateNested } from "class-validator";
-import { WorkDay } from "src/shared/enums/company-policy/work-day.enum";
+import { Type } from 'class-transformer';
+import {
+  IsArray,
+  IsEnum,
+  IsInt,
+  IsString,
+  Matches,
+  ValidateNested,
+} from 'class-validator';
+import { WorkDay } from 'src/shared/enums/company-policy/work-day.enum';
 
 class WorkingHoursConfigurationDto {
   @IsEnum(WorkDay, { each: true })

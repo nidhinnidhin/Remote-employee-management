@@ -44,4 +44,4 @@ import { JwtService } from 'src/shared/services/jwt.service';
   ],
   exports: ['EmployeeRepository', 'InviteLinkRepository'],
 })
-export class EmployeesModule { }
+export class EmployeesModule {}

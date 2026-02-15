@@ -8,6 +8,7 @@ import { EmailService } from 'src/shared/services/email.service';
 import { OtpService } from 'src/shared/services/otp.service';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
+import { hashPassword } from 'src/shared/utils/password.util';
 
 @Injectable()
 export class RegisterCompanyAdminUseCase {
@@ -23,7 +24,7 @@ export class RegisterCompanyAdminUseCase {
 
     private readonly emailService: EmailService,
     private readonly otpService: OtpService,
-  ) { }
+  ) {}
 
   async execute(dto: RegisterCompanyAdminDto) {
     const existingCompany = await this.companyRepository.findByEmail(
@@ -44,7 +45,7 @@ export class RegisterCompanyAdminUseCase {
     const otpHash = await this.otpService.hashOtp(otp);
     const expiresAt = new Date(Date.now() + 60_000);
 
-    const passwordHash = await bcrypt.hash(dto.admin.password, 10);
+    const passwordHash = await hashPassword(dto.admin.password);
 
     const payload = {
       company: dto.company,
@@ -56,7 +57,7 @@ export class RegisterCompanyAdminUseCase {
       expiresAt,
     };
 
-    // ⏱ Redis TTL = 60 seconds
+    // Redis TTL = 60 seconds
     await this.pendingRepository.save(
       dto.admin.email,
       payload,

@@ -24,7 +24,7 @@ export class VerifyEmailOtpUseCase {
     private readonly userRepository: UserRepository,
 
     private readonly jwtService: JwtService,
-  ) { }
+  ) {}
 
   async execute(input: VerifyEmailOtpInput) {
     const pending = await this.pendingRepository.find(input.email);
@@ -32,18 +32,18 @@ export class VerifyEmailOtpUseCase {
       throw new BadRequestException(OTP_MESSAGES.OTP_EXPIRED);
     }
 
-    // 🔥 Enforce expiry
+    // Enforce expiry
     if (pending.expiresAt < new Date()) {
       throw new BadRequestException(OTP_MESSAGES.OTP_EXPIRED);
     }
 
-    // 🔐 Secure OTP check
+    // Secure OTP check
     const isValid = await bcrypt.compare(input.otp, pending.otpHash);
     if (!isValid) {
       throw new BadRequestException(OTP_MESSAGES.OTP_INVALID);
     }
 
-    // 🏢 Create company
+    // Create company
     const company = new CompanyEntity(
       randomUUID(),
       pending.company.name,
@@ -57,7 +57,7 @@ export class VerifyEmailOtpUseCase {
 
     const createdCompany = await this.companyRepository.create(company);
 
-    // 👤 Create user
+    // Create user
     const user = new UserEntity(
       randomUUID(),
       pending.admin.firstName,
@@ -74,10 +74,10 @@ export class VerifyEmailOtpUseCase {
 
     await this.userRepository.create(user);
 
-    // 🧹 Clear Redis
+    // Clear Redis
     await this.pendingRepository.delete(input.email);
 
-    // 🔑 Tokens
+    // Tokens
     const accessToken = this.jwtService.generateAccessToken({
       userId: user.id,
       role: user.role,

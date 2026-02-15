@@ -19,8 +19,14 @@ import { JwtService } from '../../../../../shared/services/jwt.service';
 import { AuthController } from '../controllers/auth.controller';
 import { TestController } from '../controllers/test.controller';
 import { EmailOtpSchema } from '../../infrastructure/database/mongoose/schemas/email-otp.schema';
-import { CompanyDocument, CompanySchema } from '../../infrastructure/database/mongoose/schemas/company.schema';
-import { UserDocument, UserSchema } from '../../infrastructure/database/mongoose/schemas/userSchema';
+import {
+  CompanyDocument,
+  CompanySchema,
+} from '../../infrastructure/database/mongoose/schemas/company.schema';
+import {
+  UserDocument,
+  UserSchema,
+} from '../../infrastructure/database/mongoose/schemas/userSchema';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Module } from '@nestjs/common';
 
@@ -65,6 +71,11 @@ import { Module } from '@nestjs/common';
       useClass: MongoEmailOtpRepository,
     },
   ],
-  exports: [JwtService, 'UserRepository', 'CompanyRepository', 'EmailOtpRepository'],
+  exports: [
+    JwtService,
+    'UserRepository',
+    'CompanyRepository',
+    'EmailOtpRepository',
+  ],
 })
-export class AuthModule { }
+export class AuthModule {}

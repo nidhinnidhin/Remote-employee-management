@@ -4,9 +4,11 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { createHash } from 'crypto';
 import type { InviteLinkRepository } from '../../domain/repositories/invite-link.repository';
 import type { EmployeeRepository } from '../../domain/repositories/employee.repository';
+import { EMPLOYEE_MESSAGES } from 'src/shared/constants/messages/employee/employee.messages';
+import { InviteStatus } from 'src/shared/enums/user/user-invite-status.enum';
+import { hashToken } from 'src/shared/utils/token.util';
 
 @Injectable()
 export class VerifyInviteUseCase {
@@ -20,37 +22,37 @@ export class VerifyInviteUseCase {
 
   async execute(rawToken: string) {
     if (!rawToken) {
-      throw new BadRequestException('Invite token missing');
+      throw new BadRequestException(EMPLOYEE_MESSAGES.INVITE_TOKEN_MISSING);
     }
 
     // 1️⃣ Hash RAW token (MUST match invite use case)
-    const hashedToken = createHash('sha256').update(rawToken).digest('hex');
+    const hashedToken = hashToken(rawToken);
 
     // 2️⃣ Find invite link
     const invite = await this.inviteLinkRepo.findByToken(hashedToken);
 
     if (!invite) {
-      throw new UnauthorizedException('Invalid invite token');
+      throw new UnauthorizedException(EMPLOYEE_MESSAGES.INVALID_TOKEN);
     }
 
     // 3️⃣ Validate invite
     if (invite.used) {
-      throw new UnauthorizedException('Invite already used');
+      throw new UnauthorizedException(EMPLOYEE_MESSAGES.INVITE_USED);
     }
 
     if (invite.expiresAt < new Date()) {
-      throw new UnauthorizedException('Invite expired');
+      throw new UnauthorizedException(EMPLOYEE_MESSAGES.INVITE_EXPIRED);
     }
 
     // 4️⃣ Fetch employee
     const employee = await this.employeeRepo.findById(invite.employeeId);
 
     if (!employee) {
-      throw new UnauthorizedException('Employee not found');
+      throw new UnauthorizedException(EMPLOYEE_MESSAGES.EMPLOYEE_NOT_FOUND);
     }
 
-    if (employee.inviteStatus !== 'PENDING') {
-      throw new UnauthorizedException('Invite already processed');
+    if (employee.inviteStatus !== InviteStatus.PENDING) {
+      throw new UnauthorizedException(EMPLOYEE_MESSAGES.INVITE_PROCESSED);
     }
 
     // 5️⃣ Activate employee

@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { InviteStatus } from 'src/shared/enums/user/user-invite-status.enum';
+import { UserRole } from 'src/shared/enums/user/user-role.enum';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 
 @Schema({ timestamps: true })
@@ -24,7 +26,7 @@ export class UserDocument extends Document {
 
   @Prop({
     required: function (this: any) {
-      return this.role !== 'EMPLOYEE';
+      return this.role !== UserRole.EMPLOYEE;
     },
   })
   passwordHash: string;
@@ -39,8 +41,8 @@ export class UserDocument extends Document {
   @Prop()
   department?: string;
 
-  @Prop({ enum: ['PENDING', 'USED'] })
-  inviteStatus?: 'PENDING' | 'USED';
+  @Prop({ enum: InviteStatus })
+  inviteStatus?: InviteStatus;
 
   @Prop({ default: true })
   hasPassword: boolean;

@@ -11,7 +11,7 @@ export class MongoCompanyRepository implements CompanyRepository {
     @InjectModel(CompanyDocument.name)
     private readonly companyModel: Model<CompanyDocument>,
   ) {}
-  
+
   // ✅ new
   async findAll(): Promise<CompanyEntity[]> {
     const companies = await this.companyModel.find().sort({ createdAt: -1 }); // latest first

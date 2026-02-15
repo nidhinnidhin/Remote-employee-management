@@ -1,9 +1,17 @@
-import { Type } from "class-transformer";
-import { IsBoolean, IsInt, IsString, Max, Min, ValidateNested } from "class-validator";
+import { Type } from 'class-transformer';
+import {
+  IsBoolean,
+  IsInt,
+  IsString,
+  Max,
+  Min,
+  ValidateNested,
+} from 'class-validator';
+import { CarryOverType } from 'src/shared/enums/company-policy/carry-over-type.enum';
 
 class CarryOverDto {
   @IsString()
-  type: 'FULL' | 'PARTIAL' | 'NONE';
+  type: CarryOverType;
 
   @IsInt()
   @Min(0)

@@ -31,7 +31,7 @@ export class ResetPasswordUseCase {
 
     await this.userRepository.updatePasswordByEmail(email, passwordHash);
 
-    // 🧹 Cleanup
+    // Cleanup
     await this.redisService.del(redisKey);
 
     return { message: AUTH_MESSAGES.PASSWORD_RESET_SUCCESS };

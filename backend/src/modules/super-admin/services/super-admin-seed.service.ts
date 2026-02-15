@@ -1,4 +1,3 @@
-
 import { Injectable, OnModuleInit, Inject, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
@@ -9,67 +8,73 @@ import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 
 @Injectable()
 export class SuperAdminSeedService implements OnModuleInit {
-    private readonly logger = new Logger(SuperAdminSeedService.name);
+  private readonly logger = new Logger(SuperAdminSeedService.name);
 
-    constructor(
-        @Inject('UserRepository') private readonly userRepository: UserRepository,
-        private readonly configService: ConfigService,
-    ) { }
+  constructor(
+    @Inject('UserRepository') private readonly userRepository: UserRepository,
+    private readonly configService: ConfigService,
+  ) {}
 
-    async onModuleInit() {
-        await this.seedSuperAdmin();
+  async onModuleInit() {
+    await this.seedSuperAdmin();
+  }
+
+  private async seedSuperAdmin() {
+    const email = this.configService.get<string>('SUPER_ADMIN_EMAIL');
+    const password = this.configService.get<string>('SUPER_ADMIN_PASSWORD');
+
+    if (!email || !password) {
+      this.logger.warn(
+        'SUPER_ADMIN_EMAIL or SUPER_ADMIN_PASSWORD not set. Skipping seed.',
+      );
+      return;
     }
 
-    private async seedSuperAdmin() {
-        const email = this.configService.get<string>('SUPER_ADMIN_EMAIL');
-        const password = this.configService.get<string>('SUPER_ADMIN_PASSWORD');
+    try {
+      const existingUser = await this.userRepository.findByEmail(email);
 
-        if (!email || !password) {
-            this.logger.warn('SUPER_ADMIN_EMAIL or SUPER_ADMIN_PASSWORD not set. Skipping seed.');
-            return;
+      if (existingUser) {
+        if (existingUser.role !== UserRole.SUPER_ADMIN) {
+          this.logger.warn(
+            `User ${email} exists but is not SUPER_ADMIN. Manual intervention recommended.`,
+          );
+        } else {
+          this.logger.log(`Super Admin ${email} already exists.`);
         }
+        return;
+      }
 
-        try {
-            const existingUser = await this.userRepository.findByEmail(email);
+      this.logger.log(`Creating Super Admin user: ${email}...`);
 
-            if (existingUser) {
-                if (existingUser.role !== UserRole.SUPER_ADMIN) {
-                    this.logger.warn(`User ${email} exists but is not SUPER_ADMIN. Manual intervention recommended.`);
-                } else {
-                    this.logger.log(`Super Admin ${email} already exists.`);
-                }
-                return;
-            }
+      const salt = await bcrypt.genSalt(10);
+      const passwordHash = await bcrypt.hash(password, salt);
 
-            this.logger.log(`Creating Super Admin user: ${email}...`);
+      // Create a dummy companyId or handle it appropriately.
+      // UserEntity requires companyId. For Super Admin, it might not be relevant but required by schema.
+      // We'll generate a random string or use a static one.
+      const companyId = 'super-admin-company';
 
-            const salt = await bcrypt.genSalt(10);
-            const passwordHash = await bcrypt.hash(password, salt);
+      const newUser = new UserEntity(
+        '',
+        'Super',
+        'Admin',
+        email,
+        '0000000000',
+        UserRole.SUPER_ADMIN,
+        passwordHash,
+        UserStatus.ACTIVE,
+        new Date(),
+        new Date(),
+        companyId,
+      );
 
-            // Create a dummy companyId or handle it appropriately. 
-            // UserEntity requires companyId. For Super Admin, it might not be relevant but required by schema.
-            // We'll generate a random string or use a static one.
-            const companyId = 'super-admin-company';
-
-            const newUser = new UserEntity(
-                '',
-                'Super',
-                'Admin',
-                email,
-                '0000000000',
-                UserRole.SUPER_ADMIN,
-                passwordHash,
-                UserStatus.ACTIVE,
-                new Date(),
-                new Date(),
-                companyId,
-            );
-
-            await this.userRepository.create(newUser);
-            this.logger.log(`Super Admin ${email} created successfully.`);
-
-        } catch (error) {
-            this.logger.error(`Failed to seed Super Admin: ${error.message}`, error.stack);
-        }
+      await this.userRepository.create(newUser);
+      this.logger.log(`Super Admin ${email} created successfully.`);
+    } catch (error) {
+      this.logger.error(
+        `Failed to seed Super Admin: ${error.message}`,
+        error.stack,
+      );
     }
+  }
 }

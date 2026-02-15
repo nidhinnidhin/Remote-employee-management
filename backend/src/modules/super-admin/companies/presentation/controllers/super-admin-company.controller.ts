@@ -1,6 +1,6 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import { ListCompaniesUseCase } from '../../application/use-cases/list-companies-use-case';
-import { SuperAdminGuard } from '../../../guards/super-admin.guard';
+import { SuperAdminGuard } from 'src/shared/guards/super-admin.guard';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 
 @Controller('super-admin/companies')

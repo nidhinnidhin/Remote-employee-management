@@ -3,15 +3,16 @@ import { Model } from 'mongoose';
 import { EmployeeRepository } from '../../domain/repositories/employee.repository';
 import { Employee } from '../../domain/entities/employee.entity';
 import { UserDocument } from '../../../auth/infrastructure/database/mongoose/schemas/userSchema';
+import { InviteStatus } from 'src/shared/enums/user/user-invite-status.enum';
+import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 
 export class EmployeeRepositoryImpl implements EmployeeRepository {
   constructor(
     @InjectModel(UserDocument.name)
     private readonly model: Model<UserDocument>,
-  ) { }
+  ) {}
 
   async create(input: any): Promise<Employee> {
-    // Split name into firstName and lastName if possible
     const nameParts = input.name.split(' ');
     const firstName = nameParts[0];
     const lastName = nameParts.slice(1).join(' ') || '';
@@ -24,9 +25,9 @@ export class EmployeeRepositoryImpl implements EmployeeRepository {
       phone: input.phone || '',
       role: input.role,
       passwordHash: input.password || undefined,
-      status: 'PENDING_VERIFICATION',
+      status: UserStatus.PENDING_VERIFICATION,
       department: input.department || undefined,
-      inviteStatus: input.inviteStatus || 'PENDING',
+      inviteStatus: input.inviteStatus || InviteStatus.PENDING,
       hasPassword: !!input.hasPassword,
     });
 
@@ -36,9 +37,9 @@ export class EmployeeRepositoryImpl implements EmployeeRepository {
       doc.email,
       doc.role,
       doc.department || '',
-      doc.status === 'ACTIVE',
+      doc.status === UserStatus.ACTIVE,
       doc.hasPassword,
-      doc.inviteStatus || 'PENDING',
+      doc.inviteStatus || InviteStatus.PENDING,
       doc.companyId,
     );
   }
@@ -53,9 +54,9 @@ export class EmployeeRepositoryImpl implements EmployeeRepository {
       doc.email,
       doc.role,
       doc.department || '',
-      doc.status === 'ACTIVE',
+      doc.status === UserStatus.ACTIVE,
       doc.hasPassword,
-      doc.inviteStatus || 'PENDING',
+      doc.inviteStatus || InviteStatus.PENDING,
       doc.companyId,
     );
   }
@@ -70,9 +71,9 @@ export class EmployeeRepositoryImpl implements EmployeeRepository {
       doc.email,
       doc.role,
       doc.department || '',
-      doc.status === 'ACTIVE',
+      doc.status === UserStatus.ACTIVE,
       doc.hasPassword,
-      doc.inviteStatus || 'PENDING',
+      doc.inviteStatus || InviteStatus.PENDING,
       doc.companyId,
     );
   }
@@ -82,8 +83,8 @@ export class EmployeeRepositoryImpl implements EmployeeRepository {
       { _id: id },
       {
         $set: {
-          status: 'ACTIVE',
-          inviteStatus: 'USED',
+          status: UserStatus.ACTIVE,
+          inviteStatus: InviteStatus.USED,
         },
       },
     );

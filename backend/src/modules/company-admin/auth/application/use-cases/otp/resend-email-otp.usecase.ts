@@ -2,6 +2,7 @@ import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import type { PendingRegistrationRepository } from '../../../domain/repositories/cache/auth-repository/pending-registration.repository';
 import { EmailService } from 'src/shared/services/email.service';
 import { OtpService } from 'src/shared/services/otp.service';
+import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 
 @Injectable()
 export class ResendEmailOtpUseCase {
@@ -11,13 +12,13 @@ export class ResendEmailOtpUseCase {
 
     private readonly emailService: EmailService,
     private readonly otpService: OtpService,
-  ) { }
+  ) {}
 
   async execute(email: string): Promise<void> {
     const pending = await this.pendingRepository.find(email);
 
     if (!pending) {
-      throw new BadRequestException("Registration session expired. Please register again.");
+      throw new BadRequestException(AUTH_MESSAGES.SESSION_EXPIRED);
     }
 
     const otp = this.otpService.generateOtp();

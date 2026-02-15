@@ -11,5 +11,10 @@ export const AUTH_MESSAGES = {
     USER_ALEADY_VERIFIED: 'User already verified',
     PASSWORD_RESET_SUCCESS: 'Password reset successful',
     MISSING_REFRESH_TOKEN: 'Refresh token missing',
-    USER_ALREADY_EXIST: 'User already exist'
+    USER_ALREADY_EXIST: 'User already exist',
+    SESSION_EXPIRED: 'Registration session expired. Please register again.',
+    USER_NOT_FOUND_FOR_EMAIL: 'User not found for email',
+    PASSWORD_TOO_SHORT: 'Password too short',
+    PASSWORD_ALREADY_SET: 'Password already set',
+    PASSWORD_SET: 'Password set & logged in successfully',
 };
