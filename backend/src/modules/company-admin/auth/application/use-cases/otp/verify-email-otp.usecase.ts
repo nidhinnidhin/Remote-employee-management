@@ -24,7 +24,7 @@ export class VerifyEmailOtpUseCase {
     private readonly userRepository: UserRepository,
 
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async execute(input: VerifyEmailOtpInput) {
     const pending = await this.pendingRepository.find(input.email);

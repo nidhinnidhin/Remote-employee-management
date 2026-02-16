@@ -42,37 +42,37 @@ export class AuthController {
     private readonly forgotPasswordUseCase: ForgotPasswordUseCase,
     private readonly verifyResetPasswordOtpUseCase: VerifyResetPasswordOtpUseCase,
     private readonly resetPasswordUseCase: ResetPasswordUseCase,
-  ) {}
+  ) { }
 
   // LOGIN
   @Post('login')
-async login(
-  @Body() dto: LoginDto,
-  @Res({ passthrough: true }) res: Response,
-) {
-  console.log('!!! Login Called !!!');
+  async login(
+    @Body() dto: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    console.log('!!! Login Called !!!');
 
-  const result = await this.loginUseCase.execute({
-    email: dto.email,
-    password: dto.password,
-  });
+    const result = await this.loginUseCase.execute({
+      email: dto.email,
+      password: dto.password,
+    });
 
-  res.cookie(
-    ACCESS_TOKEN_COOKIE_NAME,
-    result.accessToken,
-    ACCESS_TOKEN_COOKIE_OPTIONS,
-  );
+    res.cookie(
+      ACCESS_TOKEN_COOKIE_NAME,
+      result.accessToken,
+      ACCESS_TOKEN_COOKIE_OPTIONS,
+    );
 
-  res.cookie(
-    REFRESH_TOKEN_COOKIE_NAME,
-    result.refreshToken,
-    REFRESH_TOKEN_COOKIE_OPTIONS,
-  );
+    res.cookie(
+      REFRESH_TOKEN_COOKIE_NAME,
+      result.refreshToken,
+      REFRESH_TOKEN_COOKIE_OPTIONS,
+    );
 
-  console.log('Login successful for user:', result.user.id, 'Role:', result.user.role);
+    console.log('Login successful for user:', result.user.id, 'Role:', result.user.role);
 
-  return result; // ← return full object including message
-}
+    return result; // ← return full object including message
+  }
 
 
   // Register

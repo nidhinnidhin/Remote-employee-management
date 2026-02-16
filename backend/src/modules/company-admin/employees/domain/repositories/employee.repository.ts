@@ -12,6 +12,13 @@ export interface EmployeeRepository {
     inviteStatus: InviteStatus;
   }): Promise<Employee>;
 
+  update(id: string, input: {
+    name?: string;
+    role?: string;
+    department?: string;
+    phone?: string;
+  }): Promise<void>;
+
   findByEmail(email: string): Promise<Employee | null>;
   findById(id: string): Promise<Employee | null>;
   activateEmployee(id: string): Promise<void>;

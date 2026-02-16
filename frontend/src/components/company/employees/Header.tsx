@@ -6,7 +6,9 @@ import EmployeeStats from "./EmployeeStats";
 import Button from "../../ui/Button";
 import InviteEmployeeModal from "../modals/InviteEmployeeModal";
 import { InviteEmployeePayload } from "@/shared/types/company/employees/auth/invite-employee-payload.type";
+import { toast } from "sonner";
 import { clientApi } from "@/lib/axios/axiosClient";
+
 const Header = () => {
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -18,11 +20,12 @@ const Header = () => {
       await clientApi.post("/company/employees/invite", data);
 
       setIsInviteOpen(false);
-      // ✅ optional: toast success
+      toast.success("Invitation sent successfully"); // ✅ optional: toast success
       console.log("Invitation sent successfully");
     } catch (error: any) {
       console.error("Invite failed", error);
-      // ❌ optional: toast error
+      const errorMessage = error.response?.data?.message || "Failed to send invitation";
+      toast.error(errorMessage); // ❌ optional: toast error
     } finally {
       setLoading(false);
     }

@@ -17,7 +17,7 @@ export class InviteEmployeeUseCase {
     private readonly inviteLinkRepo: InviteLinkRepository,
 
     private readonly emailService: EmailService,
-  ) {}
+  ) { }
 
   async execute(input: {
     name: string;
@@ -27,22 +27,32 @@ export class InviteEmployeeUseCase {
     phone: string;
     companyId: string;
   }) {
-    // Prevent duplicate employee
+    // Prevent duplicate active employee or handle re-invite
     const existing = await this.employeeRepo.findByEmail(input.email);
+    let employee;
+
     if (existing) {
       if (existing.inviteStatus === InviteStatus.USED) {
         throw new ConflictException(EMPLOYEE_MESSAGES.EMPLOYEE_ALREADY_ACTIVE);
       }
-      throw new ConflictException(EMPLOYEE_MESSAGES.EMPLOYEE_ALREADY_INVITED);
-    }
 
-    // Create inactive employee
-    const employee = await this.employeeRepo.create({
-      ...input,
-      isActive: false,
-      hasPassword: false,
-      inviteStatus: InviteStatus.PENDING,
-    });
+      // Re-invite: Update existing pending employee
+      await this.employeeRepo.update(existing.id, {
+        name: input.name,
+        role: input.role,
+        department: input.department,
+        phone: input.phone,
+      });
+      employee = existing;
+    } else {
+      // Create new inactive employee
+      employee = await this.employeeRepo.create({
+        ...input,
+        isActive: false,
+        hasPassword: false,
+        inviteStatus: InviteStatus.PENDING,
+      });
+    }
 
     // Generate secure token (raw + hashed)
     const { rawToken, hashedToken } = generateSecureToken();

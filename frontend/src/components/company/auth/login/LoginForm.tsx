@@ -117,6 +117,7 @@ export default function LoginForm() {
         email={forgotEmail}
         onClose={() => setForgotStep("closed")}
         onVerified={handleOtpVerify}
+        onResend={() => handleForgotPasswordSend(forgotEmail)}
       />
 
       <ResetPasswordModal

@@ -1,13 +1,13 @@
 import InviteVerifier from "../verification/InviteVerifier";
 
 type Props = {
-  searchParams: {
+  searchParams: Promise<{
     token?: string;
-  };
+  }>;
 };
 
-export default function LoginPage({ searchParams }: Props) {
-  const token = searchParams?.token;
+export default async function LoginPage({ searchParams }: Props) {
+  const { token } = await searchParams;
 
   if (token) {
     return <InviteVerifier token={token} />;

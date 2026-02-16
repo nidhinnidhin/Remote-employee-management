@@ -10,7 +10,7 @@ export class EmployeeRepositoryImpl implements EmployeeRepository {
   constructor(
     @InjectModel(UserDocument.name)
     private readonly model: Model<UserDocument>,
-  ) {}
+  ) { }
 
   async create(input: any): Promise<Employee> {
     const nameParts = input.name.split(' ');
@@ -76,6 +76,25 @@ export class EmployeeRepositoryImpl implements EmployeeRepository {
       doc.inviteStatus || InviteStatus.PENDING,
       doc.companyId,
     );
+  }
+
+  async update(id: string, input: {
+    name?: string;
+    role?: string;
+    department?: string;
+    phone?: string;
+  }): Promise<void> {
+    const updateData: any = {};
+    if (input.name) {
+      const nameParts = input.name.split(' ');
+      updateData.firstName = nameParts[0];
+      updateData.lastName = nameParts.slice(1).join(' ') || '';
+    }
+    if (input.role) updateData.role = input.role;
+    if (input.department) updateData.department = input.department;
+    if (input.phone) updateData.phone = input.phone;
+
+    await this.model.updateOne({ _id: id }, { $set: updateData });
   }
 
   async activateEmployee(id: string): Promise<void> {

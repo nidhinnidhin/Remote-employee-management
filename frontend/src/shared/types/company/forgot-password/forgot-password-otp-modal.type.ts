@@ -3,4 +3,5 @@ export interface ForgotPasswordOtpModalProps {
   email: string;
   onClose: () => void;
   onVerified: (otp: string) => Promise<void>;
+  onResend: () => Promise<void>;
 }

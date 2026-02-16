@@ -3,13 +3,15 @@
 import React, { useState, useEffect } from "react";
 import AdminLayoutWrapper from "@/components/company/layout/AdminLayoutWrapper";
 import PolicyHeader from "@/components/company/policy/PolicyHeader";
-import PolicyTabs, { PolicyTabType } from "@/components/company/policy/PolicyTabs";
+import PolicyTabs from "@/components/company/policy/PolicyTabs";
+import { PolicyTabType } from "@/shared/types/company/policy/policy-tab-map.type";
 import WorkingHoursConfiguration from "@/components/company/policy/WorkingHoursConfiguration";
 import LeavePolicyConfiguration from "@/components/company/policy/LeavePolicyConfiguration";
 import {
   getAdminCompanyPolicies,
   createOrUpdateCompanyPolicies,
 } from "@/services/company/policy/company-policy.service";
+import { toast } from "sonner";
 
 const CompanyPolicyPage = () => {
   const [activeTab, setActiveTab] =
@@ -67,16 +69,16 @@ const CompanyPolicyPage = () => {
       }
 
       if (policies.length === 0) {
-        alert("Nothing to save");
+        toast.warning("No changes to save");
         return;
       }
 
       await createOrUpdateCompanyPolicies({ policies });
 
-      alert("Policies updated successfully");
+      toast.success("Policies updated successfully");
     } catch (error) {
       console.error(error);
-      alert("Failed to update policies");
+      toast.error("Failed to update policies");
     }
   };
 
