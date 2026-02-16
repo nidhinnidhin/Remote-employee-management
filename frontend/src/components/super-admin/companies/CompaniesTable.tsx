@@ -1,21 +1,16 @@
 import React from "react";
 import Table from "@/components/ui/Table";
 import Pagination from "@/components/ui/Pagination";
-import { columns, CompanyRow } from "./companiesColumns";
-
-interface Props {
-  data: CompanyRow[];
-  isLoading: boolean;
-  currentPage: number;
-  onPageChange: (page: number) => void;
-}
+import { columns } from "./companiesColumns";
+import { CompanyRow } from "@/shared/types/superadmin/companies/companiesColumns";
+import { CompaniesListingProps } from "@/shared/types/superadmin/companies/companies-listing.type";
 
 export default function CompaniesTable({
   data,
   isLoading,
   currentPage,
   onPageChange,
-}: Props) {
+}: CompaniesListingProps) {
   return (
     <>
       <Table

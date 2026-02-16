@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import BackgroundEffect from "@/components/ui/BackgroundEffect";
 import { ArrowRight, PlayCircle } from "lucide-react";
+import Link from "next/link";
 
 export default function Hero() {
     return (

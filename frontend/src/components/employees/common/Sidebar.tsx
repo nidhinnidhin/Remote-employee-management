@@ -5,136 +5,143 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-    LayoutGrid,
-    UserCircle,
-    Fingerprint,
-    CalendarOff,
-    CheckCircle2,
-    FolderKanban,
-    Users2,
-    MessageSquareText,
-    CalendarDays,
-    Megaphone,
-    Search,
-    Heart,
-    LineChart,
-    BarChart4,
-    Settings2,
-    MessagesSquare,
-    ShieldCheck,
-    Menu,
-    X
+  LayoutGrid,
+  UserCircle,
+  Fingerprint,
+  CalendarOff,
+  CheckCircle2,
+  FolderKanban,
+  Users2,
+  MessageSquareText,
+  CalendarDays,
+  Megaphone,
+  Search,
+  Heart,
+  LineChart,
+  BarChart4,
+  Settings2,
+  MessagesSquare,
+  ShieldCheck,
+  Menu,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const menuItems = [
-    { icon: LayoutGrid, label: "Dashboard", href: "/employees/dashboard" },
-    { icon: UserCircle, label: "My Profile", href: "/profile" },
-    { icon: Fingerprint, label: "Attendance", href: "/attendance" },
-    { icon: CalendarOff, label: "Leave Management", href: "/leaves" },
-    { icon: CheckCircle2, label: "Tasks", href: "/tasks" },
-    { icon: FolderKanban, label: "Projects", href: "/projects" },
-    { icon: Users2, label: "Teams", href: "/teams" },
-    { icon: MessageSquareText, label: "Discussion Pools", href: "/discussions" },
-    { icon: CalendarDays, label: "Calendar", href: "/calendar" },
-    { icon: Megaphone, label: "Announcements", href: "/announcements" },
-    { icon: Search, label: "Employee Directory", href: "/directory" },
-    { icon: Heart, label: "Mood Check-in", href: "/mood" },
-    { icon: LineChart, label: "Performance", href: "/performance" },
-    { icon: BarChart4, label: "Reports", href: "/reports" },
-    { icon: Settings2, label: "Settings", href: "/settings" },
-    { icon: MessagesSquare, label: "All chats", href: "/chats" },
-    { icon: ShieldCheck, label: "Company policy", href: "/employees/policy" },
+  { icon: LayoutGrid, label: "Dashboard", href: "/employees/dashboard" },
+  { icon: UserCircle, label: "My Profile", href: "/profile" },
+  { icon: Fingerprint, label: "Attendance", href: "/attendance" },
+  { icon: CalendarOff, label: "Leave Management", href: "/leaves" },
+  { icon: CheckCircle2, label: "Tasks", href: "/tasks" },
+  { icon: FolderKanban, label: "Projects", href: "/projects" },
+  { icon: Users2, label: "Teams", href: "/teams" },
+  { icon: MessageSquareText, label: "Discussion Pools", href: "/discussions" },
+  { icon: CalendarDays, label: "Calendar", href: "/calendar" },
+  { icon: Megaphone, label: "Announcements", href: "/announcements" },
+  { icon: Search, label: "Employee Directory", href: "/directory" },
+  { icon: Heart, label: "Mood Check-in", href: "/mood" },
+  { icon: LineChart, label: "Performance", href: "/performance" },
+  { icon: BarChart4, label: "Reports", href: "/reports" },
+  { icon: Settings2, label: "Settings", href: "/settings" },
+  { icon: MessagesSquare, label: "All chats", href: "/chats" },
+  { icon: ShieldCheck, label: "Company policy", href: "/employees/policy" },
 ];
 
 export function Sidebar({ className }: { className?: string }) {
-    const pathname = usePathname();
-    const [isOpen, setIsOpen] = useState(false);
-    const [isMobile, setIsMobile] = useState(false);
+  const pathname = usePathname();
+  const [isOpen, setIsOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-    React.useEffect(() => {
-        const checkMobile = () => setIsMobile(window.innerWidth < 1024);
-        checkMobile();
-        window.addEventListener("resize", checkMobile);
-        return () => window.removeEventListener("resize", checkMobile);
-    }, []);
+  React.useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
-    return (
-        <>
-            {/* Mobile Menu Button */}
-            <div className="lg:hidden fixed top-4 left-4 z-50">
-                <button
-                    onClick={() => setIsOpen(!isOpen)}
-                    className="p-2 bg-white rounded-lg shadow-md text-indigo-600 border border-indigo-100"
+  return (
+    <>
+      {/* Mobile Menu Button */}
+      <div className="lg:hidden fixed top-4 left-4 z-50">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="p-2 bg-white rounded-lg shadow-md text-indigo-600 border border-indigo-100"
+        >
+          {isOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+      </div>
+
+      {/* Backdrop for mobile */}
+      <AnimatePresence>
+        {isOpen && isMobile && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsOpen(false)}
+            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Sidebar Content */}
+      <motion.aside
+        initial={false}
+        animate={{ x: isMobile ? (isOpen ? 0 : "-100%") : 0 }}
+        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+        className={cn(
+          "fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-neutral-100 flex flex-col h-full lg:relative lg:translate-x-0 transition-none",
+          className,
+        )}
+      >
+        <div className="p-6">
+          <h1 className="text-xl font-bold text-indigo-600 flex items-center gap-2 tracking-tight">
+            Employee management
+          </h1>
+        </div>
+
+        <nav className="flex-1 overflow-y-auto px-3 pb-4 space-y-0.5 custom-scrollbar">
+          {menuItems.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link key={item.label} href={item.href}>
+                <div
+                  className={cn(
+                    "relative group flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200",
+                    isActive
+                      ? "text-white"
+                      : "text-neutral-500 hover:text-indigo-600 hover:bg-neutral-50",
+                  )}
                 >
-                    {isOpen ? <X size={24} /> : <Menu size={24} />}
-                </button>
-            </div>
-
-            {/* Backdrop for mobile */}
-            <AnimatePresence>
-                {isOpen && isMobile && (
+                  {/* Active background highlight */}
+                  {isActive && (
                     <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={() => setIsOpen(false)}
-                        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
+                      layoutId="sidebarHighlight"
+                      className="absolute inset-0 bg-indigo-600 rounded-lg -z-10 shadow-sm"
+                      transition={{
+                        type: "spring",
+                        bounce: 0.2,
+                        duration: 0.6,
+                      }}
                     />
-                )}
-            </AnimatePresence>
+                  )}
 
-            {/* Sidebar Content */}
-            <motion.aside
-                initial={false}
-                animate={{ x: isMobile ? (isOpen ? 0 : "-100%") : 0 }}
-                transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                className={cn(
-                    "fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-neutral-100 flex flex-col h-full lg:relative lg:translate-x-0 transition-none",
-                    className
-                )}
-            >
-                <div className="p-6">
-                    <h1 className="text-xl font-bold text-indigo-600 flex items-center gap-2 tracking-tight">
-                        RemoteHub
-                    </h1>
+                  <item.icon
+                    size={18}
+                    className={cn(
+                      "shrink-0",
+                      isActive
+                        ? "text-white"
+                        : "text-neutral-400 group-hover:text-indigo-600",
+                    )}
+                  />
+                  <span className="text-sm font-medium">{item.label}</span>
                 </div>
-
-                <nav className="flex-1 overflow-y-auto px-3 pb-4 space-y-0.5 custom-scrollbar">
-                    {menuItems.map((item) => {
-                        const isActive = pathname === item.href;
-                        return (
-                            <Link key={item.label} href={item.href}>
-                                <div
-                                    className={cn(
-                                        "relative group flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200",
-                                        isActive
-                                            ? "text-white"
-                                            : "text-neutral-500 hover:text-indigo-600 hover:bg-neutral-50"
-                                    )}
-                                >
-                                    {/* Active background highlight */}
-                                    {isActive && (
-                                        <motion.div
-                                            layoutId="sidebarHighlight"
-                                            className="absolute inset-0 bg-indigo-600 rounded-lg -z-10 shadow-sm"
-                                            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                                        />
-                                    )}
-
-                                    <item.icon size={18} className={cn(
-                                        "shrink-0",
-                                        isActive ? "text-white" : "text-neutral-400 group-hover:text-indigo-600"
-                                    )} />
-                                    <span className="text-sm font-medium">
-                                        {item.label}
-                                    </span>
-                                </div>
-                            </Link>
-                        );
-                    })}
-                </nav>
-            </motion.aside>
-        </>
-    );
+              </Link>
+            );
+          })}
+        </nav>
+      </motion.aside>
+    </>
+  );
 }

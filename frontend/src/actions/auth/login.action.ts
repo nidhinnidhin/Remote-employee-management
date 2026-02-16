@@ -8,23 +8,10 @@ import {
 import { clientApi as api } from "@/lib/axios/axiosClient";
 import { getRedirectForRole } from "@/lib/auth/auth-constants";
 import { redirect } from "next/navigation";
-
-interface LoginResponse {
-  accessToken: string;
-  refreshToken: string;
-  user: {
-    id: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-    role: string;
-    companyId?: string;
-  };
-}
+import { LoginResponse } from "@/shared/types/company/auth/company-login/login-response.type";
 
 export async function loginAction(email: string, password: string) {
   try {
-    // Call unified login endpoint (company admin/employee)
     const response = await api.post<LoginResponse>("/auth/login", {
       email,
       password,
@@ -57,9 +44,9 @@ export async function loginAction(email: string, password: string) {
     await session.save();
 
     console.log("-----------------------------------------");
-    console.log("🔵 NEW LOGIN SUCCESSFUL");
-    console.log("📧 Email:", user.email);
-    console.log("👤 Role:", user.role);
+    console.log(" NEW LOGIN SUCCESSFUL");
+    console.log(" Email:", user.email);
+    console.log(" Role:", user.role);
     console.log("-----------------------------------------");
 
     // Redirect based on role

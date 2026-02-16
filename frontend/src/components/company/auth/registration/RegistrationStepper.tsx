@@ -25,6 +25,7 @@ import { resendOtp } from "@/services/company/otp/resend-otp.service";
 import { OTP_MESSAGES } from "@/shared/constants/messages/otp.messages";
 import { LOCAL_STORAGE_KEYS } from "@/shared/constants/temp/local-storage-keys";
 import BackgroundEffect from "@/components/ui/BackgroundEffect";
+import { AUTH_MESSAGES } from "@/shared/constants/messages/auth.messages";
 
 const RegistrationStepper = () => {
   const [currentStep, setCurrentStep] = useState<number>(1);
@@ -85,7 +86,7 @@ const RegistrationStepper = () => {
 
       if (!result?.success) {
         setErrors({
-          form: result?.error || "Registration failed",
+          form: result?.error || AUTH_MESSAGES.REGISTRATION_FAILED,
         });
         return;
       }
@@ -99,7 +100,7 @@ const RegistrationStepper = () => {
       );
     } catch (err: any) {
       setErrors({
-        form: err.message || "Registration failed",
+        form: err.message || AUTH_MESSAGES.REGISTRATION_FAILED,
       });
     } finally {
       setIsLoading(false);
@@ -131,7 +132,7 @@ const RegistrationStepper = () => {
       localStorage.removeItem("otp_expiry_time");
       setAuth(result.data.accessToken, "");
       setShowOtpModal(false);
-      router.replace("/company/employees/dashboard");
+      router.replace("/company/employees/employees");
     } finally {
       setOtpVerifying(false);
     }

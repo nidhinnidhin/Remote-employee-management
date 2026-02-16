@@ -46,33 +46,34 @@ export class AuthController {
 
   // LOGIN
   @Post('login')
-  async login(
-    @Body() dto: LoginDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
-    console.log('!!! Login Called !!!');
-    const { accessToken, refreshToken, user } = await this.loginUseCase.execute(
-      {
-        email: dto.email,
-        password: dto.password,
-      },
-    );
+async login(
+  @Body() dto: LoginDto,
+  @Res({ passthrough: true }) res: Response,
+) {
+  console.log('!!! Login Called !!!');
 
-    res.cookie(
-      ACCESS_TOKEN_COOKIE_NAME,
-      accessToken,
-      ACCESS_TOKEN_COOKIE_OPTIONS,
-    );
+  const result = await this.loginUseCase.execute({
+    email: dto.email,
+    password: dto.password,
+  });
 
-    res.cookie(
-      REFRESH_TOKEN_COOKIE_NAME,
-      refreshToken,
-      REFRESH_TOKEN_COOKIE_OPTIONS,
-    );
+  res.cookie(
+    ACCESS_TOKEN_COOKIE_NAME,
+    result.accessToken,
+    ACCESS_TOKEN_COOKIE_OPTIONS,
+  );
 
-    console.log('Login successful for user:', user.id, 'Role:', user.role);
-    return { accessToken, refreshToken, user };
-  }
+  res.cookie(
+    REFRESH_TOKEN_COOKIE_NAME,
+    result.refreshToken,
+    REFRESH_TOKEN_COOKIE_OPTIONS,
+  );
+
+  console.log('Login successful for user:', result.user.id, 'Role:', result.user.role);
+
+  return result; // ← return full object including message
+}
+
 
   // Register
   @Post('register')

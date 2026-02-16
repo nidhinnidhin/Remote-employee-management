@@ -1,10 +1,12 @@
-import { AuthActionError } from "./login-error.type";
-import { AuthActionSuccess } from "./login-success.type";
-
 export interface LoginResponse {
   accessToken: string;
-  userId: string;
-  refreshToken?: string;
+  refreshToken: string;
+  user: {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    role: string;
+    companyId?: string;
+  };
 }
-
-export type AuthActionResult<T> = AuthActionSuccess<T> | AuthActionError;

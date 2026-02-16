@@ -2,16 +2,8 @@
 
 import React from "react";
 import { CalendarDays } from "lucide-react";
+import { LeavePolicyProps } from "@/shared/types/company/policy/policy.type";
 
-interface Section {
-  _id: string;
-  title: string;
-  points: string[];
-}
-
-interface LeavePolicyProps {
-  sections: Section[];
-}
 
 export function LeavePolicy({ sections }: LeavePolicyProps) {
   return (

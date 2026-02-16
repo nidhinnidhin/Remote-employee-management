@@ -92,8 +92,9 @@ const Table = <T,>({
               {columns.map((col, colIndex) => (
                 <td
                   key={colIndex}
-                  className={`px-6 py-4 whitespace-nowrap ${styles.text} ${col.className || ""
-                    }`}
+                  className={`px-6 py-4 whitespace-nowrap ${styles.text} ${
+                    col.className || ""
+                  }`}
                 >
                   {typeof col.accessor === "function"
                     ? col.accessor(item)

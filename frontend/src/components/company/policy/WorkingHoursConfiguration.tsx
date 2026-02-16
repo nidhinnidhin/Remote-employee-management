@@ -1,13 +1,11 @@
 "use client";
 
+import { WorkingHoursProps } from "@/shared/types/company/policy/working-hours.type";
 import React, { useState, useEffect } from "react";
 
-interface Props {
-  onChange: (data: any) => void;
-  initialData?: any;
-}
 
-const WorkingHoursConfiguration: React.FC<Props> = ({
+
+const WorkingHoursConfiguration: React.FC<WorkingHoursProps> = ({
   onChange,
   initialData,
 }) => {

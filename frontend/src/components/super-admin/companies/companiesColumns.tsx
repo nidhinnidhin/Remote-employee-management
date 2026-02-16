@@ -1,21 +1,7 @@
 // import { CompanyRow } from "@/shared/types/superadmin/companies/companiesColumns";
+import { CompanyRow } from "@/shared/types/superadmin/companies/companiesColumns";
 import { Column } from "@/shared/types/ui/table-props.type";
-import { MoreVertical, Eye, Ban, Trash2 } from "lucide-react";
 import React from "react";
-
-export interface CompanyRow {
-  id: string;
-  name: string;
-  email: string;
-  logo: string;
-  owner: string;
-  plan: string;
-  employees: number;
-  status: "Active" | "Suspended";
-  mrr: string;
-  created: string;
-}
-
 
 
 export const columns: Column<CompanyRow>[] = [

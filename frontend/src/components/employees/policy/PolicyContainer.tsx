@@ -6,7 +6,9 @@ import { PolicyTabs } from "./PolicyTabs";
 import { WorkingHours } from "./tabs/WorkingHours";
 import { LeavePolicy } from "./tabs/LeavePolicy";
 import { motion, AnimatePresence } from "framer-motion";
-import { getCompanyPolicies, CompanyPolicy } from "@/services/employee/policy/company-policy.service";
+import { getCompanyPolicies } from "@/services/employee/policy/company-policy.service";
+import { CompanyPolicyType } from "@/shared/enum/company/policy/policy-type.enum";
+import { CompanyPolicy } from "@/shared/types/company/policy/policy.type";
 
 export function PolicyContainer() {
   const [activeTab, setActiveTab] = useState("working-hours");
@@ -29,12 +31,12 @@ export function PolicyContainer() {
   }, []);
 
   const workingHoursPolicy = policies.find(
-    (p) => p.type === "WORKING_HOURS"
-  );
+  (p) => p.type === CompanyPolicyType.WORKING_HOURS
+);
 
-  const leavePolicy = policies.find(
-    (p) => p.type === "LEAVE_POLICY"
-  );
+const leavePolicy = policies.find(
+  (p) => p.type === CompanyPolicyType.LEAVE_POLICY
+);
 
   const renderTabContent = () => {
     if (loading) {

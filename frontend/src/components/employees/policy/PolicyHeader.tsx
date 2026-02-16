@@ -3,12 +3,14 @@
 import React from "react";
 
 export function PolicyHeader() {
-    return (
-        <div className="space-y-0.5">
-            <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Company Policy</h1>
-            <p className="text-slate-500 text-sm font-medium">
-                Internal policies and guidelines for all IT employees
-            </p>
-        </div>
-    );
+  return (
+    <div className="space-y-0.5">
+      <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
+        Company Policy
+      </h1>
+      <p className="text-slate-500 text-sm font-medium">
+        Internal policies and guidelines for all IT employees
+      </p>
+    </div>
+  );
 }

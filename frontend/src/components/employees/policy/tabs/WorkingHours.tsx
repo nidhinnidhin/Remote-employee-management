@@ -2,16 +2,7 @@
 
 import React from "react";
 import { Clock } from "lucide-react";
-
-interface Section {
-  _id: string;
-  title: string;
-  points: string[];
-}
-
-interface WorkingHoursProps {
-  sections: Section[];
-}
+import { WorkingHoursProps } from "@/shared/types/company/policy/policy.type";
 
 export function WorkingHours({ sections }: WorkingHoursProps) {
   return (
@@ -22,13 +13,11 @@ export function WorkingHours({ sections }: WorkingHoursProps) {
           <Clock size={22} />
         </div>
         <div className="space-y-0.5">
-          <h2 className="text-lg font-bold text-slate-800">
-            Working Hours
-          </h2>
+          <h2 className="text-lg font-bold text-slate-800">Working Hours</h2>
           <p className="text-slate-500 text-sm leading-relaxed max-w-2xl">
             We believe in flexible work schedules that respect individual
-            productivity patterns while ensuring team collaboration and
-            project delivery.
+            productivity patterns while ensuring team collaboration and project
+            delivery.
           </p>
         </div>
       </div>

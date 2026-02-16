@@ -64,6 +64,7 @@ export class LoginUseCase {
         role: user.role,
         companyId: user.companyId,
       },
+      message: 'Login Successfull'
     };
   }
 }

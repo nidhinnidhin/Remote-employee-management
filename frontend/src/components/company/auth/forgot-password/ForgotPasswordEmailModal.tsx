@@ -5,17 +5,21 @@ import BaseModal from "@/components/ui/BaseModal";
 import FormInput from "@/components/ui/FormInput";
 import Button from "@/components/ui/Button";
 import { ForgotPasswordEmailModalProps } from "@/shared/types/company/forgot-password/forgot-password-email-modal-props.type";
+import { AUTH_MESSAGES } from "@/shared/constants/messages/auth.messages";
+import { OTP_MESSAGES } from "@/shared/constants/messages/otp.messages";
 
-
-
-const ForgotPasswordEmailModal = ({ isOpen, onClose, onSend }: ForgotPasswordEmailModalProps) => {
+const ForgotPasswordEmailModal = ({
+  isOpen,
+  onClose,
+  onSend,
+}: ForgotPasswordEmailModalProps) => {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSend = async () => {
     if (!email) {
-      setError("Email is required");
+      setError(AUTH_MESSAGES.EMAIL_MISSING);
       return;
     }
 
@@ -25,7 +29,7 @@ const ForgotPasswordEmailModal = ({ isOpen, onClose, onSend }: ForgotPasswordEma
     try {
       await onSend(email);
     } catch (err: any) {
-      setError(err.message || "Failed to send OTP");
+      setError(err.message || OTP_MESSAGES.FAILED_TO_SEND_OTP);
     } finally {
       setLoading(false);
     }

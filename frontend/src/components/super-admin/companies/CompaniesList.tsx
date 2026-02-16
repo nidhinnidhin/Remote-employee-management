@@ -8,7 +8,7 @@ import CompaniesFilter from "./CompaniesFilter";
 import CompaniesTable from "./CompaniesTable";
 
 import { CompanyApi } from "@/shared/types/superadmin/companies/company.type";
-import { CompanyRow } from "./companiesColumns";
+import { CompanyRow } from "@/shared/types/superadmin/companies/companiesColumns";
 import { formatDateISO } from "@/lib/date/date-format";
 
 type CompaniesListingProps = {

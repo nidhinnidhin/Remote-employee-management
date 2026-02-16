@@ -5,9 +5,13 @@ import BaseModal from "@/components/ui/BaseModal";
 import FormInput from "@/components/ui/FormInput";
 import Button from "@/components/ui/Button";
 import { ResetPasswordModalProps } from "@/shared/types/company/forgot-password/reset-password-modal-props.type";
+import { AUTH_MESSAGES } from "@/shared/constants/messages/auth.messages";
 
-
-const ResetPasswordModal = ({ isOpen, onClose, onReset }: ResetPasswordModalProps) => {
+const ResetPasswordModal = ({
+  isOpen,
+  onClose,
+  onReset,
+}: ResetPasswordModalProps) => {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
@@ -15,12 +19,12 @@ const ResetPasswordModal = ({ isOpen, onClose, onReset }: ResetPasswordModalProp
 
   const handleReset = async () => {
     if (!password) {
-      setError("Password is required");
+      setError(AUTH_MESSAGES.PASSWORD_REQUIRED);
       return;
     }
 
     if (password !== confirm) {
-      setError("Passwords do not match");
+      setError(AUTH_MESSAGES.PASSWORD_DO_NOT_MATCH);
       return;
     }
 
@@ -31,7 +35,7 @@ const ResetPasswordModal = ({ isOpen, onClose, onReset }: ResetPasswordModalProp
       await onReset(password);
       onClose();
     } catch (err: any) {
-      setError(err.message || "Reset failed");
+      setError(err.message || AUTH_MESSAGES.RESET_FAILED_PASSWORD);
     } finally {
       setLoading(false);
     }

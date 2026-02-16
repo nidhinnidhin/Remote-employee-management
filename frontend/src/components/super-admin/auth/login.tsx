@@ -10,6 +10,7 @@ import {
   AdminLoginFormData,
 } from "@/shared/types/superadmin/auth/login-form-data.type";
 import { superAdminLoginAction } from "@/actions/super-admin/auth/login.action";
+import { validateAdminLogin } from "@/lib/validations/client/auth/login-validation";
 
 export default function SuperAdminLoginForm() {
   const [formData, setFormData] = useState<AdminLoginFormData>({
@@ -32,30 +33,12 @@ export default function SuperAdminLoginForm() {
     }
   };
 
-  const validate = () => {
-    const newErrors: AdminLoginErrors = {};
-
-    if (!formData.email) {
-      newErrors.email = AUTH_MESSAGES.EMAIL_MISSING;
-    } else if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
-      newErrors.email = AUTH_MESSAGES.INVALID_EMAIL;
-    }
-
-    if (!formData.password) {
-      newErrors.password = AUTH_MESSAGES.PASSWORD_REQUIRED;
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-    }
-
-    return newErrors;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setErrors({});
 
-    const validationErrors = validate();
+    const validationErrors = validateAdminLogin(formData);
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);

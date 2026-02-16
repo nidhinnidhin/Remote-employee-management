@@ -9,4 +9,5 @@ export interface LoginResponse {
     role: string;
     companyId?: string;
   };
+  message: string
 }
