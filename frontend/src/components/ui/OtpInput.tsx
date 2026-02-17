@@ -67,9 +67,8 @@ const OtpInput = ({ length = 6, value, onChange, error }: OtpInputProps) => {
             onChange={(e) => handleChange(index, e.target.value)}
             onKeyDown={(e) => handleKeyDown(index, e)}
             onPaste={handlePaste}
-            className={`w-12 h-14 text-center text-xl font-bold bg-neutral-900 border ${
-              error ? "border-red-500" : "border-neutral-700"
-            } text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500`}
+            className={`w-12 h-14 text-center text-xl font-bold bg-neutral-900 border ${error ? "border-red-500" : "border-neutral-700"
+              } text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500`}
           />
         ))}
       </div>

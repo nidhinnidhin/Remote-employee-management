@@ -116,8 +116,8 @@ const StepTwo: React.FC<StepTwoProps> = ({
             </div>
             <p
               className={`text-xs mt-1 ${passwordStrength.color
-                  ? passwordStrength.color.replace("bg-", "text-")
-                  : ""
+                ? passwordStrength.color.replace("bg-", "text-")
+                : ""
                 }`}
             >
               {passwordStrength.label}

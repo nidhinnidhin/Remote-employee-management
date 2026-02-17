@@ -3,7 +3,7 @@
  */
 const ROLE_REDIRECTS: Record<string, string> = {
   SUPER_ADMIN: "/super-admin/companies",
-  COMPANY_ADMIN: "/company/employees/dashboard",
+  COMPANY_ADMIN: "/company/employees/employees",
   EMPLOYEE: "/employees/dashboard",
 };
 

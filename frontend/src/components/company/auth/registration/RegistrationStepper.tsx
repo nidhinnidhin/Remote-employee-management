@@ -172,7 +172,7 @@ const RegistrationStepper = () => {
             <p className="text-neutral-400">
               Already have an account?{" "}
               <a
-                href="/company-login"
+                href="/company/login"
                 className="text-red-500 hover:text-red-400 transition-colors"
               >
                 Sign in

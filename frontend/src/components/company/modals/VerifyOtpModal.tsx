@@ -88,7 +88,7 @@ const OtpModal = ({
         </div>
       )}
 
-      {localError && <p className="text-red-500 mt-2">{localError}</p>}
+      {/* {localError && <p className="text-red-500 mt-2">{localError}</p>} */}
       {/* {error && <p className="text-red-500 mt-2">{error}</p>} */}
     </BaseModal>
   );

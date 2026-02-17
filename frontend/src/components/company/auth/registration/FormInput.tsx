@@ -31,9 +31,8 @@ const FormInput: React.FC<FormInputProps> = ({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className={`w-full bg-neutral-900 border ${
-            error ? "border-red-500" : "border-neutral-700"
-          } text-white px-4 py-3 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all duration-200`}
+          className={`w-full bg-neutral-900 border ${error ? "border-red-500" : "border-neutral-700"
+            } text-white px-4 py-3 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all duration-200`}
         />
 
         {type === "password" && (
