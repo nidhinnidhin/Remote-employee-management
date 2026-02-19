@@ -1,20 +1,17 @@
 "use server";
 
-import { api } from "@/lib/axios/axiosClient";
 import { getSession } from "@/lib/iron-session/getSession";
 import { setRefreshTokenCookie } from "@/lib/auth/cookies";
 import { AUTH_MESSAGES } from "@/shared/constants/messages/auth.messages";
 import { loginUser } from "@/services/company/auth/login.service";
 import { LoginPayload } from "@/shared/types/company/auth/company-login/login-payload.type";
-import {
-  AuthActionResult,
-  LoginResponse,
-} from "@/shared/types/company/auth/company-login/login-response.type";
+
 import { COOKIE_KEYS } from "@/shared/constants/temp/cookie-keys";
+import { ActionResult } from "@/shared/types/company/auth/company-login/action-result.type";
 
 export async function loginAction(
   payload: LoginPayload,
-): Promise<AuthActionResult<LoginResponse>> {
+): Promise<ActionResult> {
   try {
     const response = await loginUser(payload);
 

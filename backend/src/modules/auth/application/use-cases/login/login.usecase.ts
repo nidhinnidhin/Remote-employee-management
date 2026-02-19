@@ -29,14 +29,21 @@ export class LoginUseCase {
       throw new UnauthorizedException(AUTH_MESSAGES.INVALID_CREDENTIALS);
     }
 
-    // Role-agnostic status check
+    // Account must be active
     if (user.status !== UserStatus.ACTIVE) {
       throw new ForbiddenException(AUTH_MESSAGES.ACCOUNT_NOT_VERIFIED);
     }
 
+    // 🔐 IMPORTANT: Prevent password login for social users
+    if (!user.passwordHash) {
+      throw new UnauthorizedException(
+        'This account uses social login. Please sign in with Google/Facebook/GitHub.',
+      );
+    }
+
     const isPasswordValid = await comparePassword(
       input.password,
-      user.passwordHash,
+      user.passwordHash, // ✅ now guaranteed string
     );
 
     if (!isPasswordValid) {
@@ -64,7 +71,7 @@ export class LoginUseCase {
         role: user.role,
         companyId: user.companyId,
       },
-      message: 'Login Successfull'
+      message: 'Login Successful',
     };
   }
 }

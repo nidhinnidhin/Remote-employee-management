@@ -1,10 +1,12 @@
-import { getSession } from "./getSession";
+import { cookies } from "next/headers";
+import { getIronSession } from "iron-session";
+import { sessionOptions, SessionData } from "./session";
 
-export async function GET() {
-  const session = await getSession();
-  console.log("SESSION DATA:", session);
+export async function getSession() {
+  const cookieStore = await cookies(); 
 
-  return Response.json({
-    accessToken: session.accessToken ?? null,
-  });
+  return getIronSession<SessionData>(
+    cookieStore,
+    sessionOptions
+  );
 }

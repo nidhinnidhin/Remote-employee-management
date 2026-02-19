@@ -5,14 +5,14 @@ import {
   setRefreshTokenCookie,
   setAccessTokenCookie,
 } from "@/lib/auth/cookies";
-import { clientApi as api } from "@/lib/axios/axiosClient";
+import { clientApi } from "@/lib/axios/axiosClient";
 import { getRedirectForRole } from "@/lib/auth/auth-constants";
 import { redirect } from "next/navigation";
 import { LoginResponse } from "@/shared/types/company/auth/company-login/login-response.type";
 
 export async function loginAction(email: string, password: string) {
   try {
-    const response = await api.post<LoginResponse>("/auth/login", {
+    const response = await clientApi.post<LoginResponse>("/auth/login", {
       email,
       password,
     });
@@ -38,9 +38,16 @@ export async function loginAction(email: string, password: string) {
     // Save to session with role and user info
     const session = await getSession();
     session.accessToken = accessToken;
-    session.userId = user.id;
-    session.role = user.role;
-    session.email = user.email;
+    session.user = {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      role: user.role,
+      companyId: user.companyId,
+    };
+    session.isLoggedIn = true;
+
     await session.save();
 
     console.log("-----------------------------------------");

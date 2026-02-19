@@ -1,7 +1,21 @@
 import type { SessionOptions } from "iron-session";
 
+export interface SessionData {
+  accessToken?: string;
+  refreshToken?: string;
+  user?: {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    role: string;
+    companyId?: string;
+  };
+  isLoggedIn?: boolean;
+}
+
 export const sessionOptions: SessionOptions = {
-  cookieName: "app_session", // MUST MATCH browser cookie
+  cookieName: "app_session",
   password: process.env.SESSION_SECRET!,
   cookieOptions: {
     httpOnly: true,

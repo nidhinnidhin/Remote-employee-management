@@ -1,6 +1,5 @@
-import { InviteStatus } from "src/shared/enums/user/user-invite-status.enum";
-import { UserStatus } from "src/shared/enums/user/user-status.enum";
-
+import { InviteStatus } from 'src/shared/enums/user/user-invite-status.enum';
+import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 
 export class UserEntity {
   constructor(
@@ -8,15 +7,15 @@ export class UserEntity {
     public readonly firstName: string,
     public readonly lastName: string,
     public readonly email: string,
-    public readonly phone: string,
     public readonly role: string,
-    public readonly passwordHash: string,
-    public readonly status: UserStatus,
-    public readonly createdAt: Date,
-    public readonly updatedAt: Date,
+    public readonly phone?: string,
+    public readonly passwordHash?: string,
+    public readonly status?: UserStatus,
+    public readonly createdAt?: Date,
+    public readonly updatedAt?: Date,
     public readonly companyId?: string,
     public readonly department?: string,
     public readonly inviteStatus?: InviteStatus,
     public readonly hasPassword: boolean = true,
-  ) { }
+  ) {}
 }

@@ -1,6 +1,7 @@
-export type ActionResult =
+export type ActionResult<T = undefined> =
   | {
       success: true;
+      data: T;
       message?: string;
       redirectUrl?: string;
     }
@@ -8,3 +9,4 @@ export type ActionResult =
       success: false;
       error: string;
     };
+

@@ -8,4 +8,4 @@ git push origin develop
 
 git checkout feature/company-admin-reset-password
 git merge develop
-git push origin feature/company-admin-reset-password
+git push origin feature/company-admin-reset-passwordP

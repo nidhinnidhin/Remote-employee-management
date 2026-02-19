@@ -10,6 +10,7 @@ import type { Request, Response } from 'express';
 import { RegisterCompanyAdminUseCase } from '../../application/use-cases/register/register-company-admin.usecase';
 import { VerifyEmailOtpUseCase } from '../../application/use-cases/otp/verify-email-otp.usecase';
 import { LoginUseCase } from '../../application/use-cases/login/login.usecase';
+import { SocialLoginUseCase } from '../../application/use-cases/login/social-login.usecase';
 import { ResendEmailOtpUseCase } from '../../application/use-cases/otp/resend-email-otp.usecase';
 import { RegisterCompanyAdminDto } from '../../presentation/dto/register-company-admin.dto';
 import { VerifyEmailOtpDto } from '../../presentation/dto/verify-email-otp.dto';
@@ -42,7 +43,8 @@ export class AuthController {
     private readonly forgotPasswordUseCase: ForgotPasswordUseCase,
     private readonly verifyResetPasswordOtpUseCase: VerifyResetPasswordOtpUseCase,
     private readonly resetPasswordUseCase: ResetPasswordUseCase,
-  ) { }
+    private readonly socialLoginUseCase: SocialLoginUseCase,
+  ) {}
 
   // LOGIN
   @Post('login')
@@ -69,11 +71,45 @@ export class AuthController {
       REFRESH_TOKEN_COOKIE_OPTIONS,
     );
 
-    console.log('Login successful for user:', result.user.id, 'Role:', result.user.role);
+    console.log(
+      'Login successful for user:',
+      result.user.id,
+      'Role:',
+      result.user.role,
+    );
 
     return result; // ← return full object including message
   }
 
+  // Social auth
+  @Post('social-login')
+  async socialLogin(
+    @Body()
+    body: {
+      email: string;
+      firstName: string;
+      lastName: string;
+      provider: string;
+      providerId: string;
+    },
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = await this.socialLoginUseCase.execute(body);
+
+    res.cookie(
+      ACCESS_TOKEN_COOKIE_NAME,
+      result.accessToken,
+      ACCESS_TOKEN_COOKIE_OPTIONS,
+    );
+
+    res.cookie(
+      REFRESH_TOKEN_COOKIE_NAME,
+      result.refreshToken,
+      REFRESH_TOKEN_COOKIE_OPTIONS,
+    );
+
+    return result;
+  }
 
   // Register
   @Post('register')

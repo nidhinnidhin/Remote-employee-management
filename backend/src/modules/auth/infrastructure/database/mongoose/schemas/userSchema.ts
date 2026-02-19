@@ -24,12 +24,15 @@ export class UserDocument extends Document {
   @Prop({ required: true })
   role: string;
 
-  @Prop({
-    required: function (this: any) {
-      return this.role !== UserRole.EMPLOYEE;
-    },
-  })
-  passwordHash: string;
+  // @Prop({
+  //   required: function (this: any) {
+  //     return this.role !== UserRole.EMPLOYEE;
+  //   },
+  // })
+  // passwordHash: string;
+
+  @Prop({ required: false })
+  passwordHash?: string;
 
   @Prop({
     required: true,
@@ -37,6 +40,12 @@ export class UserDocument extends Document {
     default: UserStatus.PENDING_VERIFICATION,
   })
   status: string;
+
+  @Prop({ required: false })
+  provider?: string; // google | facebook | github
+
+  @Prop({ required: false })
+  providerId?: string;
 
   @Prop()
   department?: string;

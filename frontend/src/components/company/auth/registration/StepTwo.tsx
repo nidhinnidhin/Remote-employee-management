@@ -115,10 +115,11 @@ const StepTwo: React.FC<StepTwoProps> = ({
               />
             </div>
             <p
-              className={`text-xs mt-1 ${passwordStrength.color
-                ? passwordStrength.color.replace("bg-", "text-")
-                : ""
-                }`}
+              className={`text-xs mt-1 ${
+                passwordStrength.color
+                  ? passwordStrength.color.replace("bg-", "text-")
+                  : ""
+              }`}
             >
               {passwordStrength.label}
             </p>
@@ -137,7 +138,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
         placeholder="••••••••"
       />
 
-      {errors.form && (
+      {errors.form && typeof errors.form === "string" && (
         <p className="text-red-500 text-sm text-center mt-2">{errors.form}</p>
       )}
     </motion.div>

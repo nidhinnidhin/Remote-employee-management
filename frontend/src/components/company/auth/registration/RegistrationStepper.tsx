@@ -85,9 +85,15 @@ const RegistrationStepper = () => {
       const result = await registerAction(formData);
 
       if (!result?.success) {
-        setErrors({
-          form: result?.error || AUTH_MESSAGES.REGISTRATION_FAILED,
-        });
+        let errorMessage = AUTH_MESSAGES.REGISTRATION_FAILED;
+
+        if (typeof result?.error === "string") {
+          errorMessage = result.error;
+        } else if (result?.error?.company) {
+          errorMessage = result.error.company;
+        }
+
+        setErrors({ form: errorMessage });
         return;
       }
 
@@ -99,9 +105,12 @@ const RegistrationStepper = () => {
         (Date.now() + 60_000).toString(),
       );
     } catch (err: any) {
-      setErrors({
-        form: err.message || AUTH_MESSAGES.REGISTRATION_FAILED,
-      });
+      const message =
+        typeof err?.message === "string"
+          ? err.message
+          : AUTH_MESSAGES.REGISTRATION_FAILED;
+
+      setErrors({ form: message });
     } finally {
       setIsLoading(false);
     }
