@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CompanyEntity } from 'src/modules/company-admin/auth/domain/entities/company.entity';
-import { CompanyDocument } from 'src/modules/company-admin/auth/infrastructure/database/mongoose/schemas/company.schema';
+import { CompanyEntity } from 'src/modules/auth/domain/entities/company.entity';
+import { CompanyDocument } from 'src/modules/auth/infrastructure/database/mongoose/schemas/company.schema';
 import { CompanyRepository } from '../../domain/repositories/company.repository';
 
 @Injectable()

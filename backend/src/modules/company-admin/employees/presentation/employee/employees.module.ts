@@ -4,10 +4,7 @@ import {
   InviteLinkDocument,
   InviteLinkSchema,
 } from '../../infrastructure/schema/invite-link.schema';
-import {
-  UserDocument,
-  UserSchema,
-} from '../../../auth/infrastructure/database/mongoose/schemas/userSchema';
+import { UserDocument, UserSchema } from 'src/modules/auth/infrastructure/database/mongoose/schemas/userSchema';
 import { EmployeesController } from '../controller/employees.controller';
 import { InviteEmployeeUseCase } from '../../application/use-cases/invite-employee.usecase';
 import { VerifyInviteUseCase } from '../../application/use-cases/verify-invite.usecase';

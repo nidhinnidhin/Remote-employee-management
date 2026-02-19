@@ -14,8 +14,8 @@ import { MongoCompanyRepository } from '../../infrastructure/database/repositori
 import { MongoEmailOtpRepository } from '../../infrastructure/database/repositories/mongo-email-otp.repository';
 import { MongoUserRepository } from '../../infrastructure/database/repositories/mongo-user.repository';
 import { OtpService } from 'src/shared/services/otp.service';
-import { EmailService } from '../../../../../shared/services/email.service';
-import { JwtService } from '../../../../../shared/services/jwt.service';
+import { EmailService } from 'src/shared/services/email.service';
+import { JwtService } from 'src/shared/services/jwt.service';
 import { AuthController } from '../controllers/auth.controller';
 import { TestController } from '../controllers/test.controller';
 import { EmailOtpSchema } from '../../infrastructure/database/mongoose/schemas/email-otp.schema';

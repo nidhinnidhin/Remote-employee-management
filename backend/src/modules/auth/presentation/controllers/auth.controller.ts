@@ -14,7 +14,7 @@ import { ResendEmailOtpUseCase } from '../../application/use-cases/otp/resend-em
 import { RegisterCompanyAdminDto } from '../../presentation/dto/register-company-admin.dto';
 import { VerifyEmailOtpDto } from '../../presentation/dto/verify-email-otp.dto';
 import { LoginDto } from '../../presentation/dto/login.dto';
-import { ResendOtpDto } from 'src/modules/company-admin/auth/presentation/dto/resend-otp.dto';
+import { ResendOtpDto } from '../dto/resend-otp.dto';
 import { RefreshAccessTokenUseCase } from '../../application/use-cases/token/refresh-access-token.usecase';
 import { ForgotPasswordUseCase } from '../../application/use-cases/reset-password/forgot-password.usecase';
 import { ResetPasswordUseCase } from '../../application/use-cases/reset-password/reset-password.usecase';

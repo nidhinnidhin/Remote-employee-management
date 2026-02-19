@@ -2,7 +2,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { EmployeeRepository } from '../../domain/repositories/employee.repository';
 import { Employee } from '../../domain/entities/employee.entity';
-import { UserDocument } from '../../../auth/infrastructure/database/mongoose/schemas/userSchema';
+import { UserDocument } from 'src/modules/auth/infrastructure/database/mongoose/schemas/userSchema';
 import { InviteStatus } from 'src/shared/enums/user/user-invite-status.enum';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 

@@ -1,8 +1,8 @@
 import { Injectable, OnModuleInit, Inject, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
-import type { UserRepository } from 'src/modules/company-admin/auth/domain/repositories/user.repository';
-import { UserEntity } from 'src/modules/company-admin/auth/domain/entities/user.entity';
+import type { UserRepository } from 'src/modules/auth/domain/repositories/user.repository';
+import { UserEntity } from 'src/modules/auth/domain/entities/user.entity';
 import { UserRole } from 'src/shared/enums/user/user-role.enum';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 

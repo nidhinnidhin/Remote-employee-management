@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { SuperAdminCompanyController } from './companies/presentation/controllers/super-admin-company.controller';
 import { SuperAdminSeedService } from './services/super-admin-seed.service';
-import { AuthModule } from '../company-admin/auth/presentation/auth/auth.module';
+import { AuthModule } from '../auth/presentation/auth/auth.module';
 import { ListCompaniesUseCase } from './companies/application/use-cases/list-companies-use-case';
 import { MongoCompanyRepository } from './companies/infrastructure/repositories/mongo-company.repository';
 import { MongooseModule } from '@nestjs/mongoose';
-import { CompanyDocument, CompanySchema } from '../company-admin/auth/infrastructure/database/mongoose/schemas/company.schema';
+import { CompanyDocument, CompanySchema } from '../auth/infrastructure/database/mongoose/schemas/company.schema';
 
 @Module({
   imports: [
