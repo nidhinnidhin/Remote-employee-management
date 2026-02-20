@@ -13,6 +13,11 @@ const handler = NextAuth({
     FacebookProvider({
       clientId: process.env.FACEBOOK_CLIENT_ID!,
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          scope: "email public_profile",
+        },
+      },
     }),
     GitHubProvider({
       clientId: process.env.GITHUB_CLIENT_ID!,
@@ -23,20 +28,17 @@ const handler = NextAuth({
   callbacks: {
     async signIn({ user, account }) {
       console.log("SignIn callback triggered");
-      const res = await fetch(
-        "http://localhost:4000/api/auth/social-login",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: user.email,
-            firstName: user.name?.split(" ")[0] || "",
-            lastName: user.name?.split(" ")[1] || "",
-            provider: account?.provider,
-            providerId: account?.providerAccountId,
-          }),
-        }
-      );
+      const res = await fetch("http://localhost:4000/api/auth/social-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: user.email,
+          firstName: user.name?.split(" ")[0] || "",
+          lastName: user.name?.split(" ")[1] || "",
+          provider: account?.provider,
+          providerId: account?.providerAccountId,
+        }),
+      });
 
       console.log("Backend response status:", res.status);
 
@@ -46,7 +48,11 @@ const handler = NextAuth({
         return `/company/login?error=${encodeURIComponent(data.message || "Login failed")}`;
       }
 
-      const data = await res.json();
+      const data = await res.json().catch(() => null);
+
+      if (!data) {
+        return "/company/login?error=Backend Error";
+      }
 
       // Sync with Iron Session
       const session = await getSession();
