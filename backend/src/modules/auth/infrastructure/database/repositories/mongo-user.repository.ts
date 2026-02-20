@@ -12,7 +12,7 @@ export class MongoUserRepository implements UserRepository {
   constructor(
     @InjectModel(UserDocument.name)
     private readonly userModel: Model<UserDocument>,
-  ) {}
+  ) { }
 
   async findByEmail(email: string): Promise<UserEntity | null> {
     const user = await this.userModel.findOne({ email });
@@ -25,6 +25,11 @@ export class MongoUserRepository implements UserRepository {
   }
 
   async create(user: UserEntity): Promise<UserEntity> {
+    console.log('!!! DEBUG: MongoUserRepository - Creating User Entity:', {
+      role: user.role,
+      phone: user.phone,
+      email: user.email,
+    });
     const created = await this.userModel.create({
       companyId: user.companyId,
       firstName: user.firstName,
@@ -60,17 +65,16 @@ export class MongoUserRepository implements UserRepository {
       throw new Error(`${AUTH_MESSAGES.USER_NOT_FOUND_FOR_EMAIL} ${email}`);
     }
   }
-
   private toEntity(doc: UserDocument): UserEntity {
     return new UserEntity(
       doc._id.toString(),
       doc.firstName,
       doc.lastName,
       doc.email,
-      doc.phone,
       doc.role,
+      doc.phone,
       doc.passwordHash,
-      doc.status as any,
+      doc.status as UserStatus,
       doc.createdAt,
       doc.updatedAt,
       doc.companyId,
@@ -79,6 +83,7 @@ export class MongoUserRepository implements UserRepository {
       doc.hasPassword,
     );
   }
+
   async updateStatusByEmail(email: string, status: UserStatus): Promise<void> {
     await this.userModel.updateOne({ email }, { status });
   }

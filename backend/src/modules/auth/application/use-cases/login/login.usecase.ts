@@ -34,6 +34,12 @@ export class LoginUseCase {
       throw new ForbiddenException(AUTH_MESSAGES.ACCOUNT_NOT_VERIFIED);
     }
 
+    if (!user.passwordHash) {
+      throw new UnauthorizedException(
+        'This account uses social login. Please sign in using Google/Facebook/GitHub.',
+      );
+    }
+
     const isPasswordValid = await comparePassword(
       input.password,
       user.passwordHash,
@@ -64,7 +70,7 @@ export class LoginUseCase {
         role: user.role,
         companyId: user.companyId,
       },
-      message: 'Login Successfull'
+      message: 'Login Successfull',
     };
   }
 }

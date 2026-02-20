@@ -4,7 +4,7 @@ export type RegisterCompanyPayload = {
     email: string;
     size: string;
     industry: string;
-    website: string | null;
+    website?: string | null | undefined;
   };
   admin: {
     firstName: string;

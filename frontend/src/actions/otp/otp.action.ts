@@ -26,13 +26,16 @@ export async function verifyOtpAction(payload: { email: string; otp: string }) {
       }
     }
 
-    const { accessToken } = response.data;
+    const { accessToken, user } = response.data;
     if (!accessToken) {
       throw new Error(AUTH_MESSAGES.NO_ACCESS_TOKEN_RETURNED);
     }
 
     const session = await getSession();
     session.accessToken = accessToken;
+    session.userId = user.id;
+    session.role = user.role;
+    session.email = user.email;
     await session.save();
 
     return {

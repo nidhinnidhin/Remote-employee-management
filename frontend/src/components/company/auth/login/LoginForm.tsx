@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import BaseLoginForm from "@/components/ui/BaseLoginForm";
 
 import {
@@ -32,6 +32,14 @@ export default function LoginForm() {
   const [forgotEmail, setForgotEmail] = useState("");
 
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const errorParam = searchParams.get("error");
+
+  useEffect(() => {
+    if (errorParam) {
+      setErrors((prev) => ({ ...prev, form: errorParam }));
+    }
+  }, [errorParam]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

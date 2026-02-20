@@ -8,9 +8,12 @@ import {
 import { clientApi as api } from "@/lib/axios/axiosClient";
 import { getRedirectForRole } from "@/lib/auth/auth-constants";
 import { redirect } from "next/navigation";
-import { LoginResponse } from "@/shared/types/company/auth/company-login/login-response.type";
+import {
+  LoginResponse,
+  AuthActionResult
+} from "@/shared/types/company/auth/company-login/login-response.type";
 
-export async function loginAction(email: string, password: string) {
+export async function loginAction(email: string, password: string): Promise<AuthActionResult<LoginResponse>> {
   try {
     const response = await api.post<LoginResponse>("/auth/login", {
       email,
@@ -44,7 +47,7 @@ export async function loginAction(email: string, password: string) {
     await session.save();
 
     console.log("-----------------------------------------");
-    console.log(" NEW LOGIN SUCCESSFUL");
+    console.log(" UNIFIED LOGIN SUCCESSFUL");
     console.log(" Email:", user.email);
     console.log(" Role:", user.role);
     console.log("-----------------------------------------");
@@ -53,6 +56,10 @@ export async function loginAction(email: string, password: string) {
     const redirectUrl = getRedirectForRole(user.role);
     redirect(redirectUrl);
   } catch (error: any) {
+    if (error.digest?.startsWith("NEXT_REDIRECT")) {
+      throw error;
+    }
+
     console.error("[loginAction] Error:", error);
     return {
       success: false,

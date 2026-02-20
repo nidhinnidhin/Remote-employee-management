@@ -33,7 +33,7 @@ export class VerifyEmailOtpUseCase {
     }
 
     // Enforce expiry
-    if (pending.expiresAt < new Date()) {
+    if (new Date(pending.expiresAt) < new Date()) {
       throw new BadRequestException(OTP_MESSAGES.OTP_EXPIRED);
     }
 
@@ -58,13 +58,14 @@ export class VerifyEmailOtpUseCase {
     const createdCompany = await this.companyRepository.create(company);
 
     // Create user
+    console.log('!!! DEBUG: VerifyEmailOtpUseCase - pending.admin:', pending.admin);
     const user = new UserEntity(
       randomUUID(),
       pending.admin.firstName,
       pending.admin.lastName,
       pending.admin.email.toLowerCase(),
-      pending.admin.phone,
       'COMPANY_ADMIN',
+      pending.admin.phone,
       pending.admin.password,
       UserStatus.ACTIVE,
       new Date(),
@@ -91,7 +92,11 @@ export class VerifyEmailOtpUseCase {
     return {
       accessToken,
       refreshToken,
-      userId: user.id,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      },
     };
   }
 }

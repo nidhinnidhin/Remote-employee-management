@@ -30,6 +30,7 @@ import {
   REFRESH_TOKEN_COOKIE_NAME,
   REFRESH_TOKEN_COOKIE_OPTIONS,
 } from 'src/shared/config/cookies.config';
+import { SocialLoginUseCase } from '../../application/use-cases/login/social-login.usecase';
 
 @Controller('auth')
 export class AuthController {
@@ -42,6 +43,7 @@ export class AuthController {
     private readonly forgotPasswordUseCase: ForgotPasswordUseCase,
     private readonly verifyResetPasswordOtpUseCase: VerifyResetPasswordOtpUseCase,
     private readonly resetPasswordUseCase: ResetPasswordUseCase,
+    private readonly socialLoginUseCase: SocialLoginUseCase,
   ) { }
 
   // LOGIN
@@ -69,11 +71,44 @@ export class AuthController {
       REFRESH_TOKEN_COOKIE_OPTIONS,
     );
 
-    console.log('Login successful for user:', result.user.id, 'Role:', result.user.role);
+    console.log(
+      'Login successful for user:',
+      result.user.id,
+      'Role:',
+      result.user.role,
+    );
 
     return result; // ← return full object including message
   }
 
+  @Post('social-login')
+  async socialLogin(
+    @Body()
+    body: {
+      email: string;
+      firstName: string;
+      lastName: string;
+      provider: string;
+      providerId: string;
+    },
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = await this.socialLoginUseCase.execute(body);
+
+    res.cookie(
+      ACCESS_TOKEN_COOKIE_NAME,
+      result.accessToken,
+      ACCESS_TOKEN_COOKIE_OPTIONS,
+    );
+
+    res.cookie(
+      REFRESH_TOKEN_COOKIE_NAME,
+      result.refreshToken,
+      REFRESH_TOKEN_COOKIE_OPTIONS,
+    );
+
+    return result;
+  }
 
   // Register
   @Post('register')
@@ -87,7 +122,7 @@ export class AuthController {
     @Body() dto: VerifyEmailOtpDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    console.log('!!! FINGERPRINT: VERIFY_OTP_CALLED_v5 !!!');
+    console.log('!!! FINGERPRINT: VERIFY_OTP_CALLED_v7_FINAL_FIX_RESTART_REQUIRED !!!');
     const result = await this.verifyEmailOtpUseCase.execute({
       email: dto.email,
       otp: dto.otp,
@@ -105,11 +140,11 @@ export class AuthController {
       REFRESH_TOKEN_COOKIE_OPTIONS,
     );
 
-    console.log('OTP Verification successful for user:', result.userId);
+    console.log('OTP Verification successful for user:', result.user.id);
     return {
       accessToken: result.accessToken,
       refreshToken: result.refreshToken,
-      userId: result.userId,
+      user: result.user,
     };
   }
 

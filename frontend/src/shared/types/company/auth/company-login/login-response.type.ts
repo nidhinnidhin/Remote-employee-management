@@ -10,3 +10,7 @@ export interface LoginResponse {
     companyId?: string;
   };
 }
+
+export type AuthActionResult<T = any> =
+  | { success: true; data: T }
+  | { success: false; error: string };

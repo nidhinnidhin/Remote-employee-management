@@ -13,7 +13,7 @@ export async function registerAction(formData: RegisterFormData) {
       email: formData.companyEmail,
       size: formData.employeeSize,
       industry: formData.industry,
-      website: formData.websiteUrl ? formData.websiteUrl : null,
+      website: formData.websiteUrl || undefined,
     },
     admin: {
       firstName: formData.firstName,
@@ -26,7 +26,8 @@ export async function registerAction(formData: RegisterFormData) {
 
   const parsed = registerSchema.safeParse(payload);
   if (!parsed.success) {
-    return { error: parsed.error.flatten().fieldErrors };
+    const errorMsg = parsed.error.issues[0]?.message || "Validation failed";
+    return { success: false, error: errorMsg };
   }
 
   try {
@@ -34,7 +35,8 @@ export async function registerAction(formData: RegisterFormData) {
     return { success: true, data };
   } catch (e: any) {
     return {
-      error: e.message || AUTH_MESSAGES.REGISTRATION_FAILED,
+      success: false,
+      error: e.response?.data?.message || e.message || AUTH_MESSAGES.REGISTRATION_FAILED,
     };
   }
 }

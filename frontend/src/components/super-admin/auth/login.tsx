@@ -9,7 +9,7 @@ import {
   AdminLoginErrors,
   AdminLoginFormData,
 } from "@/shared/types/superadmin/auth/login-form-data.type";
-import { superAdminLoginAction } from "@/actions/super-admin/auth/login.action";
+import { loginAction } from "@/actions/auth/login.action";
 import { validateAdminLogin } from "@/lib/validations/client/auth/login-validation";
 
 export default function SuperAdminLoginForm() {
@@ -47,14 +47,14 @@ export default function SuperAdminLoginForm() {
     }
 
     try {
-      const result = await superAdminLoginAction(formData);
+      const result = await loginAction(formData.email, formData.password);
 
-      if (!result?.success) {
-        setErrors({ form: result?.error || AUTH_MESSAGES.LOGIN_FAILED });
+      if (result && !result.success) {
+        setErrors({ form: result.error || AUTH_MESSAGES.LOGIN_FAILED });
         return;
       }
 
-      router.replace("/super-admin/companies");
+      // Role-based redirect is handled by loginAction
     } catch (err: any) {
       setErrors({ form: err.message || AUTH_MESSAGES.LOGIN_FAILED });
     } finally {

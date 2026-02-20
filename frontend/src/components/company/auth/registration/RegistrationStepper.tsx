@@ -86,7 +86,7 @@ const RegistrationStepper = () => {
 
       if (!result?.success) {
         setErrors({
-          form: result?.error || AUTH_MESSAGES.REGISTRATION_FAILED,
+          form: (typeof result?.error === "string" ? result.error : AUTH_MESSAGES.REGISTRATION_FAILED),
         });
         return;
       }
@@ -130,7 +130,7 @@ const RegistrationStepper = () => {
       }
 
       localStorage.removeItem("otp_expiry_time");
-      setAuth(result.data.accessToken, "");
+      setAuth(result.data.accessToken, result.data.user);
       setShowOtpModal(false);
       router.replace("/company/employees/employees");
     } finally {
