@@ -24,4 +24,6 @@ import { CompanyDocument, CompanySchema } from '../auth/infrastructure/database/
     },
   ],
 })
-export class SuperAdminModule { }
+export class SuperAdminModule {
+  constructor(private readonly seedService: SuperAdminSeedService) { }
+}

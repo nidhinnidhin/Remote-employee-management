@@ -87,4 +87,15 @@ export class MongoUserRepository implements UserRepository {
   async updateStatusByEmail(email: string, status: UserStatus): Promise<void> {
     await this.userModel.updateOne({ email }, { status });
   }
+
+  async updateRoleByEmail(email: string, role: string): Promise<void> {
+    await this.userModel.updateOne({ email }, { role });
+  }
+
+  async updateUserFieldsByEmail(
+    email: string,
+    fields: Partial<UserEntity>,
+  ): Promise<void> {
+    await this.userModel.updateOne({ email }, { $set: fields });
+  }
 }

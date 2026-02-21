@@ -13,9 +13,10 @@ export class SuperAdminSeedService implements OnModuleInit {
   constructor(
     @Inject('UserRepository') private readonly userRepository: UserRepository,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   async onModuleInit() {
+    this.logger.log('Initializing Super Admin Seeder...');
     await this.seedSuperAdmin();
   }
 
@@ -32,14 +33,24 @@ export class SuperAdminSeedService implements OnModuleInit {
 
     try {
       const existingUser = await this.userRepository.findByEmail(email);
+      this.logger.log(`Checking existing Super Admin user: ${email}...`);
 
       if (existingUser) {
-        if (existingUser.role !== UserRole.SUPER_ADMIN) {
+        this.logger.log(`Found existing user with Role: ${existingUser.role}, Phone: ${existingUser.phone}`);
+        if (
+          existingUser.role !== UserRole.SUPER_ADMIN ||
+          existingUser.phone === UserRole.SUPER_ADMIN
+        ) {
           this.logger.warn(
-            `User ${email} exists but is not SUPER_ADMIN. Manual intervention recommended.`,
+            `User ${email} has incorrect fields. FIXING NOW...`,
           );
+          await this.userRepository.updateUserFieldsByEmail(email, {
+            role: UserRole.SUPER_ADMIN,
+            phone: '0000000000',
+          });
+          this.logger.log(`Super Admin ${email} fields updated successfully in database.`);
         } else {
-          this.logger.log(`Super Admin ${email} already exists.`);
+          this.logger.log(`Super Admin ${email} already has correct role and phone.`);
         }
         return;
       }
@@ -59,8 +70,8 @@ export class SuperAdminSeedService implements OnModuleInit {
         'Super',
         'Admin',
         email,
-        '0000000000',
         UserRole.SUPER_ADMIN,
+        '0000000000',
         passwordHash,
         UserStatus.ACTIVE,
         new Date(),

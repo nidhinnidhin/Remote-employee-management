@@ -11,5 +11,5 @@ const ROLE_REDIRECTS: Record<string, string> = {
  * Get the appropriate dashboard URL for a given role
  */
 export function getRedirectForRole(role: string): string {
-  return ROLE_REDIRECTS[role] || "/employees/dashboard";
+  return ROLE_REDIRECTS[role] || "/company/login";
 }

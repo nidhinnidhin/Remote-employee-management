@@ -11,4 +11,6 @@ export interface UserRepository {
   ): Promise<void>;
 
   updatePasswordByEmail(email: string, passwordHash: string): Promise<void>;
+  updateRoleByEmail(email: string, role: string): Promise<void>;
+  updateUserFieldsByEmail(email: string, fields: Partial<UserEntity>): Promise<void>;
 }

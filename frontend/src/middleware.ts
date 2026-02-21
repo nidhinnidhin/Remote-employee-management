@@ -18,7 +18,12 @@ export async function middleware(req: NextRequest) {
   // Redirect authenticated users away from auth routes (login/register)
   if (isAuthenticated && isAuthRoute) {
     const dashboardUrl = getRedirectForRole(session.role!);
-    return NextResponse.redirect(new URL(dashboardUrl, req.url));
+    const targetUrl = new URL(dashboardUrl, req.url);
+
+    // Only redirect if the target is different from current page to avoid loops
+    if (targetUrl.pathname !== pathname) {
+      return NextResponse.redirect(targetUrl);
+    }
   }
 
   // Redirect unauthenticated users away from protected routes
