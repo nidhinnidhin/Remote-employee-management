@@ -23,6 +23,7 @@ export class SuperAdminCompanyController {
         industry: company.industry,
         website: company.website,
         createdAt: company.createdAt,
+        employeeCount: company.employeeCount || 0,
       })),
     };
   }

@@ -2,7 +2,7 @@
 import { CompanyRow } from "@/shared/types/superadmin/companies/companiesColumns";
 import { Column } from "@/shared/types/ui/table-props.type";
 import React from "react";
-
+import { RowActions } from "./RowAction";
 
 export const columns: Column<CompanyRow>[] = [
   {
@@ -23,4 +23,9 @@ export const columns: Column<CompanyRow>[] = [
   { header: "Employees", accessor: "employees" },
   { header: "Status", accessor: "status" },
   { header: "Created", accessor: "created" },
+  {
+    header: "",
+    accessor: (row) => <RowActions row={row} />,
+    className: "text-right",
+  },
 ];

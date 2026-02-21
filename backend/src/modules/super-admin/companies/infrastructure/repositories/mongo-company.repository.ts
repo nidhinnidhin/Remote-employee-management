@@ -10,11 +10,31 @@ export class MongoCompanyRepository implements CompanyRepository {
   constructor(
     @InjectModel(CompanyDocument.name)
     private readonly companyModel: Model<CompanyDocument>,
-  ) {}
+  ) { }
 
   // ✅ new
   async findAll(): Promise<CompanyEntity[]> {
-    const companies = await this.companyModel.find().sort({ createdAt: -1 }); // latest first
+    const companies = await this.companyModel.aggregate([
+      { $sort: { createdAt: -1 } },
+      {
+        $addFields: {
+          stringId: { $toString: '$_id' },
+        },
+      },
+      {
+        $lookup: {
+          from: 'userdocuments',
+          localField: 'stringId',
+          foreignField: 'companyId',
+          as: 'employees',
+        },
+      },
+      {
+        $addFields: {
+          employeeCount: { $size: '$employees' },
+        },
+      },
+    ]);
 
     return companies.map((company) => this.toEntity(company));
   }
@@ -29,6 +49,7 @@ export class MongoCompanyRepository implements CompanyRepository {
       doc.website,
       doc.createdAt,
       doc.updatedAt,
+      (doc as any).employeeCount,
     );
   }
 }

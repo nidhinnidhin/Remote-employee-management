@@ -8,5 +8,6 @@ export class CompanyEntity {
     public readonly website?: string,
     public readonly createdAt?: Date,
     public readonly updatedAt?: Date,
-  ) {}
+    public readonly employeeCount?: number,
+  ) { }
 }

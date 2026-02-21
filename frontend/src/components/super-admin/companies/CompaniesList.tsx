@@ -22,7 +22,7 @@ const mapApiToRow = (company: CompanyApi): CompanyRow => ({
   logo: company.name.charAt(0).toUpperCase(),
   owner: "—",
   plan: company.size,
-  employees: 0,
+  employees: company.employeeCount || 0,
   status: "Active",
   mrr: "—",
   created: formatDateISO(company.createdAt),

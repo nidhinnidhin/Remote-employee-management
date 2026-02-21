@@ -6,4 +6,5 @@ export interface CompanyApi {
   industry: string;
   website?: string;
   createdAt: string;
+  employeeCount: number;
 }
