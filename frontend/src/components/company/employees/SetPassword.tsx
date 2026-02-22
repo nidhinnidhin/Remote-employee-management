@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { setEmployeePassword } from "@/services/employee/auth/set-employee-password.service";
+import { setEmployeePasswordAction } from "@/actions/employee/set-employee-password.action";
 import FormInput from "@/components/ui/FormInput";
 import Button from "@/components/ui/Button";
 import { AUTH_MESSAGES } from "@/shared/constants/messages/auth.messages";
@@ -25,7 +25,7 @@ const SetPasswordCard = () => {
       setLoading(true);
       setError(null);
 
-      await setEmployeePassword(password);
+      await setEmployeePasswordAction(password);
 
       router.replace("/employees/dashboard");
     } catch {

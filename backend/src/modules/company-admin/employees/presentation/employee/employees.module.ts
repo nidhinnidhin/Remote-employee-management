@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { AuthModule } from '../../../../auth/presentation/auth/auth.module';
 import {
   InviteLinkDocument,
   InviteLinkSchema,
@@ -17,6 +18,7 @@ import { JwtService } from 'src/shared/services/jwt.service';
 
 @Module({
   imports: [
+    AuthModule,
     MongooseModule.forFeature([
       { name: InviteLinkDocument.name, schema: InviteLinkSchema },
       { name: UserDocument.name, schema: UserSchema },
@@ -41,4 +43,4 @@ import { JwtService } from 'src/shared/services/jwt.service';
   ],
   exports: ['EmployeeRepository', 'InviteLinkRepository'],
 })
-export class EmployeesModule {}
+export class EmployeesModule { }

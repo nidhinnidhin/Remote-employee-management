@@ -42,6 +42,7 @@ export class InviteEmployeeUseCase {
         role: input.role,
         department: input.department,
         phone: input.phone,
+        companyId: input.companyId,
       });
       employee = existing;
     } else {

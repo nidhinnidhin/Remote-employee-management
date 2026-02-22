@@ -6,7 +6,7 @@ export interface CompanyRow {
   owner: string;
   plan: string;
   employees: number;
-  status: "Active" | "Suspended";
+  status: string;
   mrr: string;
   created: string;
 }
@@ -19,8 +19,8 @@ export interface CompaniesListingProps {
 }
 
 export interface StatsCardProps {
-    title: string;
-    value: string;
-    percentage?: string;
-    trend?: "up" | "down";
+  title: string;
+  value: string;
+  percentage?: string;
+  trend?: "up" | "down";
 }

@@ -10,6 +10,7 @@ import CompaniesTable from "./CompaniesTable";
 import { CompanyApi } from "@/shared/types/superadmin/companies/company.type";
 import { CompanyRow } from "@/shared/types/superadmin/companies/companiesColumns";
 import { formatDateISO } from "@/lib/date/date-format";
+import { useRouter } from "next/navigation";
 
 type CompaniesListingProps = {
   initialCompanies: CompanyApi[];
@@ -23,7 +24,7 @@ const mapApiToRow = (company: CompanyApi): CompanyRow => ({
   owner: "—",
   plan: company.size,
   employees: company.employeeCount || 0,
-  status: "Active",
+  status: company.status || "ACTIVE",
   mrr: "—",
   created: formatDateISO(company.createdAt),
 });
@@ -32,9 +33,14 @@ const mapApiToRow = (company: CompanyApi): CompanyRow => ({
 export default function CompaniesListing({
   initialCompanies,
 }: CompaniesListingProps) {
+  const router = useRouter();
   const [companies] = useState<CompanyRow[]>(
     initialCompanies.map(mapApiToRow)
   );
+
+  const handleRefresh = () => {
+    router.refresh();
+  };
   const [currentPage, setCurrentPage] = useState(1);
 
   return (
@@ -44,10 +50,11 @@ export default function CompaniesListing({
       <CompaniesFilter />
 
       <CompaniesTable
-        data={companies}
+        data={initialCompanies.map(mapApiToRow)}
         isLoading={false}
         currentPage={currentPage}
         onPageChange={setCurrentPage}
+        onStatusChange={handleRefresh}
       />
     </SuperAdminLayout>
   );

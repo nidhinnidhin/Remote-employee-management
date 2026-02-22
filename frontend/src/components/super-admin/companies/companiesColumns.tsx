@@ -4,7 +4,7 @@ import { Column } from "@/shared/types/ui/table-props.type";
 import React from "react";
 import { RowActions } from "./RowAction";
 
-export const columns: Column<CompanyRow>[] = [
+export const columns = (onStatusChange?: () => void): Column<CompanyRow>[] => [
   {
     header: "Company",
     accessor: (row) => (
@@ -21,11 +21,23 @@ export const columns: Column<CompanyRow>[] = [
   },
   { header: "Plan", accessor: "plan" },
   { header: "Employees", accessor: "employees" },
-  { header: "Status", accessor: "status" },
+  {
+    header: "Status",
+    accessor: (row) => (
+      <span
+        className={`px-2 py-1 rounded-full text-xs font-medium ${row.status === "ACTIVE"
+          ? "bg-green-100 text-green-700"
+          : "bg-red-100 text-red-700"
+          }`}
+      >
+        {row.status === "SUSPENDED" ? "Suspended" : "Active"}
+      </span>
+    ),
+  },
   { header: "Created", accessor: "created" },
   {
     header: "",
-    accessor: (row) => <RowActions row={row} />,
+    accessor: (row) => <RowActions row={row} onStatusChange={onStatusChange} />,
     className: "text-right",
   },
 ];

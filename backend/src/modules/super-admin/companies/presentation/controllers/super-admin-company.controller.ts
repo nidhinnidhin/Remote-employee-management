@@ -1,13 +1,16 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, UseGuards, Patch, Param, Body } from '@nestjs/common';
 import { ListCompaniesUseCase } from '../../application/use-cases/list-companies-use-case';
+import { SuspendCompanyUseCase } from '../../application/use-cases/suspend-company.use-case';
 import { SuperAdminGuard } from 'src/shared/guards/super-admin.guard';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
+import { CompanyStatus } from 'src/shared/enums/company/company-status.enum';
 
 @Controller('super-admin/companies')
 @UseGuards(JwtAuthGuard, SuperAdminGuard)
 export class SuperAdminCompanyController {
   constructor(
     private readonly listCompaniesUseCase: ListCompaniesUseCase,
+    private readonly suspendCompanyUseCase: SuspendCompanyUseCase,
   ) { }
 
   @Get()
@@ -24,7 +27,20 @@ export class SuperAdminCompanyController {
         website: company.website,
         createdAt: company.createdAt,
         employeeCount: company.employeeCount || 0,
+        status: company.status,
       })),
+    };
+  }
+
+  @Patch(':id/status')
+  async updateCompanyStatus(
+    @Param('id') id: string,
+    @Body('status') status: CompanyStatus,
+  ) {
+    await this.suspendCompanyUseCase.execute(id, status);
+
+    return {
+      message: `Company status updated to ${status} successfully`,
     };
   }
 }

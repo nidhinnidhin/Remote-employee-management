@@ -26,6 +26,12 @@ clientApi.interceptors.response.use(
       }
     }
 
+    if (err.response?.status === 403) {
+      if (typeof window !== "undefined") {
+        window.location.href = "/company/login";
+      }
+    }
+
     return Promise.reject(err);
   }
 );

@@ -5,6 +5,9 @@ import {
   Req,
   Res,
   UnauthorizedException,
+  Get,
+  UseGuards,
+  Inject,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { RegisterCompanyAdminUseCase } from '../../application/use-cases/register/register-company-admin.usecase';
@@ -31,6 +34,8 @@ import {
   REFRESH_TOKEN_COOKIE_OPTIONS,
 } from 'src/shared/config/cookies.config';
 import { SocialLoginUseCase } from '../../application/use-cases/login/social-login.usecase';
+import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
+import type { UserRepository } from '../../domain/repositories/user.repository';
 
 @Controller('auth')
 export class AuthController {
@@ -44,6 +49,8 @@ export class AuthController {
     private readonly verifyResetPasswordOtpUseCase: VerifyResetPasswordOtpUseCase,
     private readonly resetPasswordUseCase: ResetPasswordUseCase,
     private readonly socialLoginUseCase: SocialLoginUseCase,
+    @Inject('UserRepository')
+    private readonly userRepository: UserRepository,
   ) { }
 
   // LOGIN
@@ -108,6 +115,26 @@ export class AuthController {
     );
 
     return result;
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  async getMe(@Req() req: any) {
+    const user = await this.userRepository.findById(req.user.userId);
+    if (!user) {
+      throw new UnauthorizedException(AUTH_MESSAGES.USER_NOT_FOUND);
+    }
+
+    return {
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        companyId: user.companyId,
+      },
+    };
   }
 
   // Register

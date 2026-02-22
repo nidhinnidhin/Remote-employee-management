@@ -8,12 +8,22 @@ export async function middleware(req: NextRequest) {
 
   const isAuthenticated = !!session.accessToken && !!session.role;
 
-  // Define route groups
-  const isAuthRoute = pathname.startsWith("/company/login") || pathname.startsWith("/company/register");
+  // Public auth routes (no login required)
+  const isAuthRoute =
+    pathname.startsWith("/company/login") ||
+    pathname.startsWith("/company/register");
+
+  // Employee invite/onboarding routes — always public, no session needed
+  const isEmployeeAuthRoute = pathname.startsWith("/company/employees/auth");
+
+  // Protected routes — require authentication
   const isProtectedRoute =
-    pathname.startsWith("/employees") ||
-    pathname.startsWith("/super-admin") ||
-    pathname.startsWith("/company/employees");
+    !isEmployeeAuthRoute &&
+    (pathname.startsWith("/employees") ||
+      pathname.startsWith("/super-admin") ||
+      pathname.startsWith("/company/employees") ||
+      pathname.startsWith("/company/dashboard") ||
+      pathname.startsWith("/employees/dashboard"));
 
   // Redirect authenticated users away from auth routes (login/register)
   if (isAuthenticated && isAuthRoute) {
@@ -29,6 +39,25 @@ export async function middleware(req: NextRequest) {
   // Redirect unauthenticated users away from protected routes
   if (!isAuthenticated && isProtectedRoute) {
     return NextResponse.redirect(new URL("/company/login", req.url));
+  }
+
+  // If authenticated and on a protected route, verify company status with backend
+  if (isAuthenticated && isProtectedRoute) {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      });
+
+      if (response.status === 403) {
+        // Company suspended - clear session and redirect
+        session.destroy();
+        return NextResponse.redirect(new URL("/company/login", req.url));
+      }
+    } catch (error) {
+      console.error("Middleware Auth Check Error:", error);
+    }
   }
 
   return NextResponse.next();

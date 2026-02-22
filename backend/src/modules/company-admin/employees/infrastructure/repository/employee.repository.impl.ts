@@ -83,6 +83,7 @@ export class EmployeeRepositoryImpl implements EmployeeRepository {
     role?: string;
     department?: string;
     phone?: string;
+    companyId?: string;
   }): Promise<void> {
     const updateData: any = {};
     if (input.name) {
@@ -93,6 +94,7 @@ export class EmployeeRepositoryImpl implements EmployeeRepository {
     if (input.role) updateData.role = input.role;
     if (input.department) updateData.department = input.department;
     if (input.phone) updateData.phone = input.phone;
+    if (input.companyId) updateData.companyId = input.companyId;
 
     await this.model.updateOne({ _id: id }, { $set: updateData });
   }

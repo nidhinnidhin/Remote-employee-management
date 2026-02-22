@@ -38,7 +38,7 @@ export class EmployeesController {
     private readonly setPasswordUseCase: SetPasswordUseCase,
     private readonly redisService: RedisService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   @Post('invite')
   @UseGuards(JwtAuthGuard)
@@ -133,6 +133,13 @@ export class EmployeesController {
 
     return {
       message: AUTH_MESSAGES.PASSWORD_SET,
+      accessToken,
+      user: {
+        id: employee.id,
+        email: employee.email,
+        role: employee.role,
+        companyId: employee.companyId,
+      },
     };
   }
 }

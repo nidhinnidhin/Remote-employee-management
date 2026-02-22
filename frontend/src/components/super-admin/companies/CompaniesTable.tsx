@@ -5,17 +5,22 @@ import { columns } from "./companiesColumns";
 import { CompanyRow } from "@/shared/types/superadmin/companies/companiesColumns";
 import { CompaniesListingProps } from "@/shared/types/superadmin/companies/companies-listing.type";
 
+interface CompaniesTableProps extends CompaniesListingProps {
+  onStatusChange?: () => void;
+}
+
 export default function CompaniesTable({
   data,
   isLoading,
   currentPage,
   onPageChange,
-}: CompaniesListingProps) {
+  onStatusChange,
+}: CompaniesTableProps) {
   return (
     <>
       <Table
         data={data}
-        columns={columns}
+        columns={columns(onStatusChange)}
         keyExtractor={(item) => item.id}
         isLoading={isLoading}
         theme="light"

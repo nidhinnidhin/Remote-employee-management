@@ -1,4 +1,6 @@
+import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { AuthModule } from '../../auth/presentation/auth/auth.module';
 import {
   CompanyPolicy,
   CompanyPolicySchema,
@@ -6,11 +8,11 @@ import {
 import { CompanyPolicyController } from './presentation/controller/company-policy.controller';
 import { CompanyPolicyUseCase } from './application/use-case/company-policy.usecase';
 import { CompanyPolicyRepositoryImpl } from './infrastructure/repositories/company-policy.repository.impl';
-import { Module } from '@nestjs/common';
 import { POLICY_MESSAGES } from 'src/shared/constants/messages/company-policy/company-policy.message';
 
 @Module({
   imports: [
+    AuthModule,
     MongooseModule.forFeature([
       { name: CompanyPolicy.name, schema: CompanyPolicySchema },
     ]),
@@ -24,4 +26,4 @@ import { POLICY_MESSAGES } from 'src/shared/constants/messages/company-policy/co
     },
   ],
 })
-export class CompanyPolicyModule {}
+export class CompanyPolicyModule { }

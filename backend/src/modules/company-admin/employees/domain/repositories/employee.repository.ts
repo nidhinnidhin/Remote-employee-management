@@ -7,6 +7,8 @@ export interface EmployeeRepository {
     email: string;
     role: string;
     department: string;
+    phone: string;
+    companyId: string;
     isActive: boolean;
     hasPassword: boolean;
     inviteStatus: InviteStatus;
@@ -17,6 +19,7 @@ export interface EmployeeRepository {
     role?: string;
     department?: string;
     phone?: string;
+    companyId?: string;
   }): Promise<void>;
 
   findByEmail(email: string): Promise<Employee | null>;

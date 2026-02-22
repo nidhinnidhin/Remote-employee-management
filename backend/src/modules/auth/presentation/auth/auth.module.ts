@@ -80,4 +80,4 @@ import { SocialLoginUseCase } from '../../application/use-cases/login/social-log
     'EmailOtpRepository',
   ],
 })
-export class AuthModule {}
+export class AuthModule { }

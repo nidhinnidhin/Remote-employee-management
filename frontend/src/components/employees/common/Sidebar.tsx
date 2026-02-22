@@ -29,7 +29,7 @@ import { cn } from "@/lib/utils";
 
 const menuItems = [
   { icon: LayoutGrid, label: "Dashboard", href: "/employees/dashboard" },
-  { icon: UserCircle, label: "My Profile", href: "/profile" },
+  { icon: UserCircle, label: "My Profile", href: "/employees/profile" },
   { icon: Fingerprint, label: "Attendance", href: "/attendance" },
   { icon: CalendarOff, label: "Leave Management", href: "/leaves" },
   { icon: CheckCircle2, label: "Tasks", href: "/tasks" },

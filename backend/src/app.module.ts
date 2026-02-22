@@ -16,4 +16,4 @@ import { CompanyPolicyModule } from './modules/company-admin/company-policy/comp
     CompanyPolicyModule
   ],
 })
-export class AppModule {}
+export class AppModule { }

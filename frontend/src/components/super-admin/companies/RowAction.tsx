@@ -1,8 +1,16 @@
+import { clientApi } from "@/lib/axios/axiosClient";
 import { CompanyRow } from "@/shared/types/superadmin/companies/companiesColumns";
 import React from "react";
 
-export const RowActions = ({ row }: { row: CompanyRow }) => {
+export const RowActions = ({
+  row,
+  onStatusChange
+}: {
+  row: CompanyRow,
+  onStatusChange?: () => void
+}) => {
   const [open, setOpen] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
   const [position, setPosition] = React.useState({
     top: 0,
     left: 0,
@@ -32,6 +40,24 @@ export const RowActions = ({ row }: { row: CompanyRow }) => {
 
     setPosition({ top, left, openUp });
     setOpen((prev) => !prev);
+  };
+
+  const handleToggleStatus = async () => {
+    const newStatus = row.status === "ACTIVE" ? "SUSPENDED" : "ACTIVE";
+    setLoading(true);
+    try {
+      await clientApi.patch(`/super-admin/companies/${row.id}/status`, {
+        status: newStatus,
+      });
+      alert(`Company status updated to ${newStatus} successfully`);
+      if (onStatusChange) onStatusChange();
+    } catch (error) {
+      console.error("Failed to update status", error);
+      alert("Failed to update company status. Please try again.");
+    } finally {
+      setLoading(false);
+      setOpen(false);
+    }
   };
 
   // Close on outside click
@@ -70,6 +96,7 @@ export const RowActions = ({ row }: { row: CompanyRow }) => {
         aria-label="Row actions"
         aria-expanded={open}
         aria-haspopup="menu"
+        disabled={loading}
         className={`
           relative flex items-center justify-center w-8 h-8 rounded-md
           text-gray-400 hover:text-gray-600
@@ -77,9 +104,10 @@ export const RowActions = ({ row }: { row: CompanyRow }) => {
           transition-colors duration-150
           focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1
           ${open ? "bg-gray-100 text-gray-600" : ""}
+          ${loading ? "opacity-50 cursor-not-allowed" : ""}
         `}
       >
-        {/* Vertical three-dot icon (more standard for row actions) */}
+        {/* Vertical three-dot icon */}
         <svg
           width="16"
           height="16"
@@ -150,33 +178,49 @@ export const RowActions = ({ row }: { row: CompanyRow }) => {
 
           <button
             role="menuitem"
-            onClick={() => {
-              console.log("Suspend company", row.id);
-              setOpen(false);
-            }}
-            className="
+            onClick={handleToggleStatus}
+            disabled={loading}
+            className={`
               w-full flex items-center gap-2.5 px-3.5 py-2.5
-              text-sm font-medium text-red-600
-              hover:bg-red-50 active:bg-red-100
+              text-sm font-medium
+              ${row.status === "ACTIVE" ? "text-red-600 hover:bg-red-50 active:bg-red-100" : "text-green-600 hover:bg-green-50 active:bg-green-100"}
               transition-colors duration-100
-            "
+              ${loading ? "opacity-50" : ""}
+            `}
           >
-            {/* Ban/suspend icon */}
-            <svg
-              width="15"
-              height="15"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="shrink-0"
-            >
-              <circle cx="12" cy="12" r="10" />
-              <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
-            </svg>
-            Suspend Company
+            {/* Ban/suspend or Check icon */}
+            {row.status === "ACTIVE" ? (
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="shrink-0"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+              </svg>
+            ) : (
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="shrink-0"
+              >
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
+              </svg>
+            )}
+            {row.status === "ACTIVE" ? "Suspend Company" : "Activate Company"}
           </button>
         </div>
       )}

@@ -10,10 +10,15 @@ export class MongoCompanyRepository implements CompanyRepository {
   constructor(
     @InjectModel(CompanyDocument.name)
     private readonly companyModel: Model<CompanyDocument>,
-  ) {}
+  ) { }
 
   async findByEmail(email: string): Promise<CompanyEntity | null> {
     const company = await this.companyModel.findOne({ email });
+    return company ? this.toEntity(company) : null;
+  }
+
+  async findById(id: string): Promise<CompanyEntity | null> {
+    const company = await this.companyModel.findById(id);
     return company ? this.toEntity(company) : null;
   }
 
@@ -24,6 +29,7 @@ export class MongoCompanyRepository implements CompanyRepository {
       size: company.size,
       industry: company.industry,
       website: company.website,
+      status: company.status,
     });
 
     return this.toEntity(created);
@@ -39,6 +45,8 @@ export class MongoCompanyRepository implements CompanyRepository {
       doc.website,
       doc.createdAt,
       doc.updatedAt,
+      undefined,
+      doc.status || 'ACTIVE',
     );
   }
 }

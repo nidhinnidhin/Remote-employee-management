@@ -6,7 +6,7 @@ export interface CompanyRow {
   owner: string;
   plan: string;
   employees: number;
-  status: "Active" | "Suspended";
+  status: string;
   mrr: string;
   created: string;
 }

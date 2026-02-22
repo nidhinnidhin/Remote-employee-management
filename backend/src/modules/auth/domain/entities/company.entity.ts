@@ -1,3 +1,5 @@
+import { CompanyStatus } from "src/shared/enums/company/company-status.enum";
+
 export class CompanyEntity {
   constructor(
     public readonly id: string,
@@ -9,5 +11,6 @@ export class CompanyEntity {
     public readonly createdAt?: Date,
     public readonly updatedAt?: Date,
     public readonly employeeCount?: number,
+    public readonly status: CompanyStatus = CompanyStatus.ACTIVE,
   ) { }
 }
