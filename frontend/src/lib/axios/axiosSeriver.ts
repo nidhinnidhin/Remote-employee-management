@@ -5,11 +5,6 @@ import { COOKIE_KEYS } from "@/shared/constants/temp/cookie-keys";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL!;
 
-/**
- * Attempts to refresh the access token using the refresh_token cookie.
- * Updates iron-session and the access_token cookie if successful.
- * Returns the new access token, or null if refresh failed.
- */
 async function tryRefreshToken(): Promise<string | null> {
   try {
     const cookieStore = await cookies();
