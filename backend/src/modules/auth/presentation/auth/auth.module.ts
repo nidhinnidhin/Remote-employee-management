@@ -30,6 +30,7 @@ import {
 import { MongooseModule } from '@nestjs/mongoose';
 import { Module } from '@nestjs/common';
 import { SocialLoginUseCase } from '../../application/use-cases/login/social-login.usecase';
+import { GetUserProfileUseCase } from '../../application/use-cases/profile/get-user-profile.usecase';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { SocialLoginUseCase } from '../../application/use-cases/login/social-log
     VerifyResetPasswordOtpUseCase,
     ResetPasswordUseCase,
     SocialLoginUseCase,
+    GetUserProfileUseCase,
     {
       provide: 'PendingRegistrationRepository',
       useClass: RedisPendingRegistrationRepository,

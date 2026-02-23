@@ -36,6 +36,7 @@ import {
 import { SocialLoginUseCase } from '../../application/use-cases/login/social-login.usecase';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import type { UserRepository } from '../../domain/repositories/user.repository';
+import { GetUserProfileUseCase } from '../../application/use-cases/profile/get-user-profile.usecase';
 
 @Controller('auth')
 export class AuthController {
@@ -51,7 +52,8 @@ export class AuthController {
     private readonly socialLoginUseCase: SocialLoginUseCase,
     @Inject('UserRepository')
     private readonly userRepository: UserRepository,
-  ) { }
+    private readonly getUserProfileUseCase: GetUserProfileUseCase,
+  ) {}
 
   // LOGIN
   @Post('login')
@@ -117,24 +119,30 @@ export class AuthController {
     return result;
   }
 
+  // @Get('me')
+  // @UseGuards(JwtAuthGuard)
+  // async getMe(@Req() req: any) {
+  //   const user = await this.userRepository.findById(req.user.userId);
+  //   if (!user) {
+  //     throw new UnauthorizedException(AUTH_MESSAGES.USER_NOT_FOUND);
+  //   }
+
+  //   return {
+  //     user: {
+  //       id: user.id,
+  //       email: user.email,
+  //       firstName: user.firstName,
+  //       lastName: user.lastName,
+  //       role: user.role,
+  //       companyId: user.companyId,
+  //     },
+  //   };
+  // }
+
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  async getMe(@Req() req: any) {
-    const user = await this.userRepository.findById(req.user.userId);
-    if (!user) {
-      throw new UnauthorizedException(AUTH_MESSAGES.USER_NOT_FOUND);
-    }
-
-    return {
-      user: {
-        id: user.id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        role: user.role,
-        companyId: user.companyId,
-      },
-    };
+  async getMyProfile(@Req() req: any) {
+    return this.getUserProfileUseCase.execute(req.user.userId);
   }
 
   // Register
@@ -149,7 +157,9 @@ export class AuthController {
     @Body() dto: VerifyEmailOtpDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    console.log('!!! FINGERPRINT: VERIFY_OTP_CALLED_v7_FINAL_FIX_RESTART_REQUIRED !!!');
+    console.log(
+      '!!! FINGERPRINT: VERIFY_OTP_CALLED_v7_FINAL_FIX_RESTART_REQUIRED !!!',
+    );
     const result = await this.verifyEmailOtpUseCase.execute({
       email: dto.email,
       otp: dto.otp,
