@@ -8,6 +8,7 @@ import {
   Get,
   UseGuards,
   Inject,
+  Patch,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { RegisterCompanyAdminUseCase } from '../../application/use-cases/register/register-company-admin.usecase';
@@ -37,6 +38,8 @@ import { SocialLoginUseCase } from '../../application/use-cases/login/social-log
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import type { UserRepository } from '../../domain/repositories/user.repository';
 import { GetUserProfileUseCase } from '../../application/use-cases/profile/get-user-profile.usecase';
+import { UpdateProfileDto } from '../dto/update-profile.dto';
+import { UpdateProfileUseCase } from '../../application/use-cases/profile/update-user-profile.useCase';
 
 @Controller('auth')
 export class AuthController {
@@ -53,6 +56,7 @@ export class AuthController {
     @Inject('UserRepository')
     private readonly userRepository: UserRepository,
     private readonly getUserProfileUseCase: GetUserProfileUseCase,
+    private readonly updateProfileUseCase: UpdateProfileUseCase,
   ) {}
 
   // LOGIN
@@ -143,6 +147,14 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   async getMyProfile(@Req() req: any) {
     return this.getUserProfileUseCase.execute(req.user.userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('profile')
+  async updateProfile(@Req() req: any, @Body() dto: UpdateProfileDto) {
+    console.log('DTO received:', dto);
+
+    return this.updateProfileUseCase.execute(req.user.userId, dto);
   }
 
   // Register

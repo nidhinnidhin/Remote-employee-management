@@ -17,19 +17,7 @@ export class GetUserProfileUseCase {
     }
 
     return {
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      role: user.role,
-      phone: user.phone,
-      companyId: user.companyId,
-      department: user.department,
-      status: user.status,
-      inviteStatus: user.inviteStatus,
-      hasPassword: user.hasPassword,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
+      ...user,
     };
   }
 }

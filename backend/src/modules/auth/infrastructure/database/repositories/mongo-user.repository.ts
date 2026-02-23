@@ -12,7 +12,7 @@ export class MongoUserRepository implements UserRepository {
   constructor(
     @InjectModel(UserDocument.name)
     private readonly userModel: Model<UserDocument>,
-  ) { }
+  ) {}
 
   async findByEmail(email: string): Promise<UserEntity | null> {
     const user = await this.userModel.findOne({ email });
@@ -81,6 +81,23 @@ export class MongoUserRepository implements UserRepository {
       doc.department,
       doc.inviteStatus,
       doc.hasPassword,
+      doc.dateOfBirth,
+      doc.gender,
+      doc.maritalStatus,
+      doc.nationality,
+      doc.bloodGroup,
+      doc.timeZone,
+      doc.bio,
+      doc.streetAddress,
+      doc.city,
+      doc.state,
+      doc.country,
+      doc.zipCode,
+      doc.emergencyContactName,
+      doc.emergencyContactPhone,
+      doc.emergencyContactRelation,
+      doc.linkedInUrl,
+      doc.personalWebsite,
     );
   }
 
@@ -90,6 +107,26 @@ export class MongoUserRepository implements UserRepository {
 
   async updateRoleByEmail(email: string, role: string): Promise<void> {
     await this.userModel.updateOne({ email }, { role });
+  }
+
+  async updateUserFieldsById(
+    id: string,
+    fields: Partial<UserEntity>,
+  ): Promise<void> {
+    console.log('Updating user ID:', id);
+    console.log('Fields:', fields);
+
+    const result = await this.userModel.updateOne(
+      { _id: id },
+      { $set: fields },
+      { runValidators: true },
+    );
+
+    console.log('Update result:', result);
+
+    if (result.matchedCount === 0) {
+      throw new Error('User not found for update');
+    }
   }
 
   async updateUserFieldsByEmail(

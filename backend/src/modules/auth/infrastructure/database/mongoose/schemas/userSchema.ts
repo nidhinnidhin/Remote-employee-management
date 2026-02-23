@@ -25,7 +25,6 @@ export class UserDocument extends Document {
   @Prop({ required: true, enum: UserRole })
   role: string;
 
-  // 🔹 Fully optional for social login
   @Prop({ required: false })
   passwordHash?: string;
 
@@ -46,12 +45,65 @@ export class UserDocument extends Document {
   @Prop({ default: true })
   hasPassword: boolean;
 
-  // 🔹 Optional but recommended for social login tracking
   @Prop({ required: false })
   provider?: string; // google | facebook | github
 
   @Prop({ required: false })
   providerId?: string;
+
+  @Prop({ required: false })
+  dateOfBirth?: Date;
+
+  @Prop({ required: false })
+  gender?: string;
+
+  @Prop({ required: false })
+  maritalStatus?: string;
+
+  @Prop({ required: false })
+  nationality?: string;
+
+  @Prop({ required: false })
+  bloodGroup?: string;
+
+  @Prop({ required: false })
+  timeZone?: string;
+
+  @Prop({ required: false })
+  bio?: string;
+
+  // Address
+  @Prop({ required: false })
+  streetAddress?: string;
+
+  @Prop({ required: false })
+  city?: string;
+
+  @Prop({ required: false })
+  state?: string;
+
+  @Prop({ required: false })
+  country?: string;
+
+  @Prop({ required: false })
+  zipCode?: string;
+
+  // Emergency Contact
+  @Prop({ required: false })
+  emergencyContactName?: string;
+
+  @Prop({ required: false })
+  emergencyContactPhone?: string;
+
+  @Prop({ required: false })
+  emergencyContactRelation?: string;
+
+  // Online Presence
+  @Prop({ required: false })
+  linkedInUrl?: string;
+
+  @Prop({ required: false })
+  personalWebsite?: string;
 
   createdAt: Date;
   updatedAt: Date;

@@ -6,7 +6,7 @@ import ProfileTabs, { ProfileTab } from "@/components/employees/profile/ProfileT
 import PersonalInfoForm from "@/components/employees/profile/PersonalInfoForm";
 import EmptyTab from "@/components/employees/profile/EmptyTab";
 import { UserProfile } from "@/app/employees/profile/page";
-import ProfileHeader from "./ProfileHeader";
+import { ProfileHeader } from "./ProfileHeader";
 
 export default function ProfileClient({ user }: { user: UserProfile }) {
   const [activeTab, setActiveTab] = useState<ProfileTab>("personal-info");

@@ -18,6 +18,28 @@ export interface UserProfile {
   hasPassword: boolean;
   createdAt: string;
   updatedAt: string;
+
+  // 🔥 ADD ALL PROFILE FIELDS
+  dateOfBirth?: string;
+  gender?: string;
+  maritalStatus?: string;
+  nationality?: string;
+  bloodGroup?: string;
+  timeZone?: string;
+  bio?: string;
+
+  streetAddress?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  zipCode?: string;
+
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
+  emergencyContactRelation?: string;
+
+  linkedInUrl?: string;
+  personalWebsite?: string;
 }
 
 export default async function ProfilePage() {

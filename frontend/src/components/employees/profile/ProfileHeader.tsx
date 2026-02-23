@@ -15,7 +15,7 @@ interface ProfileHeaderProps {
   onEditProfile?: () => void;
 }
 
-const ProfileHeader: React.FC<ProfileHeaderProps> = ({
+export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   name = "John Doe",
   title = "Senior Backend Developer",
   department = "Engineering",
@@ -93,5 +93,3 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     </div>
   );
 };
-
-export default ProfileHeader;

@@ -18,7 +18,6 @@ import {
   ChevronDown,
 } from "lucide-react";
 
-
 interface PersonalInfoFormData {
   firstName: string;
   lastName: string;
@@ -44,8 +43,6 @@ interface PersonalInfoFormData {
   linkedIn: string;
   personalWebsite: string;
 }
-
-
 
 const GENDER_OPTIONS = ["Male", "Female", "Non-binary", "Prefer not to say"];
 const MARITAL_OPTIONS = [
@@ -76,7 +73,6 @@ const RELATION_OPTIONS = [
   "Child",
   "Other",
 ];
-
 
 const SectionHeader = ({
   icon: Icon,
@@ -181,29 +177,31 @@ const SelectField = ({
   </div>
 );
 
-
 const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
   const [formData, setFormData] = useState<PersonalInfoFormData>({
     firstName: user.firstName ?? "",
     lastName: user.lastName ?? "",
     phone: user.phone ?? "",
-    dateOfBirth: "",
-    gender: "",
-    nationality: "",
-    maritalStatus: "",
-    bloodGroup: "",
-    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    bio: "",
-    street: "",
-    city: "",
-    state: "",
-    country: "",
-    zipCode: "",
-    emergencyContactName: "",
-    emergencyContactPhone: "",
-    emergencyContactRelation: "",
-    linkedIn: "",
-    personalWebsite: "",
+    dateOfBirth: user.dateOfBirth?.split("T")[0] ?? "",
+    gender: user.gender ?? "",
+    nationality: user.nationality ?? "",
+    maritalStatus: user.maritalStatus ?? "",
+    bloodGroup: user.bloodGroup ?? "",
+    timeZone: user.timeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone,
+    bio: user.bio ?? "",
+
+    street: user.streetAddress ?? "",
+    city: user.city ?? "",
+    state: user.state ?? "",
+    country: user.country ?? "",
+    zipCode: user.zipCode ?? "",
+
+    emergencyContactName: user.emergencyContactName ?? "",
+    emergencyContactPhone: user.emergencyContactPhone ?? "",
+    emergencyContactRelation: user.emergencyContactRelation ?? "",
+
+    linkedIn: user.linkedInUrl ?? "",
+    personalWebsite: user.personalWebsite ?? "",
   });
 
   const [newEmail, setNewEmail] = useState("");
@@ -228,7 +226,35 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
     setError("");
     setSuccessMsg("");
     try {
-      await clientApi.patch("/auth/me", formData);
+      await clientApi.patch("/auth/profile", {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        phone: formData.phone,
+        gender: formData.gender,
+        maritalStatus: formData.maritalStatus,
+        nationality: formData.nationality,
+        bloodGroup: formData.bloodGroup,
+        timeZone: formData.timeZone,
+        bio: formData.bio,
+
+        city: formData.city,
+        state: formData.state,
+        country: formData.country,
+        zipCode: formData.zipCode,
+
+        streetAddress: formData.street, // 🔥 FIXED
+        linkedInUrl: formData.linkedIn, // 🔥 FIXED
+        personalWebsite: formData.personalWebsite,
+
+        emergencyContactName: formData.emergencyContactName,
+        emergencyContactPhone: formData.emergencyContactPhone,
+        emergencyContactRelation: formData.emergencyContactRelation,
+
+        // Only send date if not empty
+        ...(formData.dateOfBirth && {
+          dateOfBirth: formData.dateOfBirth,
+        }),
+      });
       setSuccessMsg("Profile updated successfully.");
     } catch {
       setError("Failed to save changes. Please try again.");
@@ -258,7 +284,6 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
 
   return (
     <div className="flex flex-col gap-5">
-      
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-7">
         <SectionHeader
           icon={User}
@@ -355,7 +380,6 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
         </div>
       </div>
 
-      
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-7">
         <SectionHeader
           icon={MapPin}
@@ -409,7 +433,6 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
         </div>
       </div>
 
-     
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-7">
         <SectionHeader
           icon={Shield}
@@ -446,7 +469,6 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
         </div>
       </div>
 
-      
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-7">
         <SectionHeader
           icon={Link}
@@ -474,7 +496,6 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
         </div>
       </div>
 
-     
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-7">
         <SectionHeader
           icon={Mail}
@@ -549,7 +570,6 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
         )}
       </div>
 
-      
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex items-center justify-between">
         <div>
           {error && <p className="text-sm text-red-500">{error}</p>}

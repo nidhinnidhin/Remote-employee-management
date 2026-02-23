@@ -17,5 +17,25 @@ export class UserEntity {
     public readonly department?: string,
     public readonly inviteStatus?: InviteStatus,
     public readonly hasPassword: boolean = true,
+    public readonly dateOfBirth?: Date,
+    public readonly gender?: string,
+    public readonly maritalStatus?: string,
+    public readonly nationality?: string,
+    public readonly bloodGroup?: string,
+    public readonly timeZone?: string,
+    public readonly bio?: string,
+
+    public readonly streetAddress?: string,
+    public readonly city?: string,
+    public readonly state?: string,
+    public readonly country?: string,
+    public readonly zipCode?: string,
+
+    public readonly emergencyContactName?: string,
+    public readonly emergencyContactPhone?: string,
+    public readonly emergencyContactRelation?: string,
+
+    public readonly linkedInUrl?: string,
+    public readonly personalWebsite?: string,
   ) {}
 }
