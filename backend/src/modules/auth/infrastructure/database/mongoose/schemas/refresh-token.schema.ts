@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Schema as MongooseSchema } from 'mongoose';
 
 @Schema({ timestamps: true })
 export class RefreshTokenDocument extends Document<string> {
@@ -24,5 +24,5 @@ export class RefreshTokenDocument extends Document<string> {
   createdAt: Date;
 }
 
-export const RefreshTokenSchema =
+export const RefreshTokenSchema: MongooseSchema<RefreshTokenDocument> =
   SchemaFactory.createForClass(RefreshTokenDocument);

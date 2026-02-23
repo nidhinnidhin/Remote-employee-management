@@ -6,6 +6,13 @@ export async function middleware(req: NextRequest) {
   const session = await getSession();
   const { pathname } = req.nextUrl;
 
+  console.log("MIDDLEWARE:", {
+    pathname,
+    hasToken: !!session.accessToken,
+    role: session.role,
+    isAuthenticated: !!session.accessToken && !!session.role,
+  });
+
   const isAuthenticated = !!session.accessToken && !!session.role;
 
   // Public auth routes (no login required)

@@ -9,7 +9,11 @@ clientApi.interceptors.response.use(
   (res) => res,
   async (err) => {
     const originalRequest = err.config;
-
+    console.log("CLIENT API ERROR:", {
+      url: originalRequest?.url,
+      status: err.response?.status,
+      method: originalRequest?.method,
+    });
     if (
       err.response?.status === 401 &&
       !originalRequest._retry &&
