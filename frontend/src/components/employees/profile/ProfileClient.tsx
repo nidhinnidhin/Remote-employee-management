@@ -2,11 +2,11 @@
 
 import React, { useState } from "react";
 import { DashboardLayout } from "@/components/employees/dashboard/DashboardLayout";
-import ProfileHeader from "@/components/employees/profile/ProfileHeader";
 import ProfileTabs, { ProfileTab } from "@/components/employees/profile/ProfileTabs";
 import PersonalInfoForm from "@/components/employees/profile/PersonalInfoForm";
 import EmptyTab from "@/components/employees/profile/EmptyTab";
 import { UserProfile } from "@/app/employees/profile/page";
+import ProfileHeader from "./ProfileHeader";
 
 export default function ProfileClient({ user }: { user: UserProfile }) {
   const [activeTab, setActiveTab] = useState<ProfileTab>("personal-info");

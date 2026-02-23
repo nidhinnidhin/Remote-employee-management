@@ -18,7 +18,6 @@ import {
   ChevronDown,
 } from "lucide-react";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface PersonalInfoFormData {
   firstName: string;
@@ -46,7 +45,7 @@ interface PersonalInfoFormData {
   personalWebsite: string;
 }
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+
 
 const GENDER_OPTIONS = ["Male", "Female", "Non-binary", "Prefer not to say"];
 const MARITAL_OPTIONS = [
@@ -78,7 +77,6 @@ const RELATION_OPTIONS = [
   "Other",
 ];
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
 
 const SectionHeader = ({
   icon: Icon,
@@ -183,7 +181,6 @@ const SelectField = ({
   </div>
 );
 
-// ─── Main Component ───────────────────────────────────────────────────────────
 
 const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
   const [formData, setFormData] = useState<PersonalInfoFormData>({
@@ -261,7 +258,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
 
   return (
     <div className="flex flex-col gap-5">
-      {/* ── Basic Info ─────────────────────────────────────────────────────── */}
+      
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-7">
         <SectionHeader
           icon={User}
@@ -358,7 +355,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
         </div>
       </div>
 
-      {/* ── Address ────────────────────────────────────────────────────────── */}
+      
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-7">
         <SectionHeader
           icon={MapPin}
@@ -412,7 +409,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
         </div>
       </div>
 
-      {/* ── Emergency Contact ──────────────────────────────────────────────── */}
+     
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-7">
         <SectionHeader
           icon={Shield}
@@ -449,7 +446,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
         </div>
       </div>
 
-      {/* ── Online Presence ────────────────────────────────────────────────── */}
+      
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-7">
         <SectionHeader
           icon={Link}
@@ -477,7 +474,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
         </div>
       </div>
 
-      {/* ── Email ──────────────────────────────────────────────────────────── */}
+     
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-7">
         <SectionHeader
           icon={Mail}
@@ -552,7 +549,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
         )}
       </div>
 
-      {/* ── Save ───────────────────────────────────────────────────────────── */}
+      
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex items-center justify-between">
         <div>
           {error && <p className="text-sm text-red-500">{error}</p>}
