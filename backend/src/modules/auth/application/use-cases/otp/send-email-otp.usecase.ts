@@ -20,6 +20,10 @@ export class SendEmailOtpUseCase {
     const otpHash = await this.otpService.hashOtp(otp);
     const expiresAt = this.otpService.getExpiryDate();
 
+    console.log(
+      `📧 Sending OTP to: ${input.email} | Purpose: ${input.purpose} | OTP: ${otp}`,
+    );
+
     const otpEntity = new EmailOtpEntity(
       randomUUID(),
       input.userId,

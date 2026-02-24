@@ -17,6 +17,9 @@ import {
   Shield,
   ChevronDown,
 } from "lucide-react";
+import BaseModal from "@/components/ui/BaseModal";
+import Button from "@/components/ui/Button";
+import OtpInput from "@/components/ui/OtpInput";
 
 interface PersonalInfoFormData {
   firstName: string;
@@ -212,6 +215,10 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
   const [emailSuccessMsg, setEmailSuccessMsg] = useState("");
   const [error, setError] = useState("");
   const [emailError, setEmailError] = useState("");
+  const [otpModalOpen, setOtpModalOpen] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [verifyingOtp, setVerifyingOtp] = useState(false);
+  const [otpError, setOtpError] = useState("");
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -265,20 +272,50 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
 
   const handleEmailUpdate = async () => {
     if (!newEmail) return;
+
     setSavingEmail(true);
     setEmailError("");
     setEmailSuccessMsg("");
+
     try {
-      await clientApi.patch("/auth/me/email", { email: newEmail });
-      setEmailSuccessMsg(
-        "Email update requested. Check your inbox to confirm.",
+      await clientApi.post("/auth/request-email-change", {
+        newEmail,
+      });
+
+      setOtpModalOpen(true);
+      setEmailSuccessMsg("OTP sent to your registered email. Please verify.");
+    } catch (err: any) {
+      setEmailError(
+        err.response?.data?.message || "Failed to request email change.",
       );
-      setEmailEditMode(false);
-      setNewEmail("");
-    } catch {
-      setEmailError("Failed to update email. Please try again.");
     } finally {
       setSavingEmail(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (otp.length !== 6) {
+      setOtpError("Please enter complete OTP.");
+      return;
+    }
+
+    setVerifyingOtp(true);
+    setOtpError("");
+
+    try {
+      await clientApi.post("/auth/verify-email-change", {
+        otp,
+      });
+
+      setOtpModalOpen(false);
+      setEmailEditMode(false);
+      setNewEmail("");
+      setOtp("");
+      window.location.reload(); // refresh profile
+    } catch (err: any) {
+      setOtpError(err.response?.data?.message || "OTP verification failed.");
+    } finally {
+      setVerifyingOtp(false);
     }
   };
 
@@ -588,6 +625,21 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
           {saving ? "Saving..." : "Save Changes"}
         </button>
       </div>
+      <BaseModal
+        isOpen={otpModalOpen}
+        onClose={() => setOtpModalOpen(false)}
+        title="Verify Email Change"
+        description="Enter the 6-digit OTP sent to your registered email."
+        footer={
+          <div className="flex justify-center">
+            <Button onClick={handleVerifyOtp} disabled={verifyingOtp}>
+              {verifyingOtp ? "Verifying..." : "Verify OTP"}
+            </Button>
+          </div>
+        }
+      >
+        <OtpInput value={otp} onChange={setOtp} error={otpError} />
+      </BaseModal>
     </div>
   );
 };
