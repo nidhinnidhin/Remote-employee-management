@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { OtpPurpose } from 'src/shared/enums/reset-password/otp-purpose.enum';
 
 @Schema({ timestamps: { createdAt: true, updatedAt: false } })
 export class EmailOtpDocument extends Document {
@@ -17,6 +18,12 @@ export class EmailOtpDocument extends Document {
 
   @Prop({ default: false })
   verified: boolean;
+
+  @Prop({ required: true })
+  newEmail: string;
+
+  @Prop({ enum: OtpPurpose })
+  purpose?: OtpPurpose;
 }
 
 export const EmailOtpSchema = SchemaFactory.createForClass(EmailOtpDocument);

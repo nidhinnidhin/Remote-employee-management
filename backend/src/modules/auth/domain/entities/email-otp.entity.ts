@@ -1,3 +1,5 @@
+import { OtpPurpose } from "src/shared/enums/reset-password/otp-purpose.enum";
+
 export class EmailOtpEntity {
   constructor(
     public readonly id: string,
@@ -7,5 +9,7 @@ export class EmailOtpEntity {
     public readonly expiresAt: Date,
     public readonly verified: boolean,
     public readonly createdAt: Date,
+    public readonly newEmail?: string,
+    public readonly purpose?: OtpPurpose,
   ) {}
 }

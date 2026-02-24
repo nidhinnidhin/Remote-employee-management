@@ -37,7 +37,7 @@ export class VerifyResetPasswordOtpUseCase {
     }
 
     // Mark OTP verified
-    await this.otpRepository.markAsVerified(record.id);
+    await this.otpRepository.markVerified(record.id);
 
     // Create reset session
     const resetSessionKey = `reset-password:${input.email.toLowerCase()}`;

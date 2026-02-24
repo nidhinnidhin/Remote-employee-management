@@ -32,6 +32,8 @@ import { Module } from '@nestjs/common';
 import { SocialLoginUseCase } from '../../application/use-cases/login/social-login.usecase';
 import { GetUserProfileUseCase } from '../../application/use-cases/profile/get-user-profile.usecase';
 import { UpdateProfileUseCase } from '../../application/use-cases/profile/update-user-profile.useCase';
+import { RequestEmailChangeUseCase } from '../../application/use-cases/update-email/request-email-change.usecase';
+import { VerifyEmailChangeUseCase } from '../../application/use-cases/update-email/verify-email-change.usecase';
 
 @Module({
   imports: [
@@ -60,6 +62,8 @@ import { UpdateProfileUseCase } from '../../application/use-cases/profile/update
     SocialLoginUseCase,
     GetUserProfileUseCase,
     UpdateProfileUseCase,
+    RequestEmailChangeUseCase,
+    VerifyEmailChangeUseCase,
     {
       provide: 'PendingRegistrationRepository',
       useClass: RedisPendingRegistrationRepository,
@@ -84,4 +88,4 @@ import { UpdateProfileUseCase } from '../../application/use-cases/profile/update
     'EmailOtpRepository',
   ],
 })
-export class AuthModule { }
+export class AuthModule {}

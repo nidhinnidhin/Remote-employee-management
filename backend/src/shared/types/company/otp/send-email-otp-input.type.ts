@@ -4,4 +4,5 @@ export interface SendEmailOtpInput {
   userId: string;
   email: string;
   purpose?: OtpPurpose;
+  newEmail?: string;
 }

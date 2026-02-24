@@ -23,6 +23,8 @@ export class EmailService {
         <p>If you did not request this, please ignore.</p>
       `,
     });
+
+    console.log('✅ OTP email sent successfully to:', email);
   }
 
   async sendEmployeeInvite(email: string, inviteLink: string): Promise<void> {

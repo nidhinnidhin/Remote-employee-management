@@ -28,6 +28,8 @@ export class SendEmailOtpUseCase {
       expiresAt,
       false,
       new Date(),
+      input.newEmail,
+      input.purpose,
     );
 
     await this.emailOtpRepository.create(otpEntity);

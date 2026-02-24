@@ -135,4 +135,12 @@ export class MongoUserRepository implements UserRepository {
   ): Promise<void> {
     await this.userModel.updateOne({ email }, { $set: fields });
   }
+
+  // Update email
+  async updateEmail(userId: string, email: string): Promise<void> {
+  await this.userModel.updateOne(
+    { _id: userId },
+    { $set: { email } },
+  );
+}
 }

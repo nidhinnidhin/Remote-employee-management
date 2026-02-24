@@ -40,6 +40,10 @@ import type { UserRepository } from '../../domain/repositories/user.repository';
 import { GetUserProfileUseCase } from '../../application/use-cases/profile/get-user-profile.usecase';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
 import { UpdateProfileUseCase } from '../../application/use-cases/profile/update-user-profile.useCase';
+import { VerifyEmailChangeDto } from '../dto/email-update/verify-email-change.dto';
+import { RequestEmailChangeDto } from '../dto/email-update/request-email-change.dto';
+import { VerifyEmailChangeUseCase } from '../../application/use-cases/update-email/verify-email-change.usecase';
+import { RequestEmailChangeUseCase } from '../../application/use-cases/update-email/request-email-change.usecase';
 
 @Controller('auth')
 export class AuthController {
@@ -57,6 +61,8 @@ export class AuthController {
     private readonly userRepository: UserRepository,
     private readonly getUserProfileUseCase: GetUserProfileUseCase,
     private readonly updateProfileUseCase: UpdateProfileUseCase,
+    private readonly requestEmailChangeUseCase: RequestEmailChangeUseCase,
+    private readonly verifyEmailChangeUseCase: VerifyEmailChangeUseCase,
   ) {}
 
   // LOGIN
@@ -251,5 +257,23 @@ export class AuthController {
       email: dto.email,
       newPassword: dto.newPassword,
     });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('request-email-change')
+  async requestEmailChange(
+    @Req() req: any,
+    @Body() dto: RequestEmailChangeDto,
+  ) {
+    return this.requestEmailChangeUseCase.execute(
+      req.user.userId,
+      dto.newEmail,
+    );
+  }
+
+  @Post('verify-email-change')
+  @UseGuards(JwtAuthGuard)
+  async verifyEmailChange(@Req() req: any, @Body('otp') otp: string) {
+    return this.verifyEmailChangeUseCase.execute(req.user.userId, otp);
   }
 }
