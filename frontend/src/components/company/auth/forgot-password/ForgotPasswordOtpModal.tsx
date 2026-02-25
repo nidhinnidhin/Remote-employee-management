@@ -93,8 +93,8 @@ const ForgotPasswordOtpModal = ({
       {/* Timer & Resend Logic */}
       <div className="mt-4 text-sm text-center">
         {!expired && (
-          <p className="text-neutral-600">
-            Resend OTP in <span className="font-semibold text-pink-600">{remaining}s</span>
+          <p className="text-muted">
+            Resend OTP in <span className="font-semibold text-accent">{remaining}s</span>
           </p>
         )}
       </div>

@@ -31,17 +31,17 @@ export function PolicyContainer() {
   }, []);
 
   const workingHoursPolicy = policies.find(
-  (p) => p.type === CompanyPolicyType.WORKING_HOURS
-);
+    (p) => p.type === CompanyPolicyType.WORKING_HOURS
+  );
 
-const leavePolicy = policies.find(
-  (p) => p.type === CompanyPolicyType.LEAVE_POLICY
-);
+  const leavePolicy = policies.find(
+    (p) => p.type === CompanyPolicyType.LEAVE_POLICY
+  );
 
   const renderTabContent = () => {
     if (loading) {
       return (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-12 text-center">
+        <div className="portal-card p-12 text-center text-secondary">
           Loading policies...
         </div>
       );
@@ -64,11 +64,11 @@ const leavePolicy = policies.find(
 
       default:
         return (
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-12 text-center space-y-4 animate-in fade-in duration-500">
-            <h3 className="text-xl font-semibold text-slate-900">
+          <div className="portal-card p-12 text-center space-y-4 animate-in fade-in duration-500">
+            <h3 className="text-xl font-semibold text-primary">
               Policy Content Coming Soon
             </h3>
-            <p className="text-slate-500 max-w-md mx-auto">
+            <p className="text-secondary max-w-md mx-auto">
               We are currently updating our internal guidelines for this
               section. Please check back later or contact HR for
               assistance.

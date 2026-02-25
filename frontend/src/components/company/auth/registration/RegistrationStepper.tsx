@@ -34,7 +34,6 @@ const RegistrationStepper = () => {
   const [showOtpModal, setShowOtpModal] = useState<boolean>(false);
   const [registeredEmail, setRegisteredEmail] = useState<string>("");
   const setAuth = useAuthStore((s) => s.setAuth);
-  const [otpLoading, setOtpLoading] = useState(false);
   const [otpError, setOtpError] = useState("");
   const [otpVerifying, setOtpVerifying] = useState(false);
   const [otpResending, setOtpResending] = useState(false);
@@ -54,6 +53,7 @@ const RegistrationStepper = () => {
   });
 
   const router = useRouter();
+
   const handleContinue = async () => {
     if (showOtpModal) return;
 
@@ -86,7 +86,10 @@ const RegistrationStepper = () => {
 
       if (!result?.success) {
         setErrors({
-          form: (typeof result?.error === "string" ? result.error : AUTH_MESSAGES.REGISTRATION_FAILED),
+          form:
+            typeof result?.error === "string"
+              ? result.error
+              : AUTH_MESSAGES.REGISTRATION_FAILED,
         });
         return;
       }
@@ -155,25 +158,25 @@ const RegistrationStepper = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-neutral-950 flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="min-h-screen portal-page flex items-center justify-center p-4 relative overflow-hidden">
         <BackgroundEffect />
         <div className="w-full max-w-3xl relative z-10">
           {/* Header */}
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-2 mb-4">
-              <div className="bg-red-600 p-2">
+              <div className="bg-[rgb(var(--color-accent))] p-2 rounded-lg">
                 <span className="text-white font-bold text-xl">IH</span>
               </div>
-              <span className="text-white text-2xl font-bold">IssueHub</span>
+              <span className="text-primary text-2xl font-bold">IssueHub</span>
             </div>
-            <h1 className="text-3xl font-bold text-white mb-2">
+            <h1 className="text-3xl font-bold text-primary mb-2">
               Create your account
             </h1>
-            <p className="text-neutral-400">
+            <p className="text-muted">
               Already have an account?{" "}
               <a
                 href="/company/login"
-                className="text-red-500 hover:text-red-400 transition-colors"
+                className="text-accent hover:opacity-80 transition-opacity"
               >
                 Sign in
               </a>
@@ -200,7 +203,10 @@ const RegistrationStepper = () => {
           </div>
 
           {/* Form Card */}
-          <div className="bg-neutral-800/50 border border-neutral-700/50 p-8 shadow-2xl backdrop-blur-sm">
+          <div
+            className="portal-card-inner p-8 shadow-2xl backdrop-blur-sm border rounded-2xl"
+            style={{ borderColor: "rgb(var(--color-border-subtle))" }}
+          >
             <AnimatePresence mode="wait">
               {currentStep === 1 && (
                 <StepOne
@@ -267,8 +273,6 @@ const RegistrationStepper = () => {
             </div>
           </div>
         </div>
-
-        {/* OTP Modal */}
       </div>
       <OtpModal
         isOpen={showOtpModal}

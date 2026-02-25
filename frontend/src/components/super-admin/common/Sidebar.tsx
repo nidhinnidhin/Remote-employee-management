@@ -48,19 +48,25 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="fixed inset-y-0 left-0 w-64 bg-white border-r border-gray-100 hidden lg:flex flex-col z-50">
+    <aside className="sidebar fixed inset-y-0 left-0 w-64 hidden lg:flex flex-col z-50">
       {/* Header */}
-      <div className="h-16 flex items-center px-6 border-b border-gray-100">
+      <div
+        className="h-16 flex items-center px-6"
+        style={{ borderBottom: "1px solid rgb(var(--color-sidebar-border))" }}
+      >
         <div className="flex items-center gap-2">
-          <div className="bg-purple-600 p-1.5 rounded-lg">
+          <div
+            className="p-1.5 rounded-lg"
+            style={{ backgroundColor: "rgb(var(--color-accent))" }}
+          >
             <span className="text-white font-bold text-lg">IH</span>
           </div>
-          <span className="text-gray-900 font-bold text-lg">IssueHub</span>
+          <span className="sidebar-logo-text text-lg">IssueHub</span>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto p-4 space-y-1">
+      <nav className="flex-1 overflow-y-auto p-4 space-y-1 custom-scrollbar">
         {navigation.map((item) => {
           const isActive =
             pathname === item.href || pathname?.startsWith(`${item.href}/`);
@@ -70,19 +76,10 @@ export default function Sidebar() {
             <Link
               key={item.name}
               href={item.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                isActive
-                  ? "bg-purple-50 text-purple-700"
-                  : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
-              }`}
-            >
-              <Icon
-                className={`w-5 h-5 ${
-                  isActive
-                    ? "text-purple-600"
-                    : "text-gray-400 group-hover:text-gray-500"
+              className={`sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive ? "active" : ""
                 }`}
-              />
+            >
+              <Icon size={20} strokeWidth={1.5} />
               {item.name}
             </Link>
           );
@@ -90,14 +87,23 @@ export default function Sidebar() {
       </nav>
 
       {/* User Info / Footer */}
-      <div className="p-4 border-t border-gray-100">
+      <div
+        className="p-4"
+        style={{ borderTop: "1px solid rgb(var(--color-sidebar-border))" }}
+      >
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold text-xs">
+          <div
+            className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs"
+            style={{
+              backgroundColor: "rgb(var(--color-accent-subtle))",
+              color: "rgb(var(--color-accent-text))",
+            }}
+          >
             SA
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-900">Super Admin</p>
-            <p className="text-xs text-gray-500">admin@issuehub.com</p>
+            <p className="text-sm font-medium text-primary">Super Admin</p>
+            <p className="text-xs text-secondary">admin@issuehub.com</p>
           </div>
         </div>
       </div>

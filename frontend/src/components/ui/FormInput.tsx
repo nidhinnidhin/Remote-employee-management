@@ -26,15 +26,15 @@ const FormInput: React.FC<ExtendedFormInputProps> = ({
   return (
     <div className="mb-1">
       {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          {label} {required && <span className="text-red-500">*</span>}
+        <label className="block text-sm font-medium text-secondary mb-1">
+          {label} {required && <span className="text-danger">*</span>}
         </label>
       )}
 
       <div className="relative">
         {/* Left icon */}
         {icon && (
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted">
             {icon}
           </div>
         )}
@@ -45,11 +45,8 @@ const FormInput: React.FC<ExtendedFormInputProps> = ({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className={`w-full border ${
-            error ? "border-red-400" : "border-gray-200"
-          } rounded-lg text-gray-800 placeholder-gray-400 text-sm
-          ${icon ? "pl-10" : "pl-4"} pr-${type === "password" ? "10" : "4"} py-3
-          focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all duration-200 bg-white`}
+          className={`field-input transition-all duration-200 ${error ? "border-danger" : ""
+            } ${icon ? "pl-10" : "pl-4"} pr-${type === "password" ? "10" : "4"} py-3`}
         />
 
         {/* Right eye toggle for password */}
@@ -57,14 +54,14 @@ const FormInput: React.FC<ExtendedFormInputProps> = ({
           <button
             type="button"
             onClick={() => setShowPassword((prev) => !prev)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-secondary transition-colors"
           >
             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
           </button>
         )}
       </div>
 
-      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+      {error && <p className="text-danger text-xs mt-1">{error}</p>}
     </div>
   );
 };

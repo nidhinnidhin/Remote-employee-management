@@ -17,11 +17,11 @@ const Button: React.FC<ButtonProps> = ({
 
   const variants: Record<ButtonVariant, string> = {
     primary:
-      "bg-pink-500 text-white hover:bg-pink-600 active:scale-95 cursor-pointer disabled:opacity-50",
+      "bg-[rgb(var(--color-btn-primary-bg))] text-[rgb(var(--color-btn-primary-text))] hover:opacity-90 active:scale-95 cursor-pointer disabled:opacity-50",
     secondary:
-      "bg-neutral-700 text-white hover:bg-neutral-600 active:scale-95 cursor-pointer disabled:opacity-50",
+      "bg-[rgb(var(--color-btn-secondary-bg))] text-[rgb(var(--color-btn-secondary-text))] hover:opacity-90 active:scale-95 cursor-pointer disabled:opacity-50",
     outline:
-      "border border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white active:scale-95 rounded disabled:opacity-50",
+      "border border-[rgb(var(--color-accent))] text-[rgb(var(--color-accent))] hover:bg-[rgb(var(--color-accent-subtle))] active:scale-95 rounded disabled:opacity-50",
   };
 
   return (

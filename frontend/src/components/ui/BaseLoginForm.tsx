@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { Building2 } from "lucide-react";
 import FormInput from "@/components/ui/FormInput";
 import SocialLoginButtons from "@/components/ui/SocialLoginButtons";
 import { BaseLoginFormProps } from "@/shared/types/ui/base-login-form-type";
@@ -19,7 +20,7 @@ export default function BaseLoginForm({
   return (
     <div className="min-h-screen flex">
       {/* ── Left Panel ── */}
-      <div className="flex flex-1 items-center justify-center bg-white px-8 py-12">
+      <div className="flex flex-1 items-center justify-center portal-page px-8 py-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -28,18 +29,18 @@ export default function BaseLoginForm({
         >
           {/* Logo */}
           <div className="flex items-center gap-2 mb-8">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-[rgb(var(--color-accent))] flex items-center justify-center">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <circle cx="8" cy="8" r="4" fill="white" />
-                <circle cx="8" cy="8" r="2" fill="#2563EB" />
+                <circle cx="8" cy="8" r="2" fill="rgb(var(--color-accent))" />
               </svg>
             </div>
-            <span className="text-lg font-semibold text-gray-800">dotwork</span>
+            <span className="text-lg font-semibold text-primary">dotwork</span>
           </div>
 
           {/* Heading */}
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">{title}</h1>
-          <p className="text-sm text-gray-500 mb-6">
+          <h1 className="text-2xl font-bold text-primary mb-1">{title}</h1>
+          <p className="text-sm text-secondary mb-6">
             Welcome back! Select method to log in:
           </p>
 
@@ -48,11 +49,11 @@ export default function BaseLoginForm({
 
           {/* Divider */}
           <div className="flex items-center gap-3 my-5">
-            <div className="flex-1 h-px bg-gray-200" />
-            <span className="text-xs text-gray-400">
+            <div className="flex-1 h-px" style={{ backgroundColor: "rgb(var(--color-border-subtle))" }} />
+            <span className="text-xs text-muted">
               or continue with email
             </span>
-            <div className="flex-1 h-px bg-gray-200" />
+            <div className="flex-1 h-px" style={{ backgroundColor: "rgb(var(--color-border-subtle))" }} />
           </div>
 
           {/* Form */}
@@ -115,15 +116,15 @@ export default function BaseLoginForm({
                 <input
                   type="checkbox"
                   defaultChecked
-                  className="w-4 h-4 rounded accent-blue-600"
+                  className="w-4 h-4 rounded accent-[rgb(var(--color-accent))]"
                 />
-                <span className="text-sm text-gray-600">Remember me</span>
+                <span className="text-sm text-secondary">Remember me</span>
               </label>
               {onForgotPassword && (
                 <button
                   type="button"
                   onClick={onForgotPassword}
-                  className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  className="text-sm text-accent hover:opacity-80 font-medium"
                 >
                   Forgot Password?
                 </button>
@@ -131,14 +132,14 @@ export default function BaseLoginForm({
             </div>
 
             {errors.form && (
-              <p className="text-red-500 text-sm text-center">{errors.form}</p>
+              <p className="text-danger text-sm text-center">{errors.form}</p>
             )}
 
             {/* Submit */}
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-lg transition-colors duration-200 mt-2"
+              className="w-full btn-primary font-semibold py-3 rounded-lg transition-all duration-200 mt-2"
             >
               {isLoading ? "Signing in..." : "Log in"}
             </button>
@@ -146,11 +147,11 @@ export default function BaseLoginForm({
 
           {/* Register link */}
           {registerHref && (
-            <p className="text-center text-sm text-gray-500 mt-5">
+            <p className="text-center text-sm text-muted mt-5">
               Don&apos;t have an account?{" "}
               <Link
                 href={registerHref}
-                className="text-blue-600 hover:text-blue-700 font-medium"
+                className="text-accent hover:opacity-80 font-medium"
               >
                 Create an account
               </Link>
@@ -160,28 +161,26 @@ export default function BaseLoginForm({
       </div>
 
       {/* ── Right Panel ── */}
-      <div className="hidden lg:flex flex-1 bg-blue-600 items-center justify-center relative overflow-hidden">
+      <div className="hidden lg:flex flex-1 bg-[rgb(var(--color-accent))] items-center justify-center relative overflow-hidden">
         {/* Decorative circles */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-[420px] h-[420px] rounded-full border border-blue-500/40" />
-          <div className="absolute w-[300px] h-[300px] rounded-full border border-blue-500/30" />
+          <div className="w-[420px] h-[420px] rounded-full border border-white/10" />
+          <div className="absolute w-[300px] h-[300px] rounded-full border border-white/5" />
         </div>
 
         <div className="relative z-10 flex flex-col items-center text-center px-10">
           {/* Illustration placeholder (hub + icons) */}
           <div className="relative w-80 h-64 mb-8">
             {/* Center hub */}
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-blue-500 border-4 border-white/20 flex items-center justify-center shadow-xl">
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-white/20 border-4 border-white/10 flex items-center justify-center shadow-xl">
               <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center">
-                <div className="w-3 h-3 rounded-full bg-blue-600" />
+                <div className="w-3 h-3 rounded-full bg-[rgb(var(--color-accent))]" />
               </div>
             </div>
 
-            {/* Slack icon bubble */}
-            <div className="absolute top-4 left-12 w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center shadow-lg border-2 border-white/20">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
-                <path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zM18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zM15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z" />
-              </svg>
+            {/* Active app icon bubble (themed) */}
+            <div className="absolute top-4 left-12 w-12 h-12 rounded-full bg-[rgb(var(--color-accent))] flex items-center justify-center shadow-lg border-2 border-white/20">
+              <Building2 className="text-white w-6 h-6" />
             </div>
 
             {/* Google icon bubble */}
@@ -207,15 +206,15 @@ export default function BaseLoginForm({
             </div>
 
             {/* Right card (user list) */}
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-36 bg-white rounded-xl shadow-xl p-3 space-y-2">
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-36 portal-card-inner rounded-xl shadow-xl p-3 space-y-2 border border-white/10">
               {[1, 2, 3].map((i) => (
                 <div key={i} className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden">
-                    <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400" />
+                  <div className="w-7 h-7 rounded-full bg-[rgb(var(--color-bg-subtle))] flex-shrink-0 overflow-hidden">
+                    <div className="w-full h-full bg-[rgb(var(--color-accent-subtle))] opacity-50" />
                   </div>
                   <div className="flex-1 space-y-1">
-                    <div className="h-2 bg-gray-200 rounded w-full" />
-                    <div className="h-1.5 bg-gray-100 rounded w-3/4" />
+                    <div className="h-2 bg-[rgb(var(--color-bg-subtle))] rounded w-full" />
+                    <div className="h-1.5 bg-[rgb(var(--color-bg-subtle))] opacity-50 rounded w-3/4" />
                   </div>
                 </div>
               ))}
@@ -259,15 +258,15 @@ export default function BaseLoginForm({
           <h2 className="text-white text-2xl font-bold mb-2">
             Connect with every application.
           </h2>
-          <p className="text-blue-200 text-sm">
+          <p className="text-white/70 text-sm">
             Everything you need in an easily customizable dashboard.
           </p>
 
           {/* Dots */}
           <div className="flex gap-2 mt-6">
             <div className="w-2 h-2 rounded-full bg-white" />
-            <div className="w-2 h-2 rounded-full bg-blue-400" />
-            <div className="w-2 h-2 rounded-full bg-blue-400" />
+            <div className="w-2 h-2 rounded-full bg-white/40" />
+            <div className="w-2 h-2 rounded-full bg-white/40" />
           </div>
         </div>
       </div>

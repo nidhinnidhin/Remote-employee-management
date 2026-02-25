@@ -35,16 +35,17 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   return (
-    <div className="relative bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+    <div className="portal-card relative overflow-hidden">
       {/* Background decoration */}
-      <div className="absolute top-0 right-0 w-64 h-full bg-gradient-to-bl from-indigo-100 via-purple-50 to-transparent rounded-2xl pointer-events-none" />
+      <div className="absolute top-0 right-0 w-64 h-full rounded-2xl pointer-events-none" style={{ background: `linear-gradient(to bottom left, rgb(var(--color-accent-subtle)), transparent)` }} />
 
       <div className="relative px-8 py-7 flex items-start justify-between gap-6">
         {/* Left: Avatar + Info */}
         <div className="flex items-start gap-5">
           {/* Avatar */}
           <div
-            className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-white shadow group cursor-pointer"
+            className="relative w-20 h-20 rounded-full overflow-hidden border-2 shadow group cursor-pointer"
+            style={{ borderColor: "rgb(var(--color-surface))" }}
             onClick={() => fileInputRef.current?.click()}
           >
             {avatarUrl ? (
@@ -54,8 +55,8 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full bg-indigo-100 flex items-center justify-center">
-                <span className="text-2xl font-semibold text-indigo-600">
+              <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: "rgb(var(--color-accent-subtle))" }}>
+                <span className="text-2xl font-semibold" style={{ color: "rgb(var(--color-accent))" }}>
                   {name
                     .split(" ")
                     .map((n) => n[0])
@@ -67,9 +68,8 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
             {/* Overlay */}
             <div
-              className={`absolute inset-0 bg-black/40 flex items-center justify-center text-white text-xs font-medium transition ${
-                uploading ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-              }`}
+              className={`absolute inset-0 bg-black/40 flex items-center justify-center text-white text-xs font-medium transition ${uploading ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                }`}
             >
               {uploading ? "Uploading..." : "Change"}
             </div>
@@ -114,30 +114,30 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
           {/* Name, title, badge */}
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 leading-tight">
+            <h1 className="text-2xl font-bold text-primary leading-tight">
               {name}
             </h1>
-            <p className="text-sm text-gray-500 mt-0.5">{title}</p>
-            <span className="inline-block mt-2 px-3 py-0.5 text-xs font-medium bg-indigo-100 text-indigo-700 rounded-full">
+            <p className="text-sm text-secondary mt-0.5">{title}</p>
+            <span className="portal-badge inline-block mt-2">
               {department}
             </span>
 
             {/* Contact info grid */}
             <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-1.5">
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <Mail className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              <div className="flex items-center gap-2 text-sm text-secondary">
+                <Mail className="w-4 h-4 text-muted flex-shrink-0" />
                 <span>{email}</span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <Phone className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              <div className="flex items-center gap-2 text-sm text-secondary">
+                <Phone className="w-4 h-4 text-muted flex-shrink-0" />
                 <span>{phone}</span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              <div className="flex items-center gap-2 text-sm text-secondary">
+                <MapPin className="w-4 h-4 text-muted flex-shrink-0" />
                 <span>{address}</span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              <div className="flex items-center gap-2 text-sm text-secondary">
+                <Calendar className="w-4 h-4 text-muted flex-shrink-0" />
                 <span>Joined {joinedDate}</span>
               </div>
             </div>

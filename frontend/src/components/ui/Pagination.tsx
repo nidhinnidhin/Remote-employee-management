@@ -11,30 +11,16 @@ const Pagination: React.FC<PaginationProps & { theme?: "dark" | "light" }> = ({
     className = "",
     theme = "dark",
 }) => {
-    const themeStyles = {
-        dark: {
-            container: "border-neutral-800",
-            text: "text-neutral-400",
-            activeText: "text-white",
-            button: {
-                base: "text-neutral-400 ring-neutral-700 hover:bg-neutral-800",
-                active: "z-10 bg-red-600 text-white focus-visible:outline-red-600 border-red-600 ring-red-600",
-                disabled: "disabled:opacity-50 disabled:cursor-not-allowed",
-            },
-        },
-        light: {
-            container: "border-gray-100 bg-white",
-            text: "text-gray-500",
-            activeText: "text-gray-900",
-            button: {
-                base: "text-gray-500 ring-gray-100 hover:bg-gray-50 hover:text-pink-500",
-                active: "z-10 bg-pink-500 text-white focus-visible:outline-pink-500 ring-pink-500",
-                disabled: "disabled:opacity-40 disabled:cursor-not-allowed text-gray-300",
-            },
+    const styles = {
+        container: "border-[rgb(var(--color-border-subtle))] bg-[rgb(var(--color-nav-bg))]",
+        text: "text-muted",
+        activeText: "text-primary",
+        button: {
+            base: "text-muted ring-[rgb(var(--color-border-subtle))] hover:bg-[rgb(var(--color-bg-subtle))] hover:text-accent",
+            active: "z-10 bg-[rgb(var(--color-accent))] text-white focus-visible:outline-[rgb(var(--color-accent))] ring-[rgb(var(--color-accent))]",
+            disabled: "disabled:opacity-40 disabled:cursor-not-allowed",
         },
     };
-
-    const styles = themeStyles[theme];
 
     const getPageNumbers = () => {
         const pages = [];

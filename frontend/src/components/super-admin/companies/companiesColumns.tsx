@@ -9,12 +9,12 @@ export const columns = (onStatusChange?: () => void): Column<CompanyRow>[] => [
     header: "Company",
     accessor: (row) => (
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold bg-purple-600">
+        <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold bg-[rgb(var(--color-accent))]">
           {row.logo}
         </div>
         <div>
-          <p className="font-medium text-gray-900">{row.name}</p>
-          <p className="text-xs text-gray-500">{row.email}</p>
+          <p className="font-medium text-primary">{row.name}</p>
+          <p className="text-xs text-muted">{row.email}</p>
         </div>
       </div>
     ),
@@ -26,8 +26,8 @@ export const columns = (onStatusChange?: () => void): Column<CompanyRow>[] => [
     accessor: (row) => (
       <span
         className={`px-2 py-1 rounded-full text-xs font-medium ${row.status === "ACTIVE"
-          ? "bg-green-100 text-green-700"
-          : "bg-red-100 text-red-700"
+          ? "bg-green-500/10 text-green-500"
+          : "bg-red-500/10 text-red-500"
           }`}
       >
         {row.status === "SUSPENDED" ? "Suspended" : "Active"}

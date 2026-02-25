@@ -79,7 +79,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed top-0 left-0 h-full z-50 bg-white border-r border-pink-50 transition-all duration-300 ease-in-out
+        className={`sidebar fixed top-0 left-0 h-full z-50 transition-all duration-300 ease-in-out
           ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
           lg:translate-x-0
           ${isCollapsed ? "lg:w-20" : "lg:w-64"}
@@ -87,16 +87,21 @@ const Sidebar: React.FC<SidebarProps> = ({
         `}
       >
         {/* Header */}
-        <div className="h-16 flex items-center justify-between px-4 border-b border-neutral-800/50">
+        <div
+          className="h-16 flex items-center justify-between px-4"
+          style={{ borderBottom: "1px solid rgb(var(--color-sidebar-border))" }}
+        >
           {!isCollapsed && (
-            <span className="text-xl font-bold text-pink-600 truncate">
+            <span className="sidebar-logo-text text-xl truncate">
               Workspace Admin
             </span>
           )}
+
           {/* Mobile Close Button */}
           <button
             onClick={closeMobileSidebar}
-            className="lg:hidden p-1 text-neutral-400 hover:text-white"
+            className="lg:hidden p-1 transition-colors"
+            style={{ color: "rgb(var(--color-sidebar-text))" }}
           >
             <X size={20} />
           </button>
@@ -104,7 +109,12 @@ const Sidebar: React.FC<SidebarProps> = ({
           {/* Desktop Collapse Toggle */}
           <button
             onClick={toggleCollapse}
-            className="hidden lg:flex items-center justify-center w-8 h-8 rounded-full bg-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-700 transition-colors absolute -right-3 top-20 border border-neutral-700 shadow-sm z-50"
+            className="hidden lg:flex items-center justify-center w-8 h-8 rounded-full transition-colors absolute -right-3 top-20 border z-50 shadow-sm"
+            style={{
+              backgroundColor: "rgb(var(--color-surface-raised))",
+              borderColor: "rgb(var(--color-border))",
+              color: "rgb(var(--color-text-secondary))",
+            }}
           >
             {isCollapsed ? (
               <ChevronRight size={14} />
@@ -122,20 +132,12 @@ const Sidebar: React.FC<SidebarProps> = ({
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group shadow-sm
-                  ${isActive
-                    ? "bg-pink-500 text-white"
-                    : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
-                  }
+                className={`sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group shadow-sm
+                  ${isActive ? "active" : ""}
                 `}
                 title={isCollapsed ? item.label : ""}
               >
-                <div
-                  className={`${isActive ? "text-white" : "text-gray-400 group-hover:text-gray-900"}`}
-                >
-                  <item.icon size={20} strokeWidth={1.5} />
-                </div>
-
+                <item.icon size={20} strokeWidth={1.5} />
                 {!isCollapsed && (
                   <span className="font-medium text-sm whitespace-nowrap overflow-hidden text-ellipsis">
                     {item.label}

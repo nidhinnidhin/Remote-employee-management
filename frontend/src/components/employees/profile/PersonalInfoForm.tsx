@@ -86,13 +86,13 @@ const SectionHeader = ({
   title: string;
   subtitle?: string;
 }) => (
-  <div className="flex items-center gap-3 mb-5 pb-4 border-b border-gray-100">
-    <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center flex-shrink-0">
-      <Icon className="w-4 h-4 text-indigo-600" />
+  <div className="flex items-center gap-3 mb-5 pb-4 border-b border-gray-100" style={{ borderColor: "rgb(var(--color-border-subtle))" }}>
+    <div className="section-icon-wrap">
+      <Icon className="section-icon" />
     </div>
     <div>
-      <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
-      {subtitle && <p className="text-xs text-gray-400 mt-0.5">{subtitle}</p>}
+      <h3 className="text-sm font-semibold text-primary">{title}</h3>
+      {subtitle && <p className="text-xs text-muted mt-0.5">{subtitle}</p>}
     </div>
   </div>
 );
@@ -117,12 +117,12 @@ const InputField = ({
   required?: boolean;
 }) => (
   <div className="flex flex-col gap-1.5">
-    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-      {label} {required && <span className="text-red-400">*</span>}
+    <label className="text-xs font-medium text-secondary uppercase tracking-wide">
+      {label} {required && <span className="text-danger">*</span>}
     </label>
     <div className="relative">
       {Icon && (
-        <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-350" />
+        <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted" />
       )}
       <input
         type={type}
@@ -130,9 +130,8 @@ const InputField = ({
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className={`w-full border border-gray-200 rounded-lg py-2.5 text-sm text-gray-800 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 focus:bg-white transition placeholder:text-gray-300 ${
-          Icon ? "pl-9 pr-3" : "px-3"
-        }`}
+        className={`field-input transition placeholder:text-muted ${Icon ? "pl-9" : ""
+          }`}
       />
     </div>
   </div>
@@ -154,7 +153,7 @@ const SelectField = ({
   placeholder?: string;
 }) => (
   <div className="flex flex-col gap-1.5">
-    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+    <label className="text-xs font-medium text-secondary uppercase tracking-wide">
       {label}
     </label>
     <div className="relative">
@@ -162,7 +161,7 @@ const SelectField = ({
         name={name}
         value={value}
         onChange={onChange}
-        className="w-full appearance-none border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 focus:bg-white transition pr-9 cursor-pointer"
+        className="field-input transition pr-9 cursor-pointer appearance-none"
       >
         {placeholder && (
           <option value="" disabled>
@@ -175,7 +174,7 @@ const SelectField = ({
           </option>
         ))}
       </select>
-      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted pointer-events-none" />
     </div>
   </div>
 );
@@ -321,7 +320,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-7">
+      <div className="portal-card p-7">
         <SectionHeader
           icon={User}
           title="Basic Information"
@@ -402,7 +401,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
 
           {/* Bio */}
           <div className="flex flex-col gap-1.5 md:col-span-2">
-            <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+            <label className="text-xs font-medium text-secondary uppercase tracking-wide">
               Bio
             </label>
             <textarea
@@ -411,13 +410,13 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
               onChange={handleChange}
               rows={3}
               placeholder="Tell us a little about yourself..."
-              className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 focus:bg-white transition resize-none placeholder:text-gray-300"
+              className="field-input transition resize-none placeholder:text-muted"
             />
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-7">
+      <div className="portal-card p-7">
         <SectionHeader
           icon={MapPin}
           title="Address"
@@ -426,7 +425,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-7 gap-y-5">
           <div className="flex flex-col gap-1.5 md:col-span-2">
-            <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+            <label className="text-xs font-medium text-secondary uppercase tracking-wide">
               Street Address
             </label>
             <input
@@ -435,7 +434,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
               value={formData.street}
               onChange={handleChange}
               placeholder="123 Main Street, Apt 4B"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 focus:bg-white transition placeholder:text-gray-300"
+              className="field-input transition placeholder:text-muted"
             />
           </div>
           <InputField
@@ -470,7 +469,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-7">
+      <div className="portal-card p-7">
         <SectionHeader
           icon={Shield}
           title="Emergency Contact"
@@ -506,7 +505,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-7">
+      <div className="portal-card p-7">
         <SectionHeader
           icon={Link}
           title="Online Presence"
@@ -533,7 +532,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-7">
+      <div className="portal-card p-7">
         <SectionHeader
           icon={Mail}
           title="Email Address"
@@ -542,15 +541,15 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-700 font-medium">
+            <div className="portal-badge-inner px-4 py-2 text-sm font-medium">
               {user.email}
             </div>
-            <span className="text-xs text-gray-400">Current email</span>
+            <span className="text-xs text-muted">Current email</span>
           </div>
           {!emailEditMode && (
             <button
               onClick={() => setEmailEditMode(true)}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-indigo-600 border border-indigo-200 rounded-lg hover:bg-indigo-50 transition"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-accent border border-accent/20 rounded-lg hover:bg-accent/5 transition"
             >
               <Pencil className="w-3.5 h-3.5" />
               Change
@@ -559,36 +558,36 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
         </div>
 
         {emailEditMode && (
-          <div className="mt-5 pt-5 border-t border-gray-100 flex flex-col gap-4 max-w-md">
+          <div className="mt-5 pt-5 border-t border-gray-100 flex flex-col gap-4 max-w-md" style={{ borderColor: "rgb(var(--color-border-subtle))" }}>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+              <label className="text-xs font-medium text-secondary uppercase tracking-wide">
                 New Email Address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted" />
                 <input
                   type="email"
                   value={newEmail}
                   onChange={(e) => setNewEmail(e.target.value)}
                   placeholder="Enter new email address"
-                  className="w-full border border-gray-200 rounded-lg pl-9 pr-3 py-2.5 text-sm text-gray-800 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 focus:bg-white transition placeholder:text-gray-300"
+                  className="field-input pl-9"
                 />
               </div>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-muted">
                 A confirmation link will be sent to your new email.
               </p>
             </div>
 
-            {emailError && <p className="text-sm text-red-500">{emailError}</p>}
+            {emailError && <p className="text-sm text-danger">{emailError}</p>}
             {emailSuccessMsg && (
-              <p className="text-sm text-green-600">{emailSuccessMsg}</p>
+              <p className="text-sm text-success">{emailSuccessMsg}</p>
             )}
 
             <div className="flex gap-3">
               <button
                 onClick={handleEmailUpdate}
                 disabled={savingEmail || !newEmail}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 transition text-white text-sm font-semibold rounded-lg"
+                className="btn-primary px-4 py-2 disabled:opacity-50 transition text-sm font-semibold rounded-lg"
               >
                 {savingEmail ? "Sending..." : "Update Email"}
               </button>
@@ -598,7 +597,8 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
                   setNewEmail("");
                   setEmailError("");
                 }}
-                className="px-4 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+                className="px-4 py-2 text-sm font-medium text-secondary border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+                style={{ borderColor: "rgb(var(--color-border))" }}
               >
                 Cancel
               </button>
@@ -607,12 +607,12 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
         )}
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex items-center justify-between">
+      <div className="portal-card p-5 flex items-center justify-between">
         <div>
-          {error && <p className="text-sm text-red-500">{error}</p>}
-          {successMsg && <p className="text-sm text-green-600">{successMsg}</p>}
+          {error && <p className="text-sm text-danger">{error}</p>}
+          {successMsg && <p className="text-sm text-success">{successMsg}</p>}
           {!error && !successMsg && (
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-muted">
               All changes are saved securely to your profile.
             </p>
           )}
@@ -620,7 +620,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
         <button
           onClick={handleSubmit}
           disabled={saving}
-          className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 transition text-white text-sm font-semibold rounded-lg shadow-sm"
+          className="btn-primary px-6 py-2.5 disabled:opacity-50 transition text-sm font-semibold rounded-lg shadow-sm"
         >
           {saving ? "Saving..." : "Save Changes"}
         </button>

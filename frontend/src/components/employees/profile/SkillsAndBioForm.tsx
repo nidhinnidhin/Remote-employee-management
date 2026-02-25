@@ -17,13 +17,13 @@ const SectionHeader = ({
   title: string;
   subtitle?: string;
 }) => (
-  <div className="flex items-center gap-3 mb-5 pb-4 border-b border-gray-100">
-    <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center flex-shrink-0">
-      <Icon className="w-4 h-4 text-indigo-600" />
+  <div className="flex items-center gap-3 mb-5 pb-4 border-b border-gray-100" style={{ borderColor: "rgb(var(--color-border-subtle))" }}>
+    <div className="section-icon-wrap">
+      <Icon className="section-icon" />
     </div>
     <div>
-      <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
-      {subtitle && <p className="text-xs text-gray-400 mt-0.5">{subtitle}</p>}
+      <h3 className="text-sm font-semibold text-primary">{title}</h3>
+      {subtitle && <p className="text-xs text-muted mt-0.5">{subtitle}</p>}
     </div>
   </div>
 );
@@ -88,7 +88,7 @@ export const SkillsAndBioForm: React.FC = () => {
   return (
     <div className="flex flex-col gap-5">
       {/* Skills Section */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-7">
+      <div className="portal-card p-7">
         <SectionHeader
           icon={Cpu}
           title="Skills & Biography"
@@ -96,12 +96,12 @@ export const SkillsAndBioForm: React.FC = () => {
         />
 
         {/* Skills label */}
-        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2 block">
+        <label className="text-xs font-medium text-secondary uppercase tracking-wide mb-2 block">
           Skills
         </label>
 
         {/* Skills tags + input row */}
-        <div className="flex flex-wrap items-center gap-2 min-h-[42px] border border-gray-200 rounded-lg px-3 py-2 bg-gray-50 focus-within:ring-2 focus-within:ring-indigo-200 focus-within:border-indigo-400 focus-within:bg-white transition">
+        <div className="flex flex-wrap items-center gap-2 min-h-[42px] field-input transition">
           {formData.skills.map((skill) => (
             <span
               key={skill}
@@ -124,13 +124,13 @@ export const SkillsAndBioForm: React.FC = () => {
             onChange={(e) => setSkillInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={formData.skills.length === 0 ? "Add a skill..." : ""}
-            className="flex-1 min-w-[120px] bg-transparent text-sm text-gray-800 outline-none placeholder:text-gray-300"
+            className="flex-1 min-w-[120px] bg-transparent text-sm text-primary outline-none placeholder:text-muted"
           />
         </div>
 
         {/* Biography */}
         <div className="flex flex-col gap-1.5 mt-6">
-          <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+          <label className="text-xs font-medium text-secondary uppercase tracking-wide">
             Biography
           </label>
           <textarea
@@ -141,20 +141,20 @@ export const SkillsAndBioForm: React.FC = () => {
             }
             rows={5}
             placeholder="Write a short professional biography..."
-            className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 focus:bg-white transition resize-none placeholder:text-gray-300"
+            className="field-input transition resize-none placeholder:text-muted"
           />
         </div>
       </div>
 
       {/* Save bar */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      <div className="portal-card p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          {error && <p className="text-sm text-danger">{error}</p>}
           {successMsg && (
-            <p className="text-sm text-green-600">{successMsg}</p>
+            <p className="text-sm text-success">{successMsg}</p>
           )}
           {!error && !successMsg && (
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-muted">
               All changes are saved securely to your profile.
             </p>
           )}
@@ -162,7 +162,7 @@ export const SkillsAndBioForm: React.FC = () => {
         <button
           onClick={handleSubmit}
           disabled={saving}
-          className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 transition text-white text-sm font-semibold rounded-lg shadow-sm whitespace-nowrap"
+          className="btn-primary px-6 py-2.5 disabled:opacity-50 transition text-sm font-semibold rounded-lg shadow-sm whitespace-nowrap"
         >
           {saving ? "Saving..." : "Save Changes"}
         </button>

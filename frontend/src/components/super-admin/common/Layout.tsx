@@ -9,7 +9,7 @@ interface SuperAdminLayoutProps {
 
 export default function SuperAdminLayout({ children }: SuperAdminLayoutProps) {
   return (
-    <div className="min-h-screen bg-gray-50 font-sans">
+    <div className="theme-super portal-page min-h-screen font-sans">
       <Sidebar />
       <TopBar />
 

@@ -86,11 +86,11 @@ const EmployeesTable = () => {
   const getStatusColor = (status: EmployeeStatus) => {
     switch (status) {
       case "Active":
-        return "bg-purple-500/10 text-purple-600";
+        return "status-success";
       case "Inactive":
-        return "bg-pink-500/10 text-pink-600";
+        return "status-danger";
       default:
-        return "bg-gray-500/10 text-gray-400";
+        return "status-warning";
     }
   };
 
@@ -99,7 +99,7 @@ const EmployeesTable = () => {
       header: "Employee",
       accessor: (employee: Employee) => (
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center text-white font-medium text-sm">
+          <div className="h-10 w-10 rounded-full bg-[rgb(var(--color-accent))] flex items-center justify-center text-white font-medium text-sm">
             {employee.avatar ? (
               <Image
                 src={employee.avatar}
@@ -118,8 +118,8 @@ const EmployeesTable = () => {
             )}
           </div>
           <div className="flex flex-col">
-            <span className="text-gray-900 font-medium">{employee.name}</span>
-            <span className="text-gray-500 text-xs">{employee.email}</span>
+            <span className="text-primary font-medium">{employee.name}</span>
+            <span className="text-muted text-xs">{employee.email}</span>
           </div>
         </div>
       ),
@@ -139,7 +139,7 @@ const EmployeesTable = () => {
     {
       header: "Role",
       accessor: (employee: Employee) => (
-        <span className="px-3 py-1 rounded-lg bg-gray-100 text-xs font-medium text-gray-700">
+        <span className="px-3 py-1 rounded-lg portal-card-inner text-xs font-medium text-secondary">
           {employee.role}
         </span>
       ),
@@ -162,7 +162,7 @@ const EmployeesTable = () => {
       header: "Actions",
       accessor: () => (
         <div className="flex justify-end">
-          <button className="text-gray-400 hover:text-gray-900 transition-colors">
+          <button className="text-muted hover:text-primary transition-colors">
             <MoreVertical size={18} />
           </button>
         </div>

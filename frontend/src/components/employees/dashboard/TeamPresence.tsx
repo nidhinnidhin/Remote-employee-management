@@ -9,44 +9,51 @@ const teamMembers = [
         name: "Sarah Manager",
         role: "Engineering Manager",
         status: "Online",
-        color: "bg-emerald-500",
+        // Kept as semantic Tailwind — emerald/rose/amber are universal status colors, not branding
+        dotColor: "bg-emerald-500",
+        textColor: "text-emerald-500",
     },
     {
         name: "Mike Lead",
         role: "Tech Lead",
         status: "Online",
-        color: "bg-emerald-500",
+        dotColor: "bg-emerald-500",
+        textColor: "text-emerald-500",
     },
     {
         name: "Emily Chen",
         role: "Frontend Developer",
         status: "Busy",
-        color: "bg-rose-500",
+        dotColor: "bg-rose-500",
+        textColor: "text-rose-500",
     },
     {
         name: "David Kumar",
         role: "Backend Developer",
         status: "Away",
-        color: "bg-amber-500",
+        dotColor: "bg-amber-500",
+        textColor: "text-amber-500",
     },
     {
         name: "Lisa Wong",
         role: "DevOps Engineer",
         status: "Online",
-        color: "bg-emerald-500",
+        dotColor: "bg-emerald-500",
+        textColor: "text-emerald-500",
     },
     {
         name: "James Park",
         role: "QA Engineer",
         status: "Offline",
-        color: "bg-neutral-300",
+        dotColor: "bg-neutral-300",
+        textColor: "text-muted",
     },
 ];
 
 export function TeamPresence() {
     return (
-        <div className="bg-white p-6 rounded-xl border border-neutral-100 shadow-sm h-full">
-            <h3 className="text-base font-bold text-neutral-900 mb-8 tracking-tight">Team Presence</h3>
+        <div className="portal-card p-6 h-full">
+            <h3 className="text-base font-bold text-primary mb-8 tracking-tight">Team Presence</h3>
 
             <div className="space-y-5">
                 {teamMembers.map((member, index) => (
@@ -59,30 +66,38 @@ export function TeamPresence() {
                     >
                         <div className="flex items-center gap-3">
                             <div className="relative">
-                                <div className="w-9 h-9 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center text-[10px] font-bold text-neutral-500 shadow-sm">
+                                <div
+                                    className="w-9 h-9 rounded-full flex items-center justify-center text-[10px] font-bold shadow-sm"
+                                    style={{
+                                        backgroundColor: "rgb(var(--color-bg-subtle))",
+                                        border: "1px solid rgb(var(--color-border))",
+                                        color: "rgb(var(--color-text-secondary))",
+                                    }}
+                                >
                                     {member.name.split(' ').map(n => n[0]).join('')}
                                 </div>
-                                <div className={cn(
-                                    "absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white shadow-sm",
-                                    member.color
-                                )} />
+                                <div
+                                    className={cn(
+                                        "absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 shadow-sm",
+                                        member.dotColor
+                                    )}
+                                    style={{ borderColor: "rgb(var(--color-surface))" }}
+                                />
                             </div>
                             <div>
-                                <h4 className="text-sm font-bold text-neutral-800 leading-none mb-1 shadow-transparent">
+                                <h4 className="text-sm font-bold text-primary leading-none mb-1">
                                     {member.name}
                                 </h4>
-                                <p className="text-[10px] text-neutral-400 font-semibold tracking-wide">
+                                <p className="text-[10px] text-secondary font-semibold tracking-wide">
                                     {member.role}
                                 </p>
                             </div>
                         </div>
 
+                        {/* Status indicator — kept as semantic color (not branding) */}
                         <span className={cn(
                             "text-[9px] font-bold uppercase tracking-widest",
-                            member.status === "Online" ? "text-emerald-500" :
-                                member.status === "Busy" ? "text-rose-500" :
-                                    member.status === "Away" ? "text-amber-500" :
-                                        "text-neutral-400"
+                            member.textColor
                         )}>
                             {member.status}
                         </span>

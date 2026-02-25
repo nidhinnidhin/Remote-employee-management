@@ -35,15 +35,15 @@ const Header = () => {
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-pink-500 mb-1">Employees</h1>
-          <p className="text-gray-500">Manage your team members</p>
+          <h1 className="text-3xl font-bold text-accent mb-1">Employees</h1>
+          <p className="text-muted">Manage your team members</p>
         </div>
 
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors font-medium">
+          {/* <button className="flex items-center gap-2 px-4 py-2 rounded-lg portal-page border border-border-subtle text-secondary hover:bg-surface-raised transition-colors font-medium">
             <Users size={18} />
             <span>Bulk Invite</span>
-          </button>
+          </button> */}
 
           <Button
             variant="primary"

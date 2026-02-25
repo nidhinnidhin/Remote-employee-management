@@ -17,8 +17,8 @@ const Table = <T,>({
   const tk = {
     // Wrapper
     wrapper: isDark
-      ? "bg-neutral-900 border border-neutral-800 rounded-2xl shadow-xl shadow-black/30"
-      : "bg-white border border-gray-200/80 rounded-2xl shadow-sm shadow-gray-200/60",
+      ? "bg-[rgb(var(--color-nav-bg))] border border-[rgb(var(--color-border-subtle))] rounded-2xl shadow-xl shadow-black/30"
+      : "bg-[rgb(var(--color-nav-bg))] border border-[rgb(var(--color-border-subtle))] rounded-2xl shadow-sm shadow-gray-200/60",
 
     // Scroll container
     scroll: "w-full overflow-x-auto",
@@ -28,41 +28,31 @@ const Table = <T,>({
 
     // <thead>
     thead: isDark
-      ? "bg-neutral-800/60 border-b border-neutral-700/60"
-      : "bg-gray-50/80 border-b border-gray-200/80",
+      ? "bg-[rgb(var(--color-bg-subtle))] border-b border-[rgb(var(--color-border-subtle))]"
+      : "bg-[rgb(var(--color-bg-subtle))] border-b border-[rgb(var(--color-border-subtle))]",
 
     // <th>
-    th: isDark
-      ? "px-5 py-3.5 text-left text-[11px] font-semibold tracking-widest uppercase text-neutral-400 whitespace-nowrap select-none"
-      : "px-5 py-3.5 text-left text-[11px] font-semibold tracking-widest uppercase text-gray-400 whitespace-nowrap select-none",
+    th: "px-5 py-3.5 text-left text-[11px] font-semibold tracking-widest uppercase text-muted whitespace-nowrap select-none",
 
     // <tbody>
-    tbody: isDark
-      ? "divide-y divide-neutral-800/70"
-      : "divide-y divide-gray-100",
+    tbody: "divide-y divide-[rgb(var(--color-border-subtle))]/50",
 
     // <tr>
-    tr: isDark
-      ? "group transition-colors duration-150 hover:bg-neutral-800/40"
-      : "group transition-colors duration-150 hover:bg-blue-50/40",
+    tr: "group transition-colors duration-150 hover:bg-[rgb(var(--color-bg-subtle))]/40",
 
     // <td>
-    td: isDark
-      ? "px-5 py-3.5 whitespace-nowrap text-neutral-200 text-sm"
-      : "px-5 py-3.5 whitespace-nowrap text-gray-800 text-sm",
+    td: "px-5 py-3.5 whitespace-nowrap text-secondary text-sm group-hover:text-primary",
 
     // Empty / loading shell
-    shell: isDark
-      ? "bg-neutral-900 border border-neutral-800 rounded-2xl"
-      : "bg-white border border-gray-200/80 rounded-2xl shadow-sm",
+    shell: "bg-[rgb(var(--color-nav-bg))] border border-[rgb(var(--color-border-subtle))] rounded-2xl shadow-sm",
 
     // Spinner ring
-    spinnerRing: isDark ? "border-neutral-700" : "border-gray-200",
-    spinnerAccent: isDark ? "border-t-violet-500" : "border-t-blue-500",
+    spinnerRing: "border-[rgb(var(--color-border-subtle))]",
+    spinnerAccent: "border-t-[rgb(var(--color-accent))]",
 
     // Caption text inside shell
-    caption: isDark ? "text-neutral-400" : "text-gray-400",
-    captionSub: isDark ? "text-neutral-600" : "text-gray-300",
+    caption: "text-muted",
+    captionSub: "text-muted/60",
   };
 
   /* ─── Loading skeleton ──────────────────────────────────────────────────── */
@@ -71,20 +61,14 @@ const Table = <T,>({
       <div className={`${tk.shell} overflow-hidden`}>
         {/* Fake header */}
         <div
-          className={`px-5 py-3.5 border-b ${
-            isDark
-              ? "border-neutral-800 bg-neutral-800/60"
-              : "border-gray-100 bg-gray-50/80"
-          }`}
+          className={`px-5 py-3.5 border-b border-[rgb(var(--color-border-subtle))] bg-[rgb(var(--color-bg-subtle))]/60`}
         >
           <div className="flex gap-6">
             {[120, 80, 100, 90, 60].map((w, i) => (
               <div
                 key={i}
                 style={{ width: w }}
-                className={`h-2.5 rounded-full ${
-                  isDark ? "bg-neutral-700" : "bg-gray-200"
-                } animate-pulse`}
+                className={`h-2.5 rounded-full bg-[rgb(var(--color-border-subtle))] animate-pulse`}
               />
             ))}
           </div>
@@ -93,24 +77,18 @@ const Table = <T,>({
         {Array.from({ length: 6 }).map((_, ri) => (
           <div
             key={ri}
-            className={`px-5 py-4 flex gap-6 border-b ${
-              isDark ? "border-neutral-800/70" : "border-gray-100"
-            }`}
+            className={`px-5 py-4 flex gap-6 border-b border-[rgb(var(--color-border-subtle))]/50`}
             style={{ animationDelay: `${ri * 80}ms` }}
           >
             {/* Avatar placeholder */}
             <div
-              className={`h-8 w-8 rounded-full shrink-0 ${
-                isDark ? "bg-neutral-800" : "bg-gray-200"
-              } animate-pulse`}
+              className={`h-8 w-8 rounded-full shrink-0 bg-[rgb(var(--color-bg-subtle))] animate-pulse`}
             />
             {[140, 70, 110, 80, 50].map((w, ci) => (
               <div
                 key={ci}
                 style={{ width: w }}
-                className={`h-2.5 rounded-full my-auto ${
-                  isDark ? "bg-neutral-800" : "bg-gray-200"
-                } animate-pulse`}
+                className={`h-2.5 rounded-full my-auto bg-[rgb(var(--color-bg-subtle))] animate-pulse`}
               />
             ))}
           </div>
@@ -138,11 +116,7 @@ const Table = <T,>({
       >
         {/* Illustration */}
         <div
-          className={`h-14 w-14 rounded-2xl flex items-center justify-center ${
-            isDark
-              ? "bg-neutral-800 text-neutral-500"
-              : "bg-gray-100 text-gray-400"
-          }`}
+          className={`h-14 w-14 rounded-2xl flex items-center justify-center bg-[rgb(var(--color-bg-subtle))] text-muted`}
         >
           <svg
             width="26"
@@ -160,7 +134,7 @@ const Table = <T,>({
         </div>
         <div className="text-center">
           <p
-            className={`font-semibold text-sm ${isDark ? "text-neutral-200" : "text-gray-700"}`}
+            className={`font-semibold text-sm text-primary`}
           >
             {emptyMessage}
           </p>
@@ -211,16 +185,14 @@ const Table = <T,>({
 
       {/* Footer row count */}
       <div
-        className={`px-5 py-3 flex items-center justify-between border-t ${
-          isDark ? "border-neutral-800/70" : "border-gray-100"
-        }`}
+        className={`px-5 py-3 flex items-center justify-between border-t border-[rgb(var(--color-border-subtle))]/50`}
       >
         <span
-          className={`text-xs ${isDark ? "text-neutral-500" : "text-gray-400"}`}
+          className={`text-xs text-muted/60`}
         >
           Showing{" "}
           <span
-            className={`font-semibold ${isDark ? "text-neutral-300" : "text-gray-600"}`}
+            className={`font-semibold text-muted`}
           >
             {data.length}
           </span>{" "}
@@ -229,7 +201,7 @@ const Table = <T,>({
 
         {/* Subtle branding / last-updated hint slot — optional */}
         <span
-          className={`text-xs ${isDark ? "text-neutral-600" : "text-gray-300"}`}
+          className={`text-xs text-muted/40`}
         >
           ● Live
         </span>

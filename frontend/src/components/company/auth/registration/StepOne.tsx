@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import FormInput from "./FormInput";
 import FormDropdown from "../../../ui/FormDropdown";
 import React from "react";
 
@@ -12,6 +11,7 @@ import {
 import { StepOneProps } from "@/shared/types/company/auth/company-registeration/step-one-props.type";
 import { employeeSizeOptionsData } from "@/shared/constants/datas/company-register-employee-size-options";
 import { industryOptionsData } from "@/shared/constants/datas/company-register-industry-options";
+import FormInput from "@/components/ui/FormInput";
 
 const StepOne: React.FC<StepOneProps> = ({
   formData,
@@ -49,11 +49,11 @@ const StepOne: React.FC<StepOneProps> = ({
       exit={{ opacity: 0, x: -20 }}
       transition={{ duration: 0.3 }}
     >
-      <h2 className="text-2xl font-bold text-white mb-2">
+      <h2 className="text-2xl font-bold text-primary mb-2">
         Company Information
       </h2>
-      <p className="text-neutral-400 mb-8">Tell us about your organization</p>
-
+      <p className="text-muted mb-8">Tell us about your organization</p>
+<div className="space-y-6">
       <FormInput
         label="Company Name"
         name="companyName"
@@ -108,6 +108,7 @@ const StepOne: React.FC<StepOneProps> = ({
         error={errors.websiteUrl}
         placeholder="https://acme.com"
       />
+      </div>
     </motion.div>
   );
 };

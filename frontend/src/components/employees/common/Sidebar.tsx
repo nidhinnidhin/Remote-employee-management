@@ -65,7 +65,12 @@ export function Sidebar({ className }: { className?: string }) {
       <div className="lg:hidden fixed top-4 left-4 z-50">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="p-2 bg-white rounded-lg shadow-md text-indigo-600 border border-indigo-100"
+          className="p-2 rounded-lg shadow-md border"
+          style={{
+            backgroundColor: "rgb(var(--color-surface))",
+            borderColor: "rgb(var(--color-border-subtle))",
+            color: "rgb(var(--color-accent))",
+          }}
         >
           {isOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
@@ -79,7 +84,8 @@ export function Sidebar({ className }: { className?: string }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setIsOpen(false)}
-            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
+            className="fixed inset-0 backdrop-blur-sm z-40 lg:hidden"
+            style={{ backgroundColor: "rgba(0,0,0,0.2)" }}
           />
         )}
       </AnimatePresence>
@@ -90,12 +96,14 @@ export function Sidebar({ className }: { className?: string }) {
         animate={{ x: isMobile ? (isOpen ? 0 : "-100%") : 0 }}
         transition={{ type: "spring", damping: 25, stiffness: 200 }}
         className={cn(
-          "fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-neutral-100 flex flex-col h-full lg:relative lg:translate-x-0 transition-none",
+          "sidebar fixed inset-y-0 left-0 z-40 w-64 flex flex-col h-full lg:relative lg:translate-x-0 transition-none",
           className,
         )}
       >
         <div className="p-6">
-          <h1 className="text-xl font-bold text-indigo-600 flex items-center gap-2 tracking-tight">
+          <h1
+            className="text-xl font-bold flex items-center gap-2 tracking-tight sidebar-logo-text"
+          >
             Employee management
           </h1>
         </div>
@@ -108,16 +116,15 @@ export function Sidebar({ className }: { className?: string }) {
                 <div
                   className={cn(
                     "relative group flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200",
-                    isActive
-                      ? "text-white"
-                      : "text-neutral-500 hover:text-indigo-600 hover:bg-neutral-50",
+                    isActive ? "text-white" : "sidebar-link",
                   )}
                 >
                   {/* Active background highlight */}
                   {isActive && (
                     <motion.div
                       layoutId="sidebarHighlight"
-                      className="absolute inset-0 bg-indigo-600 rounded-lg -z-10 shadow-sm"
+                      className="absolute inset-0 rounded-lg -z-10 shadow-sm"
+                      style={{ backgroundColor: "rgb(var(--color-accent))" }}
                       transition={{
                         type: "spring",
                         bounce: 0.2,
@@ -128,12 +135,18 @@ export function Sidebar({ className }: { className?: string }) {
 
                   <item.icon
                     size={18}
+                    strokeWidth={1.5}
                     className={cn(
                       "shrink-0",
                       isActive
                         ? "text-white"
-                        : "text-neutral-400 group-hover:text-indigo-600",
+                        : "transition-colors",
                     )}
+                    style={
+                      !isActive
+                        ? { color: "rgb(var(--color-text-muted))" }
+                        : undefined
+                    }
                   />
                   <span className="text-sm font-medium">{item.label}</span>
                 </div>

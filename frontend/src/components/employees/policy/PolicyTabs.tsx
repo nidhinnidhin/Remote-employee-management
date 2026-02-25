@@ -52,16 +52,17 @@ export function PolicyTabs({ activeTab, onTabChange }: PolicyTabsProps) {
                     className={cn(
                         "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all relative border",
                         activeTab === tab.id
-                            ? "text-white bg-indigo-600 border-indigo-600 shadow-sm"
-                            : "text-slate-400 hover:text-slate-600 hover:bg-slate-50 bg-white border-slate-100"
+                            ? "btn-primary border-transparent shadow-sm"
+                            : "text-muted hover:text-primary portal-card-inner"
                     )}
                 >
-                    <tab.icon size={14} />
+                    <tab.icon size={14} strokeWidth={1.5} />
                     <span className="whitespace-nowrap">{tab.label}</span>
                     {activeTab === tab.id && (
                         <motion.div
                             layoutId="activePolicyTab"
-                            className="absolute inset-0 bg-indigo-600 rounded-lg -z-10"
+                            className="absolute inset-0 rounded-lg -z-10"
+                            style={{ backgroundColor: "rgb(var(--color-accent))" }}
                             transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                         />
                     )}

@@ -24,18 +24,17 @@ interface ProfileTabsProps {
 
 const ProfileTabs: React.FC<ProfileTabsProps> = ({ activeTab, onChange }) => {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-6 py-1 flex items-center gap-1">
+    <div className="portal-card px-6 py-1 flex items-center gap-1">
       {tabs.map(({ id, label, icon: Icon }) => {
         const isActive = activeTab === id;
         return (
           <button
             key={id}
             onClick={() => onChange(id)}
-            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
-              isActive
-                ? "text-indigo-600"
-                : "text-gray-400 hover:text-gray-600"
-            }`}
+            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium rounded-lg transition-colors ${isActive
+                ? "text-accent"
+                : "text-muted hover:text-secondary"
+              }`}
           >
             <Icon className="w-4 h-4" />
             {label}

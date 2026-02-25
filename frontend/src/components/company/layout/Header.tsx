@@ -6,11 +6,15 @@ import { HeaderProps } from "@/shared/types/company/layout/header-props.type";
 
 const Header: React.FC<HeaderProps> = ({ onMobileMenuDatas }) => {
   return (
-    <header className="sticky top-0 z-40 flex h-16 items-center border-b border-pink-50 bg-white/80 backdrop-blur-md px-4 sm:px-6 lg:px-8">
+    <header
+      className="top-nav sticky top-0 z-40 flex h-16 items-center px-4 sm:px-6 lg:px-8 backdrop-blur-md"
+      style={{ backdropFilter: "blur(12px)" }}
+    >
       {/* Mobile Menu Button */}
       <button
         type="button"
-        className="-m-2.5 p-2.5 text-neutral-400 lg:hidden hover:text-white"
+        className="-m-2.5 p-2.5 lg:hidden transition-colors"
+        style={{ color: "rgb(var(--color-text-secondary))" }}
         onClick={onMobileMenuDatas}
       >
         <span className="sr-only">Open sidebar</span>
@@ -25,21 +29,42 @@ const Header: React.FC<HeaderProps> = ({ onMobileMenuDatas }) => {
             <input
               type="text"
               placeholder="Search..."
-              className="bg-gray-50 border border-gray-100 rounded-lg pl-3 pr-10 py-1.5 text-sm text-gray-900 focus:outline-none focus:border-pink-500 transition-colors w-64"
+              className="field-input w-64 pl-3 pr-10 py-1.5 text-sm"
             />
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 w-4 h-4" />
+            <Search
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4"
+              style={{ color: "rgb(var(--color-text-muted))" }}
+            />
           </div>
 
           {/* Notifications */}
-          <button className="-m-2.5 p-2.5 text-neutral-400 hover:text-white relative">
+          <button
+            className="-m-2.5 p-2.5 relative transition-colors"
+            style={{ color: "rgb(var(--color-text-secondary))" }}
+          >
             <span className="sr-only">View notifications</span>
             <Bell size={20} />
-            <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-red-600 border border-neutral-900"></span>
+            <span
+              className="absolute top-2 right-2 w-2 h-2 rounded-full border"
+              style={{
+                backgroundColor: "rgb(var(--color-danger))",
+                borderColor: "rgb(var(--color-nav-bg))",
+              }}
+            />
           </button>
 
           {/* User Profile */}
-          <div className="pl-4 border-l border-gray-100">
-            <div className="h-8 w-8 rounded-full bg-pink-500 flex items-center justify-center text-white text-xs font-bold ring-2 ring-white cursor-pointer">
+          <div
+            className="pl-4"
+            style={{ borderLeft: "1px solid rgb(var(--color-border-subtle))" }}
+          >
+            <div
+              className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold ring-2 ring-white cursor-pointer"
+              style={{
+                backgroundColor: "rgb(var(--color-accent))",
+                color: "rgb(var(--color-btn-primary-text))",
+              }}
+            >
               CA
             </div>
           </div>

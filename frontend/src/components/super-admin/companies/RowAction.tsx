@@ -99,11 +99,11 @@ export const RowActions = ({
         disabled={loading}
         className={`
           relative flex items-center justify-center w-8 h-8 rounded-md
-          text-gray-400 hover:text-gray-600
-          hover:bg-gray-100 active:bg-gray-200
+          text-muted hover:text-primary
+          hover:bg-surface-raised active:bg-surface-sunken
           transition-colors duration-150
-          focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1
-          ${open ? "bg-gray-100 text-gray-600" : ""}
+          focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1
+          ${open ? "bg-surface-raised text-primary" : ""}
           ${loading ? "opacity-50 cursor-not-allowed" : ""}
         `}
       >
@@ -134,7 +134,7 @@ export const RowActions = ({
             transformOrigin: position.openUp ? "bottom center" : "top center",
             animation: "dropdownEnter 0.15s ease forwards",
           }}
-          className="bg-white border border-gray-200 rounded-xl shadow-lg z-[9999] overflow-hidden py-1"
+          className="portal-card-inner border border-border-subtle rounded-xl shadow-lg z-[9999] overflow-hidden py-1"
         >
           <style>{`
             @keyframes dropdownEnter {
@@ -151,8 +151,8 @@ export const RowActions = ({
             }}
             className="
               w-full flex items-center gap-2.5 px-3.5 py-2.5
-              text-sm font-medium text-gray-700
-              hover:bg-gray-50 active:bg-gray-100
+              text-sm font-medium text-primary
+              hover:bg-surface-raised active:bg-surface-sunken
               transition-colors duration-100
             "
           >
@@ -174,7 +174,7 @@ export const RowActions = ({
             View Details
           </button>
 
-          <div className="mx-3 my-1 border-t border-gray-100" />
+          <div className="mx-3 my-1 border-t border-border-subtle" />
 
           <button
             role="menuitem"
@@ -183,7 +183,7 @@ export const RowActions = ({
             className={`
               w-full flex items-center gap-2.5 px-3.5 py-2.5
               text-sm font-medium
-              ${row.status === "ACTIVE" ? "text-red-600 hover:bg-red-50 active:bg-red-100" : "text-green-600 hover:bg-green-50 active:bg-green-100"}
+              ${row.status === "ACTIVE" ? "text-danger hover:bg-danger/10 active:bg-danger/20" : "text-success hover:bg-success/10 active:bg-success/20"}
               transition-colors duration-100
               ${loading ? "opacity-50" : ""}
             `}

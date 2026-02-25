@@ -16,44 +16,54 @@ export function GreetingHeader() {
 
   const formattedTime = time
     ? time.toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: true,
-      })
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true,
+    })
     : "--:--:--";
 
   const formattedDate = time
     ? time.toLocaleDateString("en-US", {
-        weekday: "long",
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-      })
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    })
     : "";
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative overflow-hidden rounded-xl p-8 bg-white border border-neutral-100 shadow-sm"
+      className="portal-card relative overflow-hidden p-8"
     >
-      <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50/50 blur-3xl -mr-20 -mt-20 rounded-full" />
+      {/* Decorative blob */}
+      <div
+        className="absolute top-0 right-0 w-64 h-64 blur-3xl -mr-20 -mt-20 rounded-full opacity-50"
+        style={{ backgroundColor: "rgb(var(--color-accent-subtle))" }}
+      />
 
       <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900 flex items-center gap-2 tracking-tight">
+          <h1 className="text-2xl font-bold text-primary flex items-center gap-2 tracking-tight">
             Hello, John 👋
           </h1>
-          <p className="text-neutral-500 text-sm mt-1">
+          <p className="text-secondary text-sm mt-1">
             Senior Backend Developer
           </p>
         </div>
 
-        <div className="flex items-center gap-3 text-neutral-500 text-xs font-semibold bg-neutral-50 px-4 py-2 rounded-lg border border-neutral-100">
-          <Clock size={14} className="text-indigo-500" />
+        <div
+          className="flex items-center gap-3 text-xs font-semibold px-4 py-2 rounded-lg border portal-card-inner"
+          style={{ color: "rgb(var(--color-text-secondary))" }}
+        >
+          <Clock size={14} className="text-accent" />
           <span className="tabular-nums">{formattedTime}</span>
-          <span className="w-px h-3 bg-neutral-200" />
+          <span
+            className="w-px h-3"
+            style={{ backgroundColor: "rgb(var(--color-border))" }}
+          />
           <span>{formattedDate}</span>
         </div>
       </div>

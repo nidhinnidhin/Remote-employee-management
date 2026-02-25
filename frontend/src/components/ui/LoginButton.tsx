@@ -19,11 +19,11 @@ const LoginButton: React.FC<ButtonProps> = ({
 
   const variants: Record<ButtonVariant, string> = {
     primary:
-      "bg-red-600 text-white hover:bg-red-700 active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
+      "bg-[rgb(var(--color-accent))] text-white hover:opacity-90 active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
     secondary:
-      "bg-neutral-700 text-white hover:bg-neutral-600 active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
+      "bg-[rgb(var(--color-btn-secondary-bg))] text-[rgb(var(--color-btn-secondary-text))] hover:bg-[rgb(var(--color-bg-subtle))] active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
     outline:
-      "bg-transparent border border-neutral-700 text-white hover:bg-neutral-800 active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
+      "bg-transparent border border-[rgb(var(--color-border-subtle))] text-primary hover:bg-[rgb(var(--color-bg-subtle))] active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
   };
 
   return (

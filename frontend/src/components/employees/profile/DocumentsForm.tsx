@@ -60,28 +60,29 @@ const DocumentCard: React.FC<{
   doc: Document;
   onDelete: (id: string) => void;
 }> = ({ doc, onDelete }) => (
-  <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex flex-col gap-4">
+  <div className="portal-card p-5 flex flex-col gap-4">
     <div className="flex items-start gap-3">
-      <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center flex-shrink-0">
-        <FileText className="w-5 h-5 text-indigo-500" />
+      <div className="section-icon-wrap">
+        <FileText className="section-icon" />
       </div>
       <div className="min-w-0">
-        <p className="text-sm font-semibold text-gray-800 truncate">
+        <p className="text-sm font-semibold text-primary truncate">
           {doc.name}
         </p>
-        <p className="text-xs font-bold text-indigo-600 mt-0.5">
+        <p className="text-xs font-bold text-accent mt-0.5">
           {doc.category}
         </p>
       </div>
     </div>
 
-    <p className="text-xs text-gray-400">
+    <p className="text-xs text-muted">
       {doc.size} • {doc.date}
     </p>
 
     <div className="flex items-center gap-2">
       <button
-        className="flex-1 flex items-center justify-center gap-2 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
+        className="flex-1 flex items-center justify-center gap-2 py-2 border rounded-lg text-sm font-medium text-secondary hover:bg-[rgb(var(--color-bg-subtle))] transition"
+        style={{ borderColor: "rgb(var(--color-border))" }}
         onClick={() => doc.url && window.open(doc.url, "_blank")}
       >
         <Download className="w-4 h-4" />
@@ -89,7 +90,7 @@ const DocumentCard: React.FC<{
       </button>
       <button
         onClick={() => onDelete(doc.id)}
-        className="w-9 h-9 flex items-center justify-center bg-red-500 hover:bg-red-600 transition rounded-lg text-white flex-shrink-0"
+        className="w-9 h-9 flex items-center justify-center bg-danger hover:opacity-90 transition rounded-lg text-white flex-shrink-0"
         aria-label="Delete document"
       >
         <Trash2 className="w-4 h-4" />
@@ -191,7 +192,7 @@ const DocumentVault: React.FC = () => {
     <div className="flex flex-col gap-5">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-gray-900">Document Vault</h2>
+        <h2 className="text-lg font-bold text-primary">Document Vault</h2>
         <Button
           variant="primary"
           onClick={() => setUploadModalOpen(true)}
@@ -204,14 +205,14 @@ const DocumentVault: React.FC = () => {
 
       {/* Document Grid */}
       {documents.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 flex flex-col items-center gap-3 text-center">
-          <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center">
-            <FileText className="w-6 h-6 text-indigo-400" />
+        <div className="portal-card p-12 flex flex-col items-center gap-3 text-center">
+          <div className="section-icon-wrap w-12 h-12">
+            <FileText className="section-icon w-6 h-6" />
           </div>
-          <p className="text-sm font-semibold text-gray-700">
+          <p className="text-sm font-semibold text-primary">
             No documents yet
           </p>
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-muted">
             Upload your first document to get started.
           </p>
         </div>
@@ -232,7 +233,7 @@ const DocumentVault: React.FC = () => {
         footer={
           <div className="flex flex-col gap-3">
             {saveError && (
-              <p className="text-sm text-red-500 text-center">{saveError}</p>
+              <p className="text-sm text-danger text-center">{saveError}</p>
             )}
             <div className="flex gap-3">
               {/* Uses your Button component — secondary variant */}
@@ -292,10 +293,10 @@ const DocumentVault: React.FC = () => {
             required
           />
 
-          {/* File upload — custom drag-and-drop matching BaseModal's dark theme */}
+          {/* File upload — custom drag-and-drop matching active theme */}
           <div className="flex flex-col gap-1.5">
-            <label className="block text-sm font-medium text-white mb-1">
-              File <span className="text-red-500">*</span>
+            <label className="block text-sm font-medium text-secondary mb-1">
+              File <span className="text-danger">*</span>
             </label>
             <div
               onDragOver={(e) => {
@@ -305,23 +306,22 @@ const DocumentVault: React.FC = () => {
               onDragLeave={() => setDragOver(false)}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
-              className={`border-2 border-dashed rounded-lg p-6 flex flex-col items-center gap-2 cursor-pointer transition ${
-                dragOver
-                  ? "border-pink-500 bg-pink-500/10"
+              className={`border-2 border-dashed rounded-lg p-6 flex flex-col items-center gap-2 cursor-pointer transition ${dragOver
+                  ? "border-[rgb(var(--color-accent))] bg-[rgb(var(--color-accent-subtle))]"
                   : fieldErrors.docFile
-                    ? "border-red-500"
-                    : "border-neutral-700 hover:border-pink-500 hover:bg-neutral-800/50"
-              }`}
+                    ? "border-danger"
+                    : "border-[rgb(var(--color-border))] hover:border-[rgb(var(--color-accent))] hover:bg-[rgb(var(--color-bg-subtle))]"
+                }`}
             >
-              <div className="w-10 h-10 rounded-xl bg-neutral-800 flex items-center justify-center">
-                <Upload className="w-5 h-5 text-pink-400" />
+              <div className="section-icon-wrap w-10 h-10">
+                <Upload className="section-icon w-5 h-5" />
               </div>
               {docFile ? (
                 <div className="text-center">
-                  <p className="text-sm font-medium text-white">
+                  <p className="text-sm font-medium text-primary">
                     {docFile.name}
                   </p>
-                  <p className="text-xs text-neutral-400 mt-0.5">
+                  <p className="text-xs text-muted mt-0.5">
                     {docFile.size > 1024 * 1024
                       ? `${(docFile.size / (1024 * 1024)).toFixed(1)} MB`
                       : `${Math.round(docFile.size / 1024)} KB`}
@@ -329,11 +329,11 @@ const DocumentVault: React.FC = () => {
                 </div>
               ) : (
                 <div className="text-center">
-                  <p className="text-sm text-neutral-300">
+                  <p className="text-sm text-secondary">
                     Drag & drop or{" "}
-                    <span className="text-pink-400 font-medium">browse</span>
+                    <span className="text-accent font-medium">browse</span>
                   </p>
-                  <p className="text-xs text-neutral-500 mt-0.5">
+                  <p className="text-xs text-muted mt-0.5">
                     PDF, DOC, DOCX, JPG, PNG up to 10MB
                   </p>
                 </div>
@@ -357,7 +357,7 @@ const DocumentVault: React.FC = () => {
                   setDocFile(null);
                   setDocName("");
                 }}
-                className="self-end flex items-center gap-1 text-xs text-neutral-400 hover:text-red-400 transition mt-1"
+                className="self-end flex items-center gap-1 text-xs text-muted hover:text-danger transition mt-1"
               >
                 <X className="w-3 h-3" /> Remove file
               </button>

@@ -5,7 +5,7 @@ import { Sidebar } from "../common/Sidebar";
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="h-screen bg-[#F8FAFC] flex flex-col lg:flex-row overflow-hidden">
+    <div className="theme-employee portal-page h-screen flex flex-col lg:flex-row overflow-hidden">
       {/* Sidebar */}
       <Sidebar />
 

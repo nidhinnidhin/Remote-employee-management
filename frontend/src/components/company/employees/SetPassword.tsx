@@ -36,13 +36,13 @@ const SetPasswordCard = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-black">
-      <div className="w-full max-w-md bg-neutral-900 border border-neutral-800 p-6 sm:p-8 shadow-xl">
+    <div className="min-h-screen flex items-center justify-center px-4 portal-page">
+      <div className="w-full max-w-md portal-card-inner p-6 sm:p-8 shadow-xl border rounded-2xl" style={{ borderColor: 'rgb(var(--color-border-subtle))' }}>
         <div className="mb-6 text-center">
-          <h1 className="text-xl font-semibold text-white">
+          <h1 className="text-xl font-semibold text-primary">
             Set your password
           </h1>
-          <p className="text-sm text-neutral-400 mt-1">
+          <p className="text-sm text-muted mt-1">
             Secure your account to continue
           </p>
         </div>
@@ -69,7 +69,7 @@ const SetPasswordCard = () => {
         />
 
         {error && password === confirmPassword && (
-          <p className="text-red-500 text-sm mb-4">{error}</p>
+          <p className="text-danger text-sm mb-4">{error}</p>
         )}
 
         <Button

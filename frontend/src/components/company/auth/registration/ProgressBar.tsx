@@ -10,12 +10,20 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   const progress = (currentStep / totalSteps) * 100;
 
   return (
-    <div className="w-full h-1 bg-neutral-700 mb-8">
+    <div
+      className="w-full h-2 mb-8 rounded-full overflow-hidden"
+      style={{
+        backgroundColor: "rgb(var(--color-border-subtle))",
+      }}
+    >
       <motion.div
-        className="h-full bg-red-600"
+        className="h-full rounded-full"
+        style={{
+          backgroundColor: "rgb(var(--color-accent))",
+        }}
         initial={{ width: 0 }}
         animate={{ width: `${progress}%` }}
-        transition={{ duration: 0.3, ease: "easeInOut" }}
+        transition={{ duration: 0.4, ease: "easeInOut" }}
       />
     </div>
   );
