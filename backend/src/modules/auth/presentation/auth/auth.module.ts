@@ -36,6 +36,10 @@ import { RequestEmailChangeUseCase } from '../../application/use-cases/update-em
 import { VerifyEmailChangeUseCase } from '../../application/use-cases/update-email/verify-email-change.usecase';
 import { UploadProfileImageUseCase } from '../../application/use-cases/profile/upload-profile-image.usecase';
 import { CloudinaryService } from 'src/shared/services/cloudinary.service';
+import { UpdateSkillsUseCase } from '../../application/use-cases/skills/update-skills.usecase';
+import { UploadDocumentUseCase } from '../../application/use-cases/document/upload-document.usecase';
+import { DeleteDocumentUseCase } from '../../application/use-cases/document/delete-document.usecase';
+import { EditDocumentUseCase } from '../../application/use-cases/document/edit-document.usecase';
 
 @Module({
   imports: [
@@ -68,6 +72,10 @@ import { CloudinaryService } from 'src/shared/services/cloudinary.service';
     VerifyEmailChangeUseCase,
     UploadProfileImageUseCase,
     CloudinaryService,
+    UpdateSkillsUseCase,
+    UploadDocumentUseCase,
+    DeleteDocumentUseCase,
+    EditDocumentUseCase,
     {
       provide: 'PendingRegistrationRepository',
       useClass: RedisPendingRegistrationRepository,

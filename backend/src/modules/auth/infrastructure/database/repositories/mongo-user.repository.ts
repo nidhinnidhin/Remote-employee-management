@@ -66,44 +66,47 @@ export class MongoUserRepository implements UserRepository {
     }
   }
   private toEntity(doc: UserDocument): UserEntity {
-  return new UserEntity(
-    doc._id.toString(),
-    doc.firstName,
-    doc.lastName,
-    doc.email,
-    doc.role,
-    doc.phone,
-    doc.passwordHash,
-    doc.status as UserStatus,
-    doc.createdAt,
-    doc.updatedAt,
-    doc.companyId,
-    doc.department,
-    doc.inviteStatus,
-    doc.hasPassword,
-    doc.dateOfBirth,
-    doc.gender,
-    doc.maritalStatus,
-    doc.nationality,
-    doc.bloodGroup,
-    doc.timeZone,
-    doc.bio,
-    doc.streetAddress,
-    doc.city,
-    doc.state,
-    doc.country,
-    doc.zipCode,
-    doc.emergencyContactName,
-    doc.emergencyContactPhone,
-    doc.emergencyContactRelation,
-    doc.linkedInUrl,
-    doc.personalWebsite,
+    return new UserEntity(
+      doc._id.toString(),
+      doc.firstName,
+      doc.lastName,
+      doc.email,
+      doc.role,
+      doc.phone,
+      doc.passwordHash,
+      doc.status as UserStatus,
+      doc.createdAt,
+      doc.updatedAt,
+      doc.companyId,
+      doc.department,
+      doc.inviteStatus,
+      doc.hasPassword,
+      doc.dateOfBirth,
+      doc.gender,
+      doc.maritalStatus,
+      doc.nationality,
+      doc.bloodGroup,
+      doc.timeZone,
+      doc.bio,
+      doc.streetAddress,
+      doc.city,
+      doc.state,
+      doc.country,
+      doc.zipCode,
+      doc.emergencyContactName,
+      doc.emergencyContactPhone,
+      doc.emergencyContactRelation,
+      doc.linkedInUrl,
+      doc.personalWebsite,
 
-    // 🔥 ADD THESE TWO
-    doc.profileImageUrl,
-    doc.profileImagePublicId,
-  );
-}
+      // 🔥 ADD THESE TWO
+      doc.profileImageUrl,
+      doc.profileImagePublicId,
+
+      doc.skills,
+      doc.documents,
+    );
+  }
 
   async updateStatusByEmail(email: string, status: UserStatus): Promise<void> {
     await this.userModel.updateOne({ email }, { status });
@@ -145,15 +148,49 @@ export class MongoUserRepository implements UserRepository {
     await this.userModel.updateOne({ _id: userId }, { $set: { email } });
   }
 
-  // Add profile image 
+  // Add profile image
   async updateProfileImage(
-  userId: string,
-  imageUrl: string,
-  publicId: string,
-): Promise<void> {
-  await this.userModel.findByIdAndUpdate(userId, {
-    profileImageUrl: imageUrl,
-    profileImagePublicId: publicId,
-  });
-}
+    userId: string,
+    imageUrl: string,
+    publicId: string,
+  ): Promise<void> {
+    await this.userModel.findByIdAndUpdate(userId, {
+      profileImageUrl: imageUrl,
+      profileImagePublicId: publicId,
+    });
+  }
+
+  async updateSkills(userId: string, skills: string[]): Promise<void> {
+    await this.userModel.updateOne({ _id: userId }, { $set: { skills } });
+  }
+
+  async addDocument(userId: string, document: any): Promise<void> {
+    await this.userModel.updateOne(
+      { _id: userId },
+      { $push: { documents: document } },
+    );
+  }
+
+  async removeDocument(userId: string, documentId: string): Promise<void> {
+    await this.userModel.updateOne(
+      { _id: userId },
+      { $pull: { documents: { _id: documentId } } },
+    );
+  }
+
+  async updateDocument(
+    userId: string,
+    documentId: string,
+    update: any,
+  ): Promise<void> {
+    await this.userModel.updateOne(
+      { _id: userId, 'documents._id': documentId },
+      {
+        $set: {
+          'documents.$.name': update.name,
+          'documents.$.category': update.category,
+        },
+      },
+    );
+  }
 }

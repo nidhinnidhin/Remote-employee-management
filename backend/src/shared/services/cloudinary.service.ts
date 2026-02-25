@@ -11,12 +11,16 @@ export class CloudinaryService {
     });
   }
 
-  async uploadImage(file: Express.Multer.File) {
-    return new Promise<any>((resolve, reject) => {
+  async uploadFile(
+    file: Express.Multer.File,
+    folder: string,
+  ): Promise<any> {
+    return new Promise((resolve, reject) => {
       cloudinary.uploader
         .upload_stream(
           {
-            folder: 'employee-management/profile-images',
+            folder,
+            resource_type: 'auto', // 🔥 REQUIRED for PDF/DOC
           },
           (error, result) => {
             if (error) return reject(error);
@@ -27,7 +31,9 @@ export class CloudinaryService {
     });
   }
 
-  async deleteImage(publicId: string) {
-    return cloudinary.uploader.destroy(publicId);
+  async deleteFile(publicId: string) {
+    return cloudinary.uploader.destroy(publicId, {
+      resource_type: 'auto',
+    });
   }
 }

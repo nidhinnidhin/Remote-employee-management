@@ -40,5 +40,14 @@ export class UserEntity {
 
     public readonly profileImageUrl?: string,
     public readonly profileImagePublicId?: string,
+
+    public readonly skills?: string[],
+    public readonly documents?: {
+      name: string;
+      category: string;
+      fileUrl: string;
+      publicId: string;
+      uploadedAt: Date;
+    }[],
   ) {}
 }

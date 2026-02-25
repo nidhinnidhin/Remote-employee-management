@@ -111,6 +111,29 @@ export class UserDocument extends Document {
   @Prop({ required: false })
   profileImagePublicId?: string;
 
+  @Prop({ type: [String], default: [] })
+  skills: string[];
+
+  @Prop({
+    type: [
+      {
+        name: { type: String, required: true },
+        category: { type: String, required: true },
+        fileUrl: { type: String, required: true },
+        publicId: { type: String, required: true },
+        uploadedAt: { type: Date, default: Date.now },
+      },
+    ],
+    default: [],
+  })
+  documents: {
+    name: string;
+    category: string;
+    fileUrl: string;
+    publicId: string;
+    uploadedAt: Date;
+  }[];
+
   createdAt: Date;
   updatedAt: Date;
 }

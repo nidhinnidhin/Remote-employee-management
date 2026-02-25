@@ -28,7 +28,7 @@ const SectionHeader = ({
   </div>
 );
 
-export const SkillsAndBioForm: React.FC = () => {
+export const SkillsForm: React.FC = () => {
   const [formData, setFormData] = useState<SkillsBioFormData>({
     skills: [
       "Node.js",
@@ -128,22 +128,7 @@ export const SkillsAndBioForm: React.FC = () => {
           />
         </div>
 
-        {/* Biography */}
-        <div className="flex flex-col gap-1.5 mt-6">
-          <label className="text-xs font-medium text-secondary uppercase tracking-wide">
-            Biography
-          </label>
-          <textarea
-            name="biography"
-            value={formData.biography}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, biography: e.target.value }))
-            }
-            rows={5}
-            placeholder="Write a short professional biography..."
-            className="field-input transition resize-none placeholder:text-muted"
-          />
-        </div>
+       
       </div>
 
       {/* Save bar */}

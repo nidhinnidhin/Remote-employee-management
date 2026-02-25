@@ -7,7 +7,7 @@ import PersonalInfoForm from "@/components/employees/profile/PersonalInfoForm";
 import EmptyTab from "@/components/employees/profile/EmptyTab";
 import { UserProfile } from "@/app/employees/profile/page";
 import { ProfileHeader } from "./ProfileHeader";
-import { SkillsAndBioForm } from "./SkillsAndBioForm";
+import { SkillsForm } from "./SkillsForm";
 import DocumentVault from "./DocumentsForm";
 
 export default function ProfileClient({ user }: { user: UserProfile }) {
@@ -24,7 +24,7 @@ export default function ProfileClient({ user }: { user: UserProfile }) {
       case "personal-info":
         return <PersonalInfoForm user={user} />;
       case "skills-bio":
-        return <SkillsAndBioForm />;
+        return <SkillsForm />;
       case "documents":
         return <DocumentVault />;
     }

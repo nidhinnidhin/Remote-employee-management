@@ -15,7 +15,7 @@ export class EmployeeGuard implements CanActivate {
   constructor(
     @Inject('CompanyRepository')
     private readonly companyRepository: CompanyRepository,
-  ) { }
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -26,9 +26,7 @@ export class EmployeeGuard implements CanActivate {
     }
 
     if (user.role !== UserRole.EMPLOYEE) {
-      throw new ForbiddenException(
-        'Access denied. Employee rights required.',
-      );
+      throw new ForbiddenException('Access denied. Employee rights required.');
     }
 
     // Check if company is suspended

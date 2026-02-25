@@ -17,14 +17,16 @@ export class UploadProfileImageUseCase {
       throw new NotFoundException('User not found');
     }
 
-    // Delete old image if exists
+    // ✅ Delete old image if exists
     if (user.profileImagePublicId) {
-      await this.cloudinaryService.deleteImage(
-        user.profileImagePublicId,
-      );
+      await this.cloudinaryService.deleteFile(user.profileImagePublicId);
     }
 
-    const uploadResult = await this.cloudinaryService.uploadImage(file);
+    // ✅ Use new method
+    const uploadResult = await this.cloudinaryService.uploadFile(
+      file,
+      'employee-management/profile-images',
+    );
 
     await this.userRepository.updateProfileImage(
       userId,

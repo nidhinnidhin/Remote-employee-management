@@ -11,6 +11,9 @@ import {
   Patch,
   UseInterceptors,
   UploadedFile,
+  Delete,
+  Param,
+  BadRequestException,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { RegisterCompanyAdminUseCase } from '../../application/use-cases/register/register-company-admin.usecase';
@@ -48,6 +51,10 @@ import { VerifyEmailChangeUseCase } from '../../application/use-cases/update-ema
 import { RequestEmailChangeUseCase } from '../../application/use-cases/update-email/request-email-change.usecase';
 import { UploadProfileImageUseCase } from '../../application/use-cases/profile/upload-profile-image.usecase';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { UpdateSkillsUseCase } from '../../application/use-cases/skills/update-skills.usecase';
+import { UploadDocumentUseCase } from '../../application/use-cases/document/upload-document.usecase';
+import { DeleteDocumentUseCase } from '../../application/use-cases/document/delete-document.usecase';
+import { EditDocumentUseCase } from '../../application/use-cases/document/edit-document.usecase';
 
 @Controller('auth')
 export class AuthController {
@@ -68,6 +75,10 @@ export class AuthController {
     private readonly requestEmailChangeUseCase: RequestEmailChangeUseCase,
     private readonly verifyEmailChangeUseCase: VerifyEmailChangeUseCase,
     private readonly uploadProfileImageUseCase: UploadProfileImageUseCase,
+    private readonly updateSkillsUseCase: UpdateSkillsUseCase,
+    private readonly uploadDocumentUseCase: UploadDocumentUseCase,
+    private readonly deleteDocumentUseCase: DeleteDocumentUseCase,
+    private readonly editDocumentUseCase: EditDocumentUseCase,
   ) {}
 
   // LOGIN
@@ -294,5 +305,83 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   async verifyEmailChange(@Req() req: any, @Body('otp') otp: string) {
     return this.verifyEmailChangeUseCase.execute(req.user.userId, otp);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('profile/skills')
+  async updateSkills(@Req() req: any, @Body('skills') skills: string[]) {
+    return this.updateSkillsUseCase.execute(req.user.userId, skills);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('profile/documents')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: {
+        fileSize: 10 * 1024 * 1024, // 10MB
+      },
+      fileFilter: (req, file, callback) => {
+        const allowedTypes = [
+          'application/pdf',
+          'application/msword',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          'image/jpeg',
+          'image/png',
+        ];
+
+        if (!allowedTypes.includes(file.mimetype)) {
+          return callback(new BadRequestException('Invalid file type'), false);
+        }
+
+        callback(null, true);
+      },
+    }),
+  )
+  async uploadDocument(
+    @Req() req: any,
+    @UploadedFile() file: Express.Multer.File,
+    @Body('name') name: string,
+    @Body('category') category: string,
+  ) {
+    if (!file) {
+      throw new BadRequestException('File is required');
+    }
+
+    return this.uploadDocumentUseCase.execute(
+      req.user.userId,
+      file,
+      name,
+      category,
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('profile/documents/:id')
+  async deleteDocument(
+    @Req() req: any,
+    @Param('id') documentId: string,
+    @Body('publicId') publicId: string,
+  ) {
+    return this.deleteDocumentUseCase.execute(
+      req.user.userId,
+      documentId,
+      publicId,
+    );
+  }
+
+  @Patch('profile/documents/:id')
+  @UseGuards(JwtAuthGuard)
+  async editDocument(
+    @Req() req: any,
+    @Param('id') documentId: string,
+    @Body('name') name: string,
+    @Body('category') category: string,
+  ) {
+    return this.editDocumentUseCase.execute(
+      req.user.userId,
+      documentId,
+      name,
+      category,
+    );
   }
 }

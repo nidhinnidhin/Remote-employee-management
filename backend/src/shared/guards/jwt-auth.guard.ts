@@ -10,24 +10,24 @@ import { Request } from 'express';
 import * as jwt from 'jsonwebtoken';
 import type { CompanyRepository } from 'src/modules/auth/domain/repositories/company.repository';
 import { CompanyStatus } from 'src/shared/enums/company/company-status.enum';
+import { ACCESS_TOKEN_COOKIE_NAME } from '../config/cookies.config';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   constructor(
     @Inject('CompanyRepository')
     private readonly companyRepository: CompanyRepository,
-  ) { }
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
 
-    // Check for token in Authorization header (Bearer token) or cookie
-    let token = request.cookies?.access_token;
+    let token = request.cookies?.[ACCESS_TOKEN_COOKIE_NAME];
 
     if (!token) {
       const authHeader = request.headers.authorization;
-      if (authHeader && authHeader.startsWith('Bearer ')) {
-        token = authHeader.substring(7); // Remove 'Bearer ' prefix
+      if (authHeader?.startsWith('Bearer ')) {
+        token = authHeader.substring(7);
       }
     }
 
@@ -36,35 +36,36 @@ export class JwtAuthGuard implements CanActivate {
     }
 
     try {
-      // Verify JWT
       const payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET!) as {
         userId: string;
         role?: string;
         companyId?: string;
       };
 
-      // Attach user info to request (include role and companyId for guards)
       request.user = {
         userId: payload.userId,
         role: payload.role,
         companyId: payload.companyId,
       };
 
-      // Check company status if companyId is present
-      if (payload.companyId && require('mongoose').isValidObjectId(payload.companyId)) {
-        const company = await this.companyRepository.findById(payload.companyId);
-        if (company && company.status === CompanyStatus.SUSPENDED) {
+      if (
+        payload.companyId &&
+        require('mongoose').isValidObjectId(payload.companyId)
+      ) {
+        const company = await this.companyRepository.findById(
+          payload.companyId,
+        );
+
+        if (company?.status === CompanyStatus.SUSPENDED) {
           throw new ForbiddenException(
-            'Your company access has been suspended. Please contact support.',
+            'Your company access has been suspended.',
           );
         }
       }
 
       return true;
     } catch (error) {
-      if (error instanceof ForbiddenException) {
-        throw error;
-      }
+      if (error instanceof ForbiddenException) throw error;
       throw new UnauthorizedException('Invalid or expired token');
     }
   }

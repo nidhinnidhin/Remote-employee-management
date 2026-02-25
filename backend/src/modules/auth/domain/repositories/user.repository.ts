@@ -23,4 +23,14 @@ export interface UserRepository {
     imageUrl: string,
     publicId: string,
   ): Promise<void>;
+
+  updateSkills(userId: string, skills: string[]): Promise<void>;
+
+  addDocument(userId: string, document: any): Promise<void>;
+  removeDocument(userId: string, documentId: string): Promise<void>;
+  updateDocument(
+    userId: string,
+    documentId: string,
+    update: any,
+  ): Promise<void>;
 }

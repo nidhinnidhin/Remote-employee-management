@@ -13,7 +13,7 @@ interface Tab {
 
 const tabs: Tab[] = [
   { id: "personal-info", label: "Personal Info", icon: User },
-  { id: "skills-bio", label: "Skills & Bio", icon: GraduationCap },
+  { id: "skills-bio", label: "Skills", icon: GraduationCap },
   { id: "documents", label: "Documents", icon: FileText },
 ];
 
