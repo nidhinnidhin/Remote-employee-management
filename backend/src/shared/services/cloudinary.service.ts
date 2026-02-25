@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
 import { v2 as cloudinary } from 'cloudinary';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class CloudinaryService {
@@ -11,19 +11,23 @@ export class CloudinaryService {
     });
   }
 
-  async uploadImage(file: Express.Multer.File): Promise<string> {
-    return new Promise((resolve, reject) => {
+  async uploadImage(file: Express.Multer.File) {
+    return new Promise<any>((resolve, reject) => {
       cloudinary.uploader
         .upload_stream(
           {
-            folder: 'employee_profiles',
+            folder: 'employee-management/profile-images',
           },
           (error, result) => {
             if (error) return reject(error);
-            resolve(result?.secure_url || '');
+            resolve(result);
           },
         )
         .end(file.buffer);
     });
+  }
+
+  async deleteImage(publicId: string) {
+    return cloudinary.uploader.destroy(publicId);
   }
 }

@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 /* Custom Animations for Company Registration Form */
 
 /* Fade In Animation - For step transitions */
@@ -17,9 +16,6 @@
     transform: translateY(0);
   }
 }
-
-
-
 
 .animate-fadeIn {
   animation: fadeIn 0.5s ease-out forwards;
@@ -44,7 +40,6 @@
 
 /* Shake Animation - For error alerts */
 @keyframes shake {
-
   0%,
   100% {
     transform: translateX(0);
@@ -72,7 +67,6 @@
 
 /* Pulse Animation - For loading states */
 @keyframes pulse {
-
   0%,
   100% {
     opacity: 1;
@@ -87,7 +81,6 @@
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-
 .input {
   @apply w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition;
 }
@@ -95,8 +88,6 @@
 .form-icon {
   @apply w-4 h-4 text-gray-400;
 }
-
-
 
 @layer base {
   :root {
@@ -154,8 +145,6 @@
     --chart-5: 340 75% 55%;
   }
 }
-
-
 
 @layer base {
   * {

@@ -37,5 +37,8 @@ export class UserEntity {
 
     public readonly linkedInUrl?: string,
     public readonly personalWebsite?: string,
+
+    public readonly profileImageUrl?: string,
+    public readonly profileImagePublicId?: string,
   ) {}
 }

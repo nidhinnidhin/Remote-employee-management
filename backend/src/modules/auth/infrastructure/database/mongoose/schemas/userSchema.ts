@@ -105,6 +105,12 @@ export class UserDocument extends Document {
   @Prop({ required: false })
   personalWebsite?: string;
 
+  @Prop({ required: false })
+  profileImageUrl?: string;
+
+  @Prop({ required: false })
+  profileImagePublicId?: string;
+
   createdAt: Date;
   updatedAt: Date;
 }

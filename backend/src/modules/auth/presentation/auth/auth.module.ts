@@ -34,6 +34,8 @@ import { GetUserProfileUseCase } from '../../application/use-cases/profile/get-u
 import { UpdateProfileUseCase } from '../../application/use-cases/profile/update-user-profile.useCase';
 import { RequestEmailChangeUseCase } from '../../application/use-cases/update-email/request-email-change.usecase';
 import { VerifyEmailChangeUseCase } from '../../application/use-cases/update-email/verify-email-change.usecase';
+import { UploadProfileImageUseCase } from '../../application/use-cases/profile/upload-profile-image.usecase';
+import { CloudinaryService } from 'src/shared/services/cloudinary.service';
 
 @Module({
   imports: [
@@ -64,6 +66,8 @@ import { VerifyEmailChangeUseCase } from '../../application/use-cases/update-ema
     UpdateProfileUseCase,
     RequestEmailChangeUseCase,
     VerifyEmailChangeUseCase,
+    UploadProfileImageUseCase,
+    CloudinaryService,
     {
       provide: 'PendingRegistrationRepository',
       useClass: RedisPendingRegistrationRepository,

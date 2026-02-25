@@ -9,6 +9,8 @@ import {
   UseGuards,
   Inject,
   Patch,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { RegisterCompanyAdminUseCase } from '../../application/use-cases/register/register-company-admin.usecase';
@@ -44,6 +46,8 @@ import { VerifyEmailChangeDto } from '../dto/email-update/verify-email-change.dt
 import { RequestEmailChangeDto } from '../dto/email-update/request-email-change.dto';
 import { VerifyEmailChangeUseCase } from '../../application/use-cases/update-email/verify-email-change.usecase';
 import { RequestEmailChangeUseCase } from '../../application/use-cases/update-email/request-email-change.usecase';
+import { UploadProfileImageUseCase } from '../../application/use-cases/profile/upload-profile-image.usecase';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('auth')
 export class AuthController {
@@ -63,6 +67,7 @@ export class AuthController {
     private readonly updateProfileUseCase: UpdateProfileUseCase,
     private readonly requestEmailChangeUseCase: RequestEmailChangeUseCase,
     private readonly verifyEmailChangeUseCase: VerifyEmailChangeUseCase,
+    private readonly uploadProfileImageUseCase: UploadProfileImageUseCase,
   ) {}
 
   // LOGIN
@@ -232,6 +237,20 @@ export class AuthController {
     );
 
     return { accessToken };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('upload-profile-image')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadProfileImage(
+    @Req() req: any,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file) {
+      throw new UnauthorizedException('No file uploaded');
+    }
+
+    return this.uploadProfileImageUseCase.execute(req.user.userId, file);
   }
 
   // Forgot Password
