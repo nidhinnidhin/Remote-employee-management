@@ -1,29 +1,25 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { UserRepository } from 'src/modules/auth/domain/repositories/user.repository';
+import { DOCUMENT_MESSAGES } from 'src/shared/constants/messages/profile/document.messages';
+import { CloudinaryResourceType } from 'src/shared/enums/employees/media/cloudinary-resource.enum';
 import { CloudinaryService } from 'src/shared/services/cloudinary.service';
 
 @Injectable()
 export class DeleteDocumentUseCase {
   constructor(
     @Inject('UserRepository')
-    private readonly userRepository: UserRepository,
-    private readonly cloudinaryService: CloudinaryService,
+    private readonly _userRepository: UserRepository,
+    private readonly _cloudinaryService: CloudinaryService,
   ) {}
-
-  private getResourceType(publicId: string): 'image' | 'raw' {
-    const rawExtensions = ['pdf', 'doc', 'docx'];
-    const ext = publicId.split('.').pop()?.toLowerCase() ?? '';
-    return rawExtensions.includes(ext) ? 'raw' : 'image';
-  }
 
   async execute(
     userId: string,
     documentId: string,
     publicId: string,
-    resourceType: 'image' | 'raw' | 'video',
+    resourceType: CloudinaryResourceType,
   ) {
-    await this.cloudinaryService.deleteFile(publicId, resourceType);
-    await this.userRepository.removeDocument(userId, documentId);
-    return { message: 'Document deleted successfully' };
+    await this._cloudinaryService.deleteFile(publicId, resourceType);
+    await this._userRepository.removeDocument(userId, documentId);
+    return { message: DOCUMENT_MESSAGES.SUCCESS_DOCUMENT_DELETE };
   }
 }

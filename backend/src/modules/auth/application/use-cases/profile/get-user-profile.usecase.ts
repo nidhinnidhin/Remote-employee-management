@@ -6,11 +6,11 @@ import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages'
 export class GetUserProfileUseCase {
   constructor(
     @Inject('UserRepository')
-    private readonly userRepository: UserRepository,
+    private readonly _userRepository: UserRepository,
   ) {}
 
   async execute(userId: string) {
-    const user = await this.userRepository.findById(userId);
+    const user = await this._userRepository.findById(userId);
 
     if (!user) {
       throw new UnauthorizedException(AUTH_MESSAGES.USER_NOT_FOUND);

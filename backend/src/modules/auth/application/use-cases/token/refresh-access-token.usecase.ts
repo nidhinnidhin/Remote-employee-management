@@ -16,8 +16,8 @@ import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 export class RefreshAccessTokenUseCase {
   constructor(
     @Inject('UserRepository')
-    private readonly userRepository: UserRepository,
-    private readonly jwtService: JwtService,
+    private readonly _userRepository: UserRepository,
+    private readonly _jwtService: JwtService,
   ) {}
 
   async execute(refreshToken: string): Promise<RefreshAccessTokenResponse> {
@@ -32,7 +32,7 @@ export class RefreshAccessTokenUseCase {
       throw new UnauthorizedException(AUTH_MESSAGES.INVALID_REFRESH_TOKEN);
     }
 
-    const user = await this.userRepository.findById(payload.userId);
+    const user = await this._userRepository.findById(payload.userId);
 
     if (!user) {
       throw new UnauthorizedException(AUTH_MESSAGES.USER_NOT_FOUND);
@@ -42,7 +42,7 @@ export class RefreshAccessTokenUseCase {
       throw new ForbiddenException(AUTH_MESSAGES.ACCOUNT_NOT_ACTIVE);
     }
 
-    const accessToken = this.jwtService.generateAccessToken({
+    const accessToken = this._jwtService.generateAccessToken({
       userId: user.id,
       role: user.role,
       companyId: user.companyId,

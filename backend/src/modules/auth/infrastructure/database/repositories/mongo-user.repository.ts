@@ -11,26 +11,21 @@ import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages'
 export class MongoUserRepository implements UserRepository {
   constructor(
     @InjectModel(UserDocument.name)
-    private readonly userModel: Model<UserDocument>,
+    private readonly _userModel: Model<UserDocument>,
   ) {}
 
   async findByEmail(email: string): Promise<UserEntity | null> {
-    const user = await this.userModel.findOne({ email });
+    const user = await this._userModel.findOne({ email });
     return user ? this.toEntity(user) : null;
   }
 
   async findById(id: string): Promise<UserEntity | null> {
-    const user = await this.userModel.findById(id);
+    const user = await this._userModel.findById(id);
     return user ? this.toEntity(user) : null;
   }
 
   async create(user: UserEntity): Promise<UserEntity> {
-    console.log('!!! DEBUG: MongoUserRepository - Creating User Entity:', {
-      role: user.role,
-      phone: user.phone,
-      email: user.email,
-    });
-    const created = await this.userModel.create({
+    const created = await this._userModel.create({
       companyId: user.companyId,
       firstName: user.firstName,
       lastName: user.lastName,
@@ -51,11 +46,11 @@ export class MongoUserRepository implements UserRepository {
     email: string,
     passwordHash: string,
   ): Promise<void> {
-    const result = await this.userModel.updateOne(
+    const result = await this._userModel.updateOne(
       { email: email.toLowerCase() },
       {
         $set: {
-          passwordHash: passwordHash, // 🔥 MUST MATCH LOGIN
+          passwordHash: passwordHash, 
           hasPassword: true,
         },
       },
@@ -98,41 +93,35 @@ export class MongoUserRepository implements UserRepository {
       doc.emergencyContactRelation,
       doc.linkedInUrl,
       doc.personalWebsite,
-
-      // 🔥 ADD THESE TWO
       doc.profileImageUrl,
       doc.profileImagePublicId,
-
       doc.skills,
       doc.documents,
     );
   }
 
   async updateStatusByEmail(email: string, status: UserStatus): Promise<void> {
-    await this.userModel.updateOne({ email }, { status });
+    await this._userModel.updateOne({ email }, { status });
   }
 
   async updateRoleByEmail(email: string, role: string): Promise<void> {
-    await this.userModel.updateOne({ email }, { role });
+    await this._userModel.updateOne({ email }, { role });
   }
 
   async updateUserFieldsById(
     id: string,
     fields: Partial<UserEntity>,
   ): Promise<void> {
-    console.log('Updating user ID:', id);
-    console.log('Fields:', fields);
 
-    const result = await this.userModel.updateOne(
+    const result = await this._userModel.updateOne(
       { _id: id },
       { $set: fields },
       { runValidators: true },
     );
 
-    console.log('Update result:', result);
 
     if (result.matchedCount === 0) {
-      throw new Error('User not found for update');
+      throw new Error(AUTH_MESSAGES.USER_NOT_FOUND);
     }
   }
 
@@ -140,12 +129,12 @@ export class MongoUserRepository implements UserRepository {
     email: string,
     fields: Partial<UserEntity>,
   ): Promise<void> {
-    await this.userModel.updateOne({ email }, { $set: fields });
+    await this._userModel.updateOne({ email }, { $set: fields });
   }
 
   // Update email
   async updateEmail(userId: string, email: string): Promise<void> {
-    await this.userModel.updateOne({ _id: userId }, { $set: { email } });
+    await this._userModel.updateOne({ _id: userId }, { $set: { email } });
   }
 
   // Add profile image
@@ -154,25 +143,25 @@ export class MongoUserRepository implements UserRepository {
     imageUrl: string,
     publicId: string,
   ): Promise<void> {
-    await this.userModel.findByIdAndUpdate(userId, {
+    await this._userModel.findByIdAndUpdate(userId, {
       profileImageUrl: imageUrl,
       profileImagePublicId: publicId,
     });
   }
 
   async updateSkills(userId: string, skills: string[]): Promise<void> {
-    await this.userModel.updateOne({ _id: userId }, { $set: { skills } });
+    await this._userModel.updateOne({ _id: userId }, { $set: { skills } });
   }
 
   async addDocument(userId: string, document: any): Promise<void> {
-    await this.userModel.updateOne(
+    await this._userModel.updateOne(
       { _id: userId },
       { $push: { documents: document } },
     );
   }
 
   async removeDocument(userId: string, documentId: string): Promise<void> {
-    await this.userModel.updateOne(
+    await this._userModel.updateOne(
       { _id: userId },
       { $pull: { documents: { _id: documentId } } },
     );
@@ -188,7 +177,7 @@ export class MongoUserRepository implements UserRepository {
       setFields[`documents.$.${key}`] = update[key];
     });
 
-    await this.userModel.updateOne(
+    await this._userModel.updateOne(
       { _id: userId, 'documents._id': documentId },
       { $set: setFields },
     );

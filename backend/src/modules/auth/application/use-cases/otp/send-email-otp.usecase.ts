@@ -10,15 +10,15 @@ import { OtpService } from 'src/shared/services/otp.service';
 export class SendEmailOtpUseCase {
   constructor(
     @Inject('EmailOtpRepository')
-    private readonly emailOtpRepository: EmailOtpRepository,
-    private readonly emailService: EmailService,
-    private readonly otpService: OtpService,
+    private readonly _emailOtpRepository: EmailOtpRepository,
+    private readonly _emailService: EmailService,
+    private readonly _otpService: OtpService,
   ) {}
 
   async execute(input: SendEmailOtpInput): Promise<void> {
-    const otp = this.otpService.generateOtp();
-    const otpHash = await this.otpService.hashOtp(otp);
-    const expiresAt = this.otpService.getExpiryDate();
+    const otp = this._otpService.generateOtp();
+    const otpHash = await this._otpService.hashOtp(otp);
+    const expiresAt = this._otpService.getExpiryDate();
 
     console.log(
       `📧 Sending OTP to: ${input.email} | Purpose: ${input.purpose} | OTP: ${otp}`,
@@ -36,7 +36,7 @@ export class SendEmailOtpUseCase {
       input.purpose,
     );
 
-    await this.emailOtpRepository.create(otpEntity);
-    await this.emailService.sendOtp(input.email, otp);
+    await this._emailOtpRepository.create(otpEntity);
+    await this._emailService.sendOtp(input.email, otp);
   }
 }

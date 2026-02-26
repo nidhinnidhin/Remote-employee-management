@@ -10,16 +10,16 @@ import { RedisService } from 'src/shared/services/redis.service';
 export class ResetPasswordUseCase {
   constructor(
     @Inject('UserRepository')
-    private readonly userRepository: UserRepository,
+    private readonly _userRepository: UserRepository,
 
-    private readonly redisService: RedisService,
+    private readonly _redisService: RedisService,
   ) {}
 
   async execute(input: ResetPasswordInput) {
     const email = input.email.toLowerCase();
     const redisKey = `reset-password:${email}`;
 
-    const resetAllowed = await this.redisService.get(redisKey);
+    const resetAllowed = await this._redisService.get(redisKey);
 
     if (!resetAllowed) {
       throw new BadRequestException(OTP_MESSAGES.OTP_NOT_VERIFIED);
@@ -27,10 +27,10 @@ export class ResetPasswordUseCase {
 
     const passwordHash = await bcrypt.hash(input.newPassword, 10);
 
-    await this.userRepository.updatePasswordByEmail(email, passwordHash);
+    await this._userRepository.updatePasswordByEmail(email, passwordHash);
 
     // Cleanup
-    await this.redisService.del(redisKey);
+    await this._redisService.del(redisKey);
 
     return { message: AUTH_MESSAGES.PASSWORD_RESET_SUCCESS };
   }

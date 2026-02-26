@@ -1,41 +1,42 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import type { UserRepository } from 'src/modules/auth/domain/repositories/user.repository';
+import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
+import { PROFILE_MESSAGES } from 'src/shared/constants/messages/profile/profile.messages';
+import { CLOUDINARY_PATH } from 'src/shared/constants/path/cloudinary.path';
 import { CloudinaryService } from 'src/shared/services/cloudinary.service';
 
 @Injectable()
 export class UploadProfileImageUseCase {
   constructor(
     @Inject('UserRepository')
-    private readonly userRepository: UserRepository,
-    private readonly cloudinaryService: CloudinaryService,
+    private readonly _userRepository: UserRepository,
+    private readonly _cloudinaryService: CloudinaryService,
   ) {}
 
   async execute(userId: string, file: Express.Multer.File) {
-    const user = await this.userRepository.findById(userId);
+    const user = await this._userRepository.findById(userId);
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException(AUTH_MESSAGES.USER_NOT_FOUND);
     }
 
-    // ✅ Delete old image if exists
     if (user.profileImagePublicId) {
-      await this.cloudinaryService.deleteFile(user.profileImagePublicId);
+      await this._cloudinaryService.deleteFile(user.profileImagePublicId);
     }
 
-    // ✅ Use new method
-    const uploadResult = await this.cloudinaryService.uploadFile(
+    const uploadResult = await this._cloudinaryService.uploadFile(
       file,
-      'employee-management/profile-images',
+      CLOUDINARY_PATH.UPLOAD_DOCUMENT_PATH,
     );
 
-    await this.userRepository.updateProfileImage(
+    await this._userRepository.updateProfileImage(
       userId,
       uploadResult.secure_url,
       uploadResult.public_id,
     );
 
     return {
-      message: 'Profile image uploaded successfully',
+      message: PROFILE_MESSAGES.PROFILE_IMAGE_UPLOADED,
       imageUrl: uploadResult.secure_url,
     };
   }

@@ -3,13 +3,13 @@ import type { PendingRegistrationRepository } from '../../../domain/repositories
 import { EmailService } from 'src/shared/services/email.service';
 import { OtpService } from 'src/shared/services/otp.service';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
+import { getOtpExpiresAt, SESSION_TTL_SECONDS } from 'src/shared/constants/functions/otp/otp.constants';
 
 @Injectable()
 export class ResendEmailOtpUseCase {
   constructor(
     @Inject('PendingRegistrationRepository')
     private readonly pendingRepository: PendingRegistrationRepository,
-
     private readonly emailService: EmailService,
     private readonly otpService: OtpService,
   ) {}
@@ -23,16 +23,11 @@ export class ResendEmailOtpUseCase {
 
     const otp = this.otpService.generateOtp();
     const otpHash = await this.otpService.hashOtp(otp);
-    const expiresAt = new Date(Date.now() + 60_000);
 
     await this.pendingRepository.save(
       email,
-      {
-        ...pending,
-        otpHash,
-        expiresAt,
-      },
-      900, // Refresh session TTL to 15 mins
+      { ...pending, otpHash, expiresAt: getOtpExpiresAt() },
+      SESSION_TTL_SECONDS,
     );
 
     await this.emailService.sendOtp(email, otp);

@@ -9,13 +9,13 @@ import { RedisService } from 'src/shared/services/redis.service';
 export class VerifyResetPasswordOtpUseCase {
   constructor(
     @Inject('EmailOtpRepository')
-    private readonly otpRepository: EmailOtpRepository,
+    private readonly _otpRepository: EmailOtpRepository,
 
-    private readonly redisService: RedisService,
+    private readonly _redisService: RedisService,
   ) {}
 
   async execute(input: VerifyResetPasswordOtpInput) {
-    const record = await this.otpRepository.findLatestByEmail(
+    const record = await this._otpRepository.findLatestByEmail(
       input.email.toLowerCase(),
     );
 
@@ -37,11 +37,11 @@ export class VerifyResetPasswordOtpUseCase {
     }
 
     // Mark OTP verified
-    await this.otpRepository.markVerified(record.id);
+    await this._otpRepository.markVerified(record.id);
 
     // Create reset session
     const resetSessionKey = `reset-password:${input.email.toLowerCase()}`;
-    await this.redisService.set(resetSessionKey, 'true', 10 * 60); // 10 min
+    await this._redisService.set(resetSessionKey, 'true', 10 * 60); // 10 min
 
     return { message: OTP_MESSAGES.OTP_VERIFIED };
   }

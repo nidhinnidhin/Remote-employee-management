@@ -3,53 +3,55 @@ import * as bcrypt from 'bcrypt';
 import type { EmailOtpRepository } from '../../../domain/repositories/email-otp.repository';
 import type { UserRepository } from '../../../domain/repositories/user.repository';
 import { OtpPurpose } from 'src/shared/enums/reset-password/otp-purpose.enum';
+import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
+import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
 
 @Injectable()
 export class VerifyEmailChangeUseCase {
   constructor(
     @Inject('EmailOtpRepository')
-    private readonly emailOtpRepository: EmailOtpRepository,
+    private readonly _emailOtpRepository: EmailOtpRepository,
 
     @Inject('UserRepository')
-    private readonly userRepository: UserRepository,
+    private readonly _userRepository: UserRepository,
   ) {}
 
   async execute(userId: string, otp: string) {
-    const user = await this.userRepository.findById(userId);
+    const user = await this._userRepository.findById(userId);
     if (!user) {
-      throw new BadRequestException('User not found');
+      throw new BadRequestException(AUTH_MESSAGES.USER_NOT_FOUND);
     }
 
-    const otpRecord = await this.emailOtpRepository.findLatestByUserAndEmail(
+    const otpRecord = await this._emailOtpRepository.findLatestByUserAndEmail(
       userId,
       user.email,
-      OtpPurpose.EMAIL_CHANGE, // VERY IMPORTANT
+      OtpPurpose.EMAIL_CHANGE, 
     );
 
     console.log('OTP Record:', otpRecord);
 
     if (!otpRecord) {
-      throw new BadRequestException('OTP not found');
+      throw new BadRequestException(OTP_MESSAGES.OTP_NOT_FOUND);
     }
 
     if (otpRecord.expiresAt < new Date()) {
-      throw new BadRequestException('OTP expired');
+      throw new BadRequestException(OTP_MESSAGES.OTP_EXPIRED);
     }
 
     const isValid = await bcrypt.compare(otp, otpRecord.otpHash);
 
     if (!isValid) {
-      throw new BadRequestException('Invalid OTP');
+      throw new BadRequestException(OTP_MESSAGES.OTP_INVALID);
     }
 
     // 🔥 Update to stored newEmail
     if (!otpRecord.newEmail) {
-      throw new BadRequestException('Invalid OTP record');
+      throw new BadRequestException(OTP_MESSAGES.OTP_INVALID);
     }
 
-    await this.userRepository.updateEmail(userId, otpRecord.newEmail);
-    await this.emailOtpRepository.markVerified(otpRecord.id);
+    await this._userRepository.updateEmail(userId, otpRecord.newEmail);
+    await this._emailOtpRepository.markVerified(otpRecord.id);
 
-    return { message: 'Email updated successfully' };
+    return { message: AUTH_MESSAGES.EMAIL_UPDATED };
   }
 }

@@ -1,45 +1,39 @@
 import { Injectable, Inject, ForbiddenException } from '@nestjs/common';
-import { JwtService } from 'src/shared/services/jwt.service';
-import { UserStatus } from 'src/shared/enums/user/user-status.enum';
-import { UserRole } from 'src/shared/enums/user/user-role.enum';
-import { UserEntity } from '../../../domain/entities/user.entity';
 import type { UserRepository } from 'src/modules/auth/domain/repositories/user.repository';
+import { UserStatus } from 'src/shared/enums/user/user-status.enum';
+import { JwtService } from 'src/shared/services/jwt.service';
+import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
+import {
+  SocialLoginInput,
+  SocialLoginResponse,
+} from 'src/shared/types/auth/social-login.type';
 
 @Injectable()
 export class SocialLoginUseCase {
   constructor(
     @Inject('UserRepository')
-    private readonly userRepository: UserRepository,
-    private readonly jwtService: JwtService,
-  ) { }
+    private readonly _userRepository: UserRepository,
+    private readonly _jwtService: JwtService,
+  ) {}
 
-  async execute(input: {
-    email: string;
-    firstName: string;
-    lastName: string;
-    provider: string;
-    providerId: string;
-  }) {
-    let user = await this.userRepository.findByEmail(
-      input.email.toLowerCase(),
-    );
+  async execute({ email }: SocialLoginInput): Promise<SocialLoginResponse> {
+    const user = await this._userRepository.findByEmail(email.toLowerCase());
 
-    // If user exists
-    if (user) {
-      if (user.status !== UserStatus.ACTIVE) {
-        throw new ForbiddenException('Account not active');
-      }
-    } else {
-      throw new ForbiddenException('User not found');
+    if (!user) {
+      throw new ForbiddenException(AUTH_MESSAGES.USER_NOT_FOUND);
     }
 
-    const accessToken = this.jwtService.generateAccessToken({
+    if (user.status !== UserStatus.ACTIVE) {
+      throw new ForbiddenException(AUTH_MESSAGES.ACCOUNT_NOT_ACTIVE);
+    }
+
+    const accessToken = this._jwtService.generateAccessToken({
       userId: user.id,
       role: user.role,
       companyId: user.companyId,
     });
 
-    const refreshToken = this.jwtService.generateRefreshToken({
+    const refreshToken = this._jwtService.generateRefreshToken({
       userId: user.id,
     });
 

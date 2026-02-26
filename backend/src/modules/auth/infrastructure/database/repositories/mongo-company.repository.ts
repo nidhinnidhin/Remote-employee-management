@@ -4,26 +4,27 @@ import { Model } from 'mongoose';
 import { CompanyRepository } from '../../../domain/repositories/company.repository';
 import { CompanyEntity } from '../../../domain/entities/company.entity';
 import { CompanyDocument } from '../mongoose/schemas/company.schema';
+import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 
 @Injectable()
 export class MongoCompanyRepository implements CompanyRepository {
   constructor(
     @InjectModel(CompanyDocument.name)
-    private readonly companyModel: Model<CompanyDocument>,
+    private readonly _companyModel: Model<CompanyDocument>,
   ) { }
 
   async findByEmail(email: string): Promise<CompanyEntity | null> {
-    const company = await this.companyModel.findOne({ email });
+    const company = await this._companyModel.findOne({ email });
     return company ? this.toEntity(company) : null;
   }
 
   async findById(id: string): Promise<CompanyEntity | null> {
-    const company = await this.companyModel.findById(id);
+    const company = await this._companyModel.findById(id);
     return company ? this.toEntity(company) : null;
   }
 
   async create(company: CompanyEntity): Promise<CompanyEntity> {
-    const created = await this.companyModel.create({
+    const created = await this._companyModel.create({
       name: company.name,
       email: company.email,
       size: company.size,
@@ -46,7 +47,7 @@ export class MongoCompanyRepository implements CompanyRepository {
       doc.createdAt,
       doc.updatedAt,
       undefined,
-      doc.status || 'ACTIVE',
+      doc.status || UserStatus.ACTIVE,
     );
   }
 }

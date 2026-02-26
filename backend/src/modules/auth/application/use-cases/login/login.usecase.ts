@@ -6,76 +6,62 @@ import {
 } from '@nestjs/common';
 import type { CompanyRepository } from '../../../domain/repositories/company.repository';
 import type { UserRepository } from '../../../domain/repositories/user.repository';
+import { isValidObjectId } from 'mongoose';
 import { CompanyStatus } from 'src/shared/enums/company/company-status.enum';
-import { JwtService } from 'src/shared/services/jwt.service';
-import { LoginResponse } from 'src/shared/types/auth/login-response.type';
-import { LoginInput } from 'src/shared/types/auth/login-input.type';
-import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
+import { JwtService } from 'src/shared/services/jwt.service';
+import { LoginInput } from 'src/shared/types/auth/login-input.type';
+import { LoginResponse } from 'src/shared/types/auth/login-response.type';
+import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { comparePassword } from 'src/shared/utils/password.util';
 
 @Injectable()
 export class LoginUseCase {
   constructor(
     @Inject('UserRepository')
-    private readonly userRepository: UserRepository,
+    private readonly _userRepository: UserRepository,
     @Inject('CompanyRepository')
-    private readonly companyRepository: CompanyRepository,
-    private readonly jwtService: JwtService,
-  ) { }
+    private readonly _companyRepository: CompanyRepository,
+    private readonly _jwtService: JwtService,
+  ) {}
 
-  async execute(input: LoginInput): Promise<LoginResponse> {
-    const user = await this.userRepository.findByEmail(
-      input.email.toLowerCase(),
-    );
+  async execute({ email, password }: LoginInput): Promise<LoginResponse> {
+    const user = await this._userRepository.findByEmail(email.toLowerCase());
 
     if (!user) {
       throw new UnauthorizedException(AUTH_MESSAGES.INVALID_CREDENTIALS);
     }
 
-    // Check company status if user is part of a company
-    if (user.companyId && require('mongoose').isValidObjectId(user.companyId)) {
-      const company = await this.companyRepository.findById(user.companyId);
-      if (company && company.status === CompanyStatus.SUSPENDED) {
-        throw new ForbiddenException(
-          'Your company access has been suspended. Please contact support.',
-        );
-      }
-    }
+    await this.checkCompanySuspension(user.companyId);
 
-    // Role-agnostic status check
     if (user.status !== UserStatus.ACTIVE) {
       throw new ForbiddenException(AUTH_MESSAGES.ACCOUNT_NOT_VERIFIED);
     }
 
     if (!user.passwordHash) {
-      throw new UnauthorizedException(
-        'This account uses social login. Please sign in using Google/Facebook/GitHub.',
-      );
+      throw new UnauthorizedException(AUTH_MESSAGES.SOCIAL_LOGIN_REQUIRED);
     }
 
-    const isPasswordValid = await comparePassword(
-      input.password,
-      user.passwordHash,
-    );
+    const isPasswordValid = await comparePassword(password, user.passwordHash);
 
     if (!isPasswordValid) {
       throw new UnauthorizedException(AUTH_MESSAGES.INVALID_CREDENTIALS);
     }
 
-    const accessToken = this.jwtService.generateAccessToken({
+    const accessToken = this._jwtService.generateAccessToken({
       userId: user.id,
       role: user.role,
       companyId: user.companyId,
     });
 
-    const refreshToken = this.jwtService.generateRefreshToken({
+    const refreshToken = this._jwtService.generateRefreshToken({
       userId: user.id,
     });
 
     return {
       accessToken,
       refreshToken,
+      message: AUTH_MESSAGES.LOGIN_SUCCESS,
       user: {
         id: user.id,
         email: user.email,
@@ -84,7 +70,18 @@ export class LoginUseCase {
         role: user.role,
         companyId: user.companyId,
       },
-      message: 'Login Successfull',
     };
+  }
+
+  private async checkCompanySuspension(
+    companyId: string | undefined,
+  ): Promise<void> {
+    if (!companyId || !isValidObjectId(companyId)) return;
+
+    const company = await this._companyRepository.findById(companyId);
+
+    if (company?.status === CompanyStatus.SUSPENDED) {
+      throw new ForbiddenException(AUTH_MESSAGES.COMPANY_SUSPENDED);
+    }
   }
 }

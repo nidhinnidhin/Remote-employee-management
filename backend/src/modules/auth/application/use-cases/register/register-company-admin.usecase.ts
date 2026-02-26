@@ -1,5 +1,4 @@
 import { Injectable, ConflictException, Inject } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
 import type { UserRepository } from '../../../domain/repositories/user.repository';
 import type { CompanyRepository } from '../../../domain/repositories/company.repository';
 import type { PendingRegistrationRepository } from '../../../domain/repositories/cache/auth-repository/pending-registration.repository';
@@ -9,63 +8,59 @@ import { OtpService } from 'src/shared/services/otp.service';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
 import { hashPassword } from 'src/shared/utils/password.util';
+import { getOtpExpiresAt, SESSION_TTL_SECONDS } from 'src/shared/constants/functions/otp/otp.constants';
 
 @Injectable()
 export class RegisterCompanyAdminUseCase {
   constructor(
     @Inject('UserRepository')
-    private readonly userRepository: UserRepository,
+    private readonly _userRepository: UserRepository,
 
     @Inject('CompanyRepository')
-    private readonly companyRepository: CompanyRepository,
+    private readonly _companyRepository: CompanyRepository,
 
     @Inject('PendingRegistrationRepository')
-    private readonly pendingRepository: PendingRegistrationRepository,
+    private readonly _pendingRepository: PendingRegistrationRepository,
 
-    private readonly emailService: EmailService,
-    private readonly otpService: OtpService,
+    private readonly _emailService: EmailService,
+    private readonly _otpService: OtpService,
   ) {}
 
   async execute(dto: RegisterCompanyAdminDto) {
-    const existingCompany = await this.companyRepository.findByEmail(
+    const existingCompany = await this._companyRepository.findByEmail(
       dto.company.email,
     );
+
     if (existingCompany) {
       throw new ConflictException(AUTH_MESSAGES.COMPANY_ALREADY_EXIST);
     }
 
-    const existingUser = await this.userRepository.findByEmail(
+    const existingUser = await this._userRepository.findByEmail(
       dto.admin.email.toLowerCase(),
     );
+
     if (existingUser) {
       throw new ConflictException(AUTH_MESSAGES.USER_ALREADY_EXIST);
     }
 
-    const otp = this.otpService.generateOtp();
-    const otpHash = await this.otpService.hashOtp(otp);
-    const expiresAt = new Date(Date.now() + 60_000);
-
+    const otp = this._otpService.generateOtp();
+    const otpHash = await this._otpService.hashOtp(otp);
     const passwordHash = await hashPassword(dto.admin.password);
 
-    const payload = {
-      company: dto.company,
-      admin: {
-        ...dto.admin,
-        password: passwordHash,
-      },
-      otpHash,
-      expiresAt,
-    };
-
-    // Redis TTL = 60 seconds
-    await this.pendingRepository.save(
+    await this._pendingRepository.save(
       dto.admin.email,
-      payload,
-      900, // 15 minutes TTL for SESSION to allow resend
+      {
+        company: dto.company,
+        admin: { ...dto.admin, password: passwordHash },
+        otpHash,
+        expiresAt: getOtpExpiresAt(),
+      },
+      SESSION_TTL_SECONDS,
     );
 
-    await this.emailService.sendOtp(dto.admin.email, otp);
+    await this._emailService.sendOtp(dto.admin.email, otp);
 
     return { message: OTP_MESSAGES.OTP_SENT };
   }
 }
+

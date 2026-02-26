@@ -1,5 +1,6 @@
 import { v2 as cloudinary } from 'cloudinary';
 import { Injectable } from '@nestjs/common';
+import { CloudinaryResourceType } from '../enums/employees/media/cloudinary-resource.enum';
 
 @Injectable()
 export class CloudinaryService {
@@ -30,7 +31,7 @@ export class CloudinaryService {
 
   async deleteFile(
     publicId: string,
-    resourceType: 'image' | 'raw' | 'video' = 'image',
+    resourceType?: CloudinaryResourceType,
   ) {
     return cloudinary.uploader.destroy(publicId, {
       resource_type: resourceType,

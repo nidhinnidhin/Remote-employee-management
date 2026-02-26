@@ -13,12 +13,12 @@ import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages'
 export class ForgotPasswordUseCase {
   constructor(
     @Inject('UserRepository')
-    private readonly userRepository: UserRepository,
-    private readonly sendEmailOtpUseCase: SendEmailOtpUseCase,
+    private readonly _userRepository: UserRepository,
+    private readonly _sendEmailOtpUseCase: SendEmailOtpUseCase,
   ) {}
 
   async execute({ email }: { email: string }) {
-    const user = await this.userRepository.findByEmail(email.toLowerCase());
+    const user = await this._userRepository.findByEmail(email.toLowerCase());
 
     if (!user) {
       throw new NotFoundException(AUTH_MESSAGES.USER_NOT_FOUND);
@@ -28,7 +28,7 @@ export class ForgotPasswordUseCase {
       throw new ForbiddenException(AUTH_MESSAGES.USER_NOT_ACTIVE);
     }
 
-    await this.sendEmailOtpUseCase.execute({
+    await this._sendEmailOtpUseCase.execute({
       userId: user.id,
       email: user.email,
     });

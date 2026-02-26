@@ -9,11 +9,11 @@ import { OtpPurpose } from 'src/shared/enums/reset-password/otp-purpose.enum';
 export class MongoEmailOtpRepository implements EmailOtpRepository {
   constructor(
     @InjectModel('EmailOtp')
-    private readonly emailOtpModel: Model<any>,
+    private readonly _emailOtpModel: Model<any>,
   ) {}
 
   async create(otp: EmailOtpEntity): Promise<void> {
-    await this.emailOtpModel.create({
+    await this._emailOtpModel.create({
       userId: otp.userId,
       email: otp.email,
       otpHash: otp.otpHash,
@@ -25,7 +25,7 @@ export class MongoEmailOtpRepository implements EmailOtpRepository {
   }
 
   async findLatestByEmail(email: string): Promise<EmailOtpEntity | null> {
-    const doc = await this.emailOtpModel
+    const doc = await this._emailOtpModel
       .findOne({ email, verified: false })
       .sort({ createdAt: -1 });
 
@@ -59,7 +59,7 @@ export class MongoEmailOtpRepository implements EmailOtpRepository {
     query.purpose = purpose;
   }
 
-  const doc = await this.emailOtpModel
+  const doc = await this._emailOtpModel
     .findOne(query)
     .sort({ createdAt: -1 });
 
@@ -79,7 +79,7 @@ export class MongoEmailOtpRepository implements EmailOtpRepository {
 }
 
   async markVerified(id: string): Promise<void> {
-    await this.emailOtpModel.updateOne(
+    await this._emailOtpModel.updateOne(
       { _id: id },
       { verified: true },
     );

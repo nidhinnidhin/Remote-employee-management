@@ -10,24 +10,25 @@ import { VerifyEmailOtpInput } from 'src/shared/types/company/otp/verify-email-o
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
 import { JwtService } from 'src/shared/services/jwt.service';
+import { UserRole } from 'src/shared/enums/user/user-role.enum';
 
 @Injectable()
 export class VerifyEmailOtpUseCase {
   constructor(
     @Inject('PendingRegistrationRepository')
-    private readonly pendingRepository: PendingRegistrationRepository,
+    private readonly _pendingRepository: PendingRegistrationRepository,
 
     @Inject('CompanyRepository')
-    private readonly companyRepository: CompanyRepository,
+    private readonly _companyRepository: CompanyRepository,
 
     @Inject('UserRepository')
-    private readonly userRepository: UserRepository,
+    private readonly _userRepository: UserRepository,
 
-    private readonly jwtService: JwtService,
-  ) { }
+    private readonly _jwtService: JwtService,
+  ) {}
 
   async execute(input: VerifyEmailOtpInput) {
-    const pending = await this.pendingRepository.find(input.email);
+    const pending = await this._pendingRepository.find(input.email);
     if (!pending) {
       throw new BadRequestException(OTP_MESSAGES.OTP_EXPIRED);
     }
@@ -55,16 +56,14 @@ export class VerifyEmailOtpUseCase {
       new Date(),
     );
 
-    const createdCompany = await this.companyRepository.create(company);
+    const createdCompany = await this._companyRepository.create(company);
 
-    // Create user
-    console.log('!!! DEBUG: VerifyEmailOtpUseCase - pending.admin:', pending.admin);
     const user = new UserEntity(
       randomUUID(),
       pending.admin.firstName,
       pending.admin.lastName,
       pending.admin.email.toLowerCase(),
-      'COMPANY_ADMIN',
+      UserRole.COMPANY_ADMIN,
       pending.admin.phone,
       pending.admin.password,
       UserStatus.ACTIVE,
@@ -73,19 +72,19 @@ export class VerifyEmailOtpUseCase {
       createdCompany.id,
     );
 
-    await this.userRepository.create(user);
+    await this._userRepository.create(user);
 
     // Clear Redis
-    await this.pendingRepository.delete(input.email);
+    await this._pendingRepository.delete(input.email);
 
     // Tokens
-    const accessToken = this.jwtService.generateAccessToken({
+    const accessToken = this._jwtService.generateAccessToken({
       userId: user.id,
       role: user.role,
       companyId: user.companyId,
     });
 
-    const refreshToken = this.jwtService.generateRefreshToken({
+    const refreshToken = this._jwtService.generateRefreshToken({
       userId: user.id,
     });
 
