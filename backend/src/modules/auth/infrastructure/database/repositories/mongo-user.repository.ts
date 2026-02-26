@@ -183,14 +183,14 @@ export class MongoUserRepository implements UserRepository {
     documentId: string,
     update: any,
   ): Promise<void> {
+    const setFields: any = {};
+    Object.keys(update).forEach((key) => {
+      setFields[`documents.$.${key}`] = update[key];
+    });
+
     await this.userModel.updateOne(
       { _id: userId, 'documents._id': documentId },
-      {
-        $set: {
-          'documents.$.name': update.name,
-          'documents.$.category': update.category,
-        },
-      },
+      { $set: setFields },
     );
   }
 }

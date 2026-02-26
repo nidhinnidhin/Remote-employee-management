@@ -121,6 +121,7 @@ export class UserDocument extends Document {
         category: { type: String, required: true },
         fileUrl: { type: String, required: true },
         publicId: { type: String, required: true },
+        resourceType: { type: String, default: 'image' },
         uploadedAt: { type: Date, default: Date.now },
       },
     ],
@@ -131,6 +132,7 @@ export class UserDocument extends Document {
     category: string;
     fileUrl: string;
     publicId: string;
+    resourceType: string;
     uploadedAt: Date;
   }[];
 

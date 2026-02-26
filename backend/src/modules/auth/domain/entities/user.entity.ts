@@ -47,6 +47,7 @@ export class UserEntity {
       category: string;
       fileUrl: string;
       publicId: string;
+      resourceType: string;
       uploadedAt: Date;
     }[],
   ) {}

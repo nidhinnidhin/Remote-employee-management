@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
-import { Plus, X, FileText, Cpu } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { X, Cpu } from "lucide-react";
+import { updateSkills } from "@/services/employee/profile/skills.service";
 
-interface SkillsBioFormData {
-  skills: string[];
-  biography: string;
+interface SkillsFormProps {
+  initialSkills: string[];
 }
 
 const SectionHeader = ({
@@ -17,7 +17,10 @@ const SectionHeader = ({
   title: string;
   subtitle?: string;
 }) => (
-  <div className="flex items-center gap-3 mb-5 pb-4 border-b border-gray-100" style={{ borderColor: "rgb(var(--color-border-subtle))" }}>
+  <div
+    className="flex items-center gap-3 mb-5 pb-4 border-b border-gray-100"
+    style={{ borderColor: "rgb(var(--color-border-subtle))" }}
+  >
     <div className="section-icon-wrap">
       <Icon className="section-icon" />
     </div>
@@ -28,38 +31,30 @@ const SectionHeader = ({
   </div>
 );
 
-export const SkillsForm: React.FC = () => {
-  const [formData, setFormData] = useState<SkillsBioFormData>({
-    skills: [
-      "Node.js",
-      "TypeScript",
-      "React",
-      "MongoDB",
-      "AWS",
-      "Docker",
-      "GraphQL",
-      "PostgreSQL",
-    ],
-    biography: "",
-  });
-
+export const SkillsForm: React.FC<SkillsFormProps> = ({
+  initialSkills,
+}) => {
+  const [skills, setSkills] = useState<string[]>(initialSkills);
   const [skillInput, setSkillInput] = useState("");
   const [saving, setSaving] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
   const [error, setError] = useState("");
 
+  // Sync when parent updates skills (e.g. after refresh)
+  useEffect(() => {
+    setSkills(initialSkills);
+  }, [initialSkills]);
+
   const handleAddSkill = () => {
     const trimmed = skillInput.trim();
-    if (!trimmed || formData.skills.includes(trimmed)) return;
-    setFormData((prev) => ({ ...prev, skills: [...prev.skills, trimmed] }));
+    if (!trimmed || skills.includes(trimmed)) return;
+
+    setSkills((prev) => [...prev, trimmed]);
     setSkillInput("");
   };
 
   const handleRemoveSkill = (skill: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      skills: prev.skills.filter((s) => s !== skill),
-    }));
+    setSkills((prev) => prev.filter((s) => s !== skill));
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -73,13 +68,15 @@ export const SkillsForm: React.FC = () => {
     setSaving(true);
     setError("");
     setSuccessMsg("");
+
     try {
-      // Replace with your actual API call
-      // await clientApi.patch("/auth/profile", { skills: formData.skills, bio: formData.biography });
-      await new Promise((res) => setTimeout(res, 800)); // mock delay
-      setSuccessMsg("Profile updated successfully.");
-    } catch {
-      setError("Failed to save changes. Please try again.");
+      await updateSkills(skills);
+      setSuccessMsg("Skills updated successfully.");
+    } catch (err: any) {
+      setError(
+        err?.response?.data?.message ||
+          "Failed to save changes. Please try again."
+      );
     } finally {
       setSaving(false);
     }
@@ -91,18 +88,16 @@ export const SkillsForm: React.FC = () => {
       <div className="portal-card p-7">
         <SectionHeader
           icon={Cpu}
-          title="Skills & Biography"
-          subtitle="Your expertise and professional summary"
+          title="Skills"
+          subtitle="Your expertise"
         />
 
-        {/* Skills label */}
         <label className="text-xs font-medium text-secondary uppercase tracking-wide mb-2 block">
           Skills
         </label>
 
-        {/* Skills tags + input row */}
         <div className="flex flex-wrap items-center gap-2 min-h-[42px] field-input transition">
-          {formData.skills.map((skill) => (
+          {skills.map((skill) => (
             <span
               key={skill}
               className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500 text-white"
@@ -118,17 +113,16 @@ export const SkillsForm: React.FC = () => {
               </button>
             </span>
           ))}
+
           <input
             type="text"
             value={skillInput}
             onChange={(e) => setSkillInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={formData.skills.length === 0 ? "Add a skill..." : ""}
+            placeholder={skills.length === 0 ? "Add a skill..." : ""}
             className="flex-1 min-w-[120px] bg-transparent text-sm text-primary outline-none placeholder:text-muted"
           />
         </div>
-
-       
       </div>
 
       {/* Save bar */}
@@ -144,6 +138,7 @@ export const SkillsForm: React.FC = () => {
             </p>
           )}
         </div>
+
         <button
           onClick={handleSubmit}
           disabled={saving}

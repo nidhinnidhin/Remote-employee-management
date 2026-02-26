@@ -361,27 +361,49 @@ export class AuthController {
     @Req() req: any,
     @Param('id') documentId: string,
     @Body('publicId') publicId: string,
+    @Body('resourceType') resourceType: 'image' | 'raw' | 'video', // ← add this
   ) {
     return this.deleteDocumentUseCase.execute(
       req.user.userId,
       documentId,
       publicId,
+      resourceType,
     );
   }
 
   @Patch('profile/documents/:id')
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: { fileSize: 10 * 1024 * 1024 },
+      fileFilter: (req, file, callback) => {
+        const allowed = [
+          'application/pdf',
+          'application/msword',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          'image/jpeg',
+          'image/png',
+        ];
+        if (!allowed.includes(file.mimetype)) {
+          return callback(new BadRequestException('Invalid file type'), false);
+        }
+        callback(null, true);
+      },
+    }),
+  )
   async editDocument(
     @Req() req: any,
     @Param('id') documentId: string,
     @Body('name') name: string,
     @Body('category') category: string,
+    @UploadedFile() file?: Express.Multer.File,
   ) {
     return this.editDocumentUseCase.execute(
       req.user.userId,
       documentId,
       name,
       category,
+      file,
     );
   }
 }

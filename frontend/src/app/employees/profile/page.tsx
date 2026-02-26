@@ -41,6 +41,16 @@ export interface UserProfile {
 
   linkedInUrl?: string;
   personalWebsite?: string;
+
+  skills?: string[];
+  documents?: {
+    _id: string;
+    name: string;
+    category: string;
+    fileUrl: string;
+    publicId: string;
+    uploadedAt: string;
+  }[];
 }
 
 export default async function ProfilePage() {

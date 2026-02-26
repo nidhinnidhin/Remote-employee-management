@@ -11,15 +11,12 @@ export class CloudinaryService {
     });
   }
 
-  async uploadFile(
-    file: Express.Multer.File,
-    folder: string,
-  ): Promise<any> {
+  async uploadFile(file: Express.Multer.File, folder: string): Promise<any> {
     return new Promise((resolve, reject) => {
       cloudinary.uploader
         .upload_stream(
           {
-            folder,
+            folder: 'employee-management/documents',
             resource_type: 'auto', // 🔥 REQUIRED for PDF/DOC
           },
           (error, result) => {
@@ -31,9 +28,12 @@ export class CloudinaryService {
     });
   }
 
-  async deleteFile(publicId: string) {
+  async deleteFile(
+    publicId: string,
+    resourceType: 'image' | 'raw' | 'video' = 'image',
+  ) {
     return cloudinary.uploader.destroy(publicId, {
-      resource_type: 'auto',
+      resource_type: resourceType,
     });
   }
 }
