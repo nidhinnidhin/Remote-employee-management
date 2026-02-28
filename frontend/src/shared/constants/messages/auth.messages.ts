@@ -20,4 +20,6 @@ export const AUTH_MESSAGES = {
     LOGIN_FAILED: 'Login Failed',
     PASSWORD_DO_NOT_MATCH: 'Passwords do not match',
     UNABLE_TO_SET_PASSWORD: 'Unable to set password',
+    INVALID_EMAIL: 'Invalid email',
+    RESET_FAILED_PASSWORD: 'Password reset failed'
 };

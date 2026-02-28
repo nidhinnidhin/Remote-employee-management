@@ -14,7 +14,6 @@ import { InviteEmployeeModalProps } from "@/shared/types/company/employees/auth/
 import { AUTH_MESSAGES } from "@/shared/constants/messages/auth.messages";
 
 const ROLE_OPTIONS = Object.values(EmployeeRole);
-
 const DEPARTMENT_OPTIONS = Object.values(EmployeeDepartment);
 
 const InviteEmployeeModal = ({
@@ -27,25 +26,35 @@ const InviteEmployeeModal = ({
     email: "",
     role: "",
     department: "",
+    phone: "",
   });
 
   const [error, setError] = useState("");
+  const [isSending, setIsSending] = useState(false); // NEW STATE
 
   const handleChange = (e: any) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleInvite = () => {
-    const { name, email, role, department } = form;
+  const handleInvite = async () => {
+    const { name, email, role, department, phone } = form;
 
-    if (!name || !email || !role || !department) {
+    if (!name || !email || !role || !department || !phone) {
       setError(AUTH_MESSAGES.ALL_FIELDS_REQUIRED);
       return;
     }
 
     setError("");
-    onInvite(form);
+    setIsSending(true); // start loading
+
+    try {
+      await onInvite(form); // assumes onInvite returns a promise
+    } catch (err) {
+      setError("Failed to send invite. Please try again.");
+    } finally {
+      setIsSending(false); // stop loading
+    }
   };
 
   return (
@@ -56,11 +65,23 @@ const InviteEmployeeModal = ({
       description="Send a secure access link to the employee’s email"
       footer={
         <div className="flex justify-end gap-3">
-          <Button variant="secondary" onClick={onClose}>
+          <Button variant="secondary" onClick={onClose} disabled={isSending}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={handleInvite}>
-            Send Invite
+
+          <Button
+            variant="primary"
+            onClick={handleInvite}
+            disabled={isSending}
+          >
+            {isSending ? (
+              <span className="flex items-center gap-2">
+                <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Sending...
+              </span>
+            ) : (
+              "Send Invite"
+            )}
           </Button>
         </div>
       }
@@ -81,6 +102,16 @@ const InviteEmployeeModal = ({
         value={form.email}
         onChange={handleChange}
         placeholder="employee@company.com"
+        required
+      />
+
+      <FormInput
+        label="Phone Number"
+        name="phone"
+        type="tel"
+        value={form.phone}
+        onChange={handleChange}
+        placeholder="+1 234 567 8900"
         required
       />
 

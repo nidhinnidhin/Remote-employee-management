@@ -17,6 +17,7 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
+  Shield
 } from "lucide-react";
 import { SidebarProps } from "@/shared/types/company/layout/sidebar-props.type";
 
@@ -32,9 +33,9 @@ const Sidebar: React.FC<SidebarProps> = ({
     {
       label: "Dashboard",
       icon: LayoutDashboard,
-      href: "/company-admin/dashboard",
+      href: "/company/employees/dashboard",
     },
-    { label: "Employees", icon: Users, href: "/company-admin/employees" },
+    { label: "Employees", icon: Users, href: "/company/employees/employees" },
     {
       label: "Departments & Teams",
       icon: Building2,
@@ -63,6 +64,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       href: "/company-admin/profile",
     },
     { label: "Audit Logs", icon: FileText, href: "/company-admin/audit-logs" },
+    { label: "Company policy", icon: Shield, href: "/company/employees/company-policy" },
   ];
 
   return (
@@ -77,7 +79,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed top-0 left-0 h-full z-50 bg-neutral-900 border-r border-neutral-800 transition-all duration-300 ease-in-out
+        className={`sidebar fixed top-0 left-0 h-full z-50 transition-all duration-300 ease-in-out
           ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
           lg:translate-x-0
           ${isCollapsed ? "lg:w-20" : "lg:w-64"}
@@ -85,16 +87,21 @@ const Sidebar: React.FC<SidebarProps> = ({
         `}
       >
         {/* Header */}
-        <div className="h-16 flex items-center justify-between px-4 border-b border-neutral-800/50">
+        <div
+          className="h-16 flex items-center justify-between px-4"
+          style={{ borderBottom: "1px solid rgb(var(--color-sidebar-border))" }}
+        >
           {!isCollapsed && (
-            <span className="text-xl font-bold text-white truncate">
+            <span className="sidebar-logo-text text-xl truncate">
               Workspace Admin
             </span>
           )}
+
           {/* Mobile Close Button */}
           <button
             onClick={closeMobileSidebar}
-            className="lg:hidden p-1 text-neutral-400 hover:text-white"
+            className="lg:hidden p-1 transition-colors"
+            style={{ color: "rgb(var(--color-sidebar-text))" }}
           >
             <X size={20} />
           </button>
@@ -102,7 +109,12 @@ const Sidebar: React.FC<SidebarProps> = ({
           {/* Desktop Collapse Toggle */}
           <button
             onClick={toggleCollapse}
-            className="hidden lg:flex items-center justify-center w-8 h-8 rounded-full bg-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-700 transition-colors absolute -right-3 top-20 border border-neutral-700 shadow-sm z-50"
+            className="hidden lg:flex items-center justify-center w-8 h-8 rounded-full transition-colors absolute -right-3 top-20 border z-50 shadow-sm"
+            style={{
+              backgroundColor: "rgb(var(--color-surface-raised))",
+              borderColor: "rgb(var(--color-border))",
+              color: "rgb(var(--color-text-secondary))",
+            }}
           >
             {isCollapsed ? (
               <ChevronRight size={14} />
@@ -120,21 +132,12 @@ const Sidebar: React.FC<SidebarProps> = ({
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group
-                  ${
-                    isActive
-                      ? "bg-red-500/10 text-red-500"
-                      : "text-neutral-400 hover:bg-neutral-800 hover:text-white"
-                  }
+                className={`sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group shadow-sm
+                  ${isActive ? "active" : ""}
                 `}
                 title={isCollapsed ? item.label : ""}
               >
-                <div
-                  className={`${isActive ? "text-red-500" : "text-neutral-400 group-hover:text-white"}`}
-                >
-                  <item.icon size={20} strokeWidth={1.5} />
-                </div>
-
+                <item.icon size={20} strokeWidth={1.5} />
                 {!isCollapsed && (
                   <span className="font-medium text-sm whitespace-nowrap overflow-hidden text-ellipsis">
                     {item.label}

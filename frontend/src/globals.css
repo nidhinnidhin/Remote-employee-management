@@ -2,10 +2,801 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   THEME SYSTEM
+   Three portals, one design language.
+   Apply the theme class to your layout root:
+     Employee:      <html class="theme-employee">
+     Company Admin: <html class="theme-company">
+     Super Admin:   <html class="theme-super">
+   ============================================================ */
 
-/* Custom Animations for Company Registration Form */
+@layer base {
 
-/* Fade In Animation - For step transitions */
+  /* ----------------------------------------------------------
+     BASE DESIGN TOKENS (shared across all themes)
+     ---------------------------------------------------------- */
+  :root {
+    /* Radius */
+    --radius-sm: 0.375rem;
+    /* 6px  */
+    --radius-md: 0.625rem;
+    /* 10px */
+    --radius-lg: 1rem;
+    /* 16px */
+    --radius-xl: 1.25rem;
+    /* 20px */
+    --radius-2xl: 1.5rem;
+    /* 24px */
+
+    /* Shadow scale */
+    --shadow-card: 0 1px 3px 0 rgb(0 0 0 / .06), 0 1px 2px -1px rgb(0 0 0 / .06);
+    --shadow-modal: 0 20px 60px -10px rgb(0 0 0 / .3);
+    --shadow-dropdown: 0 8px 24px -4px rgb(0 0 0 / .12);
+
+    /* Typography scale */
+    --text-label: 0.6875rem;
+    /* 11px — uppercase labels */
+    --text-body-sm: 0.8125rem;
+    /* 13px */
+    --text-body: 0.875rem;
+    /* 14px */
+    --text-body-lg: 1rem;
+    /* 16px */
+    --text-heading: 1.125rem;
+    /* 18px */
+
+    /* Font families (fed from Next.js font variables in layout.tsx) */
+    --font-primary: var(--font-inter, system-ui, sans-serif);
+    /* body / UI text  */
+    --font-heading: var(--font-plus-jakarta, system-ui, sans-serif);
+    /* headings h1–h6  */
+
+    /*
+     * Icon size conventions (lucide-react, apply to all 3 portals):
+     *   size={14}  strokeWidth={1.5}  →  inline / label icons
+     *   size={16}  strokeWidth={1.5}  →  small UI icons (chips, tags)
+     *   size={18}  strokeWidth={1.5}  →  card / stat icons
+     *   size={20}  strokeWidth={1.5}  →  sidebar nav icons
+     *   size={24}  strokeWidth={1.5}  →  header / hero icons
+     */
+  }
+
+
+  /* ----------------------------------------------------------
+     THEME: EMPLOYEE  (Indigo / clean light)
+     ---------------------------------------------------------- */
+  /* ----------------------------------------------------------
+   THEME: EMPLOYEE  (Dark Teal / Gaming Cyan — from screenshot)
+   ---------------------------------------------------------- */
+.theme-employee,
+:root {
+
+  /* =========================
+     SURFACE
+     ========================= */
+  --color-bg: 6 18 24;                 /* deep blue-black */
+  --color-bg-subtle: 10 28 36;         /* soft dark teal */
+  --color-surface: 12 32 41;           /* card background */
+  --color-surface-raised: 16 42 54;    /* elevated card */
+
+  /* =========================
+     BORDER
+     ========================= */
+  --color-border: 28 66 78;            /* teal-gray border */
+  --color-border-subtle: 20 50 60;
+
+  /* =========================
+     TEXT
+     ========================= */
+  --color-text-primary: 236 254 255;   /* near-white cyan tint */
+  --color-text-secondary: 148 197 210; /* soft cyan-gray */
+  --color-text-muted: 94 139 153;      /* muted teal */
+  --color-text-inverse: 6 18 24;
+
+  /* =========================
+     BRAND / ACCENT (CYAN)
+     ========================= */
+  --color-accent: 45 212 191;          /* teal-400 */
+  --color-accent-hover: 20 184 166;    /* teal-500 */
+  --color-accent-subtle: 12 52 61;     /* dark teal glow bg */
+  --color-accent-muted: 94 234 212;    /* soft aqua */
+  --color-accent-text: 110 231 183;    /* bright mint */
+
+  /* =========================
+     SEMANTIC
+     ========================= */
+  --color-success: 34 197 94;          
+  --color-success-subtle: 12 45 32;
+
+  --color-warning: 250 204 21;
+  --color-warning-subtle: 48 38 8;
+
+  --color-danger: 248 113 113;
+  --color-danger-subtle: 60 16 16;
+
+  /* =========================
+     INPUT
+     ========================= */
+  --color-input-bg: 10 28 36;
+  --color-input-border: 28 66 78;
+  --color-input-focus: 45 212 191;
+  --color-input-text: 236 254 255;
+  --color-input-placeholder: 94 139 153;
+
+  /* =========================
+     BADGE
+     ========================= */
+  --color-badge-bg: 12 52 61;
+  --color-badge-text: 110 231 183;
+
+  /* =========================
+     TAG
+     ========================= */
+  --color-tag-bg: 45 212 191;
+  --color-tag-text: 6 18 24;
+
+  /* =========================
+     MODAL
+     ========================= */
+  --color-modal-bg: 12 32 41;
+  --color-modal-overlay: 0 0 0;
+  --color-modal-overlay-opacity: 0.7;
+  --color-modal-border: 28 66 78;
+  --color-modal-text: 236 254 255;
+  --color-modal-text-muted: 148 197 210;
+
+  /* =========================
+     BUTTONS
+     ========================= */
+  --color-btn-primary-bg: 45 212 191;
+  --color-btn-primary-hover: 20 184 166;
+  --color-btn-primary-text: 6 18 24;
+
+  --color-btn-secondary-bg: 20 50 60;
+  --color-btn-secondary-hover: 28 66 78;
+  --color-btn-secondary-text: 236 254 255;
+
+  /* =========================
+     SIDEBAR
+     ========================= */
+  --color-sidebar-bg: 8 22 28;
+  --color-sidebar-text: 148 197 210;
+  --color-sidebar-active-bg: 12 52 61;
+  --color-sidebar-active-text: 110 231 183;
+  --color-sidebar-hover-bg: 16 42 54;
+  --color-sidebar-border: 20 50 60;
+  --color-sidebar-logo-text: 236 254 255;
+
+  /* =========================
+     NAV
+     ========================= */
+  --color-nav-bg: 8 22 28;
+  --color-nav-border: 20 50 60;
+
+  /* =========================
+     SCROLLBAR
+     ========================= */
+  --color-scrollbar-thumb: 28 66 78;
+  --color-scrollbar-hover: 45 212 191;
+
+  /* =========================
+     DROPZONE
+     ========================= */
+  --color-dropzone-accent: 45 212 191;
+  --color-dropzone-accent-subtle: 12 52 61;
+}
+
+
+  /* ----------------------------------------------------------
+     THEME: COMPANY ADMIN  (Dark + Pink — your existing modal/auth)
+     ---------------------------------------------------------- */
+  /* ----------------------------------------------------------
+   THEME: COMPANY ADMIN  (Standard Corporate — Custom Palette)
+   Colors Used:
+   #244855  #E64833  #874F41  #90AEAD  #FBE9D0
+   ---------------------------------------------------------- */
+/* ----------------------------------------------------------
+   THEME: COMPANY ADMIN  (Dark Tech Teal — SIRIN Style)
+   ---------------------------------------------------------- */
+/* ----------------------------------------------------------
+   THEME: COMPANY ADMIN (Modern Gradient SaaS Dashboard)
+   ---------------------------------------------------------- */
+.theme-company {
+
+  /* =========================
+     SURFACE
+     ========================= */
+  --color-bg: 11 16 38;           /* #0B1026 */
+  --color-bg-subtle: 15 22 55;
+  --color-surface: 17 24 60;      /* #11183C */
+  --color-surface-raised: 21 30 77; /* #151E4D */
+
+  /* =========================
+     BORDER
+     ========================= */
+  --color-border: 45 65 140;
+  --color-border-subtle: 25 35 90;
+
+  /* =========================
+     TEXT
+     ========================= */
+  --color-text-primary: 255 255 255;
+  --color-text-secondary: 169 179 214; /* soft bluish */
+  --color-text-muted: 120 135 190;
+  --color-text-inverse: 11 16 38;
+
+  /* =========================
+     BRAND / ACCENT (Purple → Blue)
+     ========================= */
+  --color-accent: 123 97 255;     /* purple */
+  --color-accent-hover: 100 80 240;
+  --color-accent-subtle: 30 40 95;
+  --color-accent-muted: 77 163 255;
+  --color-accent-text: 255 255 255;
+
+  /* =========================
+     SEMANTIC
+     ========================= */
+  --color-success: 34 197 94;
+  --color-success-subtle: 15 45 35;
+
+  --color-warning: 255 159 67;   /* orange card */
+  --color-warning-subtle: 60 35 10;
+
+  --color-danger: 255 110 199;   /* pink highlight */
+  --color-danger-subtle: 60 20 60;
+
+  /* =========================
+     INPUT
+     ========================= */
+  --color-input-bg: 15 22 55;
+  --color-input-border: 45 65 140;
+  --color-input-focus: 123 97 255;
+  --color-input-text: 255 255 255;
+  --color-input-placeholder: 120 135 190;
+
+  /* =========================
+     BADGE
+     ========================= */
+  --color-badge-bg: 30 40 95;
+  --color-badge-text: 123 97 255;
+
+  /* =========================
+     TAG
+     ========================= */
+  --color-tag-bg: 77 163 255;
+  --color-tag-text: 11 16 38;
+
+  /* =========================
+     MODAL
+     ========================= */
+  --color-modal-bg: 21 30 77;
+  --color-modal-overlay: 0 0 0;
+  --color-modal-overlay-opacity: 0.7;
+  --color-modal-border: 45 65 140;
+  --color-modal-text: 255 255 255;
+  --color-modal-text-muted: 169 179 214;
+
+  /* =========================
+     BUTTONS
+     ========================= */
+
+  /* Primary = Gradient Purple */
+  --color-btn-primary-bg: 123 97 255;
+  --color-btn-primary-hover: 100 80 240;
+  --color-btn-primary-text: 255 255 255;
+
+  /* Secondary = Blue */
+  --color-btn-secondary-bg: 77 163 255;
+  --color-btn-secondary-hover: 60 140 230;
+  --color-btn-secondary-text: 11 16 38;
+
+  /* =========================
+     SIDEBAR
+     ========================= */
+  --color-sidebar-bg: 10 14 35;
+  --color-sidebar-text: 169 179 214;
+  --color-sidebar-active-bg: 30 40 95;
+  --color-sidebar-active-text: 123 97 255;
+  --color-sidebar-hover-bg: 17 24 60;
+  --color-sidebar-border: 20 28 75;
+  --color-sidebar-logo-text: 255 255 255;
+
+  /* =========================
+     NAV
+     ========================= */
+  --color-nav-bg: 10 14 35;
+  --color-nav-border: 25 35 90;
+
+  /* =========================
+     SCROLLBAR
+     ========================= */
+  --color-scrollbar-thumb: 45 65 140;
+  --color-scrollbar-hover: 123 97 255;
+
+  /* =========================
+     DROPZONE
+     ========================= */
+  --color-dropzone-accent: 123 97 255;
+  --color-dropzone-accent-subtle: 30 40 95;
+}
+
+.btn-primary {
+  background: linear-gradient(
+    135deg,
+    rgb(123 97 255),
+    rgb(77 163 255)
+  );
+  box-shadow: 0 8px 25px rgb(123 97 255 / 0.35);
+}
+
+.portal-card {
+  background: rgba(21, 30, 77, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(77, 163, 255, 0.15);
+}
+
+.section-icon {
+  filter: drop-shadow(0 0 10px rgba(123,97,255,0.6));
+}
+
+  /* ----------------------------------------------------------
+     THEME: SUPER ADMIN  (Slate dark + Violet/Amber)
+     ---------------------------------------------------------- */
+  .theme-super {
+
+    /* Surface */
+    --color-bg: 15 23 42;
+    /* slate-900          */
+    --color-bg-subtle: 15 23 42;
+    --color-surface: 30 41 59;
+    /* slate-800          */
+    --color-surface-raised: 51 65 85;
+    /* slate-700          */
+
+    /* Border */
+    --color-border: 51 65 85;
+    /* slate-700          */
+    --color-border-subtle: 30 41 59;
+    /* slate-800          */
+
+    /* Text */
+    --color-text-primary: 248 250 252;
+    /* slate-50           */
+    --color-text-secondary: 148 163 184;
+    /* slate-400          */
+    --color-text-muted: 100 116 139;
+    /* slate-500          */
+    --color-text-inverse: 15 23 42;
+
+    /* Brand / Accent — Violet */
+    --color-accent: 139 92 246;
+    /* violet-500         */
+    --color-accent-hover: 124 58 237;
+    /* violet-600         */
+    --color-accent-subtle: 46 16 101;
+    /* violet-950         */
+    --color-accent-muted: 196 181 253;
+    /* violet-300         */
+    --color-accent-text: 221 214 254;
+    /* violet-200         */
+
+    /* Semantic */
+    --color-success: 52 211 153;
+    /* emerald-400        */
+    --color-success-subtle: 14 45 36;
+    --color-warning: 251 191 36;
+    /* amber-400          */
+    --color-warning-subtle: 44 33 5;
+    --color-danger: 248 113 113;
+    /* red-400            */
+    --color-danger-subtle: 44 10 10;
+
+    /* Input */
+    --color-input-bg: 30 41 59;
+    /* slate-800          */
+    --color-input-border: 51 65 85;
+    /* slate-700          */
+    --color-input-focus: 139 92 246;
+    /* violet-500         */
+    --color-input-text: 248 250 252;
+    --color-input-placeholder: 100 116 139;
+
+    /* Badge */
+    --color-badge-bg: 46 16 101;
+    --color-badge-text: 221 214 254;
+    /* violet-200         */
+
+    /* Skill tag */
+    --color-tag-bg: 139 92 246;
+    /* violet-500         */
+    --color-tag-text: 255 255 255;
+
+    /* Modal */
+    --color-modal-bg: 30 41 59;
+    /* slate-800          */
+    --color-modal-overlay: 0 0 0;
+    --color-modal-overlay-opacity: 0.75;
+    --color-modal-border: 51 65 85;
+    --color-modal-text: 248 250 252;
+    --color-modal-text-muted: 148 163 184;
+
+    /* Button primary */
+    --color-btn-primary-bg: 139 92 246;
+    --color-btn-primary-hover: 124 58 237;
+    --color-btn-primary-text: 255 255 255;
+
+    /* Button secondary */
+    --color-btn-secondary-bg: 51 65 85;
+    --color-btn-secondary-hover: 71 85 105;
+    --color-btn-secondary-text: 248 250 252;
+
+    /* Sidebar */
+    --color-sidebar-bg: 15 23 42;
+    /* slate-900          */
+    --color-sidebar-text: 148 163 184;
+    --color-sidebar-active-bg: 46 16 101;
+    --color-sidebar-active-text: 221 214 254;
+    --color-sidebar-hover-bg: 30 41 59;
+    --color-sidebar-border: 30 41 59;
+    --color-sidebar-logo-text: 248 250 252;
+
+    /* Top nav */
+    --color-nav-bg: 15 23 42;
+    --color-nav-border: 30 41 59;
+
+    /* Scrollbar */
+    --color-scrollbar-thumb: 51 65 85;
+    --color-scrollbar-hover: 139 92 246;
+
+    /* Drop zone accent */
+    --color-dropzone-accent: 139 92 246;
+    --color-dropzone-accent-subtle: 46 16 101;
+  }
+}
+
+
+/* ============================================================
+   COMPONENT UTILITY CLASSES
+   Use these in all portal components instead of raw Tailwind
+   color classes. They automatically respond to the active theme.
+   ============================================================ */
+
+@layer components {
+
+  /* ---- Layout ---- */
+  .portal-page {
+    @apply min-h-screen;
+    background-color: rgb(var(--color-bg));
+    color: rgb(var(--color-text-primary));
+  }
+
+  .portal-card {
+    background-color: rgb(var(--color-surface));
+    border: 1px solid rgb(var(--color-border-subtle));
+    box-shadow: var(--shadow-card);
+    border-radius: var(--radius-2xl);
+  }
+
+  .portal-card-inner {
+    background-color: rgb(var(--color-surface-raised));
+    border: 1px solid rgb(var(--color-border));
+    border-radius: var(--radius-xl);
+  }
+
+  /* ---- Section header (icon + title + subtitle) ---- */
+  .section-icon-wrap {
+    @apply w-8 h-8 flex items-center justify-center flex-shrink-0;
+    background-color: rgb(var(--color-accent-subtle));
+    border-radius: var(--radius-md);
+  }
+
+  .section-icon {
+    @apply w-4 h-4;
+    color: rgb(var(--color-accent));
+  }
+
+  .section-title {
+    @apply text-sm font-semibold;
+    color: rgb(var(--color-text-primary));
+  }
+
+  .section-subtitle {
+    @apply text-xs mt-0.5;
+    color: rgb(var(--color-text-muted));
+  }
+
+  .section-divider {
+    border-bottom: 1px solid rgb(var(--color-border-subtle));
+    @apply mb-5 pb-4;
+  }
+
+  /* ---- Typography ---- */
+  .text-primary {
+    color: rgb(var(--color-text-primary));
+  }
+
+  .text-secondary {
+    color: rgb(var(--color-text-secondary));
+  }
+
+  .text-muted {
+    color: rgb(var(--color-text-muted));
+  }
+
+  .text-accent {
+    color: rgb(var(--color-accent));
+  }
+
+  .text-accent-soft {
+    color: rgb(var(--color-accent-text));
+  }
+
+  .label-upper {
+    @apply text-xs font-medium uppercase tracking-wide;
+    color: rgb(var(--color-text-secondary));
+  }
+
+  /* ---- Form inputs ---- */
+  .field-input {
+    @apply w-full rounded-lg px-3 py-2.5 text-sm transition;
+    background-color: rgb(var(--color-input-bg));
+    border: 1px solid rgb(var(--color-input-border));
+    color: rgb(var(--color-input-text));
+  }
+
+  .field-input::placeholder {
+    color: rgb(var(--color-input-placeholder));
+  }
+
+  .field-input:focus {
+    outline: none;
+    border-color: rgb(var(--color-input-focus));
+    box-shadow: 0 0 0 3px rgb(var(--color-input-focus) / 0.25);
+    background-color: rgb(var(--color-surface));
+  }
+
+  .field-input.error {
+    border-color: rgb(var(--color-danger));
+  }
+
+  .field-input-icon {
+    @apply pl-9;
+  }
+
+  .field-select {
+    @apply field-input appearance-none cursor-pointer pr-9;
+  }
+
+  .field-textarea {
+    @apply field-input resize-none;
+  }
+
+  .field-label {
+    @apply label-upper mb-1.5 block;
+  }
+
+  .field-error {
+    @apply text-xs mt-1;
+    color: rgb(var(--color-danger));
+  }
+
+  .field-hint {
+    @apply text-xs mt-1;
+    color: rgb(var(--color-text-muted));
+  }
+
+  /* ---- Skill / tag pills ---- */
+  .skill-tag {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold;
+    background-color: rgb(var(--color-tag-bg));
+    color: rgb(var(--color-tag-text));
+  }
+
+  /* ---- Badge ---- */
+  .portal-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold;
+    background-color: rgb(var(--color-badge-bg));
+    color: rgb(var(--color-badge-text));
+  }
+
+  /* ---- Buttons ---- */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 font-semibold text-sm transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+    border-radius: var(--radius-lg);
+    padding: 0.625rem 1.25rem;
+  }
+
+  .btn-primary {
+    @apply btn;
+    background-color: rgb(var(--color-btn-primary-bg));
+    color: rgb(var(--color-btn-primary-text));
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background-color: rgb(var(--color-btn-primary-hover));
+  }
+
+  .btn-secondary {
+    @apply btn;
+    background-color: rgb(var(--color-btn-secondary-bg));
+    color: rgb(var(--color-btn-secondary-text));
+  }
+
+  .btn-secondary:hover:not(:disabled) {
+    background-color: rgb(var(--color-btn-secondary-hover));
+  }
+
+  .btn-ghost {
+    @apply btn bg-transparent;
+    color: rgb(var(--color-text-secondary));
+  }
+
+  .btn-ghost:hover:not(:disabled) {
+    background-color: rgb(var(--color-accent-subtle));
+    color: rgb(var(--color-accent));
+  }
+
+  .btn-danger {
+    @apply btn;
+    background-color: rgb(var(--color-danger));
+    color: #fff;
+  }
+
+  .btn-danger:hover:not(:disabled) {
+    filter: brightness(0.9);
+  }
+
+  .btn-outline-accent {
+    @apply btn;
+    background-color: transparent;
+    border: 1px solid rgb(var(--color-accent));
+    color: rgb(var(--color-accent));
+  }
+
+  .btn-outline-accent:hover:not(:disabled) {
+    background-color: rgb(var(--color-accent-subtle));
+  }
+
+  .btn-sm {
+    @apply text-xs;
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--radius-md);
+  }
+
+  .btn-icon {
+    @apply btn p-2;
+    border-radius: var(--radius-md);
+  }
+
+  /* ---- File drop zone ---- */
+  .dropzone {
+    @apply border-2 border-dashed rounded-lg p-6 flex flex-col items-center gap-2 cursor-pointer transition;
+    border-color: rgb(var(--color-border));
+  }
+
+  .dropzone:hover,
+  .dropzone.active {
+    border-color: rgb(var(--color-dropzone-accent));
+    background-color: rgb(var(--color-dropzone-accent-subtle));
+  }
+
+  .dropzone.error {
+    border-color: rgb(var(--color-danger));
+  }
+
+  .dropzone-icon-wrap {
+    @apply w-10 h-10 flex items-center justify-center rounded-xl;
+    background-color: rgb(var(--color-accent-subtle));
+  }
+
+  .dropzone-icon {
+    @apply w-5 h-5;
+    color: rgb(var(--color-accent));
+  }
+
+  /* ---- Document card ---- */
+  .doc-card {
+    @apply portal-card p-5 flex flex-col gap-4;
+  }
+
+  .doc-card-icon-wrap {
+    @apply w-10 h-10 flex items-center justify-center rounded-xl flex-shrink-0;
+    background-color: rgb(var(--color-accent-subtle));
+  }
+
+  .doc-card-icon {
+    @apply w-5 h-5;
+    color: rgb(var(--color-accent));
+  }
+
+  /* ---- Sidebar ---- */
+  .sidebar {
+    border-right: 1px solid rgb(var(--color-sidebar-border));
+    background-color: rgb(var(--color-sidebar-bg));
+  }
+
+  .sidebar-link {
+    @apply flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-150;
+    color: rgb(var(--color-sidebar-text));
+    border-radius: var(--radius-lg);
+  }
+
+  .sidebar-link:hover {
+    background-color: rgb(var(--color-sidebar-hover-bg));
+    color: rgb(var(--color-text-primary));
+  }
+
+  .sidebar-link.active {
+    background-color: rgb(var(--color-sidebar-active-bg));
+    color: rgb(var(--color-sidebar-active-text));
+  }
+
+  .sidebar-logo-text {
+    @apply text-lg font-bold;
+    color: rgb(var(--color-sidebar-logo-text));
+  }
+
+  /* ---- Top nav ---- */
+  .top-nav {
+    border-bottom: 1px solid rgb(var(--color-nav-border));
+    background-color: rgb(var(--color-nav-bg));
+  }
+
+  /* ---- Modal (overrides BaseModal styles per theme) ---- */
+  .modal-surface {
+    background-color: rgb(var(--color-modal-bg));
+    border: 1px solid rgb(var(--color-modal-border));
+    color: rgb(var(--color-modal-text));
+    border-radius: var(--radius-xl);
+  }
+
+  .modal-title {
+    @apply text-xl font-bold text-center;
+    color: rgb(var(--color-modal-text));
+  }
+
+  .modal-description {
+    @apply text-sm text-center;
+    color: rgb(var(--color-modal-text-muted));
+  }
+
+  /* ---- Divider ---- */
+  .portal-divider {
+    border-top: 1px solid rgb(var(--color-border-subtle));
+  }
+
+  /* ---- Status indicators ---- */
+  .status-success {
+    @apply portal-badge;
+    background-color: rgb(var(--color-success-subtle));
+    color: rgb(var(--color-success));
+  }
+
+  .status-warning {
+    @apply portal-badge;
+    background-color: rgb(var(--color-warning-subtle));
+    color: rgb(var(--color-warning));
+  }
+
+  .status-danger {
+    @apply portal-badge;
+    background-color: rgb(var(--color-danger-subtle));
+    color: rgb(var(--color-danger));
+  }
+
+  /* ---- Save bar ---- */
+  .save-bar {
+    @apply portal-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-5;
+  }
+}
+
+
+/* ============================================================
+   ANIMATIONS (unchanged from original)
+   ============================================================ */
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -18,14 +809,10 @@
   }
 }
 
-
-
-
 .animate-fadeIn {
   animation: fadeIn 0.5s ease-out forwards;
 }
 
-/* Slide Down Animation - For error messages */
 @keyframes slideDown {
   from {
     opacity: 0;
@@ -42,8 +829,8 @@
   animation: slideDown 0.3s ease-out forwards;
 }
 
-/* Shake Animation - For error alerts */
 @keyframes shake {
+
   0%,
   100% {
     transform: translateX(0);
@@ -69,8 +856,8 @@
   animation: shake 0.5s ease-in-out;
 }
 
-/* Pulse Animation - For loading states */
 @keyframes pulse {
+
   0%,
   100% {
     opacity: 1;
@@ -86,79 +873,47 @@
 }
 
 
-.input {
-  @apply w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition;
-}
-
-.form-icon {
-  @apply w-4 h-4 text-gray-400;
-}
-
-
-
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
-  }
-  .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-  }
-}
-
-
+/* ============================================================
+   BASE RESET & SCROLLBAR
+   ============================================================ */
 
 @layer base {
   * {
     @apply border-border;
+    box-sizing: border-box;
   }
+
   body {
-    @apply bg-background text-foreground;
+    background-color: rgb(var(--color-bg));
+    color: rgb(var(--color-text-primary));
+    @apply font-sans antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-plus-jakarta), sans-serif;
+    color: rgb(var(--color-text-primary));
+  }
+
+  /* Themed scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgb(var(--color-scrollbar-thumb));
+    border-radius: 9999px;
+  }
+
+  .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+    background-color: rgb(var(--color-scrollbar-hover));
   }
 }

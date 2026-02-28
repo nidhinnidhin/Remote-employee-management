@@ -5,6 +5,6 @@ export interface BaseModalProps {
   onClose: () => void;
   title?: string;
   description?: string;
-  children: ReactNode;
+  children?: ReactNode;
   footer?: ReactNode;
 }

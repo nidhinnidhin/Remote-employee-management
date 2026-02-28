@@ -1,0 +1,4 @@
+export enum PolicyType {
+  WORKING_HOURS = 'WORKING_HOURS',
+  LEAVE_POLICY = 'LEAVE_POLICY',
+}

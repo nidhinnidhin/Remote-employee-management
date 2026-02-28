@@ -19,9 +19,7 @@ export function useOtpTimer() {
         return;
       }
 
-      const diff = Math.floor(
-        (Number(expiry) - Date.now()) / 1000
-      );
+      const diff = Math.floor((Number(expiry) - Date.now()) / 1000);
 
       if (diff <= 0) {
         setExpired(true);

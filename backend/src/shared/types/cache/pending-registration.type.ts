@@ -10,7 +10,7 @@ export type PendingRegistrationData = {
     password: string;
   };
 
-  company: {
+  company?: {
     name: string;
     email: string;
     size: string;

@@ -1,0 +1,36 @@
+import {
+  Injectable,
+  Inject,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
+import type { UserRepository } from '../../../domain/repositories/user.repository';
+import { SendEmailOtpUseCase } from '../otp/send-email-otp.usecase';
+import { UserStatus } from 'src/shared/enums/user/user-status.enum';
+import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
+
+@Injectable()
+export class ForgotPasswordUseCase {
+  constructor(
+    @Inject('UserRepository')
+    private readonly _userRepository: UserRepository,
+    private readonly _sendEmailOtpUseCase: SendEmailOtpUseCase,
+  ) {}
+
+  async execute({ email }: { email: string }) {
+    const user = await this._userRepository.findByEmail(email.toLowerCase());
+
+    if (!user) {
+      throw new NotFoundException(AUTH_MESSAGES.USER_NOT_FOUND);
+    }
+
+    if (user.status !== UserStatus.ACTIVE) {
+      throw new ForbiddenException(AUTH_MESSAGES.USER_NOT_ACTIVE);
+    }
+
+    await this._sendEmailOtpUseCase.execute({
+      userId: user.id,
+      email: user.email,
+    });
+  }
+}

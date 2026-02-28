@@ -7,6 +7,7 @@ import FormInput from "@/components/ui/FormInput";
 import { OTP_MESSAGES } from "@/shared/constants/messages/otp.messages";
 import { OtpModalProps } from "@/shared/types/otp/otp-modal-props.type";
 import { useOtpTimer } from "@/hooks/otp/use-otp-timer";
+import OtpInput from "@/components/ui/OtpInput";
 
 const OtpModal = ({
   isOpen,
@@ -61,24 +62,21 @@ const OtpModal = ({
         </div>
       }
     >
-      <FormInput
-        label="OTP Code"
-        name="otp"
+      <OtpInput
+        length={6}
         value={otp}
-        maxLength={6}
-        inputMode="numeric"
+        onChange={setOtp}
         error={localError || error}
-        onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
       />
 
       <div className="mt-3 text-sm text-center">
         {!expired ? (
-          <p className="text-neutral-600">
+          <p className="text-muted">
             OTP expires in{" "}
-            <span className="font-semibold text-red-600">{remaining}s</span>
+            <span className="font-semibold text-accent">{remaining}s</span>
           </p>
         ) : (
-          <p className="text-red-500">OTP expired</p>
+          <p className="text-danger">OTP expired</p>
         )}
       </div>
 
@@ -90,7 +88,7 @@ const OtpModal = ({
         </div>
       )}
 
-      {localError && <p className="text-red-500 mt-2">{localError}</p>}
+      {/* {localError && <p className="text-red-500 mt-2">{localError}</p>} */}
       {/* {error && <p className="text-red-500 mt-2">{error}</p>} */}
     </BaseModal>
   );

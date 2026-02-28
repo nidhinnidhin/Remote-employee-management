@@ -9,10 +9,10 @@ const StatCard: React.FC<StatCardProps> = ({
   className = "",
 }) => (
   <div
-    className={`p-6 rounded-xl bg-neutral-900 border border-neutral-800 shadow-sm ${className}`}
+    className={`p-6 portal-card shadow-sm ${className}`}
   >
-    <p className="text-sm font-medium text-neutral-400 mb-1">{label}</p>
-    <h3 className="text-2xl font-bold text-white">{value}</h3>
+    <p className="text-sm font-medium text-muted mb-1">{label}</p>
+    <h3 className="text-2xl font-bold text-primary">{value}</h3>
   </div>
 );
 

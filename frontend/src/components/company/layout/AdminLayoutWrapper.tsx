@@ -9,7 +9,7 @@ const AdminLayoutWrapper = ({ children }: { children: React.ReactNode }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
-    <div className="bg-neutral-950 min-h-screen">
+    <div className="theme-company portal-page min-h-screen">
       <Sidebar
         isMobileOpen={sidebarOpen}
         closeMobileSidebar={() => setSidebarOpen(false)}

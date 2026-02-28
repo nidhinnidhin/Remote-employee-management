@@ -10,7 +10,7 @@ export const registerSchema = z.object({
       .string()
       .url()
       .optional()
-      .transform((val) => (val === "" || val === undefined ? null : val)),
+      .or(z.literal("")),
   }),
   admin: z.object({
     firstName: z.string().min(2),

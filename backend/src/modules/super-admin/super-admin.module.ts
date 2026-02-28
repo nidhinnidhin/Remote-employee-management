@@ -1,15 +1,31 @@
 import { Module } from '@nestjs/common';
-import { SuperAdminAuthController } from './interfaces/controllers/super-admin-auth.controller';
-import { LoginSuperAdminUseCase } from './application/use-cases/login-super-admin.usecase';
-import { AuthModule } from '../company-admin/auth/presentation/auth/auth.module';
+import { SuperAdminCompanyController } from './companies/presentation/controllers/super-admin-company.controller';
+import { SuperAdminSeedService } from './services/super-admin-seed.service';
+import { AuthModule } from '../auth/presentation/auth/auth.module';
+import { ListCompaniesUseCase } from './companies/application/use-cases/list-companies-use-case';
+import { SuspendCompanyUseCase } from './companies/application/use-cases/suspend-company.use-case';
+import { MongoCompanyRepository } from './companies/infrastructure/repositories/mongo-company.repository';
+import { MongooseModule } from '@nestjs/mongoose';
+import { CompanyDocument, CompanySchema } from '../auth/infrastructure/database/mongoose/schemas/company.schema';
 
 @Module({
   imports: [
     AuthModule,
+    MongooseModule.forFeature([
+      { name: CompanyDocument.name, schema: CompanySchema },
+    ]),
   ],
-  controllers: [SuperAdminAuthController],
+  controllers: [SuperAdminCompanyController],
   providers: [
-    LoginSuperAdminUseCase,
+    ListCompaniesUseCase,
+    SuspendCompanyUseCase,
+    SuperAdminSeedService,
+    {
+      provide: 'CompanyRepository',
+      useClass: MongoCompanyRepository,
+    },
   ],
 })
-export class SuperAdminModule { }
+export class SuperAdminModule {
+  constructor(private readonly seedService: SuperAdminSeedService) { }
+}

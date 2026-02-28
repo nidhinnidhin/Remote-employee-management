@@ -12,5 +12,10 @@ export class InviteEmployeeDto {
   role: string;
 
   @IsString()
+  @IsNotEmpty()
   department: string;
+
+  @IsString()
+  @IsNotEmpty()
+  phone: string;
 }

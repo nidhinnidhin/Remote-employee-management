@@ -1,12 +1,11 @@
 "use client";
 
-import { useHydrateAuth } from "@/hooks/auth/use-hydrate.auth";
+import AuthHydrator from "@/store/AuthHydrator";
 
 export default function ClientLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  useHydrateAuth();
-  return <>{children}</>;
+  return <AuthHydrator>{children}</AuthHydrator>;
 }
