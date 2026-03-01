@@ -24,9 +24,9 @@ const FormInput: React.FC<ExtendedFormInputProps> = ({
   const inputType = type === "password" && showPassword ? "text" : type;
 
   return (
-    <div className="mb-1">
+    <div className="mb-0">
       {label && (
-        <label className="block text-sm font-medium text-secondary mb-1">
+        <label className="block text-sm font-semibold mb-1.5" style={{ color: "rgb(var(--color-text-secondary))" }}>
           {label} {required && <span className="text-danger">*</span>}
         </label>
       )}
@@ -46,7 +46,7 @@ const FormInput: React.FC<ExtendedFormInputProps> = ({
           onChange={onChange}
           placeholder={placeholder}
           className={`field-input transition-all duration-200 ${error ? "border-danger" : ""
-            } ${icon ? "pl-10" : "pl-4"} pr-${type === "password" ? "10" : "4"} py-3`}
+            } ${icon ? "pl-10" : "pl-4"} pr-${type === "password" ? "10" : "4"} py-3.5`}
         />
 
         {/* Right eye toggle for password */}

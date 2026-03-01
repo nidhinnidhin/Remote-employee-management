@@ -2,39 +2,53 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, Rocket, ShieldCheck } from "lucide-react";
+import { Rocket, ShieldCheck, CheckCircle2 } from "lucide-react";
 
 const ConfirmationStep: React.FC = () => {
     return (
-        <div className="space-y-8 flex flex-col items-center py-12">
-            <div className="text-center">
-                <motion.div
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ type: "spring", damping: 15, stiffness: 200, delay: 0.2 }}
-                    className="w-24 h-24 bg-accent/10 rounded-[2.5rem] flex items-center justify-center mb-10 mx-auto shadow-inner"
-                >
-                    <Rocket className="w-12 h-12 text-accent" />
-                </motion.div>
-                <h2 className="text-4xl font-black text-primary tracking-tight mb-4">Almost There!</h2>
-                <p className="text-secondary text-lg max-w-md mx-auto leading-relaxed">
-                    Your workspace is ready to be created. Click the button below to activate your account and access your dashboard.
-                </p>
+        <div className="flex flex-col items-center text-center py-4">
+            {/* Animated icon */}
+            <motion.div
+                initial={{ scale: 0, rotate: -90 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: "spring", damping: 14, stiffness: 180, delay: 0.1 }}
+                className="w-20 h-20 rounded-2xl flex items-center justify-center mb-6"
+                style={{ backgroundColor: "rgb(var(--color-accent-subtle))" }}
+            >
+                <Rocket className="w-10 h-10" style={{ color: "rgb(var(--color-accent))" }} />
+            </motion.div>
+
+            <h2 className="text-2xl font-bold mb-2" style={{ color: "rgb(var(--color-text-primary))" }}>
+                Almost There!
+            </h2>
+            <p className="text-sm leading-relaxed mb-8 max-w-xs" style={{ color: "rgb(var(--color-text-secondary))" }}>
+                Your workspace is ready to be created. Click the button below to activate your account and access your dashboard.
+            </p>
+
+            {/* Summary checklist */}
+            <div className="w-full space-y-3">
+                {[
+                    { icon: CheckCircle2, label: "Organization details saved" },
+                    { icon: CheckCircle2, label: "Subscription plan selected" },
+                    { icon: ShieldCheck, label: "256-bit encryption enabled" },
+                ].map(({ icon: Icon, label }) => (
+                    <div
+                        key={label}
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl"
+                        style={{
+                            backgroundColor: "rgb(var(--color-surface-raised))",
+                            border: "1px solid rgb(var(--color-border-subtle))",
+                        }}
+                    >
+                        <Icon className="w-4 h-4 flex-shrink-0" style={{ color: "rgb(var(--color-accent))" }} />
+                        <span className="text-sm text-left" style={{ color: "rgb(var(--color-text-secondary))" }}>
+                            {label}
+                        </span>
+                    </div>
+                ))}
             </div>
 
-            <div className="w-full max-w-sm grid grid-cols-1 gap-4 mt-8">
-                <div className="flex items-center gap-4 p-5 rounded-3xl bg-bg-card border border-border-subtle shadow-sm">
-                    <div className="p-3 rounded-2xl bg-accent/10">
-                        <ShieldCheck className="w-6 h-6 text-accent" />
-                    </div>
-                    <div>
-                        <p className="text-xs font-bold text-primary uppercase tracking-wider">Secure Access</p>
-                        <p className="text-xs text-secondary mt-0.5">Your data is protected with 256-bit encryption</p>
-                    </div>
-                </div>
-            </div>
-
-            <p className="text-xs text-muted text-center mt-12 italic">
+            <p className="text-xs mt-6" style={{ color: "rgb(var(--color-text-muted))" }}>
                 By activating, you agree to our Terms and Conditions
             </p>
         </div>

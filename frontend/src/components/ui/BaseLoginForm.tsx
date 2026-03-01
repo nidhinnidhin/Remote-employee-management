@@ -21,9 +21,9 @@ export default function BaseLoginForm({
   onForgotPassword,
 }: BaseLoginFormProps) {
   return (
-    <div className="min-h-screen flex">
-      {/* ── Left Panel ── */}
-      <div className="flex flex-1 items-center justify-center portal-page px-8 py-12">
+    <div className="h-screen flex overflow-hidden bg-[rgb(var(--color-bg))]">
+      {/* ── Left Panel (Scrollable) ── */}
+      <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col items-center justify-center px-8 lg:px-12 py-16">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -178,7 +178,7 @@ export default function BaseLoginForm({
       </div>
 
       {/* ── Right Panel ── */}
-      <div className="hidden lg:flex flex-1 bg-[rgb(var(--color-accent))] items-center justify-center relative overflow-hidden">
+      <div className="hidden lg:flex flex-1 bg-[rgb(var(--color-accent))]/80 backdrop-blur-sm items-center justify-center relative overflow-hidden text-white">
         {/* Decorative circles */}
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="w-[420px] h-[420px] rounded-full border border-white/10" />

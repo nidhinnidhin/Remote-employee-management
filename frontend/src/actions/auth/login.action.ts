@@ -22,10 +22,10 @@ export async function loginAction(email: string, password: string): Promise<Auth
 
     const { accessToken, refreshToken, user } = response.data;
 
-    // IF NOT ONBOARDED: Do NOT establish session or cookies
-    if (!user.isOnboarded) {
+    // IF NOT ONBOARDED: Only COMPANY_ADMIN needs onboarding before session creation
+    if (user.role === "COMPANY_ADMIN" && !user.isOnboarded) {
       console.log("-----------------------------------------");
-      console.log(" LOGIN: ONBOARDING REQUIRED");
+      console.log(" LOGIN: ONBOARDING REQUIRED (COMPANY_ADMIN)");
       console.log(" User:", user.email);
       console.log("-----------------------------------------");
 
@@ -35,21 +35,9 @@ export async function loginAction(email: string, password: string): Promise<Auth
       };
     }
 
-    // Handle cookies from response headers
-    const setCookieHeader = response.headers["set-cookie"];
-    if (setCookieHeader) {
-      for (const cookieStr of setCookieHeader) {
-        const [nameValue] = cookieStr.split(";");
-        const [name, value] = nameValue.split("=");
-        const trimmedName = name.trim();
-
-        if (trimmedName === "refresh_token") {
-          await setRefreshTokenCookie(value);
-        } else if (trimmedName === "access_token") {
-          await setAccessTokenCookie(value);
-        }
-      }
-    }
+    // Set backend cookies
+    if (accessToken) await setAccessTokenCookie(accessToken);
+    if (refreshToken) await setRefreshTokenCookie(refreshToken);
 
     // Save to session with role and user info
     const session = await getSession();
@@ -67,13 +55,11 @@ export async function loginAction(email: string, password: string): Promise<Auth
     console.log(" IsOnboarded:", user.isOnboarded);
     console.log("-----------------------------------------");
 
-    const redirectUrl = getRedirectForRole(user.role);
-    redirect(redirectUrl);
+    return {
+      success: true,
+      data: response.data,
+    };
   } catch (error: any) {
-    if (error.digest?.startsWith("NEXT_REDIRECT")) {
-      throw error;
-    }
-
     console.error("[loginAction] Error:", error);
     return {
       success: false,

@@ -29,6 +29,7 @@ export class EmployeeRepositoryImpl implements EmployeeRepository {
       department: input.department || undefined,
       inviteStatus: input.inviteStatus || InviteStatus.PENDING,
       hasPassword: !!input.hasPassword,
+      isOnboarded: input.isOnboarded,
     });
 
     return new Employee(

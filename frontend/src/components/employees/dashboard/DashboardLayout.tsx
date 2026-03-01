@@ -1,9 +1,16 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Sidebar } from "../common/Sidebar";
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    document.documentElement.classList.add("theme-employee");
+    return () => {
+      document.documentElement.classList.remove("theme-employee");
+    };
+  }, []);
+
   return (
     <div className="theme-employee portal-page h-screen flex flex-col lg:flex-row overflow-hidden">
       {/* Sidebar */}

@@ -16,23 +16,11 @@ export async function onboardAction(payload: any): Promise<AuthActionResult> {
 
         const response = await api.post("/auth/onboard", payload);
 
-        // Handle cookies from backend
-        const setCookieHeader = response.headers["set-cookie"];
-        if (setCookieHeader) {
-            for (const cookieStr of setCookieHeader) {
-                const [nameValue] = cookieStr.split(";");
-                const [name, value] = nameValue.split("=");
-                const trimmedName = name.trim();
+        const { accessToken, refreshToken, user } = response.data;
 
-                if (trimmedName === COOKIE_KEYS.REFRESH_TOKEN) {
-                    await setRefreshTokenCookie(value);
-                } else if (trimmedName === COOKIE_KEYS.ACCESS_TOKEN) {
-                    await setAccessTokenCookie(value);
-                }
-            }
-        }
-
-        const { accessToken, user } = response.data;
+        // Set backend cookies
+        if (accessToken) await setAccessTokenCookie(accessToken);
+        if (refreshToken) await setRefreshTokenCookie(refreshToken);
 
         // Update session with tokens and onboarding status
         session.accessToken = accessToken;

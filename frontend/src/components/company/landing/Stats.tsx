@@ -3,15 +3,18 @@
 import { motion } from "framer-motion";
 
 const stats = [
-    { value: "50k+", label: "Employees Managed", color: "text-purple-400" },
-    { value: "2,500+", label: "Companies", color: "text-pink-400" },
-    { value: "98%", label: "Customer Satisfaction", color: "text-blue-400" },
-    { value: "99.9%", label: "Uptime SLA", color: "text-red-400" }
+    { value: "50k+", label: "Employees Managed" },
+    { value: "2,500+", label: "Companies" },
+    { value: "98%", label: "Customer Satisfaction" },
+    { value: "99.9%", label: "Uptime SLA" }
 ];
 
 export default function Stats() {
     return (
-        <section className="py-20 bg-neutral-900/30 border-y border-neutral-800/50">
+        <section className="py-20 relative">
+            <div className="absolute top-0 left-0 right-0 premium-divider opacity-50" />
+            <div className="absolute bottom-0 left-0 right-0 premium-divider opacity-50" />
+
             <div className="max-w-7xl mx-auto px-6">
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
                     {stats.map((stat, index) => (
@@ -23,10 +26,10 @@ export default function Stats() {
                             transition={{ delay: index * 0.1 }}
                             className="text-center"
                         >
-                            <h3 className={`text-4xl md:text-5xl font-bold mb-2 ${stat.color}`}>
+                            <h3 className="text-4xl md:text-5xl font-bold mb-2 text-accent">
                                 {stat.value}
                             </h3>
-                            <p className="text-sm font-medium text-neutral-400 uppercase tracking-wider">
+                            <p className="text-sm font-medium text-muted uppercase tracking-wider">
                                 {stat.label}
                             </p>
                         </motion.div>

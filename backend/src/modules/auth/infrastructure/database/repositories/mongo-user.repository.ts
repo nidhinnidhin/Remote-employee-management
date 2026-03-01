@@ -41,6 +41,8 @@ export class MongoUserRepository implements UserRepository {
       inviteStatus: user.inviteStatus,
       hasPassword: user.hasPassword,
       isOnboarded: user.isOnboarded,
+      provider: user.provider,
+      providerId: user.providerId,
     });
 
     return this.toEntity(created);
@@ -106,6 +108,8 @@ export class MongoUserRepository implements UserRepository {
       doc.profileImagePublicId,
       doc.skills,
       doc.isOnboarded,
+      doc.provider,
+      doc.providerId,
       doc.documents,
     );
   }

@@ -23,15 +23,15 @@ const FormDropdown: React.FC<FormDropdownProps> = ({
   };
 
   return (
-    <div className="mb-6 relative">
-      <label className="block text-sm font-medium text-secondary mb-2">
+    <div className="mb-0 relative">
+      <label className="block text-sm font-semibold mb-1.5" style={{ color: "rgb(var(--color-text-secondary))" }}>
         {label} {required && <span className="text-danger">*</span>}
       </label>
 
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className={`field-input text-left px-4 py-3 transition-all duration-200 flex justify-between items-center ${error ? "border-danger" : ""
+        className={`field-input text-left px-4 py-3.5 transition-all duration-200 flex justify-between items-center ${error ? "border-danger" : ""
           }`}
       >
         <span className={value ? "text-primary" : "text-muted"}>

@@ -15,13 +15,13 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-white mb-8 leading-tight">
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-primary mb-8 leading-tight">
             Smart Employee
             <br />
-            <span className="text-red-500">Management Platform</span>
+            <span className="text-accent">Management Platform</span>
           </h1>
 
-          <p className="text-xl text-neutral-400 mb-12 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xl text-secondary mb-12 max-w-2xl mx-auto leading-relaxed">
             Streamline HR operations, track performance, manage attendance, and
             empower your workforce. The complete solution for modern employee
             management.
@@ -30,24 +30,24 @@ export default function Hero() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link
-                href="/company/register"
-                className="px-8 py-4 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl shadow-xl shadow-red-600/20 flex items-center gap-2 group transition-all"
+                href="/company/login"
+                className="btn-highlight px-10 py-4"
               >
-                Register
+                Sign in
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </motion.div>
 
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <button className="px-8 py-4 bg-neutral-900 hover:bg-neutral-800 text-white font-semibold rounded-xl border border-neutral-800 flex items-center gap-2 transition-all">
-                <PlayCircle className="w-5 h-5 text-red-500" />
+              <button className="px-8 py-4 bg-surface-raised/50 hover:bg-surface-raised text-primary font-semibold rounded-xl border border-border/50 hover:border-accent/40 backdrop-blur-sm flex items-center gap-2 transition-all">
+                <PlayCircle className="w-5 h-5 text-accent" />
                 Watch Demo
               </button>
             </motion.div>
           </div>
 
-          <p className="mt-6 text-sm text-neutral-500">
-            No credit card required • 14-day free trial • Cancel anytime
+          <p className="mt-6 text-sm text-muted">
+            Enterprise grade security • Real-time tracking • Seamless collaboration
           </p>
         </motion.div>
       </div>

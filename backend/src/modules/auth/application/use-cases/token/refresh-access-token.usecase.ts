@@ -42,7 +42,7 @@ export class RefreshAccessTokenUseCase {
       throw new ForbiddenException(AUTH_MESSAGES.ACCOUNT_NOT_ACTIVE);
     }
 
-    if (!user.isOnboarded) {
+    if (user.role === 'COMPANY_ADMIN' && !user.isOnboarded) {
       throw new ForbiddenException('Onboarding required');
     }
 

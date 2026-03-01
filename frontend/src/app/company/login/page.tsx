@@ -1,4 +1,5 @@
 import LoginForm from "@/components/company/auth/login/LoginForm";
+import OnboardingBackground from "@/components/company/auth/onboarding/OnboardingBackground";
 import { checkAuth, getCurrentUser } from "@/lib/auth/unified-auth";
 import { getRedirectForRole } from "@/lib/auth/auth-constants";
 import { redirect } from "next/navigation";
@@ -21,7 +22,14 @@ const LoginPage = async () => {
         }
     }
 
-    return <LoginForm />;
+    return (
+        <div className="relative min-h-screen">
+            <OnboardingBackground />
+            <div className="relative z-10">
+                <LoginForm />
+            </div>
+        </div>
+    );
 };
 
 export default LoginPage;

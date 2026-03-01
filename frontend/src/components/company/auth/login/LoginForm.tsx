@@ -13,6 +13,7 @@ import {
 } from "@/shared/types/company/auth/company-login/login.type";
 import { AUTH_MESSAGES } from "@/shared/constants/messages/auth.messages";
 import { loginAction } from "@/actions/auth/login.action";
+import { getRedirectForRole } from "@/lib/auth/auth-constants";
 
 import { ForgotStep } from "@/shared/types/otp/forgot-step.type";
 import ForgotPasswordOtpModal from "../forgot-password/ForgotPasswordOtpModal";
@@ -80,9 +81,20 @@ export default function LoginForm() {
         return;
       }
 
-      if (result.success && result.data?.user && !result.data.user.isOnboarded) {
+      if (
+        result.success &&
+        result.data?.user &&
+        result.data.user.role === "COMPANY_ADMIN" &&
+        !result.data.user.isOnboarded
+      ) {
         localStorage.setItem("registration_user_id", result.data.user.id);
         router.push("/company/onboarding");
+        return;
+      }
+
+      if (result.success && result.data?.user) {
+        const redirectUrl = getRedirectForRole(result.data.user.role);
+        router.push(redirectUrl);
         return;
       }
     } catch (err: any) {

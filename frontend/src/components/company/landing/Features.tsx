@@ -12,34 +12,34 @@ import {
 
 const features = [
   {
-    icon: <Users className="w-6 h-6 text-red-500" />,
+    icon: <Users className="w-6 h-6 text-accent" />,
     title: "Employee Directory",
     description:
       "Centralized database for all employee information and profiles",
   },
   {
-    icon: <Clock className="w-6 h-6 text-blue-500" />,
+    icon: <Clock className="w-6 h-6 text-accent-muted" />,
     title: "Time & Attendance",
     description:
       "Track work hours, overtime, and leave management effortlessly",
   },
   {
-    icon: <TrendingUp className="w-6 h-6 text-yellow-500" />,
+    icon: <TrendingUp className="w-6 h-6 text-accent" />,
     title: "Performance Reviews",
     description: "360° feedback, goal tracking, and performance analytics",
   },
   {
-    icon: <CalendarDays className="w-6 h-6 text-green-500" />,
+    icon: <CalendarDays className="w-6 h-6 text-accent-muted" />,
     title: "Leave Management",
     description: "Automated leave requests, approvals, and balance tracking",
   },
   {
-    icon: <ShieldCheck className="w-6 h-6 text-purple-500" />,
+    icon: <ShieldCheck className="w-6 h-6 text-accent" />,
     title: "Enterprise Security",
     description: "SOC 2 compliant with role-based access control",
   },
   {
-    icon: <Award className="w-6 h-6 text-pink-500" />,
+    icon: <Award className="w-6 h-6 text-accent-muted" />,
     title: "Recognition System",
     description: "Celebrate achievements and boost employee engagement",
   },
@@ -54,7 +54,7 @@ export default function Features() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-3xl md:text-4xl font-bold text-white mb-4"
+            className="text-3xl md:text-4xl font-bold text-primary mb-4"
           >
             Everything your HR team needs
           </motion.h2>
@@ -63,7 +63,7 @@ export default function Features() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-neutral-400"
+            className="text-secondary"
           >
             Powerful features that scale with your organization
           </motion.p>
@@ -78,15 +78,15 @@ export default function Features() {
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
               whileHover={{ y: -5 }}
-              className="bg-neutral-800/30 border border-neutral-800/50 p-6 rounded-2xl hover:bg-neutral-800/50 hover:border-neutral-700 transition-all group"
+              className="portal-card p-6 group hover:border-accent/30 transition-all duration-500 hover:shadow-2xl hover:shadow-accent/5"
             >
-              <div className="w-12 h-12 bg-neutral-900 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 bg-accent-subtle/50 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-accent-subtle transition-all duration-300">
                 {feature.icon}
               </div>
-              <h3 className="text-xl font-semibold text-white mb-2">
+              <h3 className="text-xl font-semibold text-primary mb-2">
                 {feature.title}
               </h3>
-              <p className="text-neutral-400 text-sm leading-relaxed">
+              <p className="text-secondary text-sm leading-relaxed">
                 {feature.description}
               </p>
             </motion.div>

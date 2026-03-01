@@ -3,10 +3,18 @@
 import React, { useState } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
+import { useEffect } from "react";
 
 const AdminLayoutWrapper = ({ children }: { children: React.ReactNode }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+
+  useEffect(() => {
+    document.documentElement.classList.add("theme-company");
+    return () => {
+      document.documentElement.classList.remove("theme-company");
+    };
+  }, []);
 
   return (
     <div className="theme-company portal-page min-h-screen">

@@ -7,12 +7,12 @@ import CompanyOnboardingStep from "./CompanyOnboardingStep";
 import SubscriptionStep from "./SubscriptionStep";
 import ConfirmationStep from "./ConfirmationStep";
 import { onboardAction } from "@/actions/auth/onboard.action";
-import { ArrowRight, ArrowLeft, Loader2, Rocket, Building2, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight, ArrowLeft, Check, Loader2, Rocket } from "lucide-react";
 
 const steps = [
-    { title: "Organization", icon: Building2, description: "Basic details" },
-    { title: "Subscription", icon: Sparkles, description: "Choose your plan" },
-    { title: "Confirmation", icon: ShieldCheck, description: "Review & finish" },
+    { title: "Organization", number: 1 },
+    { title: "Subscription", number: 2 },
+    { title: "Confirmation", number: 3 },
 ];
 
 const OnboardingStepper: React.FC = () => {
@@ -22,7 +22,6 @@ const OnboardingStepper: React.FC = () => {
     const searchParams = useSearchParams();
     const [onboardingUserId, setOnboardingUserId] = useState<string | null>(null);
 
-    // Effect to catch userId from social login redirect or localStorage
     React.useEffect(() => {
         const userIdFromUrl = searchParams.get("userId");
         const userIdFromStorage = localStorage.getItem("registration_user_id");
@@ -72,7 +71,11 @@ const OnboardingStepper: React.FC = () => {
         const newErrors: any = {};
         if (step === 1) {
             if (!onboardingData.company.name) newErrors.name = "Company name is required";
-            if (!onboardingData.company.email) newErrors.email = "Company email is required";
+            if (!onboardingData.company.email) {
+                newErrors.email = "Company email is required";
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(onboardingData.company.email)) {
+                newErrors.email = "Please enter a valid email address";
+            }
             if (!onboardingData.company.size) newErrors.size = "Please select employee size";
             if (!onboardingData.company.industry) newErrors.industry = "Please select industry";
         }
@@ -86,8 +89,6 @@ const OnboardingStepper: React.FC = () => {
         if (currentStep < 3) {
             setCurrentStep(prev => prev + 1);
         } else {
-            // Final step - trigger API
-            // Use state first, fallback to storage
             const userId = onboardingUserId || localStorage.getItem("registration_user_id");
 
             if (!userId) {
@@ -106,7 +107,22 @@ const OnboardingStepper: React.FC = () => {
                     localStorage.removeItem("registration_user_id");
                     router.replace("/company/employees/dashboard");
                 } else {
-                    setErrors({ form: result.error });
+                    // If the error is about company email already taken, surface it
+                    // as an inline field error on step 1
+                    const errMsg = result.error || "";
+                    const isEmailConflict =
+                        errMsg.toLowerCase().includes("company") ||
+                        errMsg.toLowerCase().includes("email") ||
+                        errMsg.toLowerCase().includes("exist") ||
+                        errMsg.toLowerCase().includes("taken") ||
+                        errMsg.toLowerCase().includes("already");
+
+                    if (isEmailConflict) {
+                        setErrors({ email: "This company email is already registered. Please use a different email." });
+                        setCurrentStep(1); // Navigate back to company info step
+                    } else {
+                        setErrors({ form: errMsg });
+                    }
                 }
             } catch (err) {
                 setErrors({ form: "Something went wrong during setup" });
@@ -121,137 +137,183 @@ const OnboardingStepper: React.FC = () => {
     };
 
     return (
-        <div className="w-full max-w-2xl mx-auto py-12 px-4 min-h-[600px] flex flex-col justify-center">
-            {/* Header section with icons */}
-            <div className="md:flex items-center justify-between mb-12 hidden">
-                {steps.map((s, i) => {
-                    const stepNum = i + 1;
-                    const isActive = currentStep === stepNum;
-                    const isCompleted = currentStep > stepNum;
-                    const Icon = s.icon;
+        <div className="w-full max-w-2xl mx-auto py-6 px-4 flex flex-col">
+
+            {/* ── Step Indicator ────────────────────────────────── */}
+            <div className="flex items-center w-full mb-8 px-2">
+                {steps.map((step, i) => {
+                    const isCompleted = currentStep > step.number;
+                    const isActive = currentStep === step.number;
 
                     return (
-                        <div key={i} className="flex-1 flex items-center relative">
-                            {/* Connector Line */}
-                            {i !== 0 && (
-                                <div className={`absolute left-[-50%] right-[calc(50%+20px)] h-0.5 transition-colors duration-500 ${isCompleted ? 'bg-accent' : 'bg-border-subtle'}`} />
-                            )}
-
-                            <div className="flex flex-col items-center mx-auto z-10">
-                                <motion.div
-                                    animate={{
-                                        scale: isActive ? 1.1 : 1,
-                                        backgroundColor: isActive || isCompleted ? "rgb(var(--color-accent))" : "rgb(var(--color-surface-raised))"
+                        <React.Fragment key={step.number}>
+                            {/* Circle + label */}
+                            <div className="flex flex-col items-center gap-2">
+                                <div
+                                    className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 text-sm font-semibold
+                                        ${isCompleted
+                                            ? "bg-accent border-accent text-white"
+                                            : isActive
+                                                ? "border-accent text-accent bg-transparent"
+                                                : "border-border text-muted bg-transparent"
+                                        }`}
+                                    style={{
+                                        borderColor: isCompleted || isActive ? "rgb(var(--color-accent))" : "rgb(var(--color-border-subtle))",
+                                        color: isCompleted ? "#fff" : isActive ? "rgb(var(--color-accent))" : "rgb(var(--color-text-muted))",
                                     }}
-                                    className={`w-12 h-12 rounded-2xl flex items-center justify-center border shadow-lg transition-all ${isActive ? 'ring-4 ring-accent/20 border-accent' : 'border-border-subtle'}`}
                                 >
-                                    <Icon className={`w-6 h-6 ${isActive || isCompleted ? 'text-white' : 'text-muted'}`} />
-                                </motion.div>
-                                <span className={`text-[10px] font-bold uppercase tracking-widest mt-3 transition-colors ${isActive ? 'text-accent' : 'text-muted'}`}>
-                                    {s.title}
+                                    {isCompleted ? (
+                                        <Check className="w-4 h-4" />
+                                    ) : (
+                                        step.number
+                                    )}
+                                </div>
+                                <span
+                                    className="text-xs font-semibold"
+                                    style={{
+                                        color: isActive
+                                            ? "rgb(var(--color-text-primary))"
+                                            : "rgb(var(--color-text-muted))",
+                                    }}
+                                >
+                                    <span className="text-muted mr-1">{step.number}</span>
+                                    {step.title}
                                 </span>
                             </div>
 
-                            {/* Connector Line Right */}
-                            {i !== steps.length - 1 && (
-                                <div className={`absolute right-[-50%] left-[calc(50%+20px)] h-0.5 transition-colors duration-500 ${isCompleted ? 'bg-accent' : 'bg-border-subtle'}`} />
+                            {/* Connector */}
+                            {i < steps.length - 1 && (
+                                <div
+                                    className="flex-1 h-px mx-3 mb-5 transition-colors duration-500"
+                                    style={{
+                                        backgroundColor: currentStep > step.number
+                                            ? "rgb(var(--color-accent))"
+                                            : "rgb(var(--color-border-subtle))",
+                                    }}
+                                />
                             )}
-                        </div>
+                        </React.Fragment>
                     );
                 })}
             </div>
 
-            {/* Mobile Progress (Simplified) */}
-            <div className="flex gap-2 mb-8 md:hidden">
-                {steps.map((_, i) => (
-                    <div
-                        key={i}
-                        className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${i + 1 <= currentStep ? "bg-accent" : "bg-border-subtle"}`}
-                    />
-                ))}
-            </div>
-
+            {/* ── Card ──────────────────────────────────────────── */}
             <div className="relative">
                 <AnimatePresence mode="wait" initial={false}>
                     <motion.div
                         key={currentStep}
-                        initial={{ opacity: 0, y: 10, scale: 0.98 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -10, scale: 0.98 }}
-                        transition={{ duration: 0.4, ease: "easeOut" }}
-                        className="portal-card p-10 md:p-12 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-border-subtle bg-card"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.3, ease: "easeOut" }}
+                        className="rounded-2xl border overflow-hidden"
+                        style={{
+                            backgroundColor: "rgb(var(--color-surface))",
+                            borderColor: "rgb(var(--color-border-subtle))",
+                        }}
                     >
-                        {currentStep === 1 && (
-                            <CompanyOnboardingStep
-                                formData={onboardingData.company}
-                                onChange={handleCompanyChange}
-                                errors={errors}
-                            />
-                        )}
-                        {currentStep === 2 && (
-                            <SubscriptionStep
-                                selectedPlan={onboardingData.subscription.plan}
-                                onSelect={handleSubscriptionChange}
-                            />
-                        )}
-                        {currentStep === 3 && (
-                            <ConfirmationStep />
-                        )}
-
-                        {errors.form && (
-                            <motion.p
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                className="text-danger text-sm text-center mt-6 bg-danger/10 py-2 rounded-lg border border-danger/20 font-medium"
-                            >
-                                {errors.form}
-                            </motion.p>
-                        )}
-
-                        <div className="flex flex-col sm:flex-row gap-4 mt-12 pt-8 border-t border-border-subtle/50">
-                            {currentStep > 1 && (
-                                <button
-                                    onClick={handleBack}
-                                    disabled={isLoading}
-                                    className="sm:w-32 flex items-center justify-center gap-2 py-4 rounded-xl border border-border-subtle text-secondary font-semibold hover:bg-bg-subtle transition-all active:scale-95 disabled:opacity-50"
-                                >
-                                    <ArrowLeft className="w-5 h-5" />
-                                    Back
-                                </button>
+                        <div className="px-10 py-8">
+                            {currentStep === 1 && (
+                                <CompanyOnboardingStep
+                                    formData={onboardingData.company}
+                                    onChange={handleCompanyChange}
+                                    errors={errors}
+                                />
                             )}
-                            <button
-                                onClick={handleNext}
-                                disabled={isLoading}
-                                className="flex-1 flex items-center justify-center gap-3 py-4 rounded-xl bg-accent text-white font-bold hover:opacity-90 transition-all active:scale-[0.98] shadow-xl shadow-accent/25 disabled:bg-muted"
-                            >
-                                {isLoading ? (
-                                    <Loader2 className="w-6 h-6 animate-spin" />
-                                ) : (
-                                    <>
-                                        {currentStep === 3 ? (
-                                            <>
-                                                Activate Account
-                                                <Rocket className="w-5 h-5" />
-                                            </>
-                                        ) : (
-                                            <>
-                                                Continue
-                                                <ArrowRight className="w-5 h-5" />
-                                            </>
-                                        )}
-                                    </>
+                            {currentStep === 2 && (
+                                <SubscriptionStep
+                                    selectedPlan={onboardingData.subscription.plan}
+                                    onSelect={handleSubscriptionChange}
+                                />
+                            )}
+                            {currentStep === 3 && (
+                                <ConfirmationStep />
+                            )}
+
+                            {errors.form && (
+                                <motion.p
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    className="text-sm text-center mt-4 py-2 px-4 rounded-lg font-medium"
+                                    style={{
+                                        color: "rgb(var(--color-danger))",
+                                        backgroundColor: "rgb(var(--color-danger-subtle))",
+                                    }}
+                                >
+                                    {errors.form}
+                                </motion.p>
+                            )}
+
+                            {/* ── Actions ───────────────────────────────────── */}
+                            <div className="flex flex-col gap-3 mt-6">
+                                <button
+                                    onClick={handleNext}
+                                    disabled={isLoading}
+                                    className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold text-sm transition-all active:scale-[0.98] disabled:opacity-60"
+                                    style={{
+                                        backgroundColor: "rgb(var(--color-accent))",
+                                        color: "rgb(var(--color-text-inverse, 255 255 255))",
+                                    }}
+                                >
+                                    {isLoading ? (
+                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                    ) : currentStep === 3 ? (
+                                        <>Activate Account <Rocket className="w-4 h-4" /></>
+                                    ) : (
+                                        <>Continue <ArrowRight className="w-4 h-4" /></>
+                                    )}
+                                </button>
+
+                                {currentStep > 1 && (
+                                    <button
+                                        onClick={handleBack}
+                                        disabled={isLoading}
+                                        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-medium text-sm transition-all hover:opacity-80 disabled:opacity-50"
+                                        style={{
+                                            color: "rgb(var(--color-text-secondary))",
+                                            backgroundColor: "transparent",
+                                        }}
+                                    >
+                                        <ArrowLeft className="w-4 h-4" />
+                                        Back
+                                    </button>
                                 )}
-                            </button>
+
+                                {/* Security footer */}
+                                <div className="flex items-center justify-center gap-2 pt-1">
+                                    <SecurityLockIcon />
+                                    <span
+                                        className="text-xs"
+                                        style={{ color: "rgb(var(--color-text-muted))" }}
+                                    >
+                                        Enterprise-grade security included
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </motion.div>
                 </AnimatePresence>
             </div>
-
-            {/* Visual background accents */}
-            <div className="fixed top-1/4 -left-20 w-80 h-80 bg-accent/5 rounded-full blur-[100px] pointer-events-none -z-10" />
-            <div className="fixed bottom-1/4 -right-20 w-80 h-80 bg-accent/5 rounded-full blur-[100px] pointer-events-none -z-10" />
         </div>
     );
 };
+
+const SecurityLockIcon = () => (
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="13"
+        height="13"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        style={{ color: "rgb(var(--color-text-muted))" }}
+    >
+        <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </svg>
+);
 
 export default OnboardingStepper;

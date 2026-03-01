@@ -17,17 +17,15 @@ const plans = [
         description: "Perfect for exploring",
         icon: Sparkles,
         features: ["Up to 10 Employees", "Basic Analytics", "Standard Support"],
-        color: "bg-blue-500"
     },
     {
         id: "Professional",
         name: "Professional",
-        price: "$49",
+        price: "$49/mo",
         description: "Best for growing teams",
         icon: Zap,
-        features: ["Unlimited Employees", "Advanced Analytics", "Priority Support", "Custom Branding"],
-        color: "bg-accent",
-        popular: true
+        features: ["Unlimited Employees", "Advanced Analytics", "Priority Support"],
+        popular: true,
     },
     {
         id: "Enterprise",
@@ -35,20 +33,25 @@ const plans = [
         price: "Custom",
         description: "Scale with confidence",
         icon: Shield,
-        features: ["SSO & Security", "Dedicated Manager", "SLA Guarantee", "Custom Integration"],
-        color: "bg-purple-500"
-    }
+        features: ["SSO & Security", "Dedicated Manager", "Custom Integration"],
+    },
 ];
 
 const SubscriptionStep: React.FC<SubscriptionStepProps> = ({ selectedPlan, onSelect }) => {
     return (
-        <div className="space-y-8">
-            <div className="text-center mb-10">
-                <h2 className="text-3xl font-extrabold text-primary tracking-tight">Select a Plan</h2>
-                <p className="text-secondary mt-2 text-lg">Choose the perfect scale for your organization</p>
+        <div>
+            {/* Header */}
+            <div className="text-center mb-6">
+                <h2 className="text-2xl font-bold mb-1.5" style={{ color: "rgb(var(--color-text-primary))" }}>
+                    Select a Plan
+                </h2>
+                <p className="text-sm" style={{ color: "rgb(var(--color-text-secondary))" }}>
+                    Choose the perfect scale for your organization
+                </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Plan cards — single column stack */}
+            <div className="space-y-3">
                 {plans.map((plan) => {
                     const isSelected = selectedPlan === plan.id;
                     const Icon = plan.icon;
@@ -56,55 +59,93 @@ const SubscriptionStep: React.FC<SubscriptionStepProps> = ({ selectedPlan, onSel
                     return (
                         <motion.div
                             key={plan.id}
-                            whileHover={{ y: -5 }}
-                            whileTap={{ scale: 0.98 }}
+                            whileTap={{ scale: 0.99 }}
                             onClick={() => onSelect(plan.id)}
-                            className={`relative p-6 rounded-3xl border-2 transition-all cursor-pointer flex flex-col ${isSelected
-                                    ? 'border-accent bg-accent/5 shadow-2xl shadow-accent/10'
-                                    : 'border-border-subtle bg-bg-card hover:border-accent/30'
-                                }`}
+                            className="relative flex items-start gap-4 p-4 rounded-xl border cursor-pointer transition-all duration-200"
+                            style={{
+                                borderColor: isSelected
+                                    ? "rgb(var(--color-accent))"
+                                    : "rgb(var(--color-border-subtle))",
+                                backgroundColor: isSelected
+                                    ? "rgba(var(--color-accent), 0.06)"
+                                    : "rgb(var(--color-surface-raised))",
+                            }}
                         >
+                            {/* Popular badge */}
                             {plan.popular && (
-                                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-white text-[10px] font-black px-4 py-1 rounded-full uppercase tracking-widest shadow-lg">
+                                <span
+                                    className="absolute -top-2.5 right-3 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wide"
+                                    style={{
+                                        backgroundColor: "rgb(var(--color-accent))",
+                                        color: "rgb(var(--color-bg))",
+                                    }}
+                                >
                                     Most Popular
-                                </div>
+                                </span>
                             )}
 
-                            <div className={`p-3 rounded-2xl w-fit mb-4 ${plan.color} bg-opacity-10`}>
-                                <Icon className={`w-6 h-6 ${isSelected ? 'text-accent' : 'text-primary'}`} />
+                            {/* Icon */}
+                            <div
+                                className="flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center mt-0.5"
+                                style={{ backgroundColor: "rgb(var(--color-accent-subtle))" }}
+                            >
+                                <Icon className="w-4 h-4" style={{ color: "rgb(var(--color-accent))" }} />
                             </div>
 
-                            <h3 className="text-xl font-bold text-primary mb-1">{plan.name}</h3>
-                            <p className="text-xs text-muted mb-4 line-clamp-1">{plan.description}</p>
-
-                            <div className="mb-6">
-                                <span className="text-3xl font-black text-primary">{plan.price}</span>
-                                {plan.price !== "Free" && plan.price !== "Custom" && <span className="text-sm text-muted">/mo</span>}
+                            {/* Info */}
+                            <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between mb-1">
+                                    <span className="font-semibold text-sm" style={{ color: "rgb(var(--color-text-primary))" }}>
+                                        {plan.name}
+                                    </span>
+                                    <span className="font-bold text-sm" style={{ color: "rgb(var(--color-accent))" }}>
+                                        {plan.price}
+                                    </span>
+                                </div>
+                                <p className="text-xs mb-2" style={{ color: "rgb(var(--color-text-muted))" }}>
+                                    {plan.description}
+                                </p>
+                                <ul className="flex flex-wrap gap-x-4 gap-y-1">
+                                    {plan.features.map((f) => (
+                                        <li key={f} className="flex items-center gap-1 text-xs" style={{ color: "rgb(var(--color-text-secondary))" }}>
+                                            <Check className="w-3 h-3 flex-shrink-0" style={{ color: "rgb(var(--color-accent))" }} />
+                                            {f}
+                                        </li>
+                                    ))}
+                                </ul>
                             </div>
 
-                            <ul className="space-y-3 mb-8 flex-1">
-                                {plan.features.map((feature) => (
-                                    <li key={feature} className="flex items-start gap-3 text-xs text-secondary font-medium leading-tight">
-                                        <Check className="w-4 h-4 text-accent mt-0.5 shrink-0" />
-                                        {feature}
-                                    </li>
-                                ))}
-                            </ul>
-
-                            <div className={`w-full py-2.5 rounded-xl text-center text-xs font-bold transition-all ${isSelected
-                                    ? 'bg-accent text-white shadow-lg'
-                                    : 'bg-bg-subtle text-muted group-hover:bg-accent/10'
-                                }`}>
-                                {isSelected ? "Plan Selected" : "Select Plan"}
+                            {/* Radio indicator */}
+                            <div
+                                className="flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center mt-0.5"
+                                style={{
+                                    borderColor: isSelected ? "rgb(var(--color-accent))" : "rgb(var(--color-border-subtle))",
+                                }}
+                            >
+                                {isSelected && (
+                                    <div
+                                        className="w-2.5 h-2.5 rounded-full"
+                                        style={{ backgroundColor: "rgb(var(--color-accent))" }}
+                                    />
+                                )}
                             </div>
                         </motion.div>
                     );
                 })}
             </div>
 
-            <div className="p-4 rounded-2xl bg-bg-subtle border border-border-subtle flex items-center justify-center gap-3">
-                <CreditCard className="w-5 h-5 text-accent" />
-                <span className="text-xs font-semibold text-secondary">No credit card required for your 14-day free trial</span>
+            {/* Footer note */}
+            <div
+                className="mt-5 flex items-center justify-center gap-2 py-3 px-4 rounded-xl"
+                style={{
+                    backgroundColor: "rgb(var(--color-surface-raised))",
+                    border: "1px solid rgb(var(--color-border-subtle))",
+                }}
+            >
+                <CreditCard className="w-4 h-4 flex-shrink-0" style={{ color: "rgb(var(--color-accent))" }} />
+                <span className="text-xs" style={{ color: "rgb(var(--color-text-secondary))" }}>
+                    No credit card required for your 14-day free trial
+                </span>
             </div>
         </div>
     );

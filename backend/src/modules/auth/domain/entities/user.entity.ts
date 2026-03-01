@@ -43,6 +43,8 @@ export class UserEntity {
 
     public readonly skills?: string[],
     public readonly isOnboarded: boolean = false,
+    public readonly provider?: string,
+    public readonly providerId?: string,
     public readonly documents?: {
       name: string;
       category: string;

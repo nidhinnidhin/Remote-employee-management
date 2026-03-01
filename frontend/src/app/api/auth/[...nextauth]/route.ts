@@ -3,6 +3,7 @@ import GoogleProvider from "next-auth/providers/google";
 import FacebookProvider from "next-auth/providers/facebook";
 import GitHubProvider from "next-auth/providers/github";
 import { getSession } from "@/lib/iron-session/getSession";
+import { setAccessTokenCookie, setRefreshTokenCookie } from "@/lib/auth/cookies";
 
 const handler = NextAuth({
   providers: [
@@ -78,6 +79,10 @@ const handler = NextAuth({
       session.companyId = data.user.companyId;
       session.isOnboarded = true;
       await session.save();
+
+      // Set backend cookies
+      if (data.accessToken) await setAccessTokenCookie(data.accessToken);
+      if (data.refreshToken) await setRefreshTokenCookie(data.refreshToken);
 
       console.log("Login successful & Session saved:", data.user.email);
 

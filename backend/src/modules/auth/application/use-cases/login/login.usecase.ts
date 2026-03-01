@@ -46,7 +46,7 @@ export class LoginUseCase {
       throw new UnauthorizedException(AUTH_MESSAGES.INVALID_CREDENTIALS);
     }
 
-    if (!user.isOnboarded) {
+    if (user.role === 'COMPANY_ADMIN' && !user.isOnboarded) {
       return {
         message: 'Onboarding required',
         user: {
@@ -83,7 +83,7 @@ export class LoginUseCase {
         lastName: user.lastName,
         role: user.role,
         companyId: user.companyId,
-        isOnboarded: user.isOnboarded,
+        isOnboarded: user.role === 'COMPANY_ADMIN' ? user.isOnboarded : true,
       },
     };
   }

@@ -10,6 +10,7 @@ import { resendOtp } from "@/services/company/otp/resend-otp.service";
 import { useRouter } from "next/navigation";
 import { OTP_MESSAGES } from "@/shared/constants/messages/otp.messages";
 import { LOCAL_STORAGE_KEYS } from "@/shared/constants/temp/local-storage-keys";
+import SocialLoginButtons from "@/components/ui/SocialLoginButtons";
 
 interface AdminRegistrationFormProps {
     onSwitchToLogin: () => void;
@@ -122,6 +123,19 @@ const AdminRegistrationForm: React.FC<AdminRegistrationFormProps> = ({ onSwitchT
 
     return (
         <>
+            <SocialLoginButtons />
+
+            <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-neutral-800"></div>
+                </div>
+                <div className="relative flex justify-center text-xs">
+                    <span className="bg-neutral-950 px-2 text-neutral-400">
+                        Or register with email
+                    </span>
+                </div>
+            </div>
+
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                     <FormInput

@@ -12,6 +12,7 @@ export interface EmployeeRepository {
     isActive: boolean;
     hasPassword: boolean;
     inviteStatus: InviteStatus;
+    isOnboarded: boolean;
   }): Promise<Employee>;
 
   update(id: string, input: {

@@ -52,6 +52,7 @@ export class InviteEmployeeUseCase {
         isActive: false,
         hasPassword: false,
         inviteStatus: InviteStatus.PENDING,
+        isOnboarded: true,
       });
     }
 
