@@ -2,16 +2,21 @@ import {
   Body,
   Controller,
   Get,
+  Param,
+  Patch,
   Post,
   Query,
   Req,
   Res,
   UnauthorizedException,
+  Inject,
   UseGuards,
 } from '@nestjs/common';
 import { InviteEmployeeUseCase } from '../../application/use-cases/invite-employee.usecase';
 import { VerifyInviteUseCase } from '../../application/use-cases/verify-invite.usecase';
 import { SetPasswordUseCase } from '../../application/use-cases/set-password.usecase';
+import { GetEmployeesUseCase } from '../../application/use-cases/get-employees.usecase';
+import { UpdateEmployeeStatusUseCase } from '../../application/use-cases/update-employee-status.usecase';
 import { RedisService } from 'src/shared/services/redis.service';
 import type { Request, Response } from 'express';
 import { JwtService } from 'src/shared/services/jwt.service';
@@ -29,6 +34,8 @@ import { EMPLOYEE_MESSAGES } from 'src/shared/constants/messages/employee/employ
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { POLICY_MESSAGES } from 'src/shared/constants/messages/company-policy/company-policy.message';
 import { generateSecureToken } from 'src/shared/utils/token.util';
+import type { EmployeeRepository } from '../../domain/repositories/employee.repository';
+import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 
 @Controller('company/employees')
 export class EmployeesController {
@@ -36,9 +43,54 @@ export class EmployeesController {
     private readonly inviteEmployee: InviteEmployeeUseCase,
     private readonly verifyInviteUseCase: VerifyInviteUseCase,
     private readonly setPasswordUseCase: SetPasswordUseCase,
+    private readonly getEmployeesUseCase: GetEmployeesUseCase,
+    private readonly updateEmployeeStatusUseCase: UpdateEmployeeStatusUseCase,
+    @Inject('EmployeeRepository')
+    private readonly employeeRepo: EmployeeRepository,
     private readonly redisService: RedisService,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {
+    console.log('[EmployeesController] Initialized');
+  }
+
+  @Get('/')
+  @UseGuards(JwtAuthGuard)
+  async findAll(@Req() req: Request) {
+    console.log('[EmployeesController] findAll called for company:', req.user?.companyId);
+    const companyId = req.user?.companyId;
+    if (!companyId) {
+      throw new UnauthorizedException(POLICY_MESSAGES.COMPANY_ID_NOT_FOUND);
+    }
+    return await this.getEmployeesUseCase.execute(companyId);
+  }
+
+  @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  async findOne(@Req() req: Request, @Param('id') id: string) {
+    // Basic check: employee should belong to the same company
+    const employee = await this.employeeRepo.findById(id);
+    if (!employee || employee.companyId !== req.user?.companyId) {
+      throw new UnauthorizedException(EMPLOYEE_MESSAGES.EMPLOYEE_NOT_FOUND);
+    }
+    return employee;
+  }
+
+  @Patch(':id/status')
+  @UseGuards(JwtAuthGuard)
+  async updateStatus(
+    @Req() req: Request,
+    @Param('id') id: string,
+    @Body('status') status: UserStatus,
+  ) {
+    // Basic check: employee should belong to the same company
+    const employee = await this.employeeRepo.findById(id);
+    if (!employee || employee.companyId !== req.user?.companyId) {
+      throw new UnauthorizedException(EMPLOYEE_MESSAGES.EMPLOYEE_NOT_FOUND);
+    }
+
+    await this.updateEmployeeStatusUseCase.execute(id, status);
+    return { message: 'Employee status updated successfully' };
+  }
 
   @Post('invite')
   @UseGuards(JwtAuthGuard)

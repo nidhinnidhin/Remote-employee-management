@@ -7,4 +7,5 @@ export interface BaseModalProps {
   description?: string;
   children?: ReactNode;
   footer?: ReactNode;
+  maxWidth?: string;
 }

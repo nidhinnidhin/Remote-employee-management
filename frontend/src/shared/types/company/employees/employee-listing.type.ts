@@ -4,8 +4,9 @@ export interface Employee {
     email: string;
     avatar?: string;
     department: string;
-    team: string;
+    team?: string;
     role: string;
-    status: "Active" | "Inactive";
-    joinDate: string;
+    isActive: boolean;
+    inviteStatus: string;
+    joinDate?: string;
 }

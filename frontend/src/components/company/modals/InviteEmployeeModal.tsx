@@ -86,56 +86,58 @@ const InviteEmployeeModal = ({
         </div>
       }
     >
-      <FormInput
-        label="Full Name"
-        name="name"
-        value={form.name}
-        onChange={handleChange}
-        placeholder="John Doe"
-        required
-      />
+      <div className="space-y-4">
+        <FormInput
+          label="Full Name"
+          name="name"
+          value={form.name}
+          onChange={handleChange}
+          placeholder="John Doe"
+          required
+        />
 
-      <FormInput
-        label="Work Email"
-        name="email"
-        type="email"
-        value={form.email}
-        onChange={handleChange}
-        placeholder="employee@company.com"
-        required
-      />
+        <FormInput
+          label="Work Email"
+          name="email"
+          type="email"
+          value={form.email}
+          onChange={handleChange}
+          placeholder="employee@company.com"
+          required
+        />
 
-      <FormInput
-        label="Phone Number"
-        name="phone"
-        type="tel"
-        value={form.phone}
-        onChange={handleChange}
-        placeholder="+1 234 567 8900"
-        required
-      />
+        <FormInput
+          label="Phone Number"
+          name="phone"
+          type="tel"
+          value={form.phone}
+          onChange={handleChange}
+          placeholder="+1 234 567 8900"
+          required
+        />
 
-      <FormDropdown
-        label="Role"
-        name="role"
-        value={form.role}
-        onChange={handleChange}
-        options={ROLE_OPTIONS}
-        placeholder="Select role"
-        required
-      />
+        <FormDropdown
+          label="Role"
+          name="role"
+          value={form.role}
+          onChange={handleChange}
+          options={ROLE_OPTIONS}
+          placeholder="Select role"
+          required
+        />
 
-      <FormDropdown
-        label="Department"
-        name="department"
-        value={form.department}
-        onChange={handleChange}
-        options={DEPARTMENT_OPTIONS}
-        placeholder="Select department"
-        required
-      />
+        <FormDropdown
+          label="Department"
+          name="department"
+          value={form.department}
+          onChange={handleChange}
+          options={DEPARTMENT_OPTIONS}
+          placeholder="Select department"
+          required
+        />
 
-      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+        {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+      </div>
     </BaseModal>
   );
 };

@@ -9,6 +9,8 @@ import { UserDocument, UserSchema } from 'src/modules/auth/infrastructure/databa
 import { EmployeesController } from '../controller/employees.controller';
 import { InviteEmployeeUseCase } from '../../application/use-cases/invite-employee.usecase';
 import { VerifyInviteUseCase } from '../../application/use-cases/verify-invite.usecase';
+import { GetEmployeesUseCase } from '../../application/use-cases/get-employees.usecase';
+import { UpdateEmployeeStatusUseCase } from '../../application/use-cases/update-employee-status.usecase';
 import { EmailService } from 'src/shared/services/email.service';
 import { EmployeeRepositoryImpl } from '../../infrastructure/repository/employee.repository.impl';
 import { InviteLinkRepositoryImpl } from '../../infrastructure/repository/invite-link.repository.impl';
@@ -29,6 +31,8 @@ import { JwtService } from 'src/shared/services/jwt.service';
     InviteEmployeeUseCase,
     VerifyInviteUseCase,
     SetPasswordUseCase,
+    GetEmployeesUseCase,
+    UpdateEmployeeStatusUseCase,
     EmailService,
     RedisService,
     JwtService,
