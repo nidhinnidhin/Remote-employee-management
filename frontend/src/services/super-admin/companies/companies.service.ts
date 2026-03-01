@@ -1,4 +1,4 @@
-import { getServerApi } from "@/lib/axios/axiosSeriver";
+import { getServerApi } from "@/lib/axios/axiosServer";
 import { CompanyApi } from "@/shared/types/superadmin/companies/company.type";
 
 export async function fetchCompanies(): Promise<CompanyApi[]> {

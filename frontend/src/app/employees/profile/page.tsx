@@ -1,6 +1,6 @@
 // app/employees/profile/page.tsx (or pages equivalent)
 import { getSession } from "@/lib/iron-session/getSession";
-import { getServerApi } from "@/lib/axios/axiosSeriver";
+import { getServerApi } from "@/lib/axios/axiosServer";
 import { redirect } from "next/navigation";
 import ProfileClient from "@/components/employees/profile/ProfileClient";
 

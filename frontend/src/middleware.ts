@@ -67,6 +67,14 @@ export async function middleware(req: NextRequest) {
         },
       });
 
+      if (response.status === 401) {
+        // Token expired or invalid - clear session and redirect
+        const loginPath = pathname.startsWith("/super-admin") ? "/super-admin/login" : "/company/login";
+        const redirResponse = NextResponse.redirect(new URL(loginPath, req.url));
+        redirResponse.cookies.delete("app_session");
+        return redirResponse;
+      }
+
       if (response.status === 403) {
         // Distinguish between company suspension and user block
         const data = await response.json().catch(() => ({}));
