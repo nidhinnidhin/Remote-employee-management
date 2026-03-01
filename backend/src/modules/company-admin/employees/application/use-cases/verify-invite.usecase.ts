@@ -18,7 +18,7 @@ export class VerifyInviteUseCase {
 
     @Inject('EmployeeRepository')
     private readonly employeeRepo: EmployeeRepository,
-  ) {}
+  ) { }
 
   async execute(rawToken: string) {
     if (!rawToken) {
@@ -55,13 +55,7 @@ export class VerifyInviteUseCase {
       throw new UnauthorizedException(EMPLOYEE_MESSAGES.INVITE_PROCESSED);
     }
 
-    // 5️⃣ Activate employee
-    await this.employeeRepo.activateEmployee(employee.id);
-
-    // 6️⃣ Mark invite as used
-    await this.inviteLinkRepo.markAsUsed(hashedToken);
-
-    // 7️⃣ Tell frontend what to do next
+    // 5️⃣ Tell frontend what to do next
     return {
       employeeId: employee.id,
     };

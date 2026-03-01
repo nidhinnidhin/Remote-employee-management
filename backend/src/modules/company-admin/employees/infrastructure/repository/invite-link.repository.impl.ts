@@ -1,5 +1,5 @@
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { InviteLinkRepository } from '../../domain/repositories/invite-link.repository';
 import { InviteLinkToken } from '../../domain/entities/invite-link-token.entity';
 import { InviteLinkDocument } from '../schema/invite-link.schema';
@@ -8,7 +8,7 @@ export class InviteLinkRepositoryImpl implements InviteLinkRepository {
   constructor(
     @InjectModel(InviteLinkDocument.name)
     private readonly model: Model<InviteLinkDocument>,
-  ) {}
+  ) { }
 
   async create(token: InviteLinkToken): Promise<void> {
     await this.model.create({
@@ -33,5 +33,12 @@ export class InviteLinkRepositoryImpl implements InviteLinkRepository {
 
   async markAsUsed(token: string): Promise<void> {
     await this.model.updateOne({ token }, { $set: { used: true } });
+  }
+
+  async markAllAsUsedByEmployeeId(employeeId: string): Promise<void> {
+    await this.model.updateMany(
+      { employeeId: new Types.ObjectId(employeeId) },
+      { $set: { used: true } },
+    );
   }
 }
