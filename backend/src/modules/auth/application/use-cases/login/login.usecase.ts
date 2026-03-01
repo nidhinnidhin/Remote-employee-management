@@ -32,6 +32,10 @@ export class LoginUseCase {
       throw new UnauthorizedException(AUTH_MESSAGES.INVALID_CREDENTIALS);
     }
 
+    if (user.status === UserStatus.SUSPENDED) {
+      throw new ForbiddenException(AUTH_MESSAGES.USER_BLOCKED);
+    }
+
     if (user.status !== UserStatus.ACTIVE) {
       throw new ForbiddenException(AUTH_MESSAGES.ACCOUNT_NOT_VERIFIED);
     }

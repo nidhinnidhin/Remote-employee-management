@@ -70,6 +70,10 @@ export class SocialLoginUseCase {
     }
     console.log('-----------------------------------------');
 
+    if (user.status === UserStatus.SUSPENDED) {
+      throw new ForbiddenException(AUTH_MESSAGES.USER_BLOCKED);
+    }
+
     if (user.status !== UserStatus.ACTIVE) {
       throw new ForbiddenException(AUTH_MESSAGES.ACCOUNT_NOT_ACTIVE);
     }

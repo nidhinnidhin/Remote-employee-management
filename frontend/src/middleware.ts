@@ -35,6 +35,15 @@ export async function middleware(req: NextRequest) {
 
   // Redirect authenticated users away from auth routes (login/register)
   if (isAuthenticated && isAuthRoute) {
+    // If the user is being redirected to the login page because of a suspension,
+    // we must clear their session instead of redirecting them back to the dashboard.
+    // This breaks the redirect loop.
+    if (req.nextUrl.searchParams.get("error") === "suspended") {
+      const resp = NextResponse.next();
+      resp.cookies.delete("app_session");
+      return resp;
+    }
+
     const dashboardUrl = getRedirectForRole(session.role!);
     const targetUrl = new URL(dashboardUrl, req.url);
 
@@ -59,9 +68,16 @@ export async function middleware(req: NextRequest) {
       });
 
       if (response.status === 403) {
-        // Company suspended - clear session and redirect
-        session.destroy();
-        return NextResponse.redirect(new URL("/company/login", req.url));
+        // Distinguish between company suspension and user block
+        const data = await response.json().catch(() => ({}));
+        const isBlocked = data.message?.includes("blocked") || data.message?.includes("Blocked");
+        const errorType = isBlocked ? "blocked" : "suspended";
+
+        // Company/User suspended - clear session and redirect
+        // We use an explicit cookie delete in the redirect response to ensure it sticks
+        const redirResponse = NextResponse.redirect(new URL(`/company/login?error=${errorType}`, req.url));
+        redirResponse.cookies.delete("app_session");
+        return redirResponse;
       }
     } catch (error) {
       console.error("Middleware Auth Check Error:", error);

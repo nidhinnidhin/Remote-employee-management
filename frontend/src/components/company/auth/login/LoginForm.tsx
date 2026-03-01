@@ -43,7 +43,17 @@ export default function LoginForm() {
   const errorParam = searchParams.get("error");
 
   useEffect(() => {
-    if (errorParam) {
+    if (errorParam === "suspended") {
+      setErrors((prev) => ({
+        ...prev,
+        form: "Your company access has been suspended. Please contact support.",
+      }));
+    } else if (errorParam === "blocked") {
+      setErrors((prev) => ({
+        ...prev,
+        form: "Your account has been blocked. Please contact your company administrator.",
+      }));
+    } else if (errorParam) {
       setErrors((prev) => ({ ...prev, form: errorParam }));
     }
   }, [errorParam]);

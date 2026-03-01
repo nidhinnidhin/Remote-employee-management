@@ -32,7 +32,10 @@ clientApi.interceptors.response.use(
 
     if (err.response?.status === 403) {
       if (typeof window !== "undefined") {
-        window.location.href = "/company/login";
+        const message = err.response.data?.message || "";
+        const isBlocked = message.includes("blocked") || message.includes("Blocked");
+        const errorType = isBlocked ? "blocked" : "suspended";
+        window.location.href = `/company/login?error=${errorType}`;
       }
     }
 
