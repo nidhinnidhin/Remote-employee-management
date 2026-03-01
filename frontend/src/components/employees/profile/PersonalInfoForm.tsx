@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { clientApi } from "@/lib/axios/axiosClient";
-import { UserProfile } from "@/app/employees/profile/page";
+import { UserProfile } from "@/app/employee/profile/page";
 import {
   Mail,
   Pencil,
@@ -232,7 +232,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
     setError("");
     setSuccessMsg("");
     try {
-      await clientApi.patch("/auth/profile", {
+      await clientApi.patch("/auth/profile/update", {
         firstName: formData.firstName,
         lastName: formData.lastName,
         phone: formData.phone,
@@ -277,7 +277,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
     setEmailSuccessMsg("");
 
     try {
-      await clientApi.post("/auth/request-email-change", {
+      await clientApi.post("/auth/profile/request-email-change", {
         newEmail,
       });
 
@@ -302,7 +302,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
     setOtpError("");
 
     try {
-      await clientApi.post("/auth/verify-email-change", {
+      await clientApi.post("/auth/profile/verify-email-change", {
         otp,
       });
 

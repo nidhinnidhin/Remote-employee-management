@@ -47,7 +47,7 @@ const handler = NextAuth({
       if (!res.ok) {
         const data = await res.json();
         console.log("Login failed, redirecting with error:", data.message);
-        return `/company/login?error=${encodeURIComponent(data.message || "Login failed")}`;
+        return `/auth/login?error=${encodeURIComponent(data.message || "Login failed")}`;
       }
 
       const data = await res.json().catch(() => null);
@@ -61,13 +61,13 @@ const handler = NextAuth({
       console.log("-----------------------------------------");
 
       if (!data) {
-        return "/company/login?error=Backend Error";
+        return "/auth/login?error=Backend Error";
       }
 
       if (!data.user.isOnboarded) {
         console.log(" Redirecting to ONBOARDING for userId:", data.user.id);
         // Return redirect URL with userId to handle client-side localStorage
-        return `/company/onboarding?userId=${data.user.id}`;
+        return `/auth/onboarding?userId=${data.user.id}`;
       }
 
       // Sync with Iron Session
@@ -89,16 +89,16 @@ const handler = NextAuth({
       // Redirect to correct dashboard based on role
       const ROLE_REDIRECTS: Record<string, string> = {
         SUPER_ADMIN: "/super-admin/companies",
-        COMPANY_ADMIN: "/company/employees/dashboard", // Using dashboard as per user's preference
-        EMPLOYEE: "/employees/dashboard",
+        COMPANY_ADMIN: "/admin/dashboard", // Using dashboard as per user's preference
+        EMPLOYEE: "/employee/dashboard",
       };
 
-      return ROLE_REDIRECTS[data.user.role] || "/company/employees/dashboard";
+      return ROLE_REDIRECTS[data.user.role] || "/admin/dashboard";
     },
   },
   pages: {
-    signIn: "/company/login",
-    error: "/company/login",
+    signIn: "/auth/login",
+    error: "/auth/login",
   },
 });
 

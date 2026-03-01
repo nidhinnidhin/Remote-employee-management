@@ -33,9 +33,9 @@ const Sidebar: React.FC<SidebarProps> = ({
     {
       label: "Dashboard",
       icon: LayoutDashboard,
-      href: "/company/employees/dashboard",
+      href: "/admin/dashboard",
     },
-    { label: "Employees", icon: Users, href: "/company/employees/employees" },
+    { label: "Employees", icon: Users, href: "/admin/employees" },
     {
       label: "Departments & Teams",
       icon: Building2,
@@ -64,7 +64,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       href: "/company-admin/profile",
     },
     { label: "Audit Logs", icon: FileText, href: "/company-admin/audit-logs" },
-    { label: "Company policy", icon: Shield, href: "/company/employees/company-policy" },
+    { label: "Company policy", icon: Shield, href: "/admin/company-policy" },
   ];
 
   return (

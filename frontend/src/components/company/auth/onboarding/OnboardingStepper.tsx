@@ -105,7 +105,7 @@ const OnboardingStepper: React.FC = () => {
 
                 if (result.success) {
                     localStorage.removeItem("registration_user_id");
-                    router.replace("/company/employees/dashboard");
+                    router.replace("/admin/dashboard");
                 } else {
                     // If the error is about company email already taken, surface it
                     // as an inline field error on step 1

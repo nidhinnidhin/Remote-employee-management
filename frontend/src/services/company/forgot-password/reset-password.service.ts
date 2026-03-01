@@ -4,5 +4,5 @@ export async function resetPasswordService(payload: {
   email: string;
   newPassword: string;
 }) {
-  return clientApi.post("/auth/reset-password", payload);
+  return clientApi.post("/auth/password/reset", payload);
 }

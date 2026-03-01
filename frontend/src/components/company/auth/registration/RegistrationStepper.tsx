@@ -137,7 +137,7 @@ const RegistrationStepper = () => {
       localStorage.setItem("registration_user_id", result.data.user.id);
 
       setShowOtpModal(false);
-      router.replace("/company/onboarding");
+      router.replace("/auth/onboarding");
     } finally {
       setOtpVerifying(false);
     }
@@ -181,7 +181,7 @@ const RegistrationStepper = () => {
             <p className="text-muted">
               Already have an account?{" "}
               <a
-                href="/company/login"
+                href="/auth/login"
                 className="text-accent hover:opacity-80 transition-opacity"
               >
                 Sign in

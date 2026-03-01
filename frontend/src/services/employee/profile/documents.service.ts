@@ -1,7 +1,7 @@
 import { clientApi } from "@/lib/axios/axiosClient";
 
 export const fetchProfile = async () => {
-  const response = await clientApi.get("/auth/me");
+  const response = await clientApi.get("/auth/profile/me");
   return response.data;
 };
 
@@ -15,7 +15,7 @@ export const uploadDocument = async (
   formData.append("name", name);
   formData.append("category", category);
 
-  const response = await clientApi.post("/auth/profile/documents", formData, {
+  const response = await clientApi.post("/auth/documents", formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
@@ -30,7 +30,7 @@ export const deleteDocument = async (
   resourceType: string,
 ) => {
   const response = await clientApi.delete(
-    `/auth/profile/documents/${documentId}`,
+    `/auth/documents/${documentId}`,
     {
       data: { publicId, resourceType }, // ← add resourceType
     },
@@ -50,7 +50,7 @@ export const editDocument = async (
   if (file) formData.append("file", file);
 
   const response = await clientApi.patch(
-    `/auth/profile/documents/${documentId}`,
+    `/auth/documents/${documentId}`,
     formData,
     {
       headers: { "Content-Type": "multipart/form-data" },

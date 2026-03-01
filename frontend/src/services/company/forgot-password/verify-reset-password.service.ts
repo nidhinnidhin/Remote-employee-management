@@ -4,5 +4,5 @@ export async function verifyResetPasswordOtpService(payload: {
   email: string;
   otp: string;
 }) {
-  return clientApi.post("/auth/verify-reset-password-otp", payload);
+  return clientApi.post("/auth/password/verify-reset", payload);
 }

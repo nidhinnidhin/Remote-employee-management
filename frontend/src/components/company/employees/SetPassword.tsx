@@ -27,7 +27,7 @@ const SetPasswordCard = () => {
 
       await setEmployeePasswordAction(password);
 
-      router.replace("/employees/dashboard");
+      router.replace("/employee/dashboard");
     } catch {
       setError(AUTH_MESSAGES.UNABLE_TO_SET_PASSWORD);
     } finally {

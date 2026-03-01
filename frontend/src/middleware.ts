@@ -17,21 +17,21 @@ export async function middleware(req: NextRequest) {
 
   // Public auth routes (no login required)
   const isAuthRoute =
-    pathname.startsWith("/company/login") ||
-    pathname.startsWith("/company/register") ||
-    pathname.startsWith("/company/onboarding");
+    pathname.startsWith("/auth/login") ||
+    pathname.startsWith("/auth/register") ||
+    pathname.startsWith("/auth/onboarding");
 
   // Employee invite/onboarding routes — always public, no session needed
-  const isEmployeeAuthRoute = pathname.startsWith("/company/employees/auth");
+  const isEmployeeAuthRoute = pathname.startsWith("/admin/auth");
 
   // Protected routes — require authentication
   const isProtectedRoute =
     !isEmployeeAuthRoute &&
-    (pathname.startsWith("/employees") ||
+    (pathname.startsWith("/employee") ||
       pathname.startsWith("/super-admin") ||
-      pathname.startsWith("/company/employees") ||
-      pathname.startsWith("/company/dashboard") ||
-      pathname.startsWith("/employees/dashboard"));
+      pathname.startsWith("/admin") ||
+      pathname.startsWith("/auth/dashboard") ||
+      pathname.startsWith("/employee/dashboard"));
 
   // Redirect authenticated users away from auth routes (login/register)
   if (isAuthenticated && isAuthRoute) {
@@ -55,13 +55,13 @@ export async function middleware(req: NextRequest) {
 
   // Redirect unauthenticated users away from protected routes
   if (!isAuthenticated && isProtectedRoute) {
-    return NextResponse.redirect(new URL("/company/login", req.url));
+    return NextResponse.redirect(new URL("/auth/login", req.url));
   }
 
   // If authenticated and on a protected route, verify company status with backend
   if (isAuthenticated && isProtectedRoute) {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/profile/me`, {
         headers: {
           Authorization: `Bearer ${session.accessToken}`,
         },
@@ -69,7 +69,7 @@ export async function middleware(req: NextRequest) {
 
       if (response.status === 401) {
         // Token expired or invalid - clear session and redirect
-        const loginPath = pathname.startsWith("/super-admin") ? "/super-admin/login" : "/company/login";
+        const loginPath = pathname.startsWith("/super-admin") ? "/super-admin/login" : "/auth/login";
         const redirResponse = NextResponse.redirect(new URL(loginPath, req.url));
         redirResponse.cookies.delete("app_session");
         return redirResponse;
@@ -83,7 +83,7 @@ export async function middleware(req: NextRequest) {
 
         // Company/User suspended - clear session and redirect
         // We use an explicit cookie delete in the redirect response to ensure it sticks
-        const redirResponse = NextResponse.redirect(new URL(`/company/login?error=${errorType}`, req.url));
+        const redirResponse = NextResponse.redirect(new URL(`/auth/login?error=${errorType}`, req.url));
         redirResponse.cookies.delete("app_session");
         return redirResponse;
       }

@@ -58,7 +58,7 @@ export default async function ProfilePage() {
 
   try {
     const api = await getServerApi();
-    const res = await api.get<UserProfile>("/auth/me");
+    const res = await api.get<UserProfile>("/auth/profile/me");
     user = res.data;
   } catch (err: any) {
     console.error(
@@ -66,7 +66,7 @@ export default async function ProfilePage() {
       err?.message,
       err?.response?.status,
     );
-    redirect("/company/login");
+    redirect("/auth/login");
   }
 
   return <ProfileClient user={user} />;

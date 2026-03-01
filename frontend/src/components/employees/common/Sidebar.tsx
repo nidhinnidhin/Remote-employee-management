@@ -28,8 +28,8 @@ import {
 import { cn } from "@/lib/utils";
 
 const menuItems = [
-  { icon: LayoutGrid, label: "Dashboard", href: "/employees/dashboard" },
-  { icon: UserCircle, label: "My Profile", href: "/employees/profile" },
+  { icon: LayoutGrid, label: "Dashboard", href: "/employee/dashboard" },
+  { icon: UserCircle, label: "My Profile", href: "/employee/profile" },
   { icon: Fingerprint, label: "Attendance", href: "/attendance" },
   { icon: CalendarOff, label: "Leave Management", href: "/leaves" },
   { icon: CheckCircle2, label: "Tasks", href: "/tasks" },
@@ -44,7 +44,7 @@ const menuItems = [
   { icon: BarChart4, label: "Reports", href: "/reports" },
   { icon: Settings2, label: "Settings", href: "/settings" },
   { icon: MessagesSquare, label: "All chats", href: "/chats" },
-  { icon: ShieldCheck, label: "Company policy", href: "/employees/policy" },
+  { icon: ShieldCheck, label: "Company policy", href: "/employee/policy" },
 ];
 
 export function Sidebar({ className }: { className?: string }) {

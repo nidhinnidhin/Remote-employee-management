@@ -18,7 +18,7 @@ export default function Navbar() {
                 </Link>
 
                 <div className="flex items-center gap-8">
-                    <Link href="/company/login" className="btn-highlight">
+                    <Link href="/auth/login" className="btn-highlight">
                         Sign in
                     </Link>
                 </div>

@@ -98,7 +98,7 @@ export default function LoginForm() {
         !result.data.user.isOnboarded
       ) {
         localStorage.setItem("registration_user_id", result.data.user.id);
-        router.push("/company/onboarding");
+        router.push("/auth/onboarding");
         return;
       }
 

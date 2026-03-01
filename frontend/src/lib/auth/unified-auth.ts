@@ -12,7 +12,7 @@ export async function requireAuth() {
     const session = await getSession();
 
     if (!session.accessToken || !session.role) {
-        redirect("/company/login");
+        redirect("/auth/login");
     }
 
     return session;
@@ -28,7 +28,7 @@ export async function requireRole(requiredRole: string) {
 
     // Not authenticated
     if (!session.accessToken || !session.role) {
-        redirect("/company/login");
+        redirect("/auth/login");
     }
 
     // Wrong role - redirect to their own dashboard
@@ -71,5 +71,5 @@ export async function getCurrentUser() {
 export async function logout() {
     const session = await getSession();
     session.destroy();
-    redirect("/company/login");
+    redirect("/auth/login");
 }

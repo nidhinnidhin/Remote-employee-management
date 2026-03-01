@@ -25,7 +25,7 @@ clientApi.interceptors.response.use(
         return clientApi(originalRequest);
       } catch {
         if (typeof window !== "undefined") {
-          window.location.href = "/company/login";
+          window.location.href = "/auth/login";
         }
       }
     }
@@ -35,7 +35,7 @@ clientApi.interceptors.response.use(
         const message = err.response.data?.message || "";
         const isBlocked = message.includes("blocked") || message.includes("Blocked");
         const errorType = isBlocked ? "blocked" : "suspended";
-        window.location.href = `/company/login?error=${errorType}`;
+        window.location.href = `/auth/login?error=${errorType}`;
       }
     }
 

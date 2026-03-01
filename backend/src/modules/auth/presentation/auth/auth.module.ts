@@ -17,6 +17,10 @@ import { MongoUserRepository } from '../../infrastructure/database/repositories/
 import { OtpService } from 'src/shared/services/otp.service';
 import { EmailService } from 'src/shared/services/email.service';
 import { JwtService } from 'src/shared/services/jwt.service';
+import { OtpController } from '../controllers/otp.controller';
+import { PasswordController } from '../controllers/password.controller';
+import { ProfileController } from '../controllers/profile.controller';
+import { DocumentController } from '../controllers/document.controller';
 import { AuthController } from '../controllers/auth.controller';
 import { TestController } from '../controllers/test.controller';
 import { EmailOtpSchema } from '../../infrastructure/database/mongoose/schemas/email-otp.schema';
@@ -51,7 +55,14 @@ import { EditDocumentUseCase } from '../../application/use-cases/document/edit-d
       { name: 'EmailOtp', schema: EmailOtpSchema },
     ]),
   ],
-  controllers: [AuthController, TestController],
+  controllers: [
+    AuthController,
+    OtpController,
+    PasswordController,
+    ProfileController,
+    DocumentController,
+    TestController,
+  ],
   providers: [
     JwtAuthGuard,
     RegisterAdminUseCase,

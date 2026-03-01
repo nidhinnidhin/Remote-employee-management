@@ -97,9 +97,9 @@ const AdminRegistrationForm: React.FC<AdminRegistrationFormProps> = ({ onSwitchT
             setShowOtpModal(false);
 
             if (result.data.user.role === "COMPANY_ADMIN" && !result.data.user.isOnboarded) {
-                router.replace("/company/onboarding");
+                router.replace("/auth/onboarding");
             } else {
-                router.replace("/company/employees/employees");
+                router.replace("/admin/employees");
             }
         } catch (err: any) {
             setOtpError(err.message || "Verification failed");

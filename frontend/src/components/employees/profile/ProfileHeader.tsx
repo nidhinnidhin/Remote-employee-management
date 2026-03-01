@@ -96,7 +96,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                   setUploading(true);
 
                   const res = await clientApi.post(
-                    "/auth/upload-profile-image",
+                    "/auth/profile/upload-image",
                     formData,
                   );
 

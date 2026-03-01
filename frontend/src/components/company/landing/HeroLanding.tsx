@@ -30,7 +30,7 @@ export default function Hero() {
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                             <Link
-                                href="/company/register"
+                                href="/auth/register"
                                 className="px-8 py-4 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl shadow-xl shadow-red-600/20 flex items-center gap-2 group transition-all"
                             >
                                 Register
