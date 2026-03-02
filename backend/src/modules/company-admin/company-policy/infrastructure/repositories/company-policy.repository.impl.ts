@@ -12,6 +12,7 @@ export class CompanyPolicyRepositoryImpl implements CompanyPolicyRepository {
     private readonly model: Model<CompanyPolicy>,
   ) {}
 
+  
   async upsertCompanyPolicies(companyId: string, policies: any[]) {
     return this.model
       .findOneAndUpdate(
