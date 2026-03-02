@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { verifyEmployeeInvite } from "@/services/employee/auth/employee-verify-invite.service";
 import { InviteVerifierProps } from "@/shared/types/company/employees/auth/invite-employee-verifier-props.type";
+import { FRONTEND_ROUTES } from "@/constants/frontend.routes";
 
 export default function InviteVerifier({ token }: InviteVerifierProps) {
   const router = useRouter();
@@ -18,13 +19,13 @@ export default function InviteVerifier({ token }: InviteVerifierProps) {
         console.log("[InviteVerifier] Verification success. Next step:", data.nextStep);
 
         if (data.nextStep === "SET_PASSWORD") {
-          router.replace("/admin/auth/set-password");
+          router.replace(FRONTEND_ROUTES.ADMIN.INVITE.SET_PASSWORD);
         } else {
-          router.replace("/auth/login");
+          router.replace(FRONTEND_ROUTES.AUTH.LOGIN);
         }
       } catch (error: any) {
         console.error("[InviteVerifier] Verification failed:", error.response?.data || error.message);
-        router.replace("/admin/auth/invite-invalid");
+        router.replace(FRONTEND_ROUTES.ADMIN.INVITE.INVALID);
       }
     };
 

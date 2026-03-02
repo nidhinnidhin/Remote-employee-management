@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import BackgroundEffect from "@/components/ui/BackgroundEffect";
 import { ArrowRight, PlayCircle } from "lucide-react";
 import Link from "next/link";
+import { FRONTEND_ROUTES } from "@/constants/frontend.routes";
 
 export default function Hero() {
   return (
@@ -30,7 +31,7 @@ export default function Hero() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link
-                href="/auth/login"
+                href={FRONTEND_ROUTES.AUTH.LOGIN}
                 className="btn-highlight px-10 py-4"
               >
                 Sign in

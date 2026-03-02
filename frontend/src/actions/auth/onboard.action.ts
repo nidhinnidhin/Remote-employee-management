@@ -5,6 +5,7 @@ import { clientApi as api } from "@/lib/axios/axiosClient";
 import { AuthActionResult } from "@/shared/types/company/auth/company-login/login-response.type";
 import { setRefreshTokenCookie, setAccessTokenCookie } from "@/lib/auth/cookies";
 import { COOKIE_KEYS } from "@/shared/constants/temp/cookie-keys";
+import { API_ROUTES } from "@/constants/api.routes";
 
 export async function onboardAction(payload: any): Promise<AuthActionResult> {
     try {
@@ -14,7 +15,7 @@ export async function onboardAction(payload: any): Promise<AuthActionResult> {
             return { success: false, error: "User identification missing. Please sign up again." };
         }
 
-        const response = await api.post("/auth/onboard", payload);
+        const response = await api.post(API_ROUTES.AUTH.ONBOARD, payload);
 
         const { accessToken, refreshToken, user } = response.data;
 

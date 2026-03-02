@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { FRONTEND_ROUTES } from "@/constants/frontend.routes";
 import {
   LayoutDashboard,
   Building2,
@@ -19,32 +20,32 @@ export default function Sidebar() {
   const navigation = [
     {
       name: "Dashboard",
-      href: "/super-admin/dashboard",
+      href: FRONTEND_ROUTES.SUPER_ADMIN.DASHBOARD,
       icon: LayoutDashboard,
     },
-    { name: "Companies", href: "/super-admin/companies", icon: Building2 },
+    { name: "Companies", href: FRONTEND_ROUTES.SUPER_ADMIN.COMPANIES, icon: Building2 },
     {
       name: "Subscription Plans",
-      href: "/super-admin/subscriptions",
+      href: FRONTEND_ROUTES.SUPER_ADMIN.SUBSCRIPTIONS,
       icon: CreditCard,
     },
-    { name: "Global Users", href: "/super-admin/users", icon: Users },
+    { name: "Global Users", href: FRONTEND_ROUTES.SUPER_ADMIN.USERS, icon: Users },
     {
       name: "Billing & Payments",
-      href: "/super-admin/billing",
+      href: FRONTEND_ROUTES.SUPER_ADMIN.BILLING,
       icon: Receipt,
     },
     {
       name: "Support Tickets",
-      href: "/super-admin/support",
+      href: FRONTEND_ROUTES.SUPER_ADMIN.SUPPORT,
       icon: MessageSquare,
     },
     {
       name: "Platform Settings",
-      href: "/super-admin/settings",
+      href: FRONTEND_ROUTES.SUPER_ADMIN.SETTINGS,
       icon: Settings,
     },
-    { name: "System Logs", href: "/super-admin/logs", icon: FileText },
+    { name: "System Logs", href: FRONTEND_ROUTES.SUPER_ADMIN.LOGS, icon: FileText },
   ];
 
   return (

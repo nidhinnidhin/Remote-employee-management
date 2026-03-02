@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { FRONTEND_ROUTES } from "@/constants/frontend.routes";
 import {
   LayoutDashboard,
   Users,
@@ -33,38 +34,38 @@ const Sidebar: React.FC<SidebarProps> = ({
     {
       label: "Dashboard",
       icon: LayoutDashboard,
-      href: "/admin/dashboard",
+      href: FRONTEND_ROUTES.ADMIN.DASHBOARD,
     },
-    { label: "Employees", icon: Users, href: "/admin/employees" },
+    { label: "Employees", icon: Users, href: FRONTEND_ROUTES.ADMIN.EMPLOYEES },
     {
       label: "Departments & Teams",
       icon: Building2,
-      href: "/company-admin/departments",
+      href: FRONTEND_ROUTES.COMPANY.DEPARTMENTS,
     },
-    { label: "Projects", icon: FolderOpen, href: "/company-admin/projects" },
-    { label: "Tasks", icon: CheckSquare, href: "/company-admin/tasks" },
+    { label: "Projects", icon: FolderOpen, href: FRONTEND_ROUTES.COMPANY.PROJECTS },
+    { label: "Tasks", icon: CheckSquare, href: FRONTEND_ROUTES.COMPANY.TASKS },
     {
       label: "Discussion Pools",
       icon: MessageSquare,
-      href: "/company-admin/discussions",
+      href: FRONTEND_ROUTES.COMPANY.DISCUSSIONS,
     },
     {
       label: "Attendance & Leave",
       icon: CalendarDays,
-      href: "/company-admin/attendance",
+      href: FRONTEND_ROUTES.COMPANY.ATTENDANCE,
     },
     {
       label: "Subscription",
       icon: CreditCard,
-      href: "/company-admin/subscription",
+      href: FRONTEND_ROUTES.COMPANY.SUBSCRIPTION,
     },
     {
       label: "Company Profile",
       icon: Building,
-      href: "/company-admin/profile",
+      href: FRONTEND_ROUTES.COMPANY.PROFILE,
     },
-    { label: "Audit Logs", icon: FileText, href: "/company-admin/audit-logs" },
-    { label: "Company policy", icon: Shield, href: "/admin/company-policy" },
+    { label: "Audit Logs", icon: FileText, href: FRONTEND_ROUTES.COMPANY.AUDIT_LOGS },
+    { label: "Company policy", icon: Shield, href: FRONTEND_ROUTES.ADMIN.COMPANY_POLICY },
   ];
 
   return (

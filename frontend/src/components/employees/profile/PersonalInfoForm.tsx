@@ -21,6 +21,7 @@ import BaseModal from "@/components/ui/BaseModal";
 import Button from "@/components/ui/Button";
 import OtpInput from "@/components/ui/OtpInput";
 import { useOtpTimer } from "@/hooks/otp/use-otp-timer";
+import { API_ROUTES } from "@/constants/api.routes";
 
 interface PersonalInfoFormData {
   firstName: string;
@@ -242,7 +243,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
     setError("");
     setSuccessMsg("");
     try {
-      await clientApi.patch("/auth/profile/update", {
+      await clientApi.patch(API_ROUTES.AUTH.PROFILE.UPDATE, {
         firstName: formData.firstName,
         lastName: formData.lastName,
         phone: formData.phone,
@@ -287,7 +288,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
     setEmailSuccessMsg("");
 
     try {
-      await clientApi.post("/auth/profile/request-email-change", {
+      await clientApi.post(API_ROUTES.AUTH.PROFILE.REQUEST_EMAIL_CHANGE, {
         newEmail,
       });
 
@@ -313,7 +314,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
     setOtpError("");
 
     try {
-      await clientApi.post("/auth/profile/verify-email-change", {
+      await clientApi.post(API_ROUTES.AUTH.PROFILE.VERIFY_EMAIL_CHANGE, {
         otp,
       });
 
@@ -333,7 +334,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
     setResendingOtp(true);
     setOtpError("");
     try {
-      await clientApi.post("/auth/profile/request-email-change", {
+      await clientApi.post(API_ROUTES.AUTH.PROFILE.REQUEST_EMAIL_CHANGE, {
         newEmail,
       });
       startTimer(60);

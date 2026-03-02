@@ -1,4 +1,5 @@
 import axios from "axios";
+import { API_ROUTES } from "@/constants/api.routes";
 
 export const clientApi = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -17,12 +18,12 @@ clientApi.interceptors.response.use(
     if (
       err.response?.status === 401 &&
       !originalRequest._retry &&
-      !originalRequest.url?.includes("/auth/refresh") &&
-      !originalRequest.url?.includes("/company/employees/verify-invite")
+      !originalRequest.url?.includes(API_ROUTES.AUTH.REFRESH) &&
+      !originalRequest.url?.includes(API_ROUTES.COMPANY.EMPLOYEES.VERIFY_INVITE)
     ) {
       originalRequest._retry = true;
       try {
-        await clientApi.post("/auth/refresh");
+        await clientApi.post(API_ROUTES.AUTH.REFRESH);
         return clientApi(originalRequest);
       } catch {
         if (typeof window !== "undefined") {

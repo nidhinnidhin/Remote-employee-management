@@ -12,10 +12,11 @@ import {
   LoginResponse,
   AuthActionResult
 } from "@/shared/types/company/auth/company-login/login-response.type";
+import { API_ROUTES } from "@/constants/api.routes";
 
 export async function loginAction(email: string, password: string): Promise<AuthActionResult<LoginResponse>> {
   try {
-    const response = await api.post<LoginResponse>("/auth/login", {
+    const response = await api.post<LoginResponse>(API_ROUTES.AUTH.LOGIN, {
       email,
       password,
     });

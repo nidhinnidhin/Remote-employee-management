@@ -1,6 +1,8 @@
 import { getSession } from "@/lib/iron-session/getSession";
 import { NextRequest, NextResponse } from "next/server";
 import { getRedirectForRole } from "@/lib/auth/auth-constants";
+import { API_ROUTES } from "@/constants/api.routes";
+import { FRONTEND_ROUTES } from "@/constants/frontend.routes";
 
 export async function middleware(req: NextRequest) {
   const session = await getSession();
@@ -17,12 +19,12 @@ export async function middleware(req: NextRequest) {
 
   // Public auth routes (no login required)
   const isAuthRoute =
-    pathname.startsWith("/auth/login") ||
-    pathname.startsWith("/auth/register") ||
-    pathname.startsWith("/auth/onboarding");
+    pathname.startsWith(FRONTEND_ROUTES.AUTH.LOGIN) ||
+    pathname.startsWith(FRONTEND_ROUTES.AUTH.REGISTER) ||
+    pathname.startsWith(FRONTEND_ROUTES.AUTH.ONBOARDING);
 
   // Employee invite/onboarding routes — always public, no session needed
-  const isEmployeeAuthRoute = pathname.startsWith("/admin/auth");
+  const isEmployeeAuthRoute = pathname.startsWith(FRONTEND_ROUTES.ADMIN.INVITE.BASE);
 
   // Protected routes — require authentication
   const isProtectedRoute =
@@ -30,8 +32,8 @@ export async function middleware(req: NextRequest) {
     (pathname.startsWith("/employee") ||
       pathname.startsWith("/super-admin") ||
       pathname.startsWith("/admin") ||
-      pathname.startsWith("/auth/dashboard") ||
-      pathname.startsWith("/employee/dashboard"));
+      pathname.startsWith(FRONTEND_ROUTES.AUTH.DASHBOARD) ||
+      pathname.startsWith(FRONTEND_ROUTES.EMPLOYEE.DASHBOARD));
 
   // Redirect authenticated users away from auth routes (login/register)
   if (isAuthenticated && isAuthRoute) {
@@ -55,13 +57,13 @@ export async function middleware(req: NextRequest) {
 
   // Redirect unauthenticated users away from protected routes
   if (!isAuthenticated && isProtectedRoute) {
-    return NextResponse.redirect(new URL("/auth/login", req.url));
+    return NextResponse.redirect(new URL(FRONTEND_ROUTES.AUTH.LOGIN, req.url));
   }
 
   // If authenticated and on a protected route, verify company status with backend
   if (isAuthenticated && isProtectedRoute) {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/profile/me`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${API_ROUTES.AUTH.PROFILE.ME}`, {
         headers: {
           Authorization: `Bearer ${session.accessToken}`,
         },
@@ -69,7 +71,7 @@ export async function middleware(req: NextRequest) {
 
       if (response.status === 401) {
         // Token expired or invalid - clear session and redirect
-        const loginPath = pathname.startsWith("/super-admin") ? "/super-admin/login" : "/auth/login";
+        const loginPath = pathname.startsWith("/super-admin") ? FRONTEND_ROUTES.SUPER_ADMIN.LOGIN : FRONTEND_ROUTES.AUTH.LOGIN;
         const redirResponse = NextResponse.redirect(new URL(loginPath, req.url));
         redirResponse.cookies.delete("app_session");
         return redirResponse;
@@ -83,7 +85,7 @@ export async function middleware(req: NextRequest) {
 
         // Company/User suspended - clear session and redirect
         // We use an explicit cookie delete in the redirect response to ensure it sticks
-        const redirResponse = NextResponse.redirect(new URL(`/auth/login?error=${errorType}`, req.url));
+        const redirResponse = NextResponse.redirect(new URL(`${FRONTEND_ROUTES.AUTH.LOGIN}?error=${errorType}`, req.url));
         redirResponse.cookies.delete("app_session");
         return redirResponse;
       }

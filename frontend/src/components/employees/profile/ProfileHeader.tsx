@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Pencil, Mail, MapPin, Phone, Calendar } from "lucide-react";
 import { clientApi } from "@/lib/axios/axiosClient";
 import { useRef } from "react";
+import { API_ROUTES } from "@/constants/api.routes";
 
 interface ProfileHeaderProps {
   name?: string;
@@ -96,7 +97,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                   setUploading(true);
 
                   const res = await clientApi.post(
-                    "/auth/profile/upload-image",
+                    API_ROUTES.AUTH.PROFILE.UPLOAD_IMAGE,
                     formData,
                   );
 

@@ -1,6 +1,5 @@
 import { clientApi } from "@/lib/axios/axiosClient";
-import { RegisterCompanyResponse } from "@/shared/types/company/auth/company-registeration/reegister-response.type";
-import { RegisterCompanyPayload } from "@/shared/types/company/auth/company-registeration/register-company-payload.type";
+import { API_ROUTES } from "@/constants/api.routes";
 import { AxiosError } from "axios";
 
 export async function registerAdmin(
@@ -8,7 +7,7 @@ export async function registerAdmin(
 ): Promise<any> {
   try {
     const response = await clientApi.post<any>(
-      "/auth/register",
+      API_ROUTES.AUTH.REGISTER,
       payload,
     );
     return response.data;

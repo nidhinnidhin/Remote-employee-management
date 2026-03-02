@@ -21,6 +21,7 @@ import {
   Errors,
 } from "@/shared/types/company/auth/company-registeration/company-registration.type";
 import { useRouter } from "next/navigation";
+import { FRONTEND_ROUTES } from "@/constants/frontend.routes";
 import { resendOtp } from "@/services/company/otp/resend-otp.service";
 import { OTP_MESSAGES } from "@/shared/constants/messages/otp.messages";
 import { LOCAL_STORAGE_KEYS } from "@/shared/constants/temp/local-storage-keys";
@@ -137,7 +138,7 @@ const RegistrationStepper = () => {
       localStorage.setItem("registration_user_id", result.data.user.id);
 
       setShowOtpModal(false);
-      router.replace("/auth/onboarding");
+      router.replace(FRONTEND_ROUTES.AUTH.ONBOARDING);
     } finally {
       setOtpVerifying(false);
     }
@@ -181,7 +182,7 @@ const RegistrationStepper = () => {
             <p className="text-muted">
               Already have an account?{" "}
               <a
-                href="/auth/login"
+                href={FRONTEND_ROUTES.AUTH.LOGIN}
                 className="text-accent hover:opacity-80 transition-opacity"
               >
                 Sign in

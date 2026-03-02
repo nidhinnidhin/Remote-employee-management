@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { FRONTEND_ROUTES } from "@/constants/frontend.routes";
 import {
   LayoutGrid,
   UserCircle,
@@ -28,23 +29,23 @@ import {
 import { cn } from "@/lib/utils";
 
 const menuItems = [
-  { icon: LayoutGrid, label: "Dashboard", href: "/employee/dashboard" },
-  { icon: UserCircle, label: "My Profile", href: "/employee/profile" },
-  { icon: Fingerprint, label: "Attendance", href: "/attendance" },
-  { icon: CalendarOff, label: "Leave Management", href: "/leaves" },
-  { icon: CheckCircle2, label: "Tasks", href: "/tasks" },
-  { icon: FolderKanban, label: "Projects", href: "/projects" },
-  { icon: Users2, label: "Teams", href: "/teams" },
-  { icon: MessageSquareText, label: "Discussion Pools", href: "/discussions" },
-  { icon: CalendarDays, label: "Calendar", href: "/calendar" },
-  { icon: Megaphone, label: "Announcements", href: "/announcements" },
-  { icon: Search, label: "Employee Directory", href: "/directory" },
-  { icon: Heart, label: "Mood Check-in", href: "/mood" },
-  { icon: LineChart, label: "Performance", href: "/performance" },
-  { icon: BarChart4, label: "Reports", href: "/reports" },
-  { icon: Settings2, label: "Settings", href: "/settings" },
-  { icon: MessagesSquare, label: "All chats", href: "/chats" },
-  { icon: ShieldCheck, label: "Company policy", href: "/employee/policy" },
+  { icon: LayoutGrid, label: "Dashboard", href: FRONTEND_ROUTES.EMPLOYEE.DASHBOARD },
+  { icon: UserCircle, label: "My Profile", href: FRONTEND_ROUTES.EMPLOYEE.PROFILE },
+  { icon: Fingerprint, label: "Attendance", href: FRONTEND_ROUTES.EMPLOYEE.ATTENDANCE },
+  { icon: CalendarOff, label: "Leave Management", href: FRONTEND_ROUTES.EMPLOYEE.LEAVES },
+  { icon: CheckCircle2, label: "Tasks", href: FRONTEND_ROUTES.EMPLOYEE.TASKS },
+  { icon: FolderKanban, label: "Projects", href: FRONTEND_ROUTES.EMPLOYEE.PROJECTS },
+  { icon: Users2, label: "Teams", href: FRONTEND_ROUTES.EMPLOYEE.TEAMS },
+  { icon: MessageSquareText, label: "Discussion Pools", href: FRONTEND_ROUTES.EMPLOYEE.DISCUSSIONS },
+  { icon: CalendarDays, label: "Calendar", href: FRONTEND_ROUTES.EMPLOYEE.CALENDAR },
+  { icon: Megaphone, label: "Announcements", href: FRONTEND_ROUTES.EMPLOYEE.ANNOUNCEMENTS },
+  { icon: Search, label: "Employee Directory", href: FRONTEND_ROUTES.EMPLOYEE.DIRECTORY },
+  { icon: Heart, label: "Mood Check-in", href: FRONTEND_ROUTES.EMPLOYEE.MOOD },
+  { icon: LineChart, label: "Performance", href: FRONTEND_ROUTES.EMPLOYEE.PERFORMANCE },
+  { icon: BarChart4, label: "Reports", href: FRONTEND_ROUTES.EMPLOYEE.REPORTS },
+  { icon: Settings2, label: "Settings", href: FRONTEND_ROUTES.EMPLOYEE.SETTINGS },
+  { icon: MessagesSquare, label: "All chats", href: FRONTEND_ROUTES.EMPLOYEE.CHATS },
+  { icon: ShieldCheck, label: "Company policy", href: FRONTEND_ROUTES.EMPLOYEE.POLICY },
 ];
 
 export function Sidebar({ className }: { className?: string }) {

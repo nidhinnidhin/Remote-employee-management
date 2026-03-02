@@ -5,6 +5,8 @@ import { getSession } from "@/lib/iron-session/getSession";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { COOKIE_KEYS } from "@/shared/constants/temp/cookie-keys";
+import { API_ROUTES } from "@/constants/api.routes";
+import { FRONTEND_ROUTES } from "@/constants/frontend.routes";
 
 export async function logoutAction() {
     const session = await getSession();
@@ -13,7 +15,7 @@ export async function logoutAction() {
     try {
         // 1️⃣ Call backend logout to clear server cookies if possible
         const api = await getServerApi();
-        await api.post("/auth/logout");
+        await api.post(API_ROUTES.AUTH.LOGOUT);
     } catch (error) {
         console.warn("Backend logout failed or was already unauthorized:", error);
     }
@@ -28,8 +30,8 @@ export async function logoutAction() {
 
     // 4️⃣ Redirect based on role
     if (role === "SUPER_ADMIN") {
-        redirect("/super-admin/login");
+        redirect(FRONTEND_ROUTES.SUPER_ADMIN.LOGIN);
     } else {
-        redirect("/auth/login");
+        redirect(FRONTEND_ROUTES.AUTH.LOGIN);
     }
 }

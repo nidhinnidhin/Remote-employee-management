@@ -3,6 +3,8 @@ import { getSession } from "@/lib/iron-session/getSession";
 import { getServerApi } from "@/lib/axios/axiosServer";
 import { redirect } from "next/navigation";
 import ProfileClient from "@/components/employees/profile/ProfileClient";
+import { FRONTEND_ROUTES } from "@/constants/frontend.routes";
+import { API_ROUTES } from "@/constants/api.routes";
 
 export interface UserProfile {
   id: string;
@@ -58,7 +60,7 @@ export default async function ProfilePage() {
 
   try {
     const api = await getServerApi();
-    const res = await api.get<UserProfile>("/auth/profile/me");
+    const res = await api.get<UserProfile>(API_ROUTES.AUTH.PROFILE.ME);
     user = res.data;
   } catch (err: any) {
     console.error(
@@ -66,7 +68,7 @@ export default async function ProfilePage() {
       err?.message,
       err?.response?.status,
     );
-    redirect("/auth/login");
+    redirect(FRONTEND_ROUTES.AUTH.LOGIN);
   }
 
   return <ProfileClient user={user} />;

@@ -8,6 +8,7 @@ import VerifyOtpModal from "../../modals/VerifyOtpModal";
 import { verifyOtpAction } from "@/actions/otp/otp.action";
 import { resendOtp } from "@/services/company/otp/resend-otp.service";
 import { useRouter } from "next/navigation";
+import { FRONTEND_ROUTES } from "@/constants/frontend.routes";
 import { OTP_MESSAGES } from "@/shared/constants/messages/otp.messages";
 import { LOCAL_STORAGE_KEYS } from "@/shared/constants/temp/local-storage-keys";
 import SocialLoginButtons from "@/components/ui/SocialLoginButtons";
@@ -97,9 +98,9 @@ const AdminRegistrationForm: React.FC<AdminRegistrationFormProps> = ({ onSwitchT
             setShowOtpModal(false);
 
             if (result.data.user.role === "COMPANY_ADMIN" && !result.data.user.isOnboarded) {
-                router.replace("/auth/onboarding");
+                router.replace(FRONTEND_ROUTES.AUTH.ONBOARDING);
             } else {
-                router.replace("/admin/employees");
+                router.replace(FRONTEND_ROUTES.ADMIN.EMPLOYEES);
             }
         } catch (err: any) {
             setOtpError(err.message || "Verification failed");

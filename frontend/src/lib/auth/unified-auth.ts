@@ -3,18 +3,24 @@
 import { getSession } from "@/lib/iron-session/getSession";
 import { redirect } from "next/navigation";
 import { getRedirectForRole } from "./auth-constants";
+import { FRONTEND_ROUTES } from "@/constants/frontend.routes";
 
 /**
- * Check if user is authenticated (any role)
- * Returns session if authenticated, redirects to login if not
+ * Common server-side check for authentication
+ */
+export async function checkAuth(): Promise<boolean> {
+    const session = await getSession();
+    return !!(session.accessToken && session.role);
+}
+
+/**
+ * Server-side check that requires authentication or redirects to login
  */
 export async function requireAuth() {
     const session = await getSession();
-
-    if (!session.accessToken || !session.role) {
-        redirect("/auth/login");
+    if (!session.accessToken) {
+        redirect(FRONTEND_ROUTES.AUTH.LOGIN);
     }
-
     return session;
 }
 
@@ -28,7 +34,7 @@ export async function requireRole(requiredRole: string) {
 
     // Not authenticated
     if (!session.accessToken || !session.role) {
-        redirect("/auth/login");
+        redirect(FRONTEND_ROUTES.AUTH.LOGIN);
     }
 
     // Wrong role - redirect to their own dashboard
@@ -38,14 +44,6 @@ export async function requireRole(requiredRole: string) {
     }
 
     return session;
-}
-
-/**
- * Check if user is authenticated without redirecting
- */
-export async function checkAuth(): Promise<boolean> {
-    const session = await getSession();
-    return !!(session.accessToken && session.role);
 }
 
 /**
@@ -71,5 +69,5 @@ export async function getCurrentUser() {
 export async function logout() {
     const session = await getSession();
     session.destroy();
-    redirect("/auth/login");
+    redirect(FRONTEND_ROUTES.AUTH.LOGIN);
 }

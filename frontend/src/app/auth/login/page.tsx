@@ -2,6 +2,7 @@ import LoginForm from "@/components/company/auth/login/LoginForm";
 import OnboardingBackground from "@/components/company/auth/onboarding/OnboardingBackground";
 import { checkAuth, getCurrentUser } from "@/lib/auth/unified-auth";
 import { getRedirectForRole } from "@/lib/auth/auth-constants";
+import { FRONTEND_ROUTES } from "@/constants/frontend.routes";
 import { redirect } from "next/navigation";
 import { Metadata } from "next";
 

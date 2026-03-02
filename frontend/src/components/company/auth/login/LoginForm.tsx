@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import BaseLoginForm from "@/components/ui/BaseLoginForm";
 import SocialLoginButtons from "@/components/ui/SocialLoginButtons";
@@ -14,6 +15,7 @@ import {
 import { AUTH_MESSAGES } from "@/shared/constants/messages/auth.messages";
 import { loginAction } from "@/actions/auth/login.action";
 import { getRedirectForRole } from "@/lib/auth/auth-constants";
+import { FRONTEND_ROUTES } from "@/constants/frontend.routes";
 
 import { ForgotStep } from "@/shared/types/otp/forgot-step.type";
 import ForgotPasswordOtpModal from "../forgot-password/ForgotPasswordOtpModal";
@@ -92,17 +94,17 @@ export default function LoginForm() {
       }
 
       if (
-        result.success &&
+        result?.success &&
         result.data?.user &&
         result.data.user.role === "COMPANY_ADMIN" &&
         !result.data.user.isOnboarded
       ) {
         localStorage.setItem("registration_user_id", result.data.user.id);
-        router.push("/auth/onboarding");
+        router.push(FRONTEND_ROUTES.AUTH.ONBOARDING);
         return;
       }
 
-      if (result.success && result.data?.user) {
+      if (result?.success && result.data?.user) {
         const redirectUrl = getRedirectForRole(result.data.user.role);
         router.push(redirectUrl);
         return;
@@ -255,16 +257,17 @@ export default function LoginForm() {
               </button>
             </form>
 
-            <p className="text-center text-sm text-muted mt-5">
-              Don&apos;t have an account?{" "}
-              <button
-                type="button"
-                onClick={() => setIsRegistering(true)}
-                className="text-accent hover:opacity-80 font-medium"
-              >
-                Create an account
-              </button>
-            </p>
+            <div className="text-center">
+              <p className="auth-footer-text">
+                Don&apos;t have an account?{" "}
+                <Link
+                  href={FRONTEND_ROUTES.AUTH.REGISTER}
+                  className="auth-link font-semibold"
+                >
+                  Create an account
+                </Link>
+              </p>
+            </div>
           </div>
         )}
       </BaseLoginForm>

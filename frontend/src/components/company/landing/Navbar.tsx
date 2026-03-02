@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Users } from "lucide-react";
+import { FRONTEND_ROUTES } from "@/constants/frontend.routes";
 
 export default function Navbar() {
     return (
@@ -18,7 +19,7 @@ export default function Navbar() {
                 </Link>
 
                 <div className="flex items-center gap-8">
-                    <Link href="/auth/login" className="btn-highlight">
+                    <Link href={FRONTEND_ROUTES.AUTH.LOGIN} className="btn-highlight">
                         Sign in
                     </Link>
                 </div>
