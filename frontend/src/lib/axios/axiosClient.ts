@@ -17,7 +17,8 @@ clientApi.interceptors.response.use(
     if (
       err.response?.status === 401 &&
       !originalRequest._retry &&
-      !originalRequest.url?.includes("/auth/refresh")
+      !originalRequest.url?.includes("/auth/refresh") &&
+      !originalRequest.url?.includes("/company/employees/verify-invite")
     ) {
       originalRequest._retry = true;
       try {

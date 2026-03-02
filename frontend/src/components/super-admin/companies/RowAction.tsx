@@ -49,7 +49,6 @@ export const RowActions = ({
       await clientApi.patch(`/super-admin/companies/${row.id}/status`, {
         status: newStatus,
       });
-      alert(`Company status updated to ${newStatus} successfully`);
       if (onStatusChange) onStatusChange();
     } catch (error) {
       console.error("Failed to update status", error);

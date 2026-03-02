@@ -11,6 +11,8 @@ import { getEmployees, updateEmployeeStatus } from "@/services/company/employee-
 import { toast } from "sonner";
 import { EmployeeDetailsModal } from "./EmployeeDetailsModal";
 import { createPortal } from "react-dom";
+import { resendInvitationAction } from "@/actions/company/resend-invitation.action";
+import { Send } from "lucide-react";
 
 const EmployeesTable = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -53,6 +55,20 @@ const EmployeesTable = () => {
       toast.error("Failed to update status");
     } finally {
       setOpenMenuId(null);
+    }
+  };
+
+  const handleResendInvite = async (employee: Employee) => {
+    try {
+      setOpenMenuId(null);
+      const result = await resendInvitationAction(employee.id);
+      if (result.success) {
+        toast.success("Invitation resent successfully");
+      } else {
+        toast.error(result.error || "Failed to resend invitation");
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred");
     }
   };
 
@@ -124,13 +140,22 @@ const EmployeesTable = () => {
     },
     {
       header: "Status",
-      accessor: (employee: Employee) => (
-        <span
-          className={employee.isActive ? "status-active" : "status-suspended"}
-        >
-          {employee.isActive ? "Active" : "Suspended"}
-        </span>
-      ),
+      accessor: (employee: Employee) => {
+        if (employee.inviteStatus === "PENDING") {
+          return (
+            <span className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-[11px] font-bold border border-amber-200 uppercase tracking-wider">
+              Invitation Pending
+            </span>
+          );
+        }
+        return (
+          <span
+            className={employee.isActive ? "status-active" : "status-suspended"}
+          >
+            {employee.isActive ? "Active" : "Suspended"}
+          </span>
+        );
+      },
     },
     {
       header: "Actions",
@@ -160,6 +185,15 @@ const EmployeesTable = () => {
                   <Eye size={16} className="group-hover:scale-110 transition-transform" />
                   <span>View Details</span>
                 </button>
+                {employee.inviteStatus === "PENDING" && (
+                  <button
+                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-amber-600 hover:bg-amber-50 rounded-lg transition-all font-bold group"
+                    onClick={() => handleResendInvite(employee)}
+                  >
+                    <Send size={16} className="group-hover:scale-110 transition-transform" />
+                    <span>Resend Invitation</span>
+                  </button>
+                )}
                 <div className="h-px bg-white/5 my-1 mx-2" />
                 <button
                   className={`flex items-center gap-3 px-4 py-2.5 text-sm rounded-lg transition-all font-bold group ${employee.isActive

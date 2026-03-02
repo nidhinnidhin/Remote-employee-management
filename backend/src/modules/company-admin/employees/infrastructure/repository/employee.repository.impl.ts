@@ -22,6 +22,7 @@ export class EmployeeRepositoryImpl implements EmployeeRepository {
       doc.email,
       doc.role,
       doc.department || '',
+      doc.phone || '',
       doc.status === UserStatus.ACTIVE,
       doc.hasPassword,
       doc.inviteStatus || InviteStatus.PENDING,

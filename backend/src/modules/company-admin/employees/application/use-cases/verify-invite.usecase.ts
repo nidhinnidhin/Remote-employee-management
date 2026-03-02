@@ -32,15 +32,18 @@ export class VerifyInviteUseCase {
     const invite = await this.inviteLinkRepo.findByToken(hashedToken);
 
     if (!invite) {
+      console.warn(`[VerifyInviteUseCase] INVALID_TOKEN for rawToken hash: ${hashedToken.substring(0, 10)}...`);
       throw new UnauthorizedException(EMPLOYEE_MESSAGES.INVALID_TOKEN);
     }
 
     // 3️⃣ Validate invite
     if (invite.used) {
+      console.warn(`[VerifyInviteUseCase] INVITE_USED for employeeId: ${invite.employeeId}`);
       throw new UnauthorizedException(EMPLOYEE_MESSAGES.INVITE_USED);
     }
 
     if (invite.expiresAt < new Date()) {
+      console.warn(`[VerifyInviteUseCase] INVITE_EXPIRED for employeeId: ${invite.employeeId}. ExpiresAt: ${invite.expiresAt}, Now: ${new Date()}`);
       throw new UnauthorizedException(EMPLOYEE_MESSAGES.INVITE_EXPIRED);
     }
 

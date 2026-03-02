@@ -1,19 +1,17 @@
 import { clientApi } from "@/lib/axios/axiosClient";
 import { Employee } from "@/shared/types/company/employees/employee-listing.type";
 
-export const getEmployees = async (): Promise<Employee[]> => {
-    const response = await clientApi.get("/company/employees");
-    // Backend returns Employee entities which might need mapping if frontend Employee type is different
-    // For now assuming they match or are compatible enough for the table
+export const getEmployees = async () => {
+    const response = await clientApi.get<Employee[]>("/company/employees");
     return response.data;
 };
 
-export const getEmployeeDetails = async (id: string): Promise<Employee> => {
-    const response = await clientApi.get(`/company/employees/${id}`);
-    return response.data;
-};
-
-export const updateEmployeeStatus = async (id: string, status: "ACTIVE" | "SUSPENDED"): Promise<{ message: string }> => {
+export const updateEmployeeStatus = async (id: string, status: string) => {
     const response = await clientApi.patch(`/company/employees/${id}/status`, { status });
+    return response.data;
+};
+
+export const resendEmployeeInvite = async (employeeId: string) => {
+    const response = await clientApi.post(`/company/employees/${employeeId}/resend-invite`);
     return response.data;
 };

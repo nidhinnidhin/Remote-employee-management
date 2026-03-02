@@ -64,49 +64,6 @@ export class EmployeesController {
     return await this.getEmployeesUseCase.execute(companyId);
   }
 
-  @Get(':id')
-  @UseGuards(JwtAuthGuard)
-  async findOne(@Req() req: Request, @Param('id') id: string) {
-    // Basic check: employee should belong to the same company
-    const employee = await this.employeeRepo.findById(id);
-    if (!employee || employee.companyId !== req.user?.companyId) {
-      throw new UnauthorizedException(EMPLOYEE_MESSAGES.EMPLOYEE_NOT_FOUND);
-    }
-    return employee;
-  }
-
-  @Patch(':id/status')
-  @UseGuards(JwtAuthGuard)
-  async updateStatus(
-    @Req() req: Request,
-    @Param('id') id: string,
-    @Body('status') status: UserStatus,
-  ) {
-    // Basic check: employee should belong to the same company
-    const employee = await this.employeeRepo.findById(id);
-    if (!employee || employee.companyId !== req.user?.companyId) {
-      throw new UnauthorizedException(EMPLOYEE_MESSAGES.EMPLOYEE_NOT_FOUND);
-    }
-
-    await this.updateEmployeeStatusUseCase.execute(id, status);
-    return { message: 'Employee status updated successfully' };
-  }
-
-  @Post('invite')
-  @UseGuards(JwtAuthGuard)
-  async invite(@Req() req: Request, @Body() dto: InviteEmployeeDto) {
-    const companyId = req.user?.companyId;
-    if (!companyId) {
-      throw new UnauthorizedException(POLICY_MESSAGES.COMPANY_ID_NOT_FOUND);
-    }
-
-    await this.inviteEmployee.execute({
-      ...dto,
-      companyId,
-    });
-    return { message: EMPLOYEE_MESSAGES.INVITATION_SENT };
-  }
-
   @Get('verify-invite')
   async verifyInvite(
     @Query('token') token: string,
@@ -193,5 +150,73 @@ export class EmployeesController {
         companyId: employee.companyId,
       },
     };
+  }
+
+  @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  async findOne(@Req() req: Request, @Param('id') id: string) {
+    // Basic check: employee should belong to the same company
+    const employee = await this.employeeRepo.findById(id);
+    if (!employee || employee.companyId !== req.user?.companyId) {
+      throw new UnauthorizedException(EMPLOYEE_MESSAGES.EMPLOYEE_NOT_FOUND);
+    }
+    return employee;
+  }
+
+  @Patch(':id/status')
+  @UseGuards(JwtAuthGuard)
+  async updateStatus(
+    @Req() req: Request,
+    @Param('id') id: string,
+    @Body('status') status: UserStatus,
+  ) {
+    // Basic check: employee should belong to the same company
+    const employee = await this.employeeRepo.findById(id);
+    if (!employee || employee.companyId !== req.user?.companyId) {
+      throw new UnauthorizedException(EMPLOYEE_MESSAGES.EMPLOYEE_NOT_FOUND);
+    }
+
+    await this.updateEmployeeStatusUseCase.execute(id, status);
+    return { message: 'Employee status updated successfully' };
+  }
+
+  @Post('invite')
+  @UseGuards(JwtAuthGuard)
+  async invite(@Req() req: Request, @Body() dto: InviteEmployeeDto) {
+    const companyId = req.user?.companyId;
+    if (!companyId) {
+      throw new UnauthorizedException(POLICY_MESSAGES.COMPANY_ID_NOT_FOUND);
+    }
+
+    await this.inviteEmployee.execute({
+      ...dto,
+      companyId,
+    });
+    return { message: EMPLOYEE_MESSAGES.INVITATION_SENT };
+  }
+
+  @Post(':id/resend-invite')
+  @UseGuards(JwtAuthGuard)
+  async resendInvite(@Req() req: Request, @Param('id') id: string) {
+    const companyId = req.user?.companyId;
+    if (!companyId) {
+      throw new UnauthorizedException(POLICY_MESSAGES.COMPANY_ID_NOT_FOUND);
+    }
+
+    const employee = await this.employeeRepo.findById(id);
+    if (!employee || employee.companyId !== companyId) {
+      throw new UnauthorizedException(EMPLOYEE_MESSAGES.EMPLOYEE_NOT_FOUND);
+    }
+
+    await this.inviteEmployee.execute({
+      name: employee.name,
+      email: employee.email,
+      role: employee.role,
+      department: employee.department,
+      phone: employee.phone,
+      companyId,
+    });
+
+    return { message: EMPLOYEE_MESSAGES.INVITATION_SENT };
   }
 }

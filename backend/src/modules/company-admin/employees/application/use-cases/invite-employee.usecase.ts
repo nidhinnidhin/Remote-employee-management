@@ -63,15 +63,17 @@ export class InviteEmployeeUseCase {
     const inviteLink = new InviteLinkToken(
       hashedToken,
       employee.id,
-      new Date(Date.now() + 15 * 60 * 1000),
+      new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
       false,
     );
+
+    console.log(`[InviteEmployeeUseCase] Creating invite link for ${employee.email}. HashedToken: ${hashedToken.substring(0, 10)}... Expires in 24h`);
 
     // Persist invite link
     await this.inviteLinkRepo.create(inviteLink);
 
     // Send email with RAW token
-    const inviteUrl = `${process.env.FRONTEND_URL}/company/employees/auth/login?token=${rawToken}`;
+    const inviteUrl = `${process.env.FRONTEND_URL}/auth/verify?token=${rawToken}`;
 
     await this.emailService.sendEmployeeInvite(employee.email, inviteUrl);
   }
