@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { clientApi } from "@/lib/axios/axiosClient";
 import { UserProfile } from "@/app/employee/profile/page";
 import {
@@ -20,6 +20,7 @@ import {
 import BaseModal from "@/components/ui/BaseModal";
 import Button from "@/components/ui/Button";
 import OtpInput from "@/components/ui/OtpInput";
+import { useOtpTimer } from "@/hooks/otp/use-otp-timer";
 
 interface PersonalInfoFormData {
   firstName: string;
@@ -218,6 +219,15 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
   const [otp, setOtp] = useState("");
   const [verifyingOtp, setVerifyingOtp] = useState(false);
   const [otpError, setOtpError] = useState("");
+  const [resendingOtp, setResendingOtp] = useState(false);
+
+  const { remaining, expired, startTimer } = useOtpTimer();
+
+  useEffect(() => {
+    if (otpModalOpen) {
+      startTimer(60);
+    }
+  }, [otpModalOpen]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -282,6 +292,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
       });
 
       setOtpModalOpen(true);
+      startTimer(60);
       setEmailSuccessMsg("OTP sent to your registered email. Please verify.");
     } catch (err: any) {
       setEmailError(
@@ -315,6 +326,23 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
       setOtpError(err.response?.data?.message || "OTP verification failed.");
     } finally {
       setVerifyingOtp(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    setResendingOtp(true);
+    setOtpError("");
+    try {
+      await clientApi.post("/auth/profile/request-email-change", {
+        newEmail,
+      });
+      startTimer(60);
+      setOtp("");
+      setEmailSuccessMsg("OTP resent successfully.");
+    } catch (err: any) {
+      setOtpError(err.response?.data?.message || "Failed to resend OTP.");
+    } finally {
+      setResendingOtp(false);
     }
   };
 
@@ -629,12 +657,33 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
         isOpen={otpModalOpen}
         onClose={() => setOtpModalOpen(false)}
         title="Verify Email Change"
-        description="Enter the 6-digit OTP sent to your registered email."
+        description={`Enter the 6-digit OTP sent to your email to change to ${newEmail}`}
         footer={
-          <div className="flex justify-center">
-            <Button onClick={handleVerifyOtp} disabled={verifyingOtp}>
-              {verifyingOtp ? "Verifying..." : "Verify OTP"}
-            </Button>
+          <div className="flex flex-col w-full gap-4">
+            <div className="flex justify-between items-center w-full">
+              <Button variant="secondary" onClick={() => setOtpModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleVerifyOtp} disabled={verifyingOtp || expired}>
+                {verifyingOtp ? "Verifying..." : "Verify OTP"}
+              </Button>
+            </div>
+
+            <div className="text-center">
+              {!expired ? (
+                <p className="text-xs text-muted font-medium">
+                  Resend OTP in <span className="text-accent font-bold">{remaining}s</span>
+                </p>
+              ) : (
+                <button
+                  onClick={handleResendOtp}
+                  disabled={resendingOtp}
+                  className="text-xs font-bold text-accent hover:underline disabled:opacity-50"
+                >
+                  {resendingOtp ? "Resending..." : "Resend OTP"}
+                </button>
+              )}
+            </div>
           </div>
         }
       >

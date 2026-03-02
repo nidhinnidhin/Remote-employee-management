@@ -19,8 +19,8 @@ export class EmailOtpDocument extends Document {
   @Prop({ default: false })
   verified: boolean;
 
-  @Prop({ required: true })
-  newEmail: string;
+  @Prop()
+  newEmail?: string;
 
   @Prop({ enum: OtpPurpose })
   purpose?: OtpPurpose;
