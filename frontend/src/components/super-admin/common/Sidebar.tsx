@@ -85,28 +85,6 @@ export default function Sidebar() {
           );
         })}
       </nav>
-
-      {/* User Info / Footer */}
-      <div
-        className="p-4"
-        style={{ borderTop: "1px solid rgb(var(--color-sidebar-border))" }}
-      >
-        <div className="flex items-center gap-3">
-          <div
-            className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs"
-            style={{
-              backgroundColor: "rgb(var(--color-accent-subtle))",
-              color: "rgb(var(--color-accent-text))",
-            }}
-          >
-            SA
-          </div>
-          <div>
-            <p className="text-sm font-medium text-primary">Super Admin</p>
-            <p className="text-xs text-secondary">admin@issuehub.com</p>
-          </div>
-        </div>
-      </div>
     </aside>
   );
 }

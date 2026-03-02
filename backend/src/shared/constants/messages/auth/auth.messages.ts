@@ -24,5 +24,6 @@ export const AUTH_MESSAGES = {
     'Your company access has been suspended. Please contact support.',
   USER_BLOCKED: 'Your account has been blocked. Please contact your company administrator.',
   LOGIN_SUCCESS: 'Login successful',
-  EMAIL_UPDATED: 'Email updated successfully'
+  EMAIL_UPDATED: 'Email updated successfully',
+  LOGOUT_SUCCESS: 'Logout successful'
 };

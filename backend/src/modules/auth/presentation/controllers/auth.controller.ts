@@ -111,6 +111,13 @@ export class AuthController {
     return { accessToken };
   }
 
+  @Post('logout')
+  async logout(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie(ACCESS_TOKEN_COOKIE_NAME, ACCESS_TOKEN_COOKIE_OPTIONS);
+    res.clearCookie(REFRESH_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_OPTIONS);
+    return { message: AUTH_MESSAGES.LOGOUT_SUCCESS || 'Logged out successfully' };
+  }
+
   private setAuthCookies(
     res: Response,
     accessToken: string | undefined,

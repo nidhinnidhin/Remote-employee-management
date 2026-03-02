@@ -2,6 +2,7 @@
 
 import React, { useEffect } from "react";
 import { Sidebar } from "../common/Sidebar";
+import { Header } from "../common/Header";
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
@@ -17,9 +18,12 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       <Sidebar />
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto p-4 md:p-8">
-        <div className="max-w-7xl mx-auto space-y-8 pb-8">{children}</div>
-      </main>
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <Header />
+        <main className="flex-1 overflow-y-auto p-4 md:p-8">
+          <div className="max-w-7xl mx-auto space-y-8 pb-8">{children}</div>
+        </main>
+      </div>
     </div>
   );
 }
