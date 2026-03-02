@@ -7,8 +7,8 @@ export const getEmployees = async () => {
     return response.data;
 };
 
-export const updateEmployeeStatus = async (id: string, status: string) => {
-    const response = await clientApi.patch(API_ROUTES.COMPANY.EMPLOYEES.STATUS(id), { status });
+export const updateEmployeeStatus = async (employeeId: string, status: string, reason?: string) => {
+    const response = await clientApi.patch(`/company/employees/${employeeId}/status`, { status, reason });
     return response.data;
 };
 

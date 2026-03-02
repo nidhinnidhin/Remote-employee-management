@@ -1,4 +1,5 @@
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
+import { UserRole } from 'src/shared/enums/user/user-role.enum';
 import { UserEntity } from '../entities/user.entity';
 import { DocumentPayload } from 'src/shared/types/profile/document.type';
 
@@ -7,6 +8,11 @@ export interface UserRepository {
   findById(id: string): Promise<UserEntity | null>;
 
   create(user: UserEntity): Promise<UserEntity>;
+
+  findAllByCompanyIdAndRole(
+    companyId: string,
+    role: UserRole,
+  ): Promise<UserEntity[]>;
 
   updateStatusByEmail(email: string, status: UserStatus): Promise<void>;
   updatePasswordByEmail(email: string, passwordHash: string): Promise<void>;

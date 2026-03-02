@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import InviteVerifier from "@/app/admin/auth/verification/InviteVerifier";
+import OnboardingBackground from "@/components/company/auth/onboarding/OnboardingBackground";
 
 function VerifyContent() {
     const searchParams = useSearchParams();
@@ -11,7 +12,7 @@ function VerifyContent() {
     if (!token) {
         return (
             <div className="min-h-screen flex items-center justify-center">
-                <p className="text-danger">Invalid invitation link.</p>
+                <p className="text-danger font-medium">Invalid invitation link.</p>
             </div>
         );
     }

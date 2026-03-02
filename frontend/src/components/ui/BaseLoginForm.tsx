@@ -21,9 +21,9 @@ export default function BaseLoginForm({
   onForgotPassword,
 }: BaseLoginFormProps) {
   return (
-    <div className="h-screen flex overflow-hidden bg-[rgb(var(--color-bg))]">
+    <div className="h-screen flex overflow-hidden bg-transparent">
       {/* ── Left Panel (Scrollable) ── */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col items-center justify-center px-8 lg:px-12 py-16">
+      <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col items-center justify-center px-8 lg:px-12 py-16 relative">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -279,12 +279,6 @@ export default function BaseLoginForm({
             Everything you need in an easily customizable dashboard.
           </p>
 
-          {/* Dots */}
-          <div className="flex gap-2 mt-6">
-            <div className="w-2 h-2 rounded-full bg-white" />
-            <div className="w-2 h-2 rounded-full bg-white/40" />
-            <div className="w-2 h-2 rounded-full bg-white/40" />
-          </div>
         </div>
       </div>
     </div>

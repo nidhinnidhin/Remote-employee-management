@@ -24,7 +24,7 @@ const LoginPage = async () => {
     }
 
     return (
-        <div className="relative min-h-screen">
+        <div className="relative min-h-screen portal-page">
             <OnboardingBackground />
             <div className="relative z-10">
                 <LoginForm />

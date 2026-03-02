@@ -5,6 +5,7 @@ import { UserRepository } from '../../../domain/repositories/user.repository';
 import { UserEntity } from '../../../domain/entities/user.entity';
 import { UserDocument } from '../mongoose/schemas/userSchema';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
+import { UserRole } from 'src/shared/enums/user/user-role.enum';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 
 @Injectable()
@@ -46,6 +47,14 @@ export class MongoUserRepository implements UserRepository {
     });
 
     return this.toEntity(created);
+  }
+
+  async findAllByCompanyIdAndRole(
+    companyId: string,
+    role: UserRole,
+  ): Promise<UserEntity[]> {
+    const users = await this._userModel.find({ companyId, role });
+    return users.map((u) => this.toEntity(u));
   }
 
   async updatePasswordByEmail(

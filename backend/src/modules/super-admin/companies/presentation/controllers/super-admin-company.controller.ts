@@ -36,8 +36,9 @@ export class SuperAdminCompanyController {
   async updateCompanyStatus(
     @Param('id') id: string,
     @Body('status') status: CompanyStatus,
+    @Body('reason') reason?: string,
   ) {
-    await this.suspendCompanyUseCase.execute(id, status);
+    await this.suspendCompanyUseCase.execute(id, status, reason);
 
     return {
       message: `Company status updated to ${status} successfully`,

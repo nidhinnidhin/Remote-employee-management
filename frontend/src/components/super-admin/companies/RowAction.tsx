@@ -1,6 +1,7 @@
 import { clientApi } from "@/lib/axios/axiosClient";
 import { CompanyRow } from "@/shared/types/superadmin/companies/companiesColumns";
 import React from "react";
+import ActionReasonModal from "@/components/ui/ActionReasonModal";
 
 export const RowActions = ({
   row,
@@ -16,6 +17,7 @@ export const RowActions = ({
     left: 0,
     openUp: false,
   });
+  const [isReasonModalOpen, setIsReasonModalOpen] = React.useState(false);
   const buttonRef = React.useRef<HTMLButtonElement>(null);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
 
@@ -42,20 +44,26 @@ export const RowActions = ({
     setOpen((prev) => !prev);
   };
 
-  const handleToggleStatus = async () => {
+  const handleToggleStatus = () => {
+    setIsReasonModalOpen(true);
+    setOpen(false);
+  };
+
+  const handleConfirmStatusUpdate = async (reason: string) => {
     const newStatus = row.status === "ACTIVE" ? "SUSPENDED" : "ACTIVE";
     setLoading(true);
     try {
       await clientApi.patch(`/super-admin/companies/${row.id}/status`, {
         status: newStatus,
+        reason,
       });
       if (onStatusChange) onStatusChange();
     } catch (error) {
       console.error("Failed to update status", error);
-      alert("Failed to update company status. Please try again.");
+      throw error;
     } finally {
       setLoading(false);
-      setOpen(false);
+      setIsReasonModalOpen(false);
     }
   };
 
@@ -223,6 +231,17 @@ export const RowActions = ({
           </button>
         </div>
       )}
+
+      {/* Action Reason Modal */}
+      <ActionReasonModal
+        isOpen={isReasonModalOpen}
+        onClose={() => setIsReasonModalOpen(false)}
+        onConfirm={handleConfirmStatusUpdate}
+        title={row.status === "ACTIVE" ? "Suspend Company" : "Activate Company"}
+        description={`Please provide a reason for ${row.status === "ACTIVE" ? "suspending" : "activating"} ${row.name}. This reason will be emailed to the primary company administrator.`}
+        actionLabel={row.status === "ACTIVE" ? "Suspend" : "Activate"}
+        actionColor={row.status === "ACTIVE" ? "danger" : "success"}
+      />
     </>
   );
 };

@@ -45,6 +45,78 @@ export class EmailService {
     });
   }
 
+  async sendBlockNotification(
+    email: string,
+    name: string,
+    reason: string,
+  ): Promise<void> {
+    await this.sendMail({
+      to: email,
+      subject: 'Account Status Update – Blocked',
+      html: `
+          <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <h2 style="color: #d32f2f;">Account Blocked</h2>
+            <p>Hi ${name || 'there'},</p>
+            <p>We are writing to inform you that your account access has been suspended by your company administrator.</p>
+            <div style="background-color: #f5f5f5; padding: 15px; border-left: 4px solid #d32f2f; margin: 20px 0;">
+              <strong>Reason:</strong><br/>
+              ${reason}
+            </div>
+            <p>If you believe this is a mistake, please contact your HR department or company administrator.</p>
+          </div>
+        `,
+    });
+  }
+
+  async sendUnblockNotification(email: string, name: string): Promise<void> {
+    await this.sendMail({
+      to: email,
+      subject: 'Account Status Update – Restored',
+      html: `
+          <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <h2 style="color: #388e3c;">Account Restored</h2>
+            <p>Hi ${name || 'there'},</p>
+            <p>Good news! Your account access has been restored by your company administrator. You can now log in and access your portal.</p>
+            <p>If you have any issues logging in, please contact support.</p>
+          </div>
+        `,
+    });
+  }
+
+  async sendCompanyStatusNotification(
+    email: string,
+    adminName: string,
+    companyName: string,
+    status: 'ACTIVE' | 'SUSPENDED',
+    reason: string,
+  ): Promise<void> {
+    const isSuspended = status === 'SUSPENDED';
+    const subject = isSuspended
+      ? `Important: ${companyName} has been Suspended`
+      : `Important: ${companyName} has been Re-activated`;
+
+    await this.sendMail({
+      to: email,
+      subject,
+      html: `
+          <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <h2 style="color: ${isSuspended ? '#d32f2f' : '#388e3c'};">
+              Company ${isSuspended ? 'Suspension' : 'Activation'}
+            </h2>
+            <p>Hi ${adminName || 'there'},</p>
+            <p>This is an official notification regarding the status of your company, <strong>${companyName}</strong>, on our platform.</p>
+            <p>Your company has been <strong>${isSuspended ? 'SUSPENDED' : 'ACTIVATED'}</strong> by the platform administrator.</p>
+            <div style="background-color: #f5f5f5; padding: 15px; border-left: 4px solid ${isSuspended ? '#d32f2f' : '#388e3c'}; margin: 20px 0;">
+              <strong>Reason:</strong><br/>
+              ${reason || (isSuspended ? 'Administrative decision' : 'Review completed')}
+            </div>
+            <p>${isSuspended ? 'During suspension, all users from your company will lose access to the platform.' : 'All users can now resume their activities on the platform.'}</p>
+            <p>If you have any questions, please reply to this email.</p>
+          </div>
+        `,
+    });
+  }
+
   private async sendMail(options: {
     to: string;
     subject: string;

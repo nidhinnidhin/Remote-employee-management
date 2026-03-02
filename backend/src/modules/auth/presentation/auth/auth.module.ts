@@ -111,6 +111,7 @@ import { EditDocumentUseCase } from '../../application/use-cases/document/edit-d
     'UserRepository',
     'CompanyRepository',
     'EmailOtpRepository',
+    EmailService,
   ],
 })
 export class AuthModule { }

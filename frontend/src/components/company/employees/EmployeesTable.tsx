@@ -10,6 +10,7 @@ import { Employee } from "@/shared/types/company/employees/employee-listing.type
 import { getEmployees, updateEmployeeStatus } from "@/services/company/employee-management.service";
 import { toast } from "sonner";
 import { EmployeeDetailsModal } from "./EmployeeDetailsModal";
+import ActionReasonModal from "@/components/ui/ActionReasonModal";
 import { createPortal } from "react-dom";
 import { resendInvitationAction } from "@/actions/company/resend-invitation.action";
 import { Send } from "lucide-react";
@@ -22,6 +23,8 @@ const EmployeesTable = () => {
   const [menuAnchor, setMenuAnchor] = useState<{ x: number; y: number } | null>(null);
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [isReasonModalOpen, setIsReasonModalOpen] = useState(false);
+  const [pendingStatusUpdate, setPendingStatusUpdate] = useState<{ employee: Employee; status: string } | null>(null);
 
   const itemsPerPage = 10;
 
@@ -45,16 +48,25 @@ const EmployeesTable = () => {
     return () => window.removeEventListener('scroll', handleScroll, true);
   }, []);
 
-  const handleStatusToggle = async (employee: Employee) => {
+  const handleStatusToggle = (employee: Employee) => {
+    const newStatus = employee.isActive ? "SUSPENDED" : "ACTIVE";
+    setPendingStatusUpdate({ employee, status: newStatus });
+    setIsReasonModalOpen(true);
+    setOpenMenuId(null);
+  };
+
+  const handleConfirmStatusUpdate = async (reason: string) => {
+    if (!pendingStatusUpdate) return;
     try {
-      const newStatus = employee.isActive ? "SUSPENDED" : "ACTIVE";
-      await updateEmployeeStatus(employee.id, newStatus);
-      toast.success(`Employee ${employee.isActive ? "blocked" : "unblocked"} successfully`);
+      await updateEmployeeStatus(pendingStatusUpdate.employee.id, pendingStatusUpdate.status, reason);
+      toast.success(`Employee ${pendingStatusUpdate.status === "SUSPENDED" ? "blocked" : "unblocked"} successfully`);
       fetchEmployees();
     } catch (error) {
       toast.error("Failed to update status");
+      throw error;
     } finally {
-      setOpenMenuId(null);
+      setIsReasonModalOpen(false);
+      setPendingStatusUpdate(null);
     }
   };
 
@@ -255,6 +267,20 @@ const EmployeesTable = () => {
         isOpen={isDetailsModalOpen}
         onClose={() => setIsDetailsModalOpen(false)}
         employee={selectedEmployee}
+      />
+
+      {/* Action Reason Modal */}
+      <ActionReasonModal
+        isOpen={isReasonModalOpen}
+        onClose={() => {
+          setIsReasonModalOpen(false);
+          setPendingStatusUpdate(null);
+        }}
+        onConfirm={handleConfirmStatusUpdate}
+        title={pendingStatusUpdate?.status === "SUSPENDED" ? "Block Employee" : "Unblock Employee"}
+        description={`Please provide a reason for ${pendingStatusUpdate?.status === "SUSPENDED" ? "blocking" : "unblocking"} ${pendingStatusUpdate?.employee?.name}. They will receive an email with this content.`}
+        actionLabel={pendingStatusUpdate?.status === "SUSPENDED" ? "Block User" : "Unblock User"}
+        actionColor={pendingStatusUpdate?.status === "SUSPENDED" ? "danger" : "success"}
       />
     </div>
   );

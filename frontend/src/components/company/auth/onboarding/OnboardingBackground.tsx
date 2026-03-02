@@ -165,16 +165,6 @@ const OnboardingBackground: React.FC = () => {
                     )
                 )}
 
-                {/* Three-dot ellipsis hint (top-right) */}
-                {[0, 10, 20].map((offset, i) => (
-                    <circle
-                        key={`dot3-${i}`}
-                        cx={148 + offset}
-                        cy={300}
-                        r="2.5"
-                        fill="rgba(45,212,191,0.4)"
-                    />
-                ))}
 
                 {/* Abstract wireframe circle (right-mid) */}
                 <circle

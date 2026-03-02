@@ -260,12 +260,13 @@ export default function LoginForm() {
             <div className="text-center">
               <p className="auth-footer-text">
                 Don&apos;t have an account?{" "}
-                <Link
-                  href={FRONTEND_ROUTES.AUTH.REGISTER}
-                  className="auth-link font-semibold"
+                <button
+                  type="button"
+                  onClick={() => setIsRegistering(true)}
+                  className="auth-link font-semibold transition-all hover:opacity-80"
                 >
                   Create an account
-                </Link>
+                </button>
               </p>
             </div>
           </div>

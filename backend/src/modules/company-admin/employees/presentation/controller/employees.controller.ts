@@ -169,6 +169,7 @@ export class EmployeesController {
     @Req() req: Request,
     @Param('id') id: string,
     @Body('status') status: UserStatus,
+    @Body('reason') reason?: string,
   ) {
     // Basic check: employee should belong to the same company
     const employee = await this.employeeRepo.findById(id);
@@ -176,7 +177,7 @@ export class EmployeesController {
       throw new UnauthorizedException(EMPLOYEE_MESSAGES.EMPLOYEE_NOT_FOUND);
     }
 
-    await this.updateEmployeeStatusUseCase.execute(id, status);
+    await this.updateEmployeeStatusUseCase.execute(id, status, reason);
     return { message: 'Employee status updated successfully' };
   }
 

@@ -165,8 +165,7 @@ const RegistrationStepper = () => {
 
   return (
     <>
-      <div className="min-h-screen portal-page flex items-center justify-center p-4 relative overflow-hidden">
-        <BackgroundEffect />
+      <div className="min-h-screen bg-transparent flex items-center justify-center p-4 relative overflow-hidden">
         <div className="w-full max-w-3xl relative z-10">
           {/* Header */}
           <div className="text-center mb-8">
