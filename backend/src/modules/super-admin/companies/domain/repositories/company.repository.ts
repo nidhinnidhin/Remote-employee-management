@@ -5,4 +5,5 @@ export interface CompanyRepository {
   findAll(): Promise<CompanyEntity[]>;
   findById(id: string): Promise<CompanyEntity | null>;
   updateStatus(id: string, status: CompanyStatus): Promise<void>;
+  fetchByChar(): Promise<CompanyEntity[]>;
 }

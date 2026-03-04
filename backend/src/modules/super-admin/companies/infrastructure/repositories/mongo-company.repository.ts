@@ -13,7 +13,7 @@ export class MongoCompanyRepository implements CompanyRepository {
     private readonly companyModel: Model<CompanyDocument>,
   ) { }
 
-  // ✅ new
+  // new
   async findAll(): Promise<CompanyEntity[]> {
     const companies = await this.companyModel.aggregate([
       { $sort: { createdAt: -1 } },
@@ -40,6 +40,11 @@ export class MongoCompanyRepository implements CompanyRepository {
     return companies.map((company) => this.toEntity(company));
   }
 
+  async fetchByChar(): Promise<CompanyEntity[]>{
+    const comp = await this.companyModel.find({regex: 'a'})
+    return comp;
+  }
+
   async findById(id: string): Promise<CompanyEntity | null> {
     const company = await this.companyModel.findById(id);
     return company ? this.toEntity(company) : null;
@@ -48,6 +53,8 @@ export class MongoCompanyRepository implements CompanyRepository {
   async updateStatus(id: string, status: CompanyStatus): Promise<void> {
     await this.companyModel.findByIdAndUpdate(id, { status });
   }
+
+  
 
   private toEntity(doc: CompanyDocument): CompanyEntity {
     return new CompanyEntity(
@@ -63,4 +70,6 @@ export class MongoCompanyRepository implements CompanyRepository {
       doc.status || CompanyStatus.ACTIVE,
     );
   }
+
+
 }

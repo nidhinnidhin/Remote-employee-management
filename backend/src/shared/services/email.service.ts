@@ -24,7 +24,7 @@ export class EmailService {
       `,
     });
 
-    console.log('✅ OTP email sent successfully to:', email);
+    console.log(' OTP email sent successfully to:', email);
   }
 
   async sendEmployeeInvite(email: string, inviteLink: string): Promise<void> {

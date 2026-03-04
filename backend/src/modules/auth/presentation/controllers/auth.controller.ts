@@ -50,7 +50,6 @@ export class AuthController {
     }
     const result = await this.onboardCompanyUseCase.execute(dto.userId, dto);
 
-    // Set tokens in cookies upon successful onboarding
     this.setAuthCookies(res, result.accessToken, result.refreshToken);
 
     return result;
