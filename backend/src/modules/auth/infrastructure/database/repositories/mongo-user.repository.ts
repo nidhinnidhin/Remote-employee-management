@@ -1,88 +1,31 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { BaseRepository } from 'src/shared/repositories/base.repository';
 import { UserRepository } from '../../../domain/repositories/user.repository';
 import { UserEntity } from '../../../domain/entities/user.entity';
 import { UserDocument } from '../mongoose/schemas/userSchema';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 import { UserRole } from 'src/shared/enums/user/user-role.enum';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
+import { DocumentPayload } from 'src/shared/types/profile/document.type';
 
 @Injectable()
-export class MongoUserRepository implements UserRepository {
+export class MongoUserRepository
+  extends BaseRepository<UserDocument, UserEntity>
+  implements UserRepository
+{
   constructor(
     @InjectModel(UserDocument.name)
     private readonly _userModel: Model<UserDocument>,
-  ) { }
-
-  async findByEmail(email: string): Promise<UserEntity | null> {
-    console.log('[MongoUserRepository] findByEmail:', email.toLowerCase());
-    const user = await this._userModel.findOne({
-      email: { $regex: new RegExp(`^${email.toLowerCase()}$`, 'i') }
-    });
-    return user ? this.toEntity(user) : null;
+  ) {
+    super(_userModel);
   }
 
-  async findById(id: string): Promise<UserEntity | null> {
-    const user = await this._userModel.findById(id);
-    return user ? this.toEntity(user) : null;
-  }
-
-  async create(user: UserEntity): Promise<UserEntity> {
-    const created = await this._userModel.create({
-      companyId: user.companyId,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      phone: user.phone,
-      role: user.role,
-      passwordHash: user.passwordHash,
-      status: user.status,
-      department: user.department,
-      inviteStatus: user.inviteStatus,
-      hasPassword: user.hasPassword,
-      isOnboarded: user.isOnboarded,
-      provider: user.provider,
-      providerId: user.providerId,
-    });
-
-    return this.toEntity(created);
-  }
-
-  async findAllByCompanyIdAndRole(
-    companyId: string,
-    role: UserRole,
-  ): Promise<UserEntity[]> {
-    const users = await this._userModel.find({ companyId, role });
-    return users.map((u) => this.toEntity(u));
-  }
-
-  async updatePasswordByEmail(
-    email: string,
-    passwordHash: string,
-  ): Promise<void> {
-    const result = await this._userModel.updateOne(
-      { email: email.toLowerCase() },
-      {
-        $set: {
-          passwordHash: passwordHash,
-          hasPassword: true,
-        },
-      },
-    );
-
-    if (result.matchedCount === 0) {
-      throw new Error(`${AUTH_MESSAGES.USER_NOT_FOUND_FOR_EMAIL} ${email}`);
-    }
-  }
-  private toEntity(doc: UserDocument): UserEntity {
-    console.log('[MongoUserRepository] Mapping to Entity:', {
-      email: doc.email,
-      isOnboarded: doc.isOnboarded,
-      role: doc.role
-    });
+  // --- Required by abstract base ---
+  protected toEntity(doc: UserDocument): UserEntity {
     return new UserEntity(
-      doc._id.toString(),
+      (doc as any)._id.toString(),
       doc.firstName,
       doc.lastName,
       doc.email,
@@ -123,6 +66,58 @@ export class MongoUserRepository implements UserRepository {
     );
   }
 
+  // --- Override create: input is UserEntity not Partial<UserDocument> ---
+  async create(user: UserEntity): Promise<UserEntity> {
+    return super.create({
+      companyId: user.companyId,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      phone: user.phone,
+      role: user.role,
+      passwordHash: user.passwordHash,
+      status: user.status,
+      department: user.department,
+      inviteStatus: user.inviteStatus,
+      hasPassword: user.hasPassword,
+      isOnboarded: user.isOnboarded,
+      provider: user.provider,
+      providerId: user.providerId,
+    } as Partial<UserDocument>);
+  }
+
+  // --- Override findByEmail: case-insensitive regex differs from base exact match ---
+  async findByEmail(email: string): Promise<UserEntity | null> {
+    return this.findOne({
+      email: { $regex: new RegExp(`^${email.toLowerCase()}$`, 'i') },
+    });
+  }
+
+  // --- findById fully inherited ---
+  // --- findAllByCompanyId fully inherited ---
+
+  async findAllByCompanyIdAndRole(
+    companyId: string,
+    role: UserRole,
+  ): Promise<UserEntity[]> {
+    return this.findAll({ companyId, role });
+  }
+
+  // --- Domain-specific update methods ---
+
+  async updatePasswordByEmail(
+    email: string,
+    passwordHash: string,
+  ): Promise<void> {
+    const result = await this._userModel.updateOne(
+      { email: email.toLowerCase() },
+      { $set: { passwordHash, hasPassword: true } },
+    );
+    if (result.matchedCount === 0) {
+      throw new Error(`${AUTH_MESSAGES.USER_NOT_FOUND_FOR_EMAIL} ${email}`);
+    }
+  }
+
   async updateStatusByEmail(email: string, status: UserStatus): Promise<void> {
     await this._userModel.updateOne({ email }, { status });
   }
@@ -135,14 +130,11 @@ export class MongoUserRepository implements UserRepository {
     id: string,
     fields: Partial<UserEntity>,
   ): Promise<void> {
-
     const result = await this._userModel.updateOne(
       { _id: id },
       { $set: fields },
       { runValidators: true },
     );
-
-
     if (result.matchedCount === 0) {
       throw new Error(AUTH_MESSAGES.USER_NOT_FOUND);
     }
@@ -155,12 +147,10 @@ export class MongoUserRepository implements UserRepository {
     await this._userModel.updateOne({ email }, { $set: fields });
   }
 
-  // Update email
   async updateEmail(userId: string, email: string): Promise<void> {
     await this._userModel.updateOne({ _id: userId }, { $set: { email } });
   }
 
-  // Add profile image
   async updateProfileImage(
     userId: string,
     imageUrl: string,
@@ -176,7 +166,7 @@ export class MongoUserRepository implements UserRepository {
     await this._userModel.updateOne({ _id: userId }, { $set: { skills } });
   }
 
-  async addDocument(userId: string, document: any): Promise<void> {
+  async addDocument(userId: string, document: DocumentPayload): Promise<void> {
     await this._userModel.updateOne(
       { _id: userId },
       { $push: { documents: document } },
@@ -193,13 +183,12 @@ export class MongoUserRepository implements UserRepository {
   async updateDocument(
     userId: string,
     documentId: string,
-    update: any,
+    update: Partial<DocumentPayload>,
   ): Promise<void> {
-    const setFields: any = {};
+    const setFields: Record<string, any> = {};
     Object.keys(update).forEach((key) => {
-      setFields[`documents.$.${key}`] = update[key];
+      setFields[`documents.$.${key}`] = (update as any)[key];
     });
-
     await this._userModel.updateOne(
       { _id: userId, 'documents._id': documentId },
       { $set: setFields },

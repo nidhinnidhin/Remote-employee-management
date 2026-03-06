@@ -61,7 +61,7 @@ export class SocialLoginUseCase {
       );
 
       user = await this._userRepository.create(newUser);
-      console.log(' New User Created:', user.id);
+      console.log(' New User Created:', JSON.stringify(user, null, 2));
     } else {
       console.log(' User Found - ID:', user.id);
       console.log(' Role:', user.role);
@@ -83,9 +83,21 @@ export class SocialLoginUseCase {
       await this.checkCompanySuspension(user.companyId);
     }
 
+    const accessToken = this._jwtService.generateAccessToken({
+      userId: user.id,
+      role: user.role,
+      companyId: user.companyId,
+    });
+
+    const refreshToken = this._jwtService.generateRefreshToken({
+      userId: user.id,
+    });
+
     if (user.role === UserRole.COMPANY_ADMIN && !user.isOnboarded) {
-      console.log(' SocialLogin: User NOT onboarded, returning partial data for onboarding redirect');
+      console.log(' SocialLogin: User NOT onboarded, returning tokens for onboarding redirect');
       return {
+        accessToken,
+        refreshToken,
         user: {
           id: user.id,
           email: user.email,
@@ -96,16 +108,6 @@ export class SocialLoginUseCase {
         },
       };
     }
-
-    const accessToken = this._jwtService.generateAccessToken({
-      userId: user.id,
-      role: user.role,
-      companyId: user.companyId,
-    });
-
-    const refreshToken = this._jwtService.generateRefreshToken({
-      userId: user.id,
-    });
 
     console.log(' SocialLogin: User onboarded, issuing tokens');
     return {

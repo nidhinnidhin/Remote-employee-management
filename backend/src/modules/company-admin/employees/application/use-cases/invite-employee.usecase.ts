@@ -37,7 +37,7 @@ export class InviteEmployeeUseCase {
       }
 
       // Re-invite: Update existing pending employee
-      await this.employeeRepo.update(existing.id, {
+      await this.employeeRepo.updateEmployee(existing.id, {
         name: input.name,
         role: input.role,
         department: input.department,

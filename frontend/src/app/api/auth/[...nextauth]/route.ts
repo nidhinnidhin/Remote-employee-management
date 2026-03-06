@@ -35,8 +35,8 @@ const handler = NextAuth({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email,
-          firstName: user.name?.split(" ")[0] || "",
-          lastName: user.name?.split(" ")[1] || "",
+          firstName: user.name?.split(" ")[0] || user.name || "User",
+          lastName: user.name?.split(" ").slice(1).join(" ") || "",
           provider: account?.provider,
           providerId: account?.providerAccountId,
         }),
@@ -64,12 +64,6 @@ const handler = NextAuth({
         return "/auth/login?error=Backend Error";
       }
 
-      if (!data.user.isOnboarded) {
-        console.log(" Redirecting to ONBOARDING for userId:", data.user.id);
-        // Return redirect URL with userId to handle client-side localStorage
-        return `/auth/onboarding?userId=${data.user.id}`;
-      }
-
       // Sync with Iron Session
       const session = await getSession();
       session.accessToken = data.accessToken;
@@ -77,14 +71,19 @@ const handler = NextAuth({
       session.role = data.user.role;
       session.email = data.user.email;
       session.companyId = data.user.companyId;
-      session.isOnboarded = true;
+      session.isOnboarded = data.user.isOnboarded;
       await session.save();
 
       // Set backend cookies
       if (data.accessToken) await setAccessTokenCookie(data.accessToken);
       if (data.refreshToken) await setRefreshTokenCookie(data.refreshToken);
 
-      console.log("Login successful & Session saved:", data.user.email);
+      console.log("Login successful & Session saved:", data.user.email, "isOnboarded:", data.user.isOnboarded);
+
+      if (!data.user.isOnboarded && data.user.role === "COMPANY_ADMIN") {
+        console.log(" Redirecting to ONBOARDING for userId:", data.user.id);
+        return `/auth/onboarding?userId=${data.user.id}`;
+      }
 
       // Redirect to correct dashboard based on role
       const ROLE_REDIRECTS: Record<string, string> = {

@@ -16,7 +16,7 @@ export interface EmployeeRepository {
     isOnboarded: boolean;
   }): Promise<Employee>;
 
-  update(id: string, input: {
+  updateEmployee(id: string, input: {  
     name?: string;
     role?: string;
     department?: string;

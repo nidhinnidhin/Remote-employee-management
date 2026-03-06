@@ -1,21 +1,41 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { BaseRepository } from 'src/shared/repositories/base.repository';
 import { CompanyEntity } from 'src/modules/auth/domain/entities/company.entity';
 import { CompanyStatus } from 'src/shared/enums/company/company-status.enum';
 import { CompanyDocument } from 'src/modules/auth/infrastructure/database/mongoose/schemas/company.schema';
 import { CompanyRepository } from '../../domain/repositories/company.repository';
 
 @Injectable()
-export class MongoCompanyRepository implements CompanyRepository {
+export class MongoCompanyRepository
+  extends BaseRepository<CompanyDocument, CompanyEntity>
+  implements CompanyRepository
+{
   constructor(
     @InjectModel(CompanyDocument.name)
-    private readonly companyModel: Model<CompanyDocument>,
-  ) { }
+    private readonly _companyModel: Model<CompanyDocument>,
+  ) {
+    super(_companyModel);
+  }
 
-  // new
+  protected toEntity(doc: CompanyDocument): CompanyEntity {
+    return new CompanyEntity(
+      (doc as any)._id.toString(),
+      doc.name,
+      doc.email,
+      doc.size,
+      doc.industry,
+      doc.website,
+      doc.createdAt,
+      doc.updatedAt,
+      (doc as any).employeeCount,
+      doc.status || CompanyStatus.ACTIVE,
+    );
+  }
+
   async findAll(): Promise<CompanyEntity[]> {
-    const companies = await this.companyModel.aggregate([
+    const docs = await this._companyModel.aggregate([
       { $sort: { createdAt: -1 } },
       {
         $addFields: {
@@ -37,39 +57,12 @@ export class MongoCompanyRepository implements CompanyRepository {
       },
     ]);
 
-    return companies.map((company) => this.toEntity(company));
+    return docs.map((doc) => this.toEntity(doc));
   }
 
-  async fetchByChar(): Promise<CompanyEntity[]>{
-    const comp = await this.companyModel.find({regex: 'a'})
-    return comp;
-  }
-
-  async findById(id: string): Promise<CompanyEntity | null> {
-    const company = await this.companyModel.findById(id);
-    return company ? this.toEntity(company) : null;
-  }
+  // --- findById fully inherited ---
 
   async updateStatus(id: string, status: CompanyStatus): Promise<void> {
-    await this.companyModel.findByIdAndUpdate(id, { status });
+    await this._companyModel.findByIdAndUpdate(id, { status });
   }
-
-  
-
-  private toEntity(doc: CompanyDocument): CompanyEntity {
-    return new CompanyEntity(
-      doc._id.toString(),
-      doc.name,
-      doc.email,
-      doc.size,
-      doc.industry,
-      doc.website,
-      doc.createdAt,
-      doc.updatedAt,
-      (doc as any).employeeCount,
-      doc.status || CompanyStatus.ACTIVE,
-    );
-  }
-
-
 }

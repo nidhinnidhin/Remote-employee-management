@@ -10,9 +10,17 @@ export interface SessionData {
   isOnboarded?: boolean;
 }
 
+const sessionPassword = process.env.SESSION_SECRET;
+
+if (!sessionPassword || sessionPassword.length < 32) {
+  throw new Error(
+    'SESSION_SECRET env variable is missing or less than 32 characters'
+  );
+}
+
 export const sessionOptions: SessionOptions = {
-  cookieName: "app_session", // MUST MATCH browser cookie
-  password: process.env.SESSION_SECRET!,
+  cookieName: "app_session",
+  password: sessionPassword,
   cookieOptions: {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

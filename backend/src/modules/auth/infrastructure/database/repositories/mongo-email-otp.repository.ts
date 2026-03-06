@@ -19,7 +19,7 @@ export class MongoEmailOtpRepository implements EmailOtpRepository {
       otpHash: otp.otpHash,
       expiresAt: otp.expiresAt,
       verified: otp.verified,
-      newEmail: otp.newEmail, 
+      newEmail: otp.newEmail,
       purpose: otp.purpose,
     });
   }
@@ -28,9 +28,29 @@ export class MongoEmailOtpRepository implements EmailOtpRepository {
     const doc = await this._emailOtpModel
       .findOne({ email, verified: false })
       .sort({ createdAt: -1 });
-
     if (!doc) return null;
+    return this.toEntity(doc);
+  }
 
+  async findLatestByUserAndEmail(
+    userId: string,
+    email: string,
+    purpose?: OtpPurpose,
+  ): Promise<EmailOtpEntity | null> {
+    const query: any = { userId, email, verified: false };
+    if (purpose) query.purpose = purpose;
+    const doc = await this._emailOtpModel
+      .findOne(query)
+      .sort({ createdAt: -1 });
+    if (!doc) return null;
+    return this.toEntity(doc);
+  }
+
+  async markVerified(id: string): Promise<void> {
+    await this._emailOtpModel.updateOne({ _id: id }, { verified: true });
+  }
+
+  private toEntity(doc: any): EmailOtpEntity {
     return new EmailOtpEntity(
       doc._id.toString(),
       doc.userId,
@@ -41,47 +61,6 @@ export class MongoEmailOtpRepository implements EmailOtpRepository {
       doc.createdAt,
       doc.newEmail,
       doc.purpose,
-    );
-  }
-
-  async findLatestByUserAndEmail(
-  userId: string,
-  email: string,
-  purpose?: OtpPurpose,
-): Promise<EmailOtpEntity | null> {
-  const query: any = {
-    userId,
-    email,
-    verified: false,
-  };
-
-  if (purpose) {
-    query.purpose = purpose;
-  }
-
-  const doc = await this._emailOtpModel
-    .findOne(query)
-    .sort({ createdAt: -1 });
-
-  if (!doc) return null;
-
-  return new EmailOtpEntity(
-    doc._id.toString(),
-    doc.userId,
-    doc.email,
-    doc.otpHash,
-    doc.expiresAt,
-    doc.verified,
-    doc.createdAt,
-    doc.newEmail,
-    doc.purpose,
-  );
-}
-
-  async markVerified(id: string): Promise<void> {
-    await this._emailOtpModel.updateOne(
-      { _id: id },
-      { verified: true },
     );
   }
 }

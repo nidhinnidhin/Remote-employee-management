@@ -50,20 +50,6 @@ export class LoginUseCase {
       throw new UnauthorizedException(AUTH_MESSAGES.INVALID_CREDENTIALS);
     }
 
-    if (user.role === 'COMPANY_ADMIN' && !user.isOnboarded) {
-      return {
-        message: 'Onboarding required',
-        user: {
-          id: user.id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          role: user.role,
-          isOnboarded: false,
-        },
-      };
-    }
-
     await this.checkCompanySuspension(user.companyId);
 
     const accessToken = this._jwtService.generateAccessToken({
@@ -75,6 +61,22 @@ export class LoginUseCase {
     const refreshToken = this._jwtService.generateRefreshToken({
       userId: user.id,
     });
+
+    if (user.role === 'COMPANY_ADMIN' && !user.isOnboarded) {
+      return {
+        accessToken,
+        refreshToken,
+        message: 'Onboarding required',
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role,
+          isOnboarded: false,
+        },
+      };
+    }
 
     return {
       accessToken,
