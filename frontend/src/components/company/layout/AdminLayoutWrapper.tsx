@@ -1,0 +1,43 @@
+"use client";
+
+import React, { useState } from "react";
+import Sidebar from "./Sidebar";
+import Header from "./Header";
+import { useEffect } from "react";
+
+const AdminLayoutWrapper = ({ children }: { children: React.ReactNode }) => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  useEffect(() => {
+    document.documentElement.classList.add("theme-company");
+    return () => {
+      document.documentElement.classList.remove("theme-company");
+    };
+  }, []);
+
+  return (
+    <div className="theme-company portal-page min-h-screen">
+      <Sidebar
+        isMobileOpen={sidebarOpen}
+        closeMobileSidebar={() => setSidebarOpen(false)}
+        isCollapsed={isCollapsed}
+        toggleCollapse={() => setIsCollapsed(!isCollapsed)}
+      />
+
+      <div
+        className={`transition-all duration-300 ease-in-out flex flex-col min-h-screen
+          ${isCollapsed ? "lg:pl-20" : "lg:pl-64"}
+        `}
+      >
+        <Header onMobileMenuDatas={() => setSidebarOpen(true)} />
+
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-x-hidden">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+};
+
+export default AdminLayoutWrapper;

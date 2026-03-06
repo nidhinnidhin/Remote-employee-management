@@ -1,8 +1,26 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+<<<<<<< HEAD
 import { MongoDatabaseModule } from './infrastructure/database/mongoose/mongoose.module';
 
 @Module({
   imports: [ConfigModule.forRoot({ isGlobal: true }), MongoDatabaseModule],
+=======
+import { AuthModule } from './modules/auth/presentation/auth/auth.module';
+import { MongoDatabaseModule } from './shared/config/mongoose.module';
+import { SuperAdminModule } from './modules/super-admin/super-admin.module';
+import { EmployeesModule } from './modules/company-admin/employees/presentation/employee/employees.module';
+import { CompanyPolicyModule } from './modules/company-admin/company-policy/company-policy.module';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    MongoDatabaseModule,
+    AuthModule,
+    SuperAdminModule,
+    EmployeesModule,
+    CompanyPolicyModule
+  ],
+>>>>>>> develop
 })
-export class AppModule {}
+export class AppModule { }

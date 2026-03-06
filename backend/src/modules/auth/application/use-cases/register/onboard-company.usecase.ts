@@ -1,0 +1,77 @@
+import { Injectable, Inject, ConflictException, NotFoundException } from '@nestjs/common';
+import { OnboardingDto } from '../../../presentation/dto/onboarding.dto';
+import type { CompanyRepository } from '../../../domain/repositories/company.repository';
+import type { UserRepository } from '../../../domain/repositories/user.repository';
+import { CompanyEntity } from '../../../domain/entities/company.entity';
+import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
+import { JwtService } from 'src/shared/services/jwt.service';
+
+@Injectable()
+export class OnboardCompanyUseCase {
+    constructor(
+        @Inject('CompanyRepository')
+        private readonly _companyRepository: CompanyRepository,
+
+        @Inject('UserRepository')
+        private readonly _userRepository: UserRepository,
+
+        private readonly _jwtService: JwtService,
+    ) { }
+
+    async execute(userId: string, dto: OnboardingDto) {
+        const user = await this._userRepository.findById(userId);
+        if (!user) {
+            throw new NotFoundException(AUTH_MESSAGES.USER_NOT_FOUND);
+        }
+
+        if (user.isOnboarded) {
+            throw new ConflictException('User is already onboarded');
+        }
+
+        const existingCompany = await this._companyRepository.findByEmail(dto.company.email);
+        if (existingCompany) {
+            throw new ConflictException(AUTH_MESSAGES.COMPANY_ALREADY_EXIST);
+        }
+
+        const companyEntity = new CompanyEntity(
+            "",
+            dto.company.name,
+            dto.company.email,
+            dto.company.size,
+            dto.company.industry,
+            dto.company.website,
+            new Date(),
+            new Date(),
+        );
+
+        const createdCompany = await this._companyRepository.create(companyEntity);
+
+        await this._userRepository.updateUserFieldsById(userId, {
+            companyId: createdCompany.id,
+            isOnboarded: true,
+        });
+
+        const accessToken = this._jwtService.generateAccessToken({
+            userId: user.id,
+            role: user.role,
+            companyId: createdCompany.id,
+        });
+
+        const refreshToken = this._jwtService.generateRefreshToken({
+            userId: user.id,
+        });
+
+        return {
+            message: 'Onboarding completed successfully',
+            company: createdCompany,
+            accessToken,
+            refreshToken,
+            user: {
+                id: user.id,
+                email: user.email,
+                role: user.role,
+                isOnboarded: true,
+            }
+        };
+    }
+}

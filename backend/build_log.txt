@@ -1,0 +1,6 @@
+﻿
+> backend@0.0.1 build
+> nest build
+
+Found 5 error(s).
+

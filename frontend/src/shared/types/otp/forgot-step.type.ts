@@ -1,0 +1,1 @@
+export type ForgotStep = "closed" | "email" | "otp" | "reset";

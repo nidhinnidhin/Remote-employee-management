@@ -1,0 +1,6 @@
+docker rm -f redis-server
+docker run -d --name redis-server -p 6380:6379 redis
+docker exec -it redis-server redis-cli
+ping
+
+Expected - PONG

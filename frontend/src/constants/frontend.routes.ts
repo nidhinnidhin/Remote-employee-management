@@ -1,0 +1,58 @@
+export const FRONTEND_ROUTES = {
+    AUTH: {
+        LOGIN: "/auth/login",
+        REGISTER: "/auth/register",
+        ONBOARDING: "/auth/onboarding",
+        DASHBOARD: "/auth/dashboard", // Used in middleware
+    },
+    SUPER_ADMIN: {
+        LOGIN: "/super-admin/login",
+        DASHBOARD: "/super-admin/dashboard",
+        COMPANIES: "/super-admin/companies",
+        SUBSCRIPTIONS: "/super-admin/subscriptions",
+        USERS: "/super-admin/users",
+        BILLING: "/super-admin/billing",
+        SUPPORT: "/super-admin/support",
+        SETTINGS: "/super-admin/settings",
+        LOGS: "/super-admin/logs",
+    },
+    ADMIN: {
+        DASHBOARD: "/admin/dashboard",
+        EMPLOYEES: "/admin/employees",
+        COMPANY_POLICY: "/admin/company-policy",
+        INVITE: {
+            BASE: "/admin/auth",
+            SET_PASSWORD: "/admin/auth/set-password",
+            INVALID: "/admin/auth/invite-invalid",
+        }
+    },
+    COMPANY: {
+        DEPARTMENTS: "/company-admin/departments",
+        PROJECTS: "/company-admin/projects",
+        TASKS: "/company-admin/tasks",
+        DISCUSSIONS: "/company-admin/discussions",
+        ATTENDANCE: "/company-admin/attendance",
+        SUBSCRIPTION: "/company-admin/subscription",
+        PROFILE: "/company-admin/profile",
+        AUDIT_LOGS: "/company-admin/audit-logs",
+    },
+    EMPLOYEE: {
+        DASHBOARD: "/employee/dashboard",
+        PROFILE: "/employee/profile",
+        POLICY: "/employee/policy",
+        ATTENDANCE: "/attendance",
+        LEAVES: "/leaves",
+        TASKS: "/tasks",
+        PROJECTS: "/projects",
+        TEAMS: "/teams",
+        DISCUSSIONS: "/discussions",
+        CALENDAR: "/calendar",
+        ANNOUNCEMENTS: "/announcements",
+        DIRECTORY: "/directory",
+        MOOD: "/mood",
+        PERFORMANCE: "/performance",
+        REPORTS: "/reports",
+        SETTINGS: "/settings",
+        CHATS: "/chats",
+    },
+} as const;
