@@ -63,7 +63,7 @@ export async function proxy(req: NextRequest) {
     if (isAuthenticated) {
         // If they are on an auth route (login/register) or onboarding (if already onboarded), redirect to dashboard
         if (isAuthRoute || (isOnboardingRoute && isOnboarded)) {
-           
+
             if (req.nextUrl.searchParams.get("error") === "suspended") {
                 const resp = NextResponse.next();
                 resp.cookies.delete("app_session");
