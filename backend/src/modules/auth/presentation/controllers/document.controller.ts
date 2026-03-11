@@ -12,13 +12,16 @@ import {
     BadRequestException,
 } from '@nestjs/common';
 import type { Request } from 'express';
+import { Inject } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import { CloudinaryResourceType } from 'src/shared/enums/employees/media/cloudinary-resource.enum';
-import { UploadDocumentUseCase } from '../../application/use-cases/document/upload-document.usecase';
-import { DeleteDocumentUseCase } from '../../application/use-cases/document/delete-document.usecase';
-import { EditDocumentUseCase } from '../../application/use-cases/document/edit-document.usecase';
+import type {
+    IUploadDocumentUseCase,
+    IDeleteDocumentUseCase,
+    IEditDocumentUseCase,
+} from '../../application/interfaces/auth-use-cases.interfaces';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -52,9 +55,12 @@ const documentInterceptor = FileInterceptor('file', {
 @UseGuards(JwtAuthGuard)
 export class DocumentController {
     constructor(
-        private readonly uploadDocumentUseCase: UploadDocumentUseCase,
-        private readonly deleteDocumentUseCase: DeleteDocumentUseCase,
-        private readonly editDocumentUseCase: EditDocumentUseCase,
+        @Inject('IUploadDocumentUseCase')
+        private readonly uploadDocumentUseCase: IUploadDocumentUseCase,
+        @Inject('IDeleteDocumentUseCase')
+        private readonly deleteDocumentUseCase: IDeleteDocumentUseCase,
+        @Inject('IEditDocumentUseCase')
+        private readonly editDocumentUseCase: IEditDocumentUseCase,
     ) { }
 
     @Post()

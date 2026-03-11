@@ -1,7 +1,7 @@
 import { Injectable, ConflictException, Inject } from '@nestjs/common';
-import type { UserRepository } from '../../../domain/repositories/user.repository';
-import type { CompanyRepository } from '../../../domain/repositories/company.repository';
-import type { PendingRegistrationRepository } from '../../../domain/repositories/cache/auth-repository/pending-registration.repository';
+import type { IUserRepository } from '../../../domain/repositories/iuser.repository';
+import type { ICompanyRepository } from '../../../domain/repositories/icompany.repository';
+import type { IPendingRegistrationRepository } from '../../../domain/repositories/cache/auth-repository/ipending-registration.repository';
 import { RegisterCompanyAdminDto } from 'src/modules/auth/presentation/dto/register-company-admin.dto';
 import { EmailService } from 'src/shared/services/email.service';
 import { OtpService } from 'src/shared/services/otp.service';
@@ -11,15 +11,16 @@ import { hashPassword } from 'src/shared/utils/password.util';
 import { getOtpExpiresAt, SESSION_TTL_SECONDS } from 'src/shared/constants/functions/otp/otp.constants';
 
 import { RegisterAdminDto } from 'src/modules/auth/presentation/dto/register-admin.dto';
+import { IRegisterAdminUseCase } from '../../interfaces/auth-use-cases.interfaces';
 
 @Injectable()
-export class RegisterAdminUseCase {
+export class RegisterAdminUseCase implements IRegisterAdminUseCase {
   constructor(
-    @Inject('UserRepository')
-    private readonly _userRepository: UserRepository,
+    @Inject('IUserRepository')
+    private readonly _userRepository: IUserRepository,
 
-    @Inject('PendingRegistrationRepository')
-    private readonly _pendingRepository: PendingRegistrationRepository,
+    @Inject('IPendingRegistrationRepository')
+    private readonly _pendingRepository: IPendingRegistrationRepository,
 
     private readonly _emailService: EmailService,
     private readonly _otpService: OtpService,

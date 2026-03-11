@@ -11,28 +11,36 @@ import {
     BadRequestException,
 } from '@nestjs/common';
 import type { Request } from 'express';
+import { Inject } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
-import { GetUserProfileUseCase } from '../../application/use-cases/profile/get-user-profile.usecase';
-import { UpdateProfileUseCase } from '../../application/use-cases/profile/update-user-profile.useCase';
-import { UploadProfileImageUseCase } from '../../application/use-cases/profile/upload-profile-image.usecase';
-import { UpdateSkillsUseCase } from '../../application/use-cases/skills/update-skills.usecase';
+import type {
+    IGetUserProfileUseCase,
+    IUpdateProfileUseCase,
+    IUploadProfileImageUseCase,
+    IUpdateSkillsUseCase,
+    IRequestEmailChangeUseCase,
+    IVerifyEmailChangeUseCase,
+} from '../../application/interfaces/auth-use-cases.interfaces';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
-
-import { RequestEmailChangeUseCase } from '../../application/use-cases/update-email/request-email-change.usecase';
-import { VerifyEmailChangeUseCase } from '../../application/use-cases/update-email/verify-email-change.usecase';
 import { RequestEmailChangeDto } from '../dto/email-update/request-email-change.dto';
 
 @Controller('auth/profile')
 @UseGuards(JwtAuthGuard)
 export class ProfileController {
     constructor(
-        private readonly getUserProfileUseCase: GetUserProfileUseCase,
-        private readonly updateProfileUseCase: UpdateProfileUseCase,
-        private readonly uploadProfileImageUseCase: UploadProfileImageUseCase,
-        private readonly updateSkillsUseCase: UpdateSkillsUseCase,
-        private readonly requestEmailChangeUseCase: RequestEmailChangeUseCase,
-        private readonly verifyEmailChangeUseCase: VerifyEmailChangeUseCase,
+        @Inject('IGetUserProfileUseCase')
+        private readonly getUserProfileUseCase: IGetUserProfileUseCase,
+        @Inject('IUpdateProfileUseCase')
+        private readonly updateProfileUseCase: IUpdateProfileUseCase,
+        @Inject('IUploadProfileImageUseCase')
+        private readonly uploadProfileImageUseCase: IUploadProfileImageUseCase,
+        @Inject('IUpdateSkillsUseCase')
+        private readonly updateSkillsUseCase: IUpdateSkillsUseCase,
+        @Inject('IRequestEmailChangeUseCase')
+        private readonly requestEmailChangeUseCase: IRequestEmailChangeUseCase,
+        @Inject('IVerifyEmailChangeUseCase')
+        private readonly verifyEmailChangeUseCase: IVerifyEmailChangeUseCase,
     ) { }
 
     @Get('me')
@@ -71,7 +79,7 @@ export class ProfileController {
         @Req() req: Request,
         @Body() dto: RequestEmailChangeDto,
     ) {
-        return this.requestEmailChangeUseCase.execute(req.user!.userId, dto.newEmail);
+        return this.requestEmailChangeUseCase.execute(req.user!.userId, dto);
     }
 
     @Post('verify-email-change')

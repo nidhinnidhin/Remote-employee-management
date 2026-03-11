@@ -1,17 +1,18 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import type { UserRepository } from 'src/modules/auth/domain/repositories/user.repository';
+import type { IUserRepository } from 'src/modules/auth/domain/repositories/iuser.repository';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { PROFILE_MESSAGES } from 'src/shared/constants/messages/profile/profile.messages';
 import { CLOUDINARY_PATH } from 'src/shared/constants/path/cloudinary.path';
 import { CloudinaryService } from 'src/shared/services/cloudinary.service';
+import { IUploadProfileImageUseCase } from '../../interfaces/auth-use-cases.interfaces';
 
 @Injectable()
-export class UploadProfileImageUseCase {
+export class UploadProfileImageUseCase implements IUploadProfileImageUseCase {
   constructor(
-    @Inject('UserRepository')
-    private readonly _userRepository: UserRepository,
+    @Inject('IUserRepository')
+    private readonly _userRepository: IUserRepository,
     private readonly _cloudinaryService: CloudinaryService,
-  ) {}
+  ) { }
 
   async execute(userId: string, file: Express.Multer.File) {
     const user = await this._userRepository.findById(userId);

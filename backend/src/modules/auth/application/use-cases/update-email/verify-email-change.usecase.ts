@@ -1,20 +1,21 @@
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import type { EmailOtpRepository } from '../../../domain/repositories/email-otp.repository';
-import type { UserRepository } from '../../../domain/repositories/user.repository';
+import type { IEmailOtpRepository } from '../../../domain/repositories/iemail-otp.repository';
+import type { IUserRepository } from '../../../domain/repositories/iuser.repository';
 import { OtpPurpose } from 'src/shared/enums/reset-password/otp-purpose.enum';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
+import { IVerifyEmailChangeUseCase } from '../../interfaces/auth-use-cases.interfaces';
 
 @Injectable()
-export class VerifyEmailChangeUseCase {
+export class VerifyEmailChangeUseCase implements IVerifyEmailChangeUseCase {
   constructor(
-    @Inject('EmailOtpRepository')
-    private readonly _emailOtpRepository: EmailOtpRepository,
+    @Inject('IEmailOtpRepository')
+    private readonly _emailOtpRepository: IEmailOtpRepository,
 
-    @Inject('UserRepository')
-    private readonly _userRepository: UserRepository,
-  ) {}
+    @Inject('IUserRepository')
+    private readonly _userRepository: IUserRepository,
+  ) { }
 
   async execute(userId: string, otp: string) {
     const user = await this._userRepository.findById(userId);
@@ -25,10 +26,8 @@ export class VerifyEmailChangeUseCase {
     const otpRecord = await this._emailOtpRepository.findLatestByUserAndEmail(
       userId,
       user.email,
-      OtpPurpose.EMAIL_CHANGE, 
+      OtpPurpose.EMAIL_CHANGE,
     );
-
-    console.log('OTP Record:', otpRecord);
 
     if (!otpRecord) {
       throw new BadRequestException(OTP_MESSAGES.OTP_NOT_FOUND);
@@ -44,7 +43,6 @@ export class VerifyEmailChangeUseCase {
       throw new BadRequestException(OTP_MESSAGES.OTP_INVALID);
     }
 
-    // 🔥 Update to stored newEmail
     if (!otpRecord.newEmail) {
       throw new BadRequestException(OTP_MESSAGES.OTP_INVALID);
     }

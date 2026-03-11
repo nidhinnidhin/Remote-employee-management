@@ -1,17 +1,19 @@
 import { Injectable, OnModuleInit, Inject, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
-import type { UserRepository } from 'src/modules/auth/domain/repositories/user.repository';
+import type { IUserRepository } from 'src/modules/auth/domain/repositories/iuser.repository';
 import { UserEntity } from 'src/modules/auth/domain/entities/user.entity';
 import { UserRole } from 'src/shared/enums/user/user-role.enum';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 
+import type { ISuperAdminSeedService } from './isuper-admin-seed.service';
+
 @Injectable()
-export class SuperAdminSeedService implements OnModuleInit {
+export class SuperAdminSeedService implements ISuperAdminSeedService {
   private readonly logger = new Logger(SuperAdminSeedService.name);
 
   constructor(
-    @Inject('UserRepository') private readonly userRepository: UserRepository,
+    @Inject('IUserRepository') private readonly userRepository: IUserRepository,
     private readonly configService: ConfigService,
   ) { }
 

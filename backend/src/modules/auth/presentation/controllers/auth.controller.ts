@@ -17,11 +17,13 @@ import {
 } from 'src/shared/config/cookies.config';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 
-import { RegisterAdminUseCase } from '../../application/use-cases/register/register-admin.usecase';
-import { OnboardCompanyUseCase } from '../../application/use-cases/register/onboard-company.usecase';
-import { LoginUseCase } from '../../application/use-cases/login/login.usecase';
-import { RefreshAccessTokenUseCase } from '../../application/use-cases/token/refresh-access-token.usecase';
-import { SocialLoginUseCase } from '../../application/use-cases/login/social-login.usecase';
+import type { IRegisterAdminUseCase } from '../../application/interfaces/auth-use-cases.interfaces';
+import type { IOnboardCompanyUseCase } from '../../application/interfaces/auth-use-cases.interfaces';
+import type { ILoginUseCase } from '../../application/interfaces/auth-use-cases.interfaces';
+import type { IRefreshAccessTokenUseCase } from '../../application/interfaces/auth-use-cases.interfaces';
+import type { ISocialLoginUseCase } from '../../application/interfaces/auth-use-cases.interfaces';
+import type { ICookieHelperService } from 'src/shared/services/interfaces/icookie-helper.service';
+import { Inject } from '@nestjs/common';
 
 import { OnboardingDto } from '../../presentation/dto/onboarding.dto';
 import { RegisterAdminDto } from '../../presentation/dto/register-admin.dto';
@@ -31,11 +33,18 @@ import type { SocialLoginInput } from 'src/shared/types/auth/social-login.type';
 @Controller('auth')
 export class AuthController {
   constructor(
-    private readonly registerAdminUseCase: RegisterAdminUseCase,
-    private readonly onboardCompanyUseCase: OnboardCompanyUseCase,
-    private readonly refreshAccessTokenUseCase: RefreshAccessTokenUseCase,
-    private readonly loginUseCase: LoginUseCase,
-    private readonly socialLoginUseCase: SocialLoginUseCase,
+    @Inject('IRegisterAdminUseCase')
+    private readonly registerAdminUseCase: IRegisterAdminUseCase,
+    @Inject('IOnboardCompanyUseCase')
+    private readonly onboardCompanyUseCase: IOnboardCompanyUseCase,
+    @Inject('IRefreshAccessTokenUseCase')
+    private readonly refreshAccessTokenUseCase: IRefreshAccessTokenUseCase,
+    @Inject('ILoginUseCase')
+    private readonly loginUseCase: ILoginUseCase,
+    @Inject('ISocialLoginUseCase')
+    private readonly socialLoginUseCase: ISocialLoginUseCase,
+    @Inject('ICookieHelperService')
+    private readonly cookieHelperService: ICookieHelperService,
   ) { }
 
   @Post('register')
@@ -50,7 +59,7 @@ export class AuthController {
     }
     const result = await this.onboardCompanyUseCase.execute(dto.userId, dto);
 
-    this.setAuthCookies(res, result.accessToken, result.refreshToken);
+    this.cookieHelperService.setAuthCookies(res, result.accessToken, result.refreshToken);
 
     return result;
   }
@@ -66,7 +75,7 @@ export class AuthController {
     });
 
     if (result.accessToken && result.refreshToken) {
-      this.setAuthCookies(res, result.accessToken, result.refreshToken);
+      this.cookieHelperService.setAuthCookies(res, result.accessToken, result.refreshToken);
     }
     return result;
   }
@@ -86,7 +95,7 @@ export class AuthController {
     }));
 
     if (result.accessToken && result.refreshToken) {
-      this.setAuthCookies(res, result.accessToken, result.refreshToken);
+      this.cookieHelperService.setAuthCookies(res, result.accessToken, result.refreshToken);
     }
     return result;
   }
@@ -115,18 +124,5 @@ export class AuthController {
     res.clearCookie(ACCESS_TOKEN_COOKIE_NAME, ACCESS_TOKEN_COOKIE_OPTIONS);
     res.clearCookie(REFRESH_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_OPTIONS);
     return { message: AUTH_MESSAGES.LOGOUT_SUCCESS || 'Logged out successfully' };
-  }
-
-  private setAuthCookies(
-    res: Response,
-    accessToken: string | undefined,
-    refreshToken: string | undefined,
-  ): void {
-    if (accessToken) {
-      res.cookie(ACCESS_TOKEN_COOKIE_NAME, accessToken, ACCESS_TOKEN_COOKIE_OPTIONS);
-    }
-    if (refreshToken) {
-      res.cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
-    }
   }
 }

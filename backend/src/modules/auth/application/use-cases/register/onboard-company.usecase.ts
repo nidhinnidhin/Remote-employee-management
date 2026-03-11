@@ -1,19 +1,20 @@
 import { Injectable, Inject, ConflictException, NotFoundException } from '@nestjs/common';
 import { OnboardingDto } from '../../../presentation/dto/onboarding.dto';
-import type { CompanyRepository } from '../../../domain/repositories/company.repository';
-import type { UserRepository } from '../../../domain/repositories/user.repository';
+import type { ICompanyRepository } from '../../../domain/repositories/icompany.repository';
+import type { IUserRepository } from '../../../domain/repositories/iuser.repository';
 import { CompanyEntity } from '../../../domain/entities/company.entity';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { JwtService } from 'src/shared/services/jwt.service';
+import { IOnboardCompanyUseCase } from '../../interfaces/auth-use-cases.interfaces';
 
 @Injectable()
-export class OnboardCompanyUseCase {
+export class OnboardCompanyUseCase implements IOnboardCompanyUseCase {
     constructor(
-        @Inject('CompanyRepository')
-        private readonly _companyRepository: CompanyRepository,
+        @Inject('ICompanyRepository')
+        private readonly _companyRepository: ICompanyRepository,
 
-        @Inject('UserRepository')
-        private readonly _userRepository: UserRepository,
+        @Inject('IUserRepository')
+        private readonly _userRepository: IUserRepository,
 
         private readonly _jwtService: JwtService,
     ) { }

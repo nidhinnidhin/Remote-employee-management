@@ -2,11 +2,14 @@ import {
     Body,
     Controller,
     Post,
+    Inject,
 } from '@nestjs/common';
 import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
-import { ForgotPasswordUseCase } from '../../application/use-cases/reset-password/forgot-password.usecase';
-import { VerifyResetPasswordOtpUseCase } from '../../application/use-cases/reset-password/verify-reset-password-otp.usecase';
-import { ResetPasswordUseCase } from '../../application/use-cases/reset-password/reset-password.usecase';
+import type {
+    IForgotPasswordUseCase,
+    IVerifyResetPasswordOtpUseCase,
+    IResetPasswordUseCase,
+} from '../../application/interfaces/auth-use-cases.interfaces';
 import { ForgotPasswordDto } from '../../presentation/dto/forgot-password.dto';
 import { VerifyResetPasswordOtpDto } from '../../presentation/dto/verify-reset-password-otp.dto';
 import { ResetPasswordDto } from '../../presentation/dto/reset-password.dto';
@@ -14,9 +17,12 @@ import { ResetPasswordDto } from '../../presentation/dto/reset-password.dto';
 @Controller('auth/password')
 export class PasswordController {
     constructor(
-        private readonly forgotPasswordUseCase: ForgotPasswordUseCase,
-        private readonly verifyResetPasswordOtpUseCase: VerifyResetPasswordOtpUseCase,
-        private readonly resetPasswordUseCase: ResetPasswordUseCase,
+        @Inject('IForgotPasswordUseCase')
+        private readonly forgotPasswordUseCase: IForgotPasswordUseCase,
+        @Inject('IVerifyResetPasswordOtpUseCase')
+        private readonly verifyResetPasswordOtpUseCase: IVerifyResetPasswordOtpUseCase,
+        @Inject('IResetPasswordUseCase')
+        private readonly resetPasswordUseCase: IResetPasswordUseCase,
     ) { }
 
     @Post('forgot')

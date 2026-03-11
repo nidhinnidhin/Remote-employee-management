@@ -11,9 +11,21 @@ export async function verifyOtpAction(payload: { email: string; otp: string }) {
   try {
     const response = await verifyOtp(payload);
 
-    const { user } = response.data;
+    const { user, accessToken, refreshToken } = response.data;
     if (!user || !user.id) {
       throw new Error("Invalid response from server: user data missing");
+    }
+
+    if (accessToken && refreshToken) {
+      await setAccessTokenCookie(accessToken);
+      await setRefreshTokenCookie(refreshToken);
+
+      const session = await getSession();
+      session.userId = user.id;
+      session.role = user.role;
+      session.accessToken = accessToken;
+      session.isOnboarded = user.isOnboarded;
+      await session.save();
     }
 
     return {

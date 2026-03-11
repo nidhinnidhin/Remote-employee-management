@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type { UserRepository } from 'src/modules/auth/domain/repositories/user.repository';
+import type { IUserRepository } from '../../../domain/repositories/iuser.repository';
 import { DOCUMENT_MESSAGES } from 'src/shared/constants/messages/profile/document.messages';
 import { CLOUDINARY_PATH } from 'src/shared/constants/path/cloudinary.path';
 import { CloudinaryService } from 'src/shared/services/cloudinary.service';
@@ -9,14 +9,15 @@ import {
   UploadDocumentResponse,
 } from 'src/shared/types/profile/upload-document.type';
 import { CloudinaryResourceType } from 'src/shared/enums/employees/media/cloudinary-resource.enum';
+import type { IUploadDocumentUseCase } from '../../interfaces/auth-use-cases.interfaces';
 
 @Injectable()
-export class UploadDocumentUseCase {
+export class UploadDocumentUseCase implements IUploadDocumentUseCase {
   constructor(
-    @Inject('UserRepository')
-    private readonly userRepository: UserRepository,
+    @Inject('IUserRepository')
+    private readonly userRepository: IUserRepository,
     private readonly cloudinaryService: CloudinaryService,
-  ) {}
+  ) { }
 
   async execute({
     userId,
@@ -51,9 +52,9 @@ export class UploadDocumentUseCase {
 
     const savedDocument: NewDocument | null = rawDocument
       ? {
-          ...rawDocument,
-          resourceType: rawDocument.resourceType as CloudinaryResourceType,
-        }
+        ...rawDocument,
+        resourceType: rawDocument.resourceType as CloudinaryResourceType,
+      }
       : null;
 
     return {

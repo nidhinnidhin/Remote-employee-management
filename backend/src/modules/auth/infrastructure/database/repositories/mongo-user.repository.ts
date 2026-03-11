@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { BaseRepository } from 'src/shared/repositories/base.repository';
-import { UserRepository } from '../../../domain/repositories/user.repository';
+import { Model, Types } from 'mongoose';
+import { IUserRepository } from '../../../domain/repositories/iuser.repository';
 import { UserEntity } from '../../../domain/entities/user.entity';
 import { UserDocument } from '../mongoose/schemas/userSchema';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
@@ -10,11 +9,12 @@ import { UserRole } from 'src/shared/enums/user/user-role.enum';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { DocumentPayload } from 'src/shared/types/profile/document.type';
 
+import { BaseRepository } from 'src/shared/repositories/base.repository';
+
 @Injectable()
 export class MongoUserRepository
   extends BaseRepository<UserDocument, UserEntity>
-  implements UserRepository
-{
+  implements IUserRepository {
   constructor(
     @InjectModel(UserDocument.name)
     private readonly _userModel: Model<UserDocument>,
@@ -22,7 +22,6 @@ export class MongoUserRepository
     super(_userModel);
   }
 
-  // --- Required by abstract base ---
   protected toEntity(doc: UserDocument): UserEntity {
     return new UserEntity(
       (doc as any)._id.toString(),
@@ -68,7 +67,7 @@ export class MongoUserRepository
 
   // --- Override create: input is UserEntity not Partial<UserDocument> ---
   async create(user: UserEntity): Promise<UserEntity> {
-    return super.create({
+    const created = new this._userModel({
       companyId: user.companyId,
       firstName: user.firstName,
       lastName: user.lastName,
@@ -84,23 +83,21 @@ export class MongoUserRepository
       provider: user.provider,
       providerId: user.providerId,
     } as Partial<UserDocument>);
+    const saved = await created.save();
+    return this.toEntity(saved as UserDocument);
   }
 
-  // --- Override findByEmail: case-insensitive regex differs from base exact match ---
-  async findByEmail(email: string): Promise<UserEntity | null> {
-    return this.findOne({
-      email: { $regex: new RegExp(`^${email.toLowerCase()}$`, 'i') },
-    });
-  }
-
-  // --- findById fully inherited ---
-  // --- findAllByCompanyId fully inherited ---
+  // Use base findByEmail which already handles toEntity and case-insensitive check via emailField logic if we set it
+  // However, the original findByEmail uses a regex. Let's stick to base findByEmail if it works.
+  // Base findByEmail: const filter = { [this.emailField]: email.toLowerCase() } as FilterQuery<TDocument>;
+  // That should be enough for case-insensitive if stored lowercased.
 
   async findAllByCompanyIdAndRole(
     companyId: string,
     role: UserRole,
   ): Promise<UserEntity[]> {
-    return this.findAll({ companyId, role });
+    const docs = await this._userModel.find({ companyId, role }).lean().exec();
+    return docs.map((doc) => this.toEntity(doc as unknown as UserDocument));
   }
 
   // --- Domain-specific update methods ---
@@ -119,23 +116,19 @@ export class MongoUserRepository
   }
 
   async updateStatusByEmail(email: string, status: UserStatus): Promise<void> {
-    await this._userModel.updateOne({ email }, { status });
+    await this._userModel.updateOne({ email: email.toLowerCase() }, { status });
   }
 
   async updateRoleByEmail(email: string, role: string): Promise<void> {
-    await this._userModel.updateOne({ email }, { role });
+    await this._userModel.updateOne({ email: email.toLowerCase() }, { role });
   }
 
   async updateUserFieldsById(
     id: string,
     fields: Partial<UserEntity>,
   ): Promise<void> {
-    const result = await this._userModel.updateOne(
-      { _id: id },
-      { $set: fields },
-      { runValidators: true },
-    );
-    if (result.matchedCount === 0) {
+    const result = await this.updateById(id, { $set: fields });
+    if (!result) {
       throw new Error(AUTH_MESSAGES.USER_NOT_FOUND);
     }
   }

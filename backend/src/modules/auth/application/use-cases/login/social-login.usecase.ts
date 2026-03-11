@@ -1,11 +1,12 @@
 import { Injectable, Inject, ForbiddenException } from '@nestjs/common';
 import { isValidObjectId } from 'mongoose';
-import type { UserRepository } from 'src/modules/auth/domain/repositories/user.repository';
-import type { CompanyRepository } from 'src/modules/auth/domain/repositories/company.repository';
+import type { IUserRepository } from 'src/modules/auth/domain/repositories/iuser.repository';
+import type { ICompanyRepository } from 'src/modules/auth/domain/repositories/icompany.repository';
+import type { IJwtService } from 'src/shared/services/interfaces/ijwt.service';
+import { ISocialLoginUseCase } from '../../interfaces/auth-use-cases.interfaces';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 import { UserRole } from 'src/shared/enums/user/user-role.enum';
 import { CompanyStatus } from 'src/shared/enums/company/company-status.enum';
-import { JwtService } from 'src/shared/services/jwt.service';
 import { UserEntity } from 'src/modules/auth/domain/entities/user.entity';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import {
@@ -14,13 +15,14 @@ import {
 } from 'src/shared/types/auth/social-login.type';
 
 @Injectable()
-export class SocialLoginUseCase {
+export class SocialLoginUseCase implements ISocialLoginUseCase {
   constructor(
-    @Inject('UserRepository')
-    private readonly _userRepository: UserRepository,
-    @Inject('CompanyRepository')
-    private readonly _companyRepository: CompanyRepository,
-    private readonly _jwtService: JwtService,
+    @Inject('IUserRepository')
+    private readonly _userRepository: IUserRepository,
+    @Inject('ICompanyRepository')
+    private readonly _companyRepository: ICompanyRepository,
+    @Inject('IJwtService')
+    private readonly _jwtService: IJwtService,
   ) { }
 
   async execute(input: SocialLoginInput): Promise<SocialLoginResponse> {

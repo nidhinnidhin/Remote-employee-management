@@ -7,15 +7,16 @@ import {
   Inject,
 } from '@nestjs/common';
 import { UserRole } from 'src/shared/enums/user/user-role.enum';
-import type { CompanyRepository } from 'src/modules/auth/domain/repositories/company.repository';
+import type { ICompanyRepository } from 'src/modules/auth/domain/repositories/icompany.repository';
 import { CompanyStatus } from 'src/shared/enums/company/company-status.enum';
+import { isValidObjectId } from 'mongoose';
 
 @Injectable()
 export class CompanyAdminOrEmployeeGuard implements CanActivate {
   constructor(
-    @Inject('CompanyRepository')
-    private readonly companyRepository: CompanyRepository,
-  ) { }
+    @Inject('ICompanyRepository')
+    private readonly _companyRepository: ICompanyRepository,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -33,9 +34,8 @@ export class CompanyAdminOrEmployeeGuard implements CanActivate {
       );
     }
 
-    // Check if company is suspended
-    if (user.companyId && require('mongoose').isValidObjectId(user.companyId)) {
-      const company = await this.companyRepository.findById(user.companyId);
+    if (user.companyId && isValidObjectId(user.companyId)) {
+      const company = await this._companyRepository.findById(user.companyId);
       if (company && company.status === CompanyStatus.SUSPENDED) {
         throw new ForbiddenException(
           'Your company access has been suspended. Please contact support.',

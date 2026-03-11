@@ -1,18 +1,19 @@
 import { Inject, Injectable, UnauthorizedException, ForbiddenException } from '@nestjs/common';
-import type { UserRepository } from '../../../domain/repositories/user.repository';
-import type { CompanyRepository } from '../../../domain/repositories/company.repository';
+import type { IUserRepository } from '../../../domain/repositories/iuser.repository';
+import type { ICompanyRepository } from '../../../domain/repositories/icompany.repository';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { CompanyStatus } from 'src/shared/enums/company/company-status.enum';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 import { isValidObjectId } from 'mongoose';
+import { IGetUserProfileUseCase } from '../../interfaces/auth-use-cases.interfaces';
 
 @Injectable()
-export class GetUserProfileUseCase {
+export class GetUserProfileUseCase implements IGetUserProfileUseCase {
   constructor(
-    @Inject('UserRepository')
-    private readonly _userRepository: UserRepository,
-    @Inject('CompanyRepository')
-    private readonly _companyRepository: CompanyRepository,
+    @Inject('IUserRepository')
+    private readonly _userRepository: IUserRepository,
+    @Inject('ICompanyRepository')
+    private readonly _companyRepository: ICompanyRepository,
   ) { }
 
   async execute(userId: string) {
@@ -22,19 +23,15 @@ export class GetUserProfileUseCase {
       throw new UnauthorizedException(AUTH_MESSAGES.USER_NOT_FOUND);
     }
 
-    // Check if user is suspended (blocked)
     if (user.status === UserStatus.SUSPENDED) {
       throw new ForbiddenException(AUTH_MESSAGES.USER_BLOCKED);
     }
 
-    // Check company suspension if user is associated with a company
     if (user.companyId) {
       await this.checkCompanySuspension(user.companyId);
     }
 
-    return {
-      ...user,
-    };
+    return { ...user };
   }
 
   private async checkCompanySuspension(

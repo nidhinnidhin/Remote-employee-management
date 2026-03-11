@@ -45,6 +45,7 @@ import { UpdateSkillsUseCase } from '../../application/use-cases/skills/update-s
 import { UploadDocumentUseCase } from '../../application/use-cases/document/upload-document.usecase';
 import { DeleteDocumentUseCase } from '../../application/use-cases/document/delete-document.usecase';
 import { EditDocumentUseCase } from '../../application/use-cases/document/edit-document.usecase';
+import { CookieHelperService } from 'src/shared/services/cookie-helper.service';
 
 @Module({
   imports: [
@@ -65,53 +66,123 @@ import { EditDocumentUseCase } from '../../application/use-cases/document/edit-d
   ],
   providers: [
     JwtAuthGuard,
-    RegisterAdminUseCase,
-    OnboardCompanyUseCase,
-    LoginUseCase,
-    SendEmailOtpUseCase,
-    VerifyEmailOtpUseCase,
-    ResendEmailOtpUseCase,
-    RefreshAccessTokenUseCase,
+    {
+      provide: 'IRegisterAdminUseCase',
+      useClass: RegisterAdminUseCase,
+    },
+    {
+      provide: 'IOnboardCompanyUseCase',
+      useClass: OnboardCompanyUseCase,
+    },
+    {
+      provide: 'ILoginUseCase',
+      useClass: LoginUseCase,
+    },
+    {
+      provide: 'ISendEmailOtpUseCase',
+      useClass: SendEmailOtpUseCase,
+    },
+    {
+      provide: 'IVerifyEmailOtpUseCase',
+      useClass: VerifyEmailOtpUseCase,
+    },
+    {
+      provide: 'IResendEmailOtpUseCase',
+      useClass: ResendEmailOtpUseCase,
+    },
+    {
+      provide: 'IRefreshAccessTokenUseCase',
+      useClass: RefreshAccessTokenUseCase,
+    },
     EmailService,
     OtpService,
-    JwtService,
-    ForgotPasswordUseCase,
-    VerifyResetPasswordOtpUseCase,
-    ResetPasswordUseCase,
-    SocialLoginUseCase,
-    GetUserProfileUseCase,
-    UpdateProfileUseCase,
-    RequestEmailChangeUseCase,
-    VerifyEmailChangeUseCase,
-    UploadProfileImageUseCase,
-    CloudinaryService,
-    UpdateSkillsUseCase,
-    UploadDocumentUseCase,
-    DeleteDocumentUseCase,
-    EditDocumentUseCase,
     {
-      provide: 'PendingRegistrationRepository',
+      provide: 'IJwtService',
+      useClass: JwtService,
+    },
+    JwtService,
+    {
+      provide: 'IForgotPasswordUseCase',
+      useClass: ForgotPasswordUseCase,
+    },
+    {
+      provide: 'IVerifyResetPasswordOtpUseCase',
+      useClass: VerifyResetPasswordOtpUseCase,
+    },
+    {
+      provide: 'IResetPasswordUseCase',
+      useClass: ResetPasswordUseCase,
+    },
+    {
+      provide: 'ISocialLoginUseCase',
+      useClass: SocialLoginUseCase,
+    },
+    {
+      provide: 'IGetUserProfileUseCase',
+      useClass: GetUserProfileUseCase,
+    },
+    {
+      provide: 'IUpdateProfileUseCase',
+      useClass: UpdateProfileUseCase,
+    },
+    {
+      provide: 'IRequestEmailChangeUseCase',
+      useClass: RequestEmailChangeUseCase,
+    },
+    {
+      provide: 'IVerifyEmailChangeUseCase',
+      useClass: VerifyEmailChangeUseCase,
+    },
+    {
+      provide: 'IUploadProfileImageUseCase',
+      useClass: UploadProfileImageUseCase,
+    },
+    CloudinaryService,
+    {
+      provide: 'IUpdateSkillsUseCase',
+      useClass: UpdateSkillsUseCase,
+    },
+    {
+      provide: 'IUploadDocumentUseCase',
+      useClass: UploadDocumentUseCase,
+    },
+    {
+      provide: 'IDeleteDocumentUseCase',
+      useClass: DeleteDocumentUseCase,
+    },
+    {
+      provide: 'IEditDocumentUseCase',
+      useClass: EditDocumentUseCase,
+    },
+    {
+      provide: 'ICookieHelperService',
+      useClass: CookieHelperService,
+    },
+    {
+      provide: 'IPendingRegistrationRepository',
       useClass: RedisPendingRegistrationRepository,
     },
     {
-      provide: 'UserRepository',
+      provide: 'IUserRepository',
       useClass: MongoUserRepository,
     },
     {
-      provide: 'CompanyRepository',
+      provide: 'ICompanyRepository',
       useClass: MongoCompanyRepository,
     },
     {
-      provide: 'EmailOtpRepository',
+      provide: 'IEmailOtpRepository',
       useClass: MongoEmailOtpRepository,
     },
   ],
   exports: [
     JwtService,
-    'UserRepository',
-    'CompanyRepository',
-    'EmailOtpRepository',
+    'IJwtService',
+    'IUserRepository',
+    'ICompanyRepository',
+    'IEmailOtpRepository',
     EmailService,
+    'ICookieHelperService',
   ],
 })
 export class AuthModule { }

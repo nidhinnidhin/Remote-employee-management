@@ -4,8 +4,9 @@ import {
   Inject,
   ForbiddenException,
 } from '@nestjs/common';
-import type { CompanyRepository } from '../../../domain/repositories/company.repository';
-import type { UserRepository } from '../../../domain/repositories/user.repository';
+import { ILoginUseCase } from '../../interfaces/auth-use-cases.interfaces';
+import type { IUserRepository } from '../../../domain/repositories/iuser.repository';
+import type { ICompanyRepository } from '../../../domain/repositories/icompany.repository';
 import { isValidObjectId } from 'mongoose';
 import { CompanyStatus } from 'src/shared/enums/company/company-status.enum';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
@@ -16,12 +17,12 @@ import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages'
 import { comparePassword } from 'src/shared/utils/password.util';
 
 @Injectable()
-export class LoginUseCase {
+export class LoginUseCase implements ILoginUseCase {
   constructor(
-    @Inject('UserRepository')
-    private readonly _userRepository: UserRepository,
-    @Inject('CompanyRepository')
-    private readonly _companyRepository: CompanyRepository,
+    @Inject('IUserRepository')
+    private readonly _userRepository: IUserRepository,
+    @Inject('ICompanyRepository')
+    private readonly _companyRepository: ICompanyRepository,
     private readonly _jwtService: JwtService,
   ) { }
 

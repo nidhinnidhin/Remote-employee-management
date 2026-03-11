@@ -1,20 +1,23 @@
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
-import { SendEmailOtpUseCase } from '../otp/send-email-otp.usecase';
-import type { UserRepository } from '../../../domain/repositories/user.repository';
+import type { IUserRepository } from '../../../domain/repositories/iuser.repository';
+import type { ISendEmailOtpUseCase } from '../../interfaces/auth-use-cases.interfaces';
 import { OtpPurpose } from 'src/shared/enums/reset-password/otp-purpose.enum';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
+import { RequestEmailChangeDto } from '../../../presentation/dto/email-update/request-email-change.dto';
+import { IRequestEmailChangeUseCase } from '../../interfaces/auth-use-cases.interfaces';
 
 @Injectable()
-export class RequestEmailChangeUseCase {
+export class RequestEmailChangeUseCase implements IRequestEmailChangeUseCase {
   constructor(
-    @Inject('UserRepository')
-    private readonly _userRepository: UserRepository,
-    private readonly _sendEmailOtpUseCase: SendEmailOtpUseCase,
-  ) {}
+    @Inject('IUserRepository')
+    private readonly _userRepository: IUserRepository,
+    @Inject('ISendEmailOtpUseCase')
+    private readonly _sendEmailOtpUseCase: ISendEmailOtpUseCase,
+  ) { }
 
-  async execute(userId: string, newEmail: string) {
-    const emailLower = newEmail.toLowerCase();
+  async execute(userId: string, input: RequestEmailChangeDto) {
+    const emailLower = input.newEmail.toLowerCase();
 
     const user = await this._userRepository.findById(userId);
     if (!user) {
@@ -30,7 +33,7 @@ export class RequestEmailChangeUseCase {
       userId,
       email: user.email,
       purpose: OtpPurpose.EMAIL_CHANGE,
-      newEmail: emailLower, 
+      newEmail: emailLower,
     });
 
     return {

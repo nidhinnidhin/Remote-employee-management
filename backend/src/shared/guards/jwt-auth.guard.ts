@@ -8,15 +8,17 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import * as jwt from 'jsonwebtoken';
-import type { CompanyRepository } from 'src/modules/auth/domain/repositories/company.repository';
+import { isValidObjectId } from 'mongoose';
+
+import type { ICompanyRepository } from 'src/modules/auth/domain/repositories/icompany.repository';
 import { CompanyStatus } from 'src/shared/enums/company/company-status.enum';
 import { ACCESS_TOKEN_COOKIE_NAME } from '../config/cookies.config';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   constructor(
-    @Inject('CompanyRepository')
-    private readonly companyRepository: CompanyRepository,
+    @Inject('ICompanyRepository')
+    private readonly _companyRepository: ICompanyRepository,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -48,11 +50,8 @@ export class JwtAuthGuard implements CanActivate {
         companyId: payload.companyId,
       };
 
-      if (
-        payload.companyId &&
-        require('mongoose').isValidObjectId(payload.companyId)
-      ) {
-        const company = await this.companyRepository.findById(
+      if (payload.companyId && isValidObjectId(payload.companyId)) {
+        const company = await this._companyRepository.findById(
           payload.companyId,
         );
 

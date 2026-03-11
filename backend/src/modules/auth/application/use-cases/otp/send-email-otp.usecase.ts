@@ -1,15 +1,16 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { EmailService } from 'src/shared/services/email.service';
-import type { EmailOtpRepository } from '../../../domain/repositories/email-otp.repository';
+import type { IEmailOtpRepository } from '../../../domain/repositories/iemail-otp.repository';
+import { ISendEmailOtpUseCase } from '../../interfaces/auth-use-cases.interfaces';
 import { EmailOtpEntity } from '../../../domain/entities/email-otp.entity';
 import { SendEmailOtpInput } from 'src/shared/types/company/otp/send-email-otp-input.type';
 import { OtpService } from 'src/shared/services/otp.service';
 
 @Injectable()
-export class SendEmailOtpUseCase {
+export class SendEmailOtpUseCase implements ISendEmailOtpUseCase {
   constructor(
-    @Inject('EmailOtpRepository')
-    private readonly _emailOtpRepository: EmailOtpRepository,
+    @Inject('IEmailOtpRepository')
+    private readonly _emailOtpRepository: IEmailOtpRepository,
     private readonly _emailService: EmailService,
     private readonly _otpService: OtpService,
   ) { }

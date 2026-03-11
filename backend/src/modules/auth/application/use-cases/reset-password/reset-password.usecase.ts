@@ -1,21 +1,22 @@
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import type { UserRepository } from '../../../domain/repositories/user.repository';
-import { ResetPasswordInput } from 'src/shared/types/company/reset-password/reset-password-input.type';
+import type { IUserRepository } from '../../../domain/repositories/iuser.repository';
 import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { RedisService } from 'src/shared/services/redis.service';
+import { ResetPasswordDto } from '../../../presentation/dto/reset-password.dto';
+import { IResetPasswordUseCase } from '../../interfaces/auth-use-cases.interfaces';
 
 @Injectable()
-export class ResetPasswordUseCase {
+export class ResetPasswordUseCase implements IResetPasswordUseCase {
   constructor(
-    @Inject('UserRepository')
-    private readonly _userRepository: UserRepository,
+    @Inject('IUserRepository')
+    private readonly _userRepository: IUserRepository,
 
     private readonly _redisService: RedisService,
-  ) {}
+  ) { }
 
-  async execute(input: ResetPasswordInput) {
+  async execute(input: ResetPasswordDto) {
     const email = input.email.toLowerCase();
     const redisKey = `reset-password:${email}`;
 

@@ -2,18 +2,23 @@ import {
     Body,
     Controller,
     Post,
+    Inject,
 } from '@nestjs/common';
 import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
-import { VerifyEmailOtpUseCase } from '../../application/use-cases/otp/verify-email-otp.usecase';
-import { ResendEmailOtpUseCase } from '../../application/use-cases/otp/resend-email-otp.usecase';
+import type {
+    IVerifyEmailOtpUseCase,
+    IResendEmailOtpUseCase,
+} from '../../application/interfaces/auth-use-cases.interfaces';
 import { VerifyEmailOtpDto } from '../../presentation/dto/verify-email-otp.dto';
 import { ResendOtpDto } from '../dto/resend-otp.dto';
 
 @Controller('auth/otp')
 export class OtpController {
     constructor(
-        private readonly verifyEmailOtpUseCase: VerifyEmailOtpUseCase,
-        private readonly resendEmailOtpUseCase: ResendEmailOtpUseCase,
+        @Inject('IVerifyEmailOtpUseCase')
+        private readonly verifyEmailOtpUseCase: IVerifyEmailOtpUseCase,
+        @Inject('IResendEmailOtpUseCase')
+        private readonly resendEmailOtpUseCase: IResendEmailOtpUseCase,
     ) { }
 
     @Post('verify')
@@ -25,12 +30,14 @@ export class OtpController {
 
         return {
             user: result.user,
+            accessToken: result.accessToken,
+            refreshToken: result.refreshToken,
         };
     }
 
     @Post('resend')
     async resendOtp(@Body() dto: ResendOtpDto) {
-        await this.resendEmailOtpUseCase.execute(dto.email);
+        await this.resendEmailOtpUseCase.execute(dto);
         return { message: OTP_MESSAGES.OTP_RESENT };
     }
 }

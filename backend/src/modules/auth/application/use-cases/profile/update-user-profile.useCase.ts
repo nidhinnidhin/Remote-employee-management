@@ -1,15 +1,16 @@
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
-import type { UserRepository } from 'src/modules/auth/domain/repositories/user.repository';
+import type { IUserRepository } from '../../../domain/repositories/iuser.repository';
 import { UpdateProfileDto } from 'src/modules/auth/presentation/dto/update-profile.dto';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { PROFILE_MESSAGES } from 'src/shared/constants/messages/profile/profile.messages';
+import { IUpdateProfileUseCase } from '../../interfaces/auth-use-cases.interfaces';
 
 @Injectable()
-export class UpdateProfileUseCase {
+export class UpdateProfileUseCase implements IUpdateProfileUseCase {
   constructor(
-    @Inject('UserRepository')
-    private readonly _userRepository: UserRepository,
-  ) {}
+    @Inject('IUserRepository')
+    private readonly _userRepository: IUserRepository,
+  ) { }
 
   async execute(userId: string, dto: UpdateProfileDto) {
     const user = await this._userRepository.findById(userId);
