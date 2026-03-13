@@ -21,7 +21,7 @@ import type {
     IUploadDocumentUseCase,
     IDeleteDocumentUseCase,
     IEditDocumentUseCase,
-} from '../../application/interfaces/auth-use-cases.interfaces';
+} from '../../application/interfaces/documents/document-use-case.interface';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 

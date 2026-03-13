@@ -4,7 +4,7 @@ import {
   Inject,
   ForbiddenException,
 } from '@nestjs/common';
-import { ILoginUseCase } from '../../interfaces/auth-use-cases.interfaces';
+import { ILoginUseCase } from '../../interfaces/auth/auth-use-case.interface';
 import type { IUserRepository } from '../../../domain/repositories/iuser.repository';
 import type { ICompanyRepository } from '../../../domain/repositories/icompany.repository';
 import { isValidObjectId } from 'mongoose';

@@ -5,4 +5,5 @@ export interface IInviteLinkRepository {
   findByToken(token: string): Promise<InviteLinkToken | null>;
   markAsUsed(token: string): Promise<void>;
   markAllAsUsedByEmployeeId(employeeId: string): Promise<void>;
+  deleteExpiredTokens(): Promise<number>;
 }

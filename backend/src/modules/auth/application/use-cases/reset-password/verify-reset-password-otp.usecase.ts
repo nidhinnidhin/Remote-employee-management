@@ -4,7 +4,7 @@ import type { IEmailOtpRepository } from '../../../domain/repositories/iemail-ot
 import { VerifyResetPasswordOtpDto } from '../../../presentation/dto/verify-reset-password-otp.dto';
 import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
 import { RedisService } from 'src/shared/services/redis.service';
-import { IVerifyResetPasswordOtpUseCase } from '../../interfaces/auth-use-cases.interfaces';
+import { IVerifyResetPasswordOtpUseCase } from '../../interfaces/auth/auth-use-case.interface';
 
 @Injectable()
 export class VerifyResetPasswordOtpUseCase implements IVerifyResetPasswordOtpUseCase {

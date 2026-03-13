@@ -44,6 +44,13 @@ export class InviteLinkRepositoryImpl
     );
   }
 
+  async deleteExpiredTokens(): Promise<number> {
+    const result = await this._inviteLinkModel.deleteMany({
+      expiresAt: { $lt: new Date() },
+    });
+    return result.deletedCount;
+  }
+
   protected toEntity(doc: InviteLinkDocument): InviteLinkToken {
     return new InviteLinkToken(
       doc.token,

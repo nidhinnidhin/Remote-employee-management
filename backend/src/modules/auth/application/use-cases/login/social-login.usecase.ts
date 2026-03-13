@@ -3,7 +3,7 @@ import { isValidObjectId } from 'mongoose';
 import type { IUserRepository } from 'src/modules/auth/domain/repositories/iuser.repository';
 import type { ICompanyRepository } from 'src/modules/auth/domain/repositories/icompany.repository';
 import type { IJwtService } from 'src/shared/services/interfaces/ijwt.service';
-import { ISocialLoginUseCase } from '../../interfaces/auth-use-cases.interfaces';
+import { ISocialLoginUseCase } from '../../interfaces/auth/auth-use-case.interface';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 import { UserRole } from 'src/shared/enums/user/user-role.enum';
 import { CompanyStatus } from 'src/shared/enums/company/company-status.enum';

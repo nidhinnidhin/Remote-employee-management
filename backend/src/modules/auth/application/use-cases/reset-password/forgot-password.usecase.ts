@@ -5,11 +5,11 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import type { IUserRepository } from '../../../domain/repositories/iuser.repository';
-import type { ISendEmailOtpUseCase } from '../../interfaces/auth-use-cases.interfaces';
+import type { ISendEmailOtpUseCase } from '../../interfaces/otp/otp-use-case.interface';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { ForgotPasswordDto } from '../../../presentation/dto/forgot-password.dto';
-import { IForgotPasswordUseCase } from '../../interfaces/auth-use-cases.interfaces';
+import { IForgotPasswordUseCase } from '../../interfaces/auth/auth-use-case.interface';
 
 @Injectable()
 export class ForgotPasswordUseCase implements IForgotPasswordUseCase {

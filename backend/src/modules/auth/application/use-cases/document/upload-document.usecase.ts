@@ -9,7 +9,7 @@ import {
   UploadDocumentResponse,
 } from 'src/shared/types/profile/upload-document.type';
 import { CloudinaryResourceType } from 'src/shared/enums/employees/media/cloudinary-resource.enum';
-import type { IUploadDocumentUseCase } from '../../interfaces/auth-use-cases.interfaces';
+import type { IUploadDocumentUseCase } from '../../interfaces/documents/document-use-case.interface';
 
 @Injectable()
 export class UploadDocumentUseCase implements IUploadDocumentUseCase {

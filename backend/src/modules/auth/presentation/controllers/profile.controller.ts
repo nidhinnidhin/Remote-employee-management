@@ -21,7 +21,7 @@ import type {
     IUpdateSkillsUseCase,
     IRequestEmailChangeUseCase,
     IVerifyEmailChangeUseCase,
-} from '../../application/interfaces/auth-use-cases.interfaces';
+} from '../../application/interfaces/profile/profile-use-case.interface';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
 import { RequestEmailChangeDto } from '../dto/email-update/request-email-change.dto';
 

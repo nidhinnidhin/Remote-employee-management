@@ -5,7 +5,7 @@ import type { IUserRepository } from '../../../domain/repositories/iuser.reposit
 import { CompanyEntity } from '../../../domain/entities/company.entity';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { JwtService } from 'src/shared/services/jwt.service';
-import { IOnboardCompanyUseCase } from '../../interfaces/auth-use-cases.interfaces';
+import { IOnboardCompanyUseCase } from '../../interfaces/onboarding/onboarding-use-case.interface';
 
 @Injectable()
 export class OnboardCompanyUseCase implements IOnboardCompanyUseCase {

@@ -3,7 +3,7 @@ import type { IUserRepository } from '../../../domain/repositories/iuser.reposit
 import { UpdateProfileDto } from 'src/modules/auth/presentation/dto/update-profile.dto';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { PROFILE_MESSAGES } from 'src/shared/constants/messages/profile/profile.messages';
-import { IUpdateProfileUseCase } from '../../interfaces/auth-use-cases.interfaces';
+import { IUpdateProfileUseCase } from '../../interfaces/profile/profile-use-case.interface';
 
 @Injectable()
 export class UpdateProfileUseCase implements IUpdateProfileUseCase {

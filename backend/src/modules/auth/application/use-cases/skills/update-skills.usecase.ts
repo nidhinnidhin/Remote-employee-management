@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { IUserRepository } from '../../../domain/repositories/iuser.repository';
 import { SKILLS_MESSAGES } from 'src/shared/constants/messages/profile/skills.message';
-import { IUpdateSkillsUseCase } from '../../interfaces/auth-use-cases.interfaces';
+import { IUpdateSkillsUseCase } from '../../interfaces/profile/profile-use-case.interface';
 
 @Injectable()
 export class UpdateSkillsUseCase implements IUpdateSkillsUseCase {

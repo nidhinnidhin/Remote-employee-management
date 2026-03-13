@@ -17,11 +17,13 @@ import {
 } from 'src/shared/config/cookies.config';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 
-import type { IRegisterAdminUseCase } from '../../application/interfaces/auth-use-cases.interfaces';
-import type { IOnboardCompanyUseCase } from '../../application/interfaces/auth-use-cases.interfaces';
-import type { ILoginUseCase } from '../../application/interfaces/auth-use-cases.interfaces';
-import type { IRefreshAccessTokenUseCase } from '../../application/interfaces/auth-use-cases.interfaces';
-import type { ISocialLoginUseCase } from '../../application/interfaces/auth-use-cases.interfaces';
+import type {
+  IRegisterAdminUseCase,
+  ILoginUseCase,
+  IRefreshAccessTokenUseCase,
+  ISocialLoginUseCase
+} from '../../application/interfaces/auth/auth-use-case.interface';
+import type { IOnboardCompanyUseCase } from '../../application/interfaces/onboarding/onboarding-use-case.interface';
 import type { ICookieHelperService } from 'src/shared/services/interfaces/icookie-helper.service';
 import { Inject } from '@nestjs/common';
 

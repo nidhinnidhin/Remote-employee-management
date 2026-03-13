@@ -26,10 +26,10 @@ export class VerifyInviteUseCase implements IVerifyInviteUseCase {
       throw new BadRequestException(EMPLOYEE_MESSAGES.INVITE_TOKEN_MISSING);
     }
 
-    // 1️⃣ Hash RAW token (MUST match invite use case)
+    // Hash RAW token (MUST match invite use case)
     const hashedToken = hashToken(rawToken);
 
-    // 2️⃣ Find invite link
+    // Find invite link
     const invite = await this.inviteLinkRepo.findByToken(hashedToken);
 
     if (!invite) {
@@ -37,7 +37,7 @@ export class VerifyInviteUseCase implements IVerifyInviteUseCase {
       throw new UnauthorizedException(EMPLOYEE_MESSAGES.INVALID_TOKEN);
     }
 
-    // 3️⃣ Validate invite
+    // Validate invite
     if (invite.used) {
       console.warn(`[VerifyInviteUseCase] INVITE_USED for employeeId: ${invite.employeeId}`);
       throw new UnauthorizedException(EMPLOYEE_MESSAGES.INVITE_USED);
@@ -48,7 +48,7 @@ export class VerifyInviteUseCase implements IVerifyInviteUseCase {
       throw new UnauthorizedException(EMPLOYEE_MESSAGES.INVITE_EXPIRED);
     }
 
-    // 4️⃣ Fetch employee
+    // Fetch employee
     const employee = await this.employeeRepo.findById(invite.employeeId);
 
     if (!employee) {
@@ -59,7 +59,7 @@ export class VerifyInviteUseCase implements IVerifyInviteUseCase {
       throw new UnauthorizedException(EMPLOYEE_MESSAGES.INVITE_PROCESSED);
     }
 
-    // 5️⃣ Tell frontend what to do next
+    // Tell frontend what to do next
     return {
       employeeId: employee.id,
     };

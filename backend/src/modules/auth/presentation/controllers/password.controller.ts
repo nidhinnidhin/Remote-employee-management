@@ -9,7 +9,7 @@ import type {
     IForgotPasswordUseCase,
     IVerifyResetPasswordOtpUseCase,
     IResetPasswordUseCase,
-} from '../../application/interfaces/auth-use-cases.interfaces';
+} from '../../application/interfaces/auth/auth-use-case.interface';
 import { ForgotPasswordDto } from '../../presentation/dto/forgot-password.dto';
 import { VerifyResetPasswordOtpDto } from '../../presentation/dto/verify-reset-password-otp.dto';
 import { ResetPasswordDto } from '../../presentation/dto/reset-password.dto';

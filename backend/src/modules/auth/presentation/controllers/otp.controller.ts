@@ -8,7 +8,7 @@ import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
 import type {
     IVerifyEmailOtpUseCase,
     IResendEmailOtpUseCase,
-} from '../../application/interfaces/auth-use-cases.interfaces';
+} from '../../application/interfaces/otp/otp-use-case.interface';
 import { VerifyEmailOtpDto } from '../../presentation/dto/verify-email-otp.dto';
 import { ResendOtpDto } from '../dto/resend-otp.dto';
 

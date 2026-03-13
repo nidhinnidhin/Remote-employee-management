@@ -5,7 +5,7 @@ import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { RedisService } from 'src/shared/services/redis.service';
 import { ResetPasswordDto } from '../../../presentation/dto/reset-password.dto';
-import { IResetPasswordUseCase } from '../../interfaces/auth-use-cases.interfaces';
+import { IResetPasswordUseCase } from '../../interfaces/auth/auth-use-case.interface';
 
 @Injectable()
 export class ResetPasswordUseCase implements IResetPasswordUseCase {

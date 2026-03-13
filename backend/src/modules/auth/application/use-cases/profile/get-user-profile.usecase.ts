@@ -5,7 +5,7 @@ import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages'
 import { CompanyStatus } from 'src/shared/enums/company/company-status.enum';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 import { isValidObjectId } from 'mongoose';
-import { IGetUserProfileUseCase } from '../../interfaces/auth-use-cases.interfaces';
+import { IGetUserProfileUseCase } from '../../interfaces/profile/profile-use-case.interface';
 
 @Injectable()
 export class GetUserProfileUseCase implements IGetUserProfileUseCase {

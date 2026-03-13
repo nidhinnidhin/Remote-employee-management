@@ -17,6 +17,7 @@ import { InviteLinkRepositoryImpl } from './infrastructure/repository/invite-lin
 import { SetPasswordUseCase } from './application/use-cases/set-password.usecase';
 import { RedisService } from 'src/shared/services/redis.service';
 import { JwtService } from 'src/shared/services/jwt.service';
+import { InviteLinkCleanupService } from './application/services/invite-link-cleanup.service';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { JwtService } from 'src/shared/services/jwt.service';
     EmailService,
     RedisService,
     JwtService,
+    InviteLinkCleanupService,
     {
       provide: 'IEmployeeRepository',
       useClass: EmployeeRepositoryImpl,

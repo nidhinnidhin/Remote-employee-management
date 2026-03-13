@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { EmailService } from 'src/shared/services/email.service';
 import type { IEmailOtpRepository } from '../../../domain/repositories/iemail-otp.repository';
-import { ISendEmailOtpUseCase } from '../../interfaces/auth-use-cases.interfaces';
+import { ISendEmailOtpUseCase } from '../../interfaces/otp/otp-use-case.interface';
 import { EmailOtpEntity } from '../../../domain/entities/email-otp.entity';
 import { SendEmailOtpInput } from 'src/shared/types/company/otp/send-email-otp-input.type';
 import { OtpService } from 'src/shared/services/otp.service';

@@ -3,7 +3,7 @@ import * as bcrypt from 'bcrypt';
 import type { IPendingRegistrationRepository } from '../../../domain/repositories/cache/auth-repository/ipending-registration.repository';
 import type { IUserRepository } from '../../../domain/repositories/iuser.repository';
 import type { IJwtService } from 'src/shared/services/interfaces/ijwt.service';
-import { IVerifyEmailOtpUseCase } from '../../interfaces/auth-use-cases.interfaces';
+import { IVerifyEmailOtpUseCase } from '../../interfaces/otp/otp-use-case.interface';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 import { UserRole } from 'src/shared/enums/user/user-role.enum';
 import { UserEntity } from '../../../domain/entities/user.entity';

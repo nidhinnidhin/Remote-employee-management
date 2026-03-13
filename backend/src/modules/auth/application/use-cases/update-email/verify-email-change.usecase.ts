@@ -5,7 +5,7 @@ import type { IUserRepository } from '../../../domain/repositories/iuser.reposit
 import { OtpPurpose } from 'src/shared/enums/reset-password/otp-purpose.enum';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
-import { IVerifyEmailChangeUseCase } from '../../interfaces/auth-use-cases.interfaces';
+import { IVerifyEmailChangeUseCase } from '../../interfaces/profile/profile-use-case.interface';
 
 @Injectable()
 export class VerifyEmailChangeUseCase implements IVerifyEmailChangeUseCase {

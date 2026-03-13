@@ -10,7 +10,7 @@ import {
   EditDocumentResponse,
 } from 'src/shared/types/profile/edit-document.type';
 import { DOCUMENT_MESSAGES } from 'src/shared/constants/messages/profile/document.messages';
-import type { IEditDocumentUseCase } from '../../interfaces/auth-use-cases.interfaces';
+import type { IEditDocumentUseCase } from '../../interfaces/documents/document-use-case.interface';
 
 @Injectable()
 export class EditDocumentUseCase implements IEditDocumentUseCase {

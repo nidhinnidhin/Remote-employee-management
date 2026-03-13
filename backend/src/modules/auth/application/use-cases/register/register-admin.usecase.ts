@@ -11,7 +11,7 @@ import { hashPassword } from 'src/shared/utils/password.util';
 import { getOtpExpiresAt, SESSION_TTL_SECONDS } from 'src/shared/constants/functions/otp/otp.constants';
 
 import { RegisterAdminDto } from 'src/modules/auth/presentation/dto/register-admin.dto';
-import { IRegisterAdminUseCase } from '../../interfaces/auth-use-cases.interfaces';
+import { IRegisterAdminUseCase } from '../../interfaces/auth/auth-use-case.interface';
 
 @Injectable()
 export class RegisterAdminUseCase implements IRegisterAdminUseCase {
