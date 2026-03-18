@@ -1,5 +1,5 @@
 import { Injectable, Inject, ConflictException, NotFoundException } from '@nestjs/common';
-import { OnboardingDto } from '../../../presentation/dto/onboarding.dto';
+import { OnboardingDto } from '../../dto/onboarding.dto';
 import type { ICompanyRepository } from '../../../domain/repositories/icompany.repository';
 import type { IUserRepository } from '../../../domain/repositories/iuser.repository';
 import { CompanyEntity } from '../../../domain/entities/company.entity';

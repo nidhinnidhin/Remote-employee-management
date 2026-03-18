@@ -1,5 +1,5 @@
-import { RequestEmailChangeDto } from "src/modules/auth/presentation/dto/email-update/request-email-change.dto";
-import { UpdateProfileDto } from "src/modules/auth/presentation/dto/update-profile.dto";
+import { RequestEmailChangeDto } from "src/modules/auth/application/dto/email-update/request-email-change.dto";
+import { UpdateProfileDto } from "src/modules/auth/application/dto/update-profile.dto";
 
 
 export interface IProfileRepository {

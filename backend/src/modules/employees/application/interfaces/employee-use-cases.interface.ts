@@ -1,4 +1,4 @@
-import { InviteEmployeeDto } from '../../presentation/dto/invite-employee.dto';
+import { InviteEmployeeDto } from '../dto/invite-employee.dto';
 import { Employee } from '../../domain/entities/employee.entity';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 

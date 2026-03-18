@@ -1,7 +1,7 @@
-import { ForgotPasswordDto } from 'src/modules/auth/presentation/dto/forgot-password.dto';
-import { RegisterAdminDto } from 'src/modules/auth/presentation/dto/register-admin.dto';
-import { ResetPasswordDto } from 'src/modules/auth/presentation/dto/reset-password.dto';
-import { VerifyResetPasswordOtpDto } from 'src/modules/auth/presentation/dto/verify-reset-password-otp.dto';
+import { ForgotPasswordDto } from 'src/modules/auth/application/dto/forgot-password.dto';
+import { RegisterAdminDto } from 'src/modules/auth/application/dto/register-admin.dto';
+import { ResetPasswordDto } from 'src/modules/auth/application/dto/reset-password.dto';
+import { VerifyResetPasswordOtpDto } from 'src/modules/auth/application/dto/verify-reset-password-otp.dto';
 import { LoginInput } from 'src/shared/types/auth/login-input.type';
 import { LoginResponse } from 'src/shared/types/auth/login-response.type';
 import {

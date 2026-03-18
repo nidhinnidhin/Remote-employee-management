@@ -31,7 +31,7 @@ import {
   REFRESH_TOKEN_COOKIE_OPTIONS,
 } from 'src/shared/config/cookies.config';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
-import { InviteEmployeeDto } from '../dto/invite-employee.dto';
+import { InviteEmployeeDto } from '../../application/dto/invite-employee.dto';
 import { EMPLOYEE_MESSAGES } from 'src/shared/constants/messages/employee/employee.messages';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { POLICY_MESSAGES } from 'src/shared/constants/messages/company-policy/company-policy.message';

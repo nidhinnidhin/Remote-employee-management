@@ -2,7 +2,7 @@ import { Injectable, ConflictException, Inject } from '@nestjs/common';
 import type { IUserRepository } from '../../../domain/repositories/iuser.repository';
 import type { ICompanyRepository } from '../../../domain/repositories/icompany.repository';
 import type { IPendingRegistrationRepository } from '../../../domain/repositories/cache/auth-repository/ipending-registration.repository';
-import { RegisterCompanyAdminDto } from 'src/modules/auth/presentation/dto/register-company-admin.dto';
+import { RegisterCompanyAdminDto } from 'src/modules/auth/application/dto/register-company-admin.dto';
 import { EmailService } from 'src/shared/services/email.service';
 import { OtpService } from 'src/shared/services/otp.service';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
@@ -10,7 +10,7 @@ import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
 import { hashPassword } from 'src/shared/utils/password.util';
 import { getOtpExpiresAt, SESSION_TTL_SECONDS } from 'src/shared/constants/functions/otp/otp.constants';
 
-import { RegisterAdminDto } from 'src/modules/auth/presentation/dto/register-admin.dto';
+import { RegisterAdminDto } from 'src/modules/auth/application/dto/register-admin.dto';
 import { IRegisterAdminUseCase } from '../../interfaces/auth/auth-use-case.interface';
 
 @Injectable()

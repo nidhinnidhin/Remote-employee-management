@@ -4,7 +4,7 @@ import type { IUserRepository } from '../../../domain/repositories/iuser.reposit
 import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { RedisService } from 'src/shared/services/redis.service';
-import { ResetPasswordDto } from '../../../presentation/dto/reset-password.dto';
+import { ResetPasswordDto } from '../../dto/reset-password.dto';
 import { IResetPasswordUseCase } from '../../interfaces/auth/auth-use-case.interface';
 
 @Injectable()

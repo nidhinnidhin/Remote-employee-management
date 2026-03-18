@@ -10,7 +10,7 @@ import { UserEntity } from '../../../domain/entities/user.entity';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
 import { OtpService } from 'src/shared/services/otp.service';
-import { VerifyEmailOtpDto } from '../../../presentation/dto/verify-email-otp.dto';
+import { VerifyEmailOtpDto } from '../../dto/verify-email-otp.dto';
 
 @Injectable()
 export class VerifyEmailOtpUseCase implements IVerifyEmailOtpUseCase {

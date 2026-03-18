@@ -5,7 +5,7 @@ import { OtpService } from 'src/shared/services/otp.service';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { getOtpExpiresAt, SESSION_TTL_SECONDS } from 'src/shared/constants/functions/otp/otp.constants';
 import { IResendEmailOtpUseCase } from '../../interfaces/otp/otp-use-case.interface';
-import { ResendOtpDto } from '../../../presentation/dto/resend-otp.dto';
+import { ResendOtpDto } from '../../dto/resend-otp.dto';
 
 @Injectable()
 export class ResendEmailOtpUseCase implements IResendEmailOtpUseCase {

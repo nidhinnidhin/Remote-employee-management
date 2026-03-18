@@ -22,8 +22,8 @@ import type {
     IRequestEmailChangeUseCase,
     IVerifyEmailChangeUseCase,
 } from '../../application/interfaces/profile/profile-use-case.interface';
-import { UpdateProfileDto } from '../dto/update-profile.dto';
-import { RequestEmailChangeDto } from '../dto/email-update/request-email-change.dto';
+import { UpdateProfileDto } from '../../application/dto/update-profile.dto';
+import { RequestEmailChangeDto } from '../../application/dto/email-update/request-email-change.dto';
 
 @Controller('auth/profile')
 @UseGuards(JwtAuthGuard)

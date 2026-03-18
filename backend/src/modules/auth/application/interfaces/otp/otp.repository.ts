@@ -1,5 +1,5 @@
-import { ResendOtpDto } from 'src/modules/auth/presentation/dto/resend-otp.dto';
-import { VerifyEmailOtpDto } from 'src/modules/auth/presentation/dto/verify-email-otp.dto';
+import { ResendOtpDto } from 'src/modules/auth/application/dto/resend-otp.dto';
+import { VerifyEmailOtpDto } from 'src/modules/auth/application/dto/verify-email-otp.dto';
 import { SendEmailOtpInput } from 'src/shared/types/company/otp/send-email-otp-input.type';
 
 export interface IOtpRepository {

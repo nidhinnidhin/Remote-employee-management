@@ -1,5 +1,5 @@
 import { ConflictException, Inject, Injectable } from '@nestjs/common';
-import { InviteEmployeeDto } from '../../presentation/dto/invite-employee.dto';
+import { InviteEmployeeDto } from '../dto/invite-employee.dto';
 import type { IEmployeeRepository } from '../../domain/repositories/employee.repository';
 import type { IInviteLinkRepository } from '../../domain/repositories/invite-link.repository';
 import { InviteLinkToken } from '../../domain/entities/invite-link-token.entity';

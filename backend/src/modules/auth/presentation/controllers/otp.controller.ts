@@ -9,8 +9,8 @@ import type {
     IVerifyEmailOtpUseCase,
     IResendEmailOtpUseCase,
 } from '../../application/interfaces/otp/otp-use-case.interface';
-import { VerifyEmailOtpDto } from '../../presentation/dto/verify-email-otp.dto';
-import { ResendOtpDto } from '../dto/resend-otp.dto';
+import { VerifyEmailOtpDto } from '../../application/dto/verify-email-otp.dto';
+import { ResendOtpDto } from '../../application/dto/resend-otp.dto';
 
 @Controller('auth/otp')
 export class OtpController {

@@ -1,5 +1,5 @@
-import { VerifyEmailOtpDto } from '../../../presentation/dto/verify-email-otp.dto';
-import { ResendOtpDto } from '../../../presentation/dto/resend-otp.dto';
+import { VerifyEmailOtpDto } from '../../dto/verify-email-otp.dto';
+import { ResendOtpDto } from '../../dto/resend-otp.dto';
 import { SendEmailOtpInput } from 'src/shared/types/company/otp/send-email-otp-input.type';
 
 export interface IVerifyEmailOtpUseCase {

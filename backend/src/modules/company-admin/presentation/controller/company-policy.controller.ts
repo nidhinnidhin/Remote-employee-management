@@ -3,7 +3,7 @@ import type { ICompanyPolicyUseCase } from '../../application/interfaces/company
 import { Inject } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import { CompanyAdminGuard } from 'src/shared/guards/company-admin.guard';
-import { UpsertCompanyPoliciesDto } from '../dto/upsert-company-policy-dto';
+import { UpsertCompanyPoliciesDto } from '../../application/dto/upsert-company-policy-dto';
 import { CompanyAdminOrEmployeeGuard } from 'src/shared/guards/company-admin-or-employee-access.guard';
 
 @Controller('company-policies')

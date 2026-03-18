@@ -1,5 +1,5 @@
-import { UpdateProfileDto } from '../../../presentation/dto/update-profile.dto';
-import { RequestEmailChangeDto } from '../../../presentation/dto/email-update/request-email-change.dto';
+import { UpdateProfileDto } from '../../dto/update-profile.dto';
+import { RequestEmailChangeDto } from '../../dto/email-update/request-email-change.dto';
 
 export interface IGetUserProfileUseCase {
     execute(userId: string): Promise<any>;

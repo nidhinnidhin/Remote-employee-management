@@ -1,7 +1,7 @@
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import type { IEmailOtpRepository } from '../../../domain/repositories/iemail-otp.repository';
-import { VerifyResetPasswordOtpDto } from '../../../presentation/dto/verify-reset-password-otp.dto';
+import { VerifyResetPasswordOtpDto } from '../../dto/verify-reset-password-otp.dto';
 import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
 import { RedisService } from 'src/shared/services/redis.service';
 import { IVerifyResetPasswordOtpUseCase } from '../../interfaces/auth/auth-use-case.interface';

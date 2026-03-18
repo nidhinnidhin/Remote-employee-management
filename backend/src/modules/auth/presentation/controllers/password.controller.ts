@@ -10,9 +10,9 @@ import type {
     IVerifyResetPasswordOtpUseCase,
     IResetPasswordUseCase,
 } from '../../application/interfaces/auth/auth-use-case.interface';
-import { ForgotPasswordDto } from '../../presentation/dto/forgot-password.dto';
-import { VerifyResetPasswordOtpDto } from '../../presentation/dto/verify-reset-password-otp.dto';
-import { ResetPasswordDto } from '../../presentation/dto/reset-password.dto';
+import { ForgotPasswordDto } from '../../application/dto/forgot-password.dto';
+import { VerifyResetPasswordOtpDto } from '../../application/dto/verify-reset-password-otp.dto';
+import { ResetPasswordDto } from '../../application/dto/reset-password.dto';
 
 @Controller('auth/password')
 export class PasswordController {

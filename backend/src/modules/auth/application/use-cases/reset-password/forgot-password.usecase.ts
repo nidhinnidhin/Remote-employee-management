@@ -8,7 +8,7 @@ import type { IUserRepository } from '../../../domain/repositories/iuser.reposit
 import type { ISendEmailOtpUseCase } from '../../interfaces/otp/otp-use-case.interface';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
-import { ForgotPasswordDto } from '../../../presentation/dto/forgot-password.dto';
+import { ForgotPasswordDto } from '../../dto/forgot-password.dto';
 import { IForgotPasswordUseCase } from '../../interfaces/auth/auth-use-case.interface';
 
 @Injectable()

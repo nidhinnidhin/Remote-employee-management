@@ -27,9 +27,9 @@ import type { IOnboardCompanyUseCase } from '../../application/interfaces/onboar
 import type { ICookieHelperService } from 'src/shared/services/interfaces/icookie-helper.service';
 import { Inject } from '@nestjs/common';
 
-import { OnboardingDto } from '../../presentation/dto/onboarding.dto';
-import { RegisterAdminDto } from '../../presentation/dto/register-admin.dto';
-import { LoginDto } from '../../presentation/dto/login.dto';
+import { OnboardingDto } from '../../application/dto/onboarding.dto';
+import { RegisterAdminDto } from '../../application/dto/register-admin.dto';
+import { LoginDto } from '../../application/dto/login.dto';
 import type { SocialLoginInput } from 'src/shared/types/auth/social-login.type';
 
 @Controller('auth')

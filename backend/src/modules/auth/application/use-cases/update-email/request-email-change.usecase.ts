@@ -4,7 +4,7 @@ import type { ISendEmailOtpUseCase } from '../../interfaces/otp/otp-use-case.int
 import { OtpPurpose } from 'src/shared/enums/reset-password/otp-purpose.enum';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
-import { RequestEmailChangeDto } from '../../../presentation/dto/email-update/request-email-change.dto';
+import { RequestEmailChangeDto } from '../../dto/email-update/request-email-change.dto';
 import { IRequestEmailChangeUseCase } from '../../interfaces/profile/profile-use-case.interface';
 
 @Injectable()
