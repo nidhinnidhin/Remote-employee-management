@@ -2,14 +2,14 @@ import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import type { IPendingRegistrationRepository } from '../../../domain/repositories/cache/auth-repository/ipending-registration.repository';
 import type { IUserRepository } from '../../../domain/repositories/iuser.repository';
-import type { IJwtService } from 'src/shared/services/interfaces/ijwt.service';
+import type { IJwtService } from 'src/shared/services/auth/interfaces/ijwt.service';
 import { IVerifyEmailOtpUseCase } from '../../interfaces/otp/otp-use-case.interface';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 import { UserRole } from 'src/shared/enums/user/user-role.enum';
 import { UserEntity } from '../../../domain/entities/user.entity';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
-import { OtpService } from 'src/shared/services/otp.service';
+import type { IOtpService } from 'src/shared/services/auth/interfaces/iotp.service';
 import { VerifyEmailOtpDto } from '../../dto/verify-email-otp.dto';
 
 @Injectable()
@@ -24,7 +24,8 @@ export class VerifyEmailOtpUseCase implements IVerifyEmailOtpUseCase {
     @Inject('IJwtService')
     private readonly _jwtService: IJwtService,
 
-    private readonly _otpService: OtpService,
+    @Inject('IOtpService')
+    private readonly _otpService: IOtpService,
   ) { }
 
   async execute(input: VerifyEmailOtpDto) {

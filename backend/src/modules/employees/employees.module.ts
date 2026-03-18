@@ -11,12 +11,12 @@ import { InviteEmployeeUseCase } from './application/use-cases/invite-employee.u
 import { VerifyInviteUseCase } from './application/use-cases/verify-invite.usecase';
 import { GetEmployeesUseCase } from './application/use-cases/get-employees.usecase';
 import { UpdateEmployeeStatusUseCase } from './application/use-cases/update-employee-status.usecase';
-import { EmailService } from 'src/shared/services/email.service';
+import { EmailService } from 'src/shared/services/email/email.service';
 import { EmployeeRepositoryImpl } from './infrastructure/repository/employee.repository.impl';
 import { InviteLinkRepositoryImpl } from './infrastructure/repository/invite-link.repository.impl';
 import { SetPasswordUseCase } from './application/use-cases/set-password.usecase';
-import { RedisService } from 'src/shared/services/redis.service';
-import { JwtService } from 'src/shared/services/jwt.service';
+import { RedisService } from 'src/shared/services/redis/redis.service';
+import { JwtService } from 'src/shared/services/auth/jwt.service';
 import { InviteLinkCleanupService } from './application/services/invite-link-cleanup.service';
 
 @Module({
@@ -49,8 +49,20 @@ import { InviteLinkCleanupService } from './application/services/invite-link-cle
       provide: 'IUpdateEmployeeStatusUseCase',
       useClass: UpdateEmployeeStatusUseCase,
     },
+    {
+      provide: 'IEmailService',
+      useClass: EmailService,
+    },
     EmailService,
+    {
+      provide: 'IRedisService',
+      useClass: RedisService,
+    },
     RedisService,
+    {
+      provide: 'IJwtService',
+      useClass: JwtService,
+    },
     JwtService,
     InviteLinkCleanupService,
     {

@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { IUserRepository } from '../../../domain/repositories/iuser.repository';
 import { DOCUMENT_MESSAGES } from 'src/shared/constants/messages/profile/document.messages';
 import { CLOUDINARY_PATH } from 'src/shared/constants/path/cloudinary.path';
-import { CloudinaryService } from 'src/shared/services/cloudinary.service';
+import type { ICloudinaryService } from 'src/shared/services/cloudinary/interfaces/icloudinary.service';
 import {
   UploadDocumentInput,
   NewDocument,
@@ -16,7 +16,8 @@ export class UploadDocumentUseCase implements IUploadDocumentUseCase {
   constructor(
     @Inject('IUserRepository')
     private readonly userRepository: IUserRepository,
-    private readonly cloudinaryService: CloudinaryService,
+    @Inject('ICloudinaryService')
+    private readonly cloudinaryService: ICloudinaryService,
   ) { }
 
   async execute({

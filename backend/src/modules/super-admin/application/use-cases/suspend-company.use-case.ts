@@ -1,7 +1,7 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import type { ICompanyRepository } from '../../domain/repositories/company.repository';
 import { CompanyStatus } from 'src/shared/enums/company/company-status.enum';
-import { EmailService } from 'src/shared/services/email.service';
+import type { IEmailService } from 'src/shared/services/email/interfaces/iemail.service';
 import type { IUserRepository } from 'src/modules/auth/domain/repositories/iuser.repository';
 import { UserRole } from 'src/shared/enums/user/user-role.enum';
 
@@ -12,7 +12,8 @@ export class SuspendCompanyUseCase implements ISuspendCompanyUseCase {
     constructor(
         @Inject('ICompanyRepository')
         private readonly _companyRepository: ICompanyRepository,
-        private readonly _emailService: EmailService,
+        @Inject('IEmailService')
+        private readonly _emailService: IEmailService,
         @Inject('IUserRepository')
         private readonly _userRepo: IUserRepository,
     ) { }

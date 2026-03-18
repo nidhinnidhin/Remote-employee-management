@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { IOtpService } from './interfaces/iotp.service';
 
 @Injectable()
-export class OtpService {
+export class OtpService implements IOtpService {
   private readonly OTP_LENGTH = 6;
   private readonly OTP_EXPIRY_MINUTES = 1;
   private readonly SALT_ROUNDS = 10;

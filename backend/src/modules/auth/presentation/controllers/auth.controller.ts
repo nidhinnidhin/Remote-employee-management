@@ -24,7 +24,7 @@ import type {
   ISocialLoginUseCase
 } from '../../application/interfaces/auth/auth-use-case.interface';
 import type { IOnboardCompanyUseCase } from '../../application/interfaces/onboarding/onboarding-use-case.interface';
-import type { ICookieHelperService } from 'src/shared/services/interfaces/icookie-helper.service';
+import type { ICookieHelperService } from 'src/shared/services/auth/interfaces/icookie-helper.service';
 import { Inject } from '@nestjs/common';
 
 import { OnboardingDto } from '../../application/dto/onboarding.dto';

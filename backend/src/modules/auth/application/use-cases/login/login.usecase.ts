@@ -10,7 +10,7 @@ import type { ICompanyRepository } from '../../../domain/repositories/icompany.r
 import { isValidObjectId } from 'mongoose';
 import { CompanyStatus } from 'src/shared/enums/company/company-status.enum';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
-import { JwtService } from 'src/shared/services/jwt.service';
+import type { IJwtService } from 'src/shared/services/auth/interfaces/ijwt.service';
 import { LoginInput } from 'src/shared/types/auth/login-input.type';
 import { LoginResponse } from 'src/shared/types/auth/login-response.type';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
@@ -23,7 +23,8 @@ export class LoginUseCase implements ILoginUseCase {
     private readonly _userRepository: IUserRepository,
     @Inject('ICompanyRepository')
     private readonly _companyRepository: ICompanyRepository,
-    private readonly _jwtService: JwtService,
+    @Inject('IJwtService')
+    private readonly _jwtService: IJwtService,
   ) { }
 
   async execute({ email, password }: LoginInput): Promise<LoginResponse> {

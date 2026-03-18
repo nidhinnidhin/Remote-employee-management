@@ -14,9 +14,9 @@ import { AppRedisModule } from '../../infrastructure/cache/redis.module';
 import { MongoCompanyRepository } from '../../infrastructure/database/repositories/mongo-company.repository';
 import { MongoEmailOtpRepository } from '../../infrastructure/database/repositories/mongo-email-otp.repository';
 import { MongoUserRepository } from '../../infrastructure/database/repositories/mongo-user.repository';
-import { OtpService } from 'src/shared/services/otp.service';
-import { EmailService } from 'src/shared/services/email.service';
-import { JwtService } from 'src/shared/services/jwt.service';
+import { OtpService } from 'src/shared/services/auth/otp.service';
+import { EmailService } from 'src/shared/services/email/email.service';
+import { JwtService } from 'src/shared/services/auth/jwt.service';
 import { OtpController } from '../controllers/otp.controller';
 import { PasswordController } from '../controllers/password.controller';
 import { ProfileController } from '../controllers/profile.controller';
@@ -40,12 +40,13 @@ import { UpdateProfileUseCase } from '../../application/use-cases/profile/update
 import { RequestEmailChangeUseCase } from '../../application/use-cases/update-email/request-email-change.usecase';
 import { VerifyEmailChangeUseCase } from '../../application/use-cases/update-email/verify-email-change.usecase';
 import { UploadProfileImageUseCase } from '../../application/use-cases/profile/upload-profile-image.usecase';
-import { CloudinaryService } from 'src/shared/services/cloudinary.service';
+import { CloudinaryService } from 'src/shared/services/cloudinary/cloudinary.service';
 import { UpdateSkillsUseCase } from '../../application/use-cases/skills/update-skills.usecase';
 import { UploadDocumentUseCase } from '../../application/use-cases/document/upload-document.usecase';
 import { DeleteDocumentUseCase } from '../../application/use-cases/document/delete-document.usecase';
 import { EditDocumentUseCase } from '../../application/use-cases/document/edit-document.usecase';
-import { CookieHelperService } from 'src/shared/services/cookie-helper.service';
+import { CookieHelperService } from 'src/shared/services/auth/cookie-helper.service';
+import { PasswordService } from 'src/shared/services/auth/password.service';
 
 @Module({
   imports: [
@@ -94,7 +95,15 @@ import { CookieHelperService } from 'src/shared/services/cookie-helper.service';
       provide: 'IRefreshAccessTokenUseCase',
       useClass: RefreshAccessTokenUseCase,
     },
+    {
+      provide: 'IEmailService',
+      useClass: EmailService,
+    },
     EmailService,
+    {
+      provide: 'IOtpService',
+      useClass: OtpService,
+    },
     OtpService,
     {
       provide: 'IJwtService',
@@ -137,7 +146,16 @@ import { CookieHelperService } from 'src/shared/services/cookie-helper.service';
       provide: 'IUploadProfileImageUseCase',
       useClass: UploadProfileImageUseCase,
     },
+    {
+      provide: 'ICloudinaryService',
+      useClass: CloudinaryService,
+    },
     CloudinaryService,
+    {
+      provide: 'IPasswordService',
+      useClass: PasswordService,
+    },
+    PasswordService,
     {
       provide: 'IUpdateSkillsUseCase',
       useClass: UpdateSkillsUseCase,
@@ -182,7 +200,10 @@ import { CookieHelperService } from 'src/shared/services/cookie-helper.service';
     'ICompanyRepository',
     'IEmailOtpRepository',
     EmailService,
+    'IEmailService',
     'ICookieHelperService',
+    'IPasswordService',
+    'IOtpService',
   ],
 })
 export class AuthModule { }

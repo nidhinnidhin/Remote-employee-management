@@ -1,7 +1,7 @@
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import type { IPendingRegistrationRepository } from '../../../domain/repositories/cache/auth-repository/ipending-registration.repository';
-import { EmailService } from 'src/shared/services/email.service';
-import { OtpService } from 'src/shared/services/otp.service';
+import type { IEmailService } from 'src/shared/services/email/interfaces/iemail.service';
+import type { IOtpService } from 'src/shared/services/auth/interfaces/iotp.service';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { getOtpExpiresAt, SESSION_TTL_SECONDS } from 'src/shared/constants/functions/otp/otp.constants';
 import { IResendEmailOtpUseCase } from '../../interfaces/otp/otp-use-case.interface';
@@ -12,8 +12,12 @@ export class ResendEmailOtpUseCase implements IResendEmailOtpUseCase {
   constructor(
     @Inject('IPendingRegistrationRepository')
     private readonly _pendingRepository: IPendingRegistrationRepository,
-    private readonly _emailService: EmailService,
-    private readonly _otpService: OtpService,
+
+    @Inject('IEmailService')
+    private readonly _emailService: IEmailService,
+
+    @Inject('IOtpService')
+    private readonly _otpService: IOtpService,
   ) { }
 
   async execute(input: ResendOtpDto): Promise<void> {

@@ -7,7 +7,7 @@ import {
 import * as jwt from 'jsonwebtoken';
 import type { IUserRepository } from '../../../domain/repositories/iuser.repository';
 import { IRefreshAccessTokenUseCase } from '../../interfaces/auth/auth-use-case.interface';
-import type { IJwtService } from 'src/shared/services/interfaces/ijwt.service';
+import type { IJwtService } from 'src/shared/services/auth/interfaces/ijwt.service';
 import { RefreshTokenPayload } from 'src/shared/types/jwt/jwt-payload.type';
 import { RefreshAccessTokenResponse } from 'src/shared/types/jwt/refresh-access-token-response.type';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';

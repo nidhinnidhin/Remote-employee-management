@@ -4,7 +4,7 @@ import type { ICompanyRepository } from '../../../domain/repositories/icompany.r
 import type { IUserRepository } from '../../../domain/repositories/iuser.repository';
 import { CompanyEntity } from '../../../domain/entities/company.entity';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
-import { JwtService } from 'src/shared/services/jwt.service';
+import type { IJwtService } from 'src/shared/services/auth/interfaces/ijwt.service';
 import { IOnboardCompanyUseCase } from '../../interfaces/onboarding/onboarding-use-case.interface';
 
 @Injectable()
@@ -16,7 +16,8 @@ export class OnboardCompanyUseCase implements IOnboardCompanyUseCase {
         @Inject('IUserRepository')
         private readonly _userRepository: IUserRepository,
 
-        private readonly _jwtService: JwtService,
+        @Inject('IJwtService')
+        private readonly _jwtService: IJwtService,
     ) { }
 
     async execute(userId: string, dto: OnboardingDto) {

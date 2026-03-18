@@ -4,7 +4,7 @@ import {
   JwtPayload,
   RefreshTokenPayload,
 } from 'src/shared/types/jwt/jwt-payload.type';
-import { IJwtService } from './auth/interfaces/ijwt.service';
+import { IJwtService } from './interfaces/ijwt.service';
 
 @Injectable()
 export class JwtService implements IJwtService {

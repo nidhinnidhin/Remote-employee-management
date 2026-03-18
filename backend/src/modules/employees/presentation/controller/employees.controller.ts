@@ -19,9 +19,9 @@ import type {
   IGetEmployeesUseCase,
   IUpdateEmployeeStatusUseCase,
 } from '../../application/interfaces/employee-use-cases.interface';
-import { RedisService } from 'src/shared/services/redis.service';
+import type { IRedisService } from 'src/shared/services/redis/interfaces/iredis.service';
 import type { Request, Response } from 'express';
-import type { IJwtService } from 'src/shared/services/interfaces/ijwt.service';
+import type { IJwtService } from 'src/shared/services/auth/interfaces/ijwt.service';
 import {
   ACCESS_TOKEN_COOKIE_NAME,
   ACCESS_TOKEN_COOKIE_OPTIONS,
@@ -54,7 +54,8 @@ export class EmployeesController {
     private readonly updateEmployeeStatusUseCase: IUpdateEmployeeStatusUseCase,
     @Inject('IEmployeeRepository')
     private readonly employeeRepo: IEmployeeRepository,
-    private readonly redisService: RedisService,
+    @Inject('IRedisService')
+    private readonly redisService: IRedisService,
     @Inject('IJwtService')
     private readonly jwtService: IJwtService,
   ) {

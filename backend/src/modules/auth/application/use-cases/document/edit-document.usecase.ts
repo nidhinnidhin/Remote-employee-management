@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { IUserRepository } from '../../../domain/repositories/iuser.repository';
 import { CLOUDINARY_PATH } from 'src/shared/constants/path/cloudinary.path';
 import { CloudinaryResourceType } from 'src/shared/enums/employees/media/cloudinary-resource.enum';
-import { CloudinaryService } from 'src/shared/services/cloudinary.service';
+import type { ICloudinaryService } from 'src/shared/services/cloudinary/interfaces/icloudinary.service';
 import {
   EditDocumentInput,
   UpdateDocumentPayload,
@@ -17,7 +17,8 @@ export class EditDocumentUseCase implements IEditDocumentUseCase {
   constructor(
     @Inject('IUserRepository')
     private readonly _userRepository: IUserRepository,
-    private readonly _cloudinaryService: CloudinaryService,
+    @Inject('ICloudinaryService')
+    private readonly _cloudinaryService: ICloudinaryService,
   ) { }
 
   async execute({

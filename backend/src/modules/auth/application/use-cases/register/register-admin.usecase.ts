@@ -3,8 +3,8 @@ import type { IUserRepository } from '../../../domain/repositories/iuser.reposit
 import type { ICompanyRepository } from '../../../domain/repositories/icompany.repository';
 import type { IPendingRegistrationRepository } from '../../../domain/repositories/cache/auth-repository/ipending-registration.repository';
 import { RegisterCompanyAdminDto } from 'src/modules/auth/application/dto/register-company-admin.dto';
-import { EmailService } from 'src/shared/services/email.service';
-import { OtpService } from 'src/shared/services/otp.service';
+import type { IEmailService } from 'src/shared/services/email/interfaces/iemail.service';
+import type { IOtpService } from 'src/shared/services/auth/interfaces/iotp.service';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
 import { hashPassword } from 'src/shared/utils/password.util';
@@ -22,8 +22,11 @@ export class RegisterAdminUseCase implements IRegisterAdminUseCase {
     @Inject('IPendingRegistrationRepository')
     private readonly _pendingRepository: IPendingRegistrationRepository,
 
-    private readonly _emailService: EmailService,
-    private readonly _otpService: OtpService,
+    @Inject('IEmailService')
+    private readonly _emailService: IEmailService,
+
+    @Inject('IOtpService')
+    private readonly _otpService: IOtpService,
   ) { }
 
   async execute(dto: RegisterAdminDto) {

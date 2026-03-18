@@ -3,7 +3,7 @@ import * as bcrypt from 'bcrypt';
 import type { IEmailOtpRepository } from '../../../domain/repositories/iemail-otp.repository';
 import { VerifyResetPasswordOtpDto } from '../../dto/verify-reset-password-otp.dto';
 import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
-import { RedisService } from 'src/shared/services/redis.service';
+import type { IRedisService } from 'src/shared/services/redis/interfaces/iredis.service';
 import { IVerifyResetPasswordOtpUseCase } from '../../interfaces/auth/auth-use-case.interface';
 
 @Injectable()
@@ -12,7 +12,8 @@ export class VerifyResetPasswordOtpUseCase implements IVerifyResetPasswordOtpUse
     @Inject('IEmailOtpRepository')
     private readonly _otpRepository: IEmailOtpRepository,
 
-    private readonly _redisService: RedisService,
+    @Inject('IRedisService')
+    private readonly _redisService: IRedisService,
   ) { }
 
   async execute(input: VerifyResetPasswordOtpDto) {

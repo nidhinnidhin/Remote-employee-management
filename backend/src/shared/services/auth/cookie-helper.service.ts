@@ -5,7 +5,7 @@ import {
     ACCESS_TOKEN_COOKIE_OPTIONS,
     REFRESH_TOKEN_COOKIE_NAME,
     REFRESH_TOKEN_COOKIE_OPTIONS,
-} from '../config/cookies.config';
+} from '../../config/cookies.config';
 import { ICookieHelperService } from './interfaces/icookie-helper.service';
 
 @Injectable()

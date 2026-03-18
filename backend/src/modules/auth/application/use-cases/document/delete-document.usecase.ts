@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { IUserRepository } from '../../../domain/repositories/iuser.repository';
 import { DOCUMENT_MESSAGES } from 'src/shared/constants/messages/profile/document.messages';
 import { CloudinaryResourceType } from 'src/shared/enums/employees/media/cloudinary-resource.enum';
-import { CloudinaryService } from 'src/shared/services/cloudinary.service';
+import type { ICloudinaryService } from 'src/shared/services/cloudinary/interfaces/icloudinary.service';
 import type { IDeleteDocumentUseCase } from '../../interfaces/documents/document-use-case.interface';
 
 @Injectable()
@@ -10,7 +10,9 @@ export class DeleteDocumentUseCase implements IDeleteDocumentUseCase {
   constructor(
     @Inject('IUserRepository')
     private readonly _userRepository: IUserRepository,
-    private readonly _cloudinaryService: CloudinaryService,
+
+    @Inject('ICloudinaryService')
+    private readonly _cloudinaryService: ICloudinaryService,
   ) { }
 
   async execute(

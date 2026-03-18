@@ -2,7 +2,7 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import type { IEmployeeRepository } from '../../domain/repositories/employee.repository';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 import { EMPLOYEE_MESSAGES } from 'src/shared/constants/messages/employee/employee.messages';
-import { EmailService } from 'src/shared/services/email.service';
+import type { IEmailService } from 'src/shared/services/email/interfaces/iemail.service';
 import type { IUpdateEmployeeStatusUseCase } from '../interfaces/employee-use-cases.interface';
 
 @Injectable()
@@ -10,7 +10,8 @@ export class UpdateEmployeeStatusUseCase implements IUpdateEmployeeStatusUseCase
     constructor(
         @Inject('IEmployeeRepository')
         private readonly employeeRepo: IEmployeeRepository,
-        private readonly emailService: EmailService,
+        @Inject('IEmailService')
+        private readonly emailService: IEmailService,
     ) { }
 
     async execute(id: string, status: UserStatus, reason?: string) {

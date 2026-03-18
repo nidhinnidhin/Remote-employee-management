@@ -1,9 +1,10 @@
 import { v2 as cloudinary } from 'cloudinary';
 import { Injectable } from '@nestjs/common';
-import { CloudinaryResourceType } from '../enums/employees/media/cloudinary-resource.enum';
+import { CloudinaryResourceType } from '../../enums/employees/media/cloudinary-resource.enum';
+import { ICloudinaryService } from './interfaces/icloudinary.service';
 
 @Injectable()
-export class CloudinaryService {
+export class CloudinaryService implements ICloudinaryService {
   constructor() {
     cloudinary.config({
       cloud_name: process.env.CLOUDINARY_CLOUD_NAME,

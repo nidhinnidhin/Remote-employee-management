@@ -3,7 +3,7 @@ import { InviteEmployeeDto } from '../dto/invite-employee.dto';
 import type { IEmployeeRepository } from '../../domain/repositories/employee.repository';
 import type { IInviteLinkRepository } from '../../domain/repositories/invite-link.repository';
 import { InviteLinkToken } from '../../domain/entities/invite-link-token.entity';
-import { EmailService } from 'src/shared/services/email.service';
+import type { IEmailService } from 'src/shared/services/email/interfaces/iemail.service';
 import { EMPLOYEE_MESSAGES } from 'src/shared/constants/messages/employee/employee.messages';
 import { InviteStatus } from 'src/shared/enums/user/user-invite-status.enum';
 import { generateSecureToken } from 'src/shared/utils/token.util';
@@ -18,7 +18,8 @@ export class InviteEmployeeUseCase implements IInviteEmployeeUseCase {
     @Inject('IInviteLinkRepository')
     private readonly inviteLinkRepo: IInviteLinkRepository,
 
-    private readonly emailService: EmailService,
+    @Inject('IEmailService')
+    private readonly emailService: IEmailService,
   ) { }
 
   async execute(dto: InviteEmployeeDto & { companyId: string }) {

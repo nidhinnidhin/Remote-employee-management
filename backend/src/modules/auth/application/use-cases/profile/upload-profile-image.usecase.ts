@@ -3,7 +3,7 @@ import type { IUserRepository } from 'src/modules/auth/domain/repositories/iuser
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { PROFILE_MESSAGES } from 'src/shared/constants/messages/profile/profile.messages';
 import { CLOUDINARY_PATH } from 'src/shared/constants/path/cloudinary.path';
-import { CloudinaryService } from 'src/shared/services/cloudinary.service';
+import type { ICloudinaryService } from 'src/shared/services/cloudinary/interfaces/icloudinary.service';
 import { IUploadProfileImageUseCase } from '../../interfaces/profile/profile-use-case.interface';
 
 @Injectable()
@@ -11,7 +11,9 @@ export class UploadProfileImageUseCase implements IUploadProfileImageUseCase {
   constructor(
     @Inject('IUserRepository')
     private readonly _userRepository: IUserRepository,
-    private readonly _cloudinaryService: CloudinaryService,
+
+    @Inject('ICloudinaryService')
+    private readonly _cloudinaryService: ICloudinaryService,
   ) { }
 
   async execute(userId: string, file: Express.Multer.File) {
