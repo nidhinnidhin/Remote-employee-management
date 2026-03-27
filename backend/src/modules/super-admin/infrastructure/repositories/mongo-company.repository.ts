@@ -19,23 +19,23 @@ export class MongoCompanyRepository
     super(_companyModel);
   }
 
-  protected toEntity(doc: CompanyDocument): CompanyEntity {
+  protected toEntity(companyDoc: CompanyDocument): CompanyEntity {
     return new CompanyEntity(
-      (doc as any)._id.toString(),
-      doc.name,
-      doc.email,
-      doc.size,
-      doc.industry,
-      doc.website,
-      doc.createdAt,
-      doc.updatedAt,
-      (doc as any).employeeCount,
-      doc.status || CompanyStatus.ACTIVE,
+      (companyDoc as any)._id.toString(),
+      companyDoc.name,
+      companyDoc.email,
+      companyDoc.size,
+      companyDoc.industry,
+      companyDoc.website,
+      companyDoc.createdAt,
+      companyDoc.updatedAt,
+      (companyDoc as any).employeeCount,
+      companyDoc.status || CompanyStatus.ACTIVE,
     );
   }
 
   async findAll(): Promise<CompanyEntity[]> {
-    const docs = await this._companyModel.aggregate([
+    const companyDoc = await this._companyModel.aggregate([
       { $sort: { createdAt: -1 } },
       {
         $addFields: {
@@ -57,7 +57,7 @@ export class MongoCompanyRepository
       },
     ]);
 
-    return docs.map((doc) => this.toEntity(doc));
+    return companyDoc.map((doc) => this.toEntity(doc));
   }
 
   async updateStatus(id: string, status: CompanyStatus): Promise<void> {

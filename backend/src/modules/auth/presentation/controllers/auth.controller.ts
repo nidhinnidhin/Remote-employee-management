@@ -21,7 +21,7 @@ import type {
   IRegisterAdminUseCase,
   ILoginUseCase,
   IRefreshAccessTokenUseCase,
-  ISocialLoginUseCase
+  ISocialLoginUseCase,
 } from '../../application/interfaces/auth/auth-use-case.interface';
 import type { IOnboardCompanyUseCase } from '../../application/interfaces/onboarding/onboarding-use-case.interface';
 import type { ICookieHelperService } from 'src/shared/services/auth/interfaces/icookie-helper.service';
@@ -36,48 +36,59 @@ import type { SocialLoginInput } from 'src/shared/types/auth/social-login.type';
 export class AuthController {
   constructor(
     @Inject('IRegisterAdminUseCase')
-    private readonly registerAdminUseCase: IRegisterAdminUseCase,
+    private readonly _registerAdminUseCase: IRegisterAdminUseCase,
     @Inject('IOnboardCompanyUseCase')
-    private readonly onboardCompanyUseCase: IOnboardCompanyUseCase,
+    private readonly _onboardCompanyUseCase: IOnboardCompanyUseCase,
     @Inject('IRefreshAccessTokenUseCase')
-    private readonly refreshAccessTokenUseCase: IRefreshAccessTokenUseCase,
+    private readonly _refreshAccessTokenUseCase: IRefreshAccessTokenUseCase,
     @Inject('ILoginUseCase')
-    private readonly loginUseCase: ILoginUseCase,
+    private readonly _loginUseCase: ILoginUseCase,
     @Inject('ISocialLoginUseCase')
-    private readonly socialLoginUseCase: ISocialLoginUseCase,
+    private readonly _socialLoginUseCase: ISocialLoginUseCase,
     @Inject('ICookieHelperService')
-    private readonly cookieHelperService: ICookieHelperService,
-  ) { }
+    private readonly _cookieHelperService: ICookieHelperService,
+  ) {}
 
   @Post('register')
-  async register(@Body() dto: RegisterAdminDto) {
-    return this.registerAdminUseCase.execute(dto);
+  async register(@Body() registerAdminDto: RegisterAdminDto) {
+    return this._registerAdminUseCase.execute(registerAdminDto);
   }
 
   @Post('onboard')
-  async onboard(@Body() dto: OnboardingDto, @Res({ passthrough: true }) res: Response) {
-    if (!dto.userId) {
+  async onboard(
+    @Body() onboardingDto: OnboardingDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    if (!onboardingDto.userId) {
       throw new BadRequestException('User ID is required for onboarding');
     }
-    const result = await this.onboardCompanyUseCase.execute(dto.userId, dto);
+    const result = await this._onboardCompanyUseCase.execute(onboardingDto.userId, onboardingDto);
 
-    this.cookieHelperService.setAuthCookies(res, result.accessToken, result.refreshToken);
+    this._cookieHelperService.setAuthCookies(
+      res,
+      result.accessToken,
+      result.refreshToken,
+    );
 
     return result;
   }
 
   @Post('login')
   async login(
-    @Body() dto: LoginDto,
+    @Body() loginDto: LoginDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const result = await this.loginUseCase.execute({
-      email: dto.email,
-      password: dto.password,
+    const result = await this._loginUseCase.execute({
+      email: loginDto.email,
+      password: loginDto.password,
     });
 
     if (result.accessToken && result.refreshToken) {
-      this.cookieHelperService.setAuthCookies(res, result.accessToken, result.refreshToken);
+      this._cookieHelperService.setAuthCookies(
+        res,
+        result.accessToken,
+        result.refreshToken,
+      );
     }
     return result;
   }
@@ -88,16 +99,23 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     console.log('[AuthController] socialLogin input:', body.email);
-    const result = await this.socialLoginUseCase.execute(body);
+    const result = await this._socialLoginUseCase.execute(body);
 
-    console.log('[AuthController] sending result:', JSON.stringify({
-      hasUser: !!result.user,
-      isOnboarded: result.user?.isOnboarded,
-      hasAccessToken: !!result.accessToken
-    }));
+    console.log(
+      '[AuthController] sending result:',
+      JSON.stringify({
+        hasUser: !!result.user,
+        isOnboarded: result.user?.isOnboarded,
+        hasAccessToken: !!result.accessToken,
+      }),
+    );
 
     if (result.accessToken && result.refreshToken) {
-      this.cookieHelperService.setAuthCookies(res, result.accessToken, result.refreshToken);
+      this._cookieHelperService.setAuthCookies(
+        res,
+        result.accessToken,
+        result.refreshToken,
+      );
     }
     return result;
   }
@@ -114,9 +132,13 @@ export class AuthController {
     }
 
     const { accessToken } =
-      await this.refreshAccessTokenUseCase.execute(refreshToken);
+      await this._refreshAccessTokenUseCase.execute(refreshToken);
 
-    res.cookie(ACCESS_TOKEN_COOKIE_NAME, accessToken, ACCESS_TOKEN_COOKIE_OPTIONS);
+    res.cookie(
+      ACCESS_TOKEN_COOKIE_NAME,
+      accessToken,
+      ACCESS_TOKEN_COOKIE_OPTIONS,
+    );
 
     return { accessToken };
   }
@@ -125,6 +147,8 @@ export class AuthController {
   async logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie(ACCESS_TOKEN_COOKIE_NAME, ACCESS_TOKEN_COOKIE_OPTIONS);
     res.clearCookie(REFRESH_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_OPTIONS);
-    return { message: AUTH_MESSAGES.LOGOUT_SUCCESS || 'Logged out successfully' };
+    return {
+      message: AUTH_MESSAGES.LOGOUT_SUCCESS || 'Logged out successfully',
+    };
   }
 }

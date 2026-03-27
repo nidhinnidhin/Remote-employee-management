@@ -15,7 +15,7 @@ export class VerifyEmailChangeUseCase implements IVerifyEmailChangeUseCase {
 
     @Inject('IUserRepository')
     private readonly _userRepository: IUserRepository,
-  ) { }
+  ) {}
 
   async execute(userId: string, otp: string) {
     const user = await this._userRepository.findById(userId);

@@ -15,11 +15,11 @@ import type { IVerifyInviteUseCase } from '../interfaces/employee-use-cases.inte
 export class VerifyInviteUseCase implements IVerifyInviteUseCase {
   constructor(
     @Inject('IInviteLinkRepository')
-    private readonly inviteLinkRepo: IInviteLinkRepository,
+    private readonly _inviteLinkRepo: IInviteLinkRepository,
 
     @Inject('IEmployeeRepository')
-    private readonly employeeRepo: IEmployeeRepository,
-  ) { }
+    private readonly _employeeRepo: IEmployeeRepository,
+  ) {}
 
   async execute(rawToken: string) {
     if (!rawToken) {
@@ -30,26 +30,32 @@ export class VerifyInviteUseCase implements IVerifyInviteUseCase {
     const hashedToken = hashToken(rawToken);
 
     // Find invite link
-    const invite = await this.inviteLinkRepo.findByToken(hashedToken);
+    const invite = await this._inviteLinkRepo.findByToken(hashedToken);
 
     if (!invite) {
-      console.warn(`[VerifyInviteUseCase] INVALID_TOKEN for rawToken hash: ${hashedToken.substring(0, 10)}...`);
+      console.warn(
+        `[VerifyInviteUseCase] INVALID_TOKEN for rawToken hash: ${hashedToken.substring(0, 10)}...`,
+      );
       throw new UnauthorizedException(EMPLOYEE_MESSAGES.INVALID_TOKEN);
     }
 
     // Validate invite
     if (invite.used) {
-      console.warn(`[VerifyInviteUseCase] INVITE_USED for employeeId: ${invite.employeeId}`);
+      console.warn(
+        `[VerifyInviteUseCase] INVITE_USED for employeeId: ${invite.employeeId}`,
+      );
       throw new UnauthorizedException(EMPLOYEE_MESSAGES.INVITE_USED);
     }
 
     if (invite.expiresAt < new Date()) {
-      console.warn(`[VerifyInviteUseCase] INVITE_EXPIRED for employeeId: ${invite.employeeId}. ExpiresAt: ${invite.expiresAt}, Now: ${new Date()}`);
+      console.warn(
+        `[VerifyInviteUseCase] INVITE_EXPIRED for employeeId: ${invite.employeeId}. ExpiresAt: ${invite.expiresAt}, Now: ${new Date()}`,
+      );
       throw new UnauthorizedException(EMPLOYEE_MESSAGES.INVITE_EXPIRED);
     }
 
     // Fetch employee
-    const employee = await this.employeeRepo.findById(invite.employeeId);
+    const employee = await this._employeeRepo.findById(invite.employeeId);
 
     if (!employee) {
       throw new UnauthorizedException(EMPLOYEE_MESSAGES.EMPLOYEE_NOT_FOUND);

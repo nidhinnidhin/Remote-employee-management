@@ -55,31 +55,31 @@ export class VerifyEmailOtpUseCase implements IVerifyEmailOtpUseCase {
       UserStatus.ACTIVE,
       new Date(),
       new Date(),
-      undefined, // companyId
-      undefined, // department
-      undefined, // inviteStatus
-      true,      // hasPassword
-      undefined, // dateOfBirth
-      undefined, // gender
-      undefined, // maritalStatus
-      undefined, // nationality
-      undefined, // bloodGroup
-      undefined, // timeZone
-      undefined, // bio
-      undefined, // streetAddress
-      undefined, // city
-      undefined, // state
-      undefined, // country
-      undefined, // zipCode
-      undefined, // emergencyContactName
-      undefined, // emergencyContactPhone
-      undefined, // emergencyContactRelation
-      undefined, // linkedInUrl
-      undefined, // personalWebsite
-      undefined, // profileImageUrl
-      undefined, // profileImagePublicId
-      [],        // skills
-      false,     // isOnboarded
+      undefined, 
+      undefined, 
+      undefined, 
+      true,      
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+      [],        
+      false,     
     );
 
     const createdUser = await this._userRepository.create(userEntity);

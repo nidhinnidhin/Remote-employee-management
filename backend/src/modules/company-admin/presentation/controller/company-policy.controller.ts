@@ -11,15 +11,14 @@ import { CompanyAdminOrEmployeeGuard } from 'src/shared/guards/company-admin-or-
 export class CompanyPolicyController {
   constructor(
     @Inject('ICompanyPolicyUseCase')
-    private readonly useCase: ICompanyPolicyUseCase
-  ) { }
+    private readonly _useCase: ICompanyPolicyUseCase,
+  ) {}
 
-  // COMPANY ADMIN - ADD / UPDATE
   @Post()
   @UseGuards(CompanyAdminGuard)
-  createOrUpdatePolicies(@Body() dto: UpsertCompanyPoliciesDto, @Req() req) {
+  createOrUpdatePolicies(@Body() companyPolicyDto: UpsertCompanyPoliciesDto, @Req() req) {
     const companyId = req.user.companyId;
-    return this.useCase.createOrUpdatePolicies(companyId, dto.policies);
+    return this._useCase.createOrUpdatePolicies(companyId, companyPolicyDto.policies);
   }
 
   // COMPANY ADMIN OR EMPLOYEE - GET
@@ -27,6 +26,6 @@ export class CompanyPolicyController {
   @UseGuards(CompanyAdminOrEmployeeGuard)
   getPoliciesForAdmin(@Req() req) {
     const companyId = req.user.companyId;
-    return this.useCase.getPolicies(companyId);
+    return this._useCase.getPolicies(companyId);
   }
 }

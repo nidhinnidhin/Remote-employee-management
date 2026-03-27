@@ -1,26 +1,26 @@
 import {
-    Body,
-    Controller,
-    Get,
-    Patch,
-    Post,
-    Req,
-    UploadedFile,
-    UseGuards,
-    UseInterceptors,
-    BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Patch,
+  Post,
+  Req,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+  BadRequestException,
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { Inject } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import type {
-    IGetUserProfileUseCase,
-    IUpdateProfileUseCase,
-    IUploadProfileImageUseCase,
-    IUpdateSkillsUseCase,
-    IRequestEmailChangeUseCase,
-    IVerifyEmailChangeUseCase,
+  IGetUserProfileUseCase,
+  IUpdateProfileUseCase,
+  IUploadProfileImageUseCase,
+  IUpdateSkillsUseCase,
+  IRequestEmailChangeUseCase,
+  IVerifyEmailChangeUseCase,
 } from '../../application/interfaces/profile/profile-use-case.interface';
 import { UpdateProfileDto } from '../../application/dto/update-profile.dto';
 import { RequestEmailChangeDto } from '../../application/dto/email-update/request-email-change.dto';
@@ -28,62 +28,59 @@ import { RequestEmailChangeDto } from '../../application/dto/email-update/reques
 @Controller('auth/profile')
 @UseGuards(JwtAuthGuard)
 export class ProfileController {
-    constructor(
-        @Inject('IGetUserProfileUseCase')
-        private readonly getUserProfileUseCase: IGetUserProfileUseCase,
-        @Inject('IUpdateProfileUseCase')
-        private readonly updateProfileUseCase: IUpdateProfileUseCase,
-        @Inject('IUploadProfileImageUseCase')
-        private readonly uploadProfileImageUseCase: IUploadProfileImageUseCase,
-        @Inject('IUpdateSkillsUseCase')
-        private readonly updateSkillsUseCase: IUpdateSkillsUseCase,
-        @Inject('IRequestEmailChangeUseCase')
-        private readonly requestEmailChangeUseCase: IRequestEmailChangeUseCase,
-        @Inject('IVerifyEmailChangeUseCase')
-        private readonly verifyEmailChangeUseCase: IVerifyEmailChangeUseCase,
-    ) { }
+  constructor(
+    @Inject('IGetUserProfileUseCase')
+    private readonly _getUserProfileUseCase: IGetUserProfileUseCase,
+    @Inject('IUpdateProfileUseCase')
+    private readonly _updateProfileUseCase: IUpdateProfileUseCase,
+    @Inject('IUploadProfileImageUseCase')
+    private readonly _uploadProfileImageUseCase: IUploadProfileImageUseCase,
+    @Inject('IUpdateSkillsUseCase')
+    private readonly _updateSkillsUseCase: IUpdateSkillsUseCase,
+    @Inject('IRequestEmailChangeUseCase')
+    private readonly _requestEmailChangeUseCase: IRequestEmailChangeUseCase,
+    @Inject('IVerifyEmailChangeUseCase')
+    private readonly _verifyEmailChangeUseCase: IVerifyEmailChangeUseCase,
+  ) {}
 
-    @Get('me')
-    async getMyProfile(@Req() req: Request) {
-        return this.getUserProfileUseCase.execute(req.user!.userId);
+  @Get('me')
+  async getMyProfile(@Req() req: Request) {
+    return this._getUserProfileUseCase.execute(req.user!.userId);
+  }
+
+  @Patch('update')
+  async updateProfile(@Req() req: Request, @Body() updateProfileDto: UpdateProfileDto) {
+    return this._updateProfileUseCase.execute(req.user!.userId, updateProfileDto);
+  }
+
+  @Post('upload-image')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadProfileImage(
+    @Req() req: Request,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
     }
 
-    @Patch('update')
-    async updateProfile(@Req() req: Request, @Body() dto: UpdateProfileDto) {
-        return this.updateProfileUseCase.execute(req.user!.userId, dto);
-    }
+    return this._uploadProfileImageUseCase.execute(req.user!.userId, file);
+  }
 
-    @Post('upload-image')
-    @UseInterceptors(FileInterceptor('file'))
-    async uploadProfileImage(
-        @Req() req: Request,
-        @UploadedFile() file: Express.Multer.File,
-    ) {
-        if (!file) {
-            throw new BadRequestException('No file uploaded');
-        }
+  @Patch('skills')
+  async updateSkills(@Req() req: Request, @Body('skills') skills: string[]) {
+    return this._updateSkillsUseCase.execute(req.user!.userId, skills);
+  }
 
-        return this.uploadProfileImageUseCase.execute(req.user!.userId, file);
-    }
+  @Post('request-email-change')
+  async requestEmailChange(
+    @Req() req: Request,
+    @Body() emailChangeDto: RequestEmailChangeDto,
+  ) {
+    return this._requestEmailChangeUseCase.execute(req.user!.userId, emailChangeDto);
+  }
 
-    @Patch('skills')
-    async updateSkills(
-        @Req() req: Request,
-        @Body('skills') skills: string[],
-    ) {
-        return this.updateSkillsUseCase.execute(req.user!.userId, skills);
-    }
-
-    @Post('request-email-change')
-    async requestEmailChange(
-        @Req() req: Request,
-        @Body() dto: RequestEmailChangeDto,
-    ) {
-        return this.requestEmailChangeUseCase.execute(req.user!.userId, dto);
-    }
-
-    @Post('verify-email-change')
-    async verifyEmailChange(@Req() req: Request, @Body('otp') otp: string) {
-        return this.verifyEmailChangeUseCase.execute(req.user!.userId, otp);
-    }
+  @Post('verify-email-change')
+  async verifyEmailChange(@Req() req: Request, @Body('otp') verifyEmailChangeDto: string) {
+    return this._verifyEmailChangeUseCase.execute(req.user!.userId, verifyEmailChangeDto);
+  }
 }

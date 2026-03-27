@@ -7,7 +7,7 @@ import { CACHE_MESSAGES } from 'src/shared/constants/messages/cache/cache.messag
 
 @Injectable()
 export class RedisPendingRegistrationRepository implements IPendingRegistrationRepository {
-  constructor(@InjectRedis() private readonly redis: Redis) { }
+  constructor(@InjectRedis() private readonly redis: Redis) {}
 
   private readonly PREFIX = CACHE_MESSAGES.CACHE_PREFIX;
 

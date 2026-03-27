@@ -14,7 +14,8 @@ import { BaseRepository } from 'src/shared/repositories/base.repository';
 @Injectable()
 export class CompanyPolicyRepositoryImpl
   extends BaseRepository<CompanyPolicy, CompanyPolicyEntity>
-  implements ICompanyPolicyRepository {
+  implements ICompanyPolicyRepository
+{
   constructor(
     @InjectModel(CompanyPolicy.name)
     private readonly _companyPolicyModel: Model<CompanyPolicy>,
@@ -30,18 +31,18 @@ export class CompanyPolicyRepositoryImpl
   }
 
   async getCompanyPolicies(companyId: string): Promise<PolicyItemEntity[]> {
-    const doc = await this.findOne({ companyId });
-    if (!doc) return [];
-    return doc.policies;
+    const companyDoc = await this.findOne({ companyId });
+    if (!companyDoc) return [];
+    return companyDoc.policies;
   }
 
-  protected toEntity(doc: CompanyPolicy): CompanyPolicyEntity {
+  protected toEntity(companyPolicy: CompanyPolicy): CompanyPolicyEntity {
     return new CompanyPolicyEntity(
-      (doc as any)._id.toString(),
-      doc.companyId,
-      this.toPolicyItems(doc.policies ?? []),
-      (doc as any).createdAt,
-      (doc as any).updatedAt,
+      (companyPolicy as any)._id.toString(),
+      companyPolicy.companyId,
+      this.toPolicyItems(companyPolicy.policies ?? []),
+      (companyPolicy as any).createdAt,
+      (companyPolicy as any).updatedAt,
     );
   }
 

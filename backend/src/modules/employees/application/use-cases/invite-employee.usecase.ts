@@ -13,18 +13,20 @@ import type { IInviteEmployeeUseCase } from '../interfaces/employee-use-cases.in
 export class InviteEmployeeUseCase implements IInviteEmployeeUseCase {
   constructor(
     @Inject('IEmployeeRepository')
-    private readonly employeeRepo: IEmployeeRepository,
+    private readonly _employeeRepo: IEmployeeRepository,
 
     @Inject('IInviteLinkRepository')
-    private readonly inviteLinkRepo: IInviteLinkRepository,
+    private readonly _inviteLinkRepo: IInviteLinkRepository,
 
     @Inject('IEmailService')
-    private readonly emailService: IEmailService,
-  ) { }
+    private readonly _emailService: IEmailService,
+  ) {}
 
-  async execute(dto: InviteEmployeeDto & { companyId: string }) {
+  async execute(inviteEmployeeDto: InviteEmployeeDto & { companyId: string }) {
     // Prevent duplicate active employee or handle re-invite
-    const existing = await this.employeeRepo.findByEmail(dto.email);
+    const existing = await this._employeeRepo.findByEmail(
+      inviteEmployeeDto.email,
+    );
     let employee;
 
     if (existing) {
@@ -33,18 +35,18 @@ export class InviteEmployeeUseCase implements IInviteEmployeeUseCase {
       }
 
       // Re-invite: Update existing pending employee
-      await this.employeeRepo.updateEmployee(existing.id, {
-        name: dto.name,
-        role: dto.role,
-        department: dto.department,
-        phone: dto.phone,
-        companyId: dto.companyId,
+      await this._employeeRepo.updateEmployee(existing.id, {
+        name: inviteEmployeeDto.name,
+        role: inviteEmployeeDto.role,
+        department: inviteEmployeeDto.department,
+        phone: inviteEmployeeDto.phone,
+        companyId: inviteEmployeeDto.companyId,
       });
       employee = existing;
     } else {
       // Create new inactive employee
-      employee = await this.employeeRepo.create({
-        ...dto,
+      employee = await this._employeeRepo.create({
+        ...inviteEmployeeDto,
         isActive: false,
         hasPassword: false,
         inviteStatus: InviteStatus.PENDING,
@@ -63,14 +65,16 @@ export class InviteEmployeeUseCase implements IInviteEmployeeUseCase {
       false,
     );
 
-    console.log(`[InviteEmployeeUseCase] Creating invite link for ${employee.email}. HashedToken: ${hashedToken.substring(0, 10)}... Expires in 24h`);
+    console.log(
+      `[InviteEmployeeUseCase] Creating invite link for ${employee.email}. HashedToken: ${hashedToken.substring(0, 10)}... Expires in 24h`,
+    );
 
     // Persist invite link
-    await this.inviteLinkRepo.create(inviteLink);
+    await this._inviteLinkRepo.create(inviteLink);
 
     // Send email with RAW token
     const inviteUrl = `${process.env.FRONTEND_URL}/auth/verify?token=${rawToken}`;
 
-    await this.emailService.sendEmployeeInvite(employee.email, inviteUrl);
+    await this._emailService.sendEmployeeInvite(employee.email, inviteUrl);
   }
 }

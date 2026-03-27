@@ -13,7 +13,7 @@ export class DeleteDocumentUseCase implements IDeleteDocumentUseCase {
 
     @Inject('ICloudinaryService')
     private readonly _cloudinaryService: ICloudinaryService,
-  ) { }
+  ) {}
 
   async execute(
     userId: string,

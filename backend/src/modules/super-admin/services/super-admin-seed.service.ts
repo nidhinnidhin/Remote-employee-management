@@ -14,7 +14,7 @@ export class SuperAdminSeedService implements ISuperAdminSeedService {
 
   constructor(
     @Inject('IUserRepository') private readonly userRepository: IUserRepository,
-    private readonly configService: ConfigService,
+    private readonly _configService: ConfigService,
   ) { }
 
   async onModuleInit() {
@@ -23,8 +23,8 @@ export class SuperAdminSeedService implements ISuperAdminSeedService {
   }
 
   private async seedSuperAdmin() {
-    const email = this.configService.get<string>('SUPER_ADMIN_EMAIL');
-    const password = this.configService.get<string>('SUPER_ADMIN_PASSWORD');
+    const email = this._configService.get<string>('SUPER_ADMIN_EMAIL');
+    const password = this._configService.get<string>('SUPER_ADMIN_PASSWORD');
 
     if (!email || !password) {
       this.logger.warn(
@@ -62,9 +62,6 @@ export class SuperAdminSeedService implements ISuperAdminSeedService {
       const salt = await bcrypt.genSalt(10);
       const passwordHash = await bcrypt.hash(password, salt);
 
-      // Create a dummy companyId or handle it appropriately.
-      // UserEntity requires companyId. For Super Admin, it might not be relevant but required by schema.
-      // We'll generate a random string or use a static one.
       const companyId = 'super-admin-company';
 
       const newUser = new UserEntity(

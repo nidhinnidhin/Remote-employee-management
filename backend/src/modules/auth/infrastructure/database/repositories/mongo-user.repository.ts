@@ -14,7 +14,8 @@ import { BaseRepository } from 'src/shared/repositories/base.repository';
 @Injectable()
 export class MongoUserRepository
   extends BaseRepository<UserDocument, UserEntity>
-  implements IUserRepository {
+  implements IUserRepository
+{
   constructor(
     @InjectModel(UserDocument.name)
     private readonly _userModel: Model<UserDocument>,
@@ -22,46 +23,46 @@ export class MongoUserRepository
     super(_userModel);
   }
 
-  protected toEntity(doc: UserDocument): UserEntity {
+  protected toEntity(user: UserDocument): UserEntity {
     return new UserEntity(
-      (doc as any)._id.toString(),
-      doc.firstName,
-      doc.lastName,
-      doc.email,
-      doc.role,
-      doc.phone,
-      doc.passwordHash,
-      doc.status as UserStatus,
-      doc.createdAt,
-      doc.updatedAt,
-      doc.companyId,
-      doc.department,
-      doc.inviteStatus,
-      doc.hasPassword,
-      doc.dateOfBirth,
-      doc.gender,
-      doc.maritalStatus,
-      doc.nationality,
-      doc.bloodGroup,
-      doc.timeZone,
-      doc.bio,
-      doc.streetAddress,
-      doc.city,
-      doc.state,
-      doc.country,
-      doc.zipCode,
-      doc.emergencyContactName,
-      doc.emergencyContactPhone,
-      doc.emergencyContactRelation,
-      doc.linkedInUrl,
-      doc.personalWebsite,
-      doc.profileImageUrl,
-      doc.profileImagePublicId,
-      doc.skills,
-      doc.isOnboarded,
-      doc.provider,
-      doc.providerId,
-      doc.documents,
+      (user as any)._id.toString(),
+      user.firstName,
+      user.lastName,
+      user.email,
+      user.role,
+      user.phone,
+      user.passwordHash,
+      user.status as UserStatus,
+      user.createdAt,
+      user.updatedAt,
+      user.companyId,
+      user.department,
+      user.inviteStatus,
+      user.hasPassword,
+      user.dateOfBirth,
+      user.gender,
+      user.maritalStatus,
+      user.nationality,
+      user.bloodGroup,
+      user.timeZone,
+      user.bio,
+      user.streetAddress,
+      user.city,
+      user.state,
+      user.country,
+      user.zipCode,
+      user.emergencyContactName,
+      user.emergencyContactPhone,
+      user.emergencyContactRelation,
+      user.linkedInUrl,
+      user.personalWebsite,
+      user.profileImageUrl,
+      user.profileImagePublicId,
+      user.skills,
+      user.isOnboarded,
+      user.provider,
+      user.providerId,
+      user.documents,
     );
   }
 
@@ -86,11 +87,6 @@ export class MongoUserRepository
     const saved = await created.save();
     return this.toEntity(saved as UserDocument);
   }
-
-  // Use base findByEmail which already handles toEntity and case-insensitive check via emailField logic if we set it
-  // However, the original findByEmail uses a regex. Let's stick to base findByEmail if it works.
-  // Base findByEmail: const filter = { [this.emailField]: email.toLowerCase() } as FilterQuery<TDocument>;
-  // That should be enough for case-insensitive if stored lowercased.
 
   async findAllByCompanyIdAndRole(
     companyId: string,

@@ -16,10 +16,10 @@ import type { ISetPasswordUseCase } from '../interfaces/employee-use-cases.inter
 export class SetPasswordUseCase implements ISetPasswordUseCase {
   constructor(
     @Inject('IEmployeeRepository')
-    private readonly employeeRepo: IEmployeeRepository,
+    private readonly _employeeRepo: IEmployeeRepository,
 
     @Inject('IInviteLinkRepository')
-    private readonly inviteLinkRepo: IInviteLinkRepository,
+    private readonly _inviteLinkRepo: IInviteLinkRepository,
   ) { }
 
   async execute(employeeId: string, password: string) {
@@ -27,7 +27,7 @@ export class SetPasswordUseCase implements ISetPasswordUseCase {
       throw new BadRequestException(AUTH_MESSAGES.PASSWORD_TOO_SHORT);
     }
 
-    const employee = await this.employeeRepo.findById(employeeId);
+    const employee = await this._employeeRepo.findById(employeeId);
 
     if (!employee) {
       throw new UnauthorizedException(EMPLOYEE_MESSAGES.EMPLOYEE_NOT_FOUND);
@@ -48,13 +48,13 @@ export class SetPasswordUseCase implements ISetPasswordUseCase {
     const passwordHash = await hashPassword(password);
 
     // 1️⃣ Store password
-    await this.employeeRepo.setPassword(employee.id, passwordHash);
+    await this._employeeRepo.setPassword(employee.id, passwordHash);
 
     // 2️⃣ Activate employee
-    await this.employeeRepo.activateEmployee(employee.id);
+    await this._employeeRepo.activateEmployee(employee.id);
 
     // 3️⃣ Invalidate all invite links for this employee
-    await this.inviteLinkRepo.markAllAsUsedByEmployeeId(employee.id);
+    await this._inviteLinkRepo.markAllAsUsedByEmployeeId(employee.id);
 
     return employee;
   }

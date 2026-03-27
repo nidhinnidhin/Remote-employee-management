@@ -16,16 +16,16 @@ import { ResendOtpDto } from '../../application/dto/resend-otp.dto';
 export class OtpController {
     constructor(
         @Inject('IVerifyEmailOtpUseCase')
-        private readonly verifyEmailOtpUseCase: IVerifyEmailOtpUseCase,
+        private readonly _verifyEmailOtpUseCase: IVerifyEmailOtpUseCase,
         @Inject('IResendEmailOtpUseCase')
-        private readonly resendEmailOtpUseCase: IResendEmailOtpUseCase,
+        private readonly _resendEmailOtpUseCase: IResendEmailOtpUseCase,
     ) { }
 
     @Post('verify')
-    async verifyOtp(@Body() dto: VerifyEmailOtpDto) {
-        const result = await this.verifyEmailOtpUseCase.execute({
-            email: dto.email,
-            otp: dto.otp,
+    async verifyOtp(@Body() verifyEmailOtpDto: VerifyEmailOtpDto) {
+        const result = await this._verifyEmailOtpUseCase.execute({
+            email: verifyEmailOtpDto.email,
+            otp: verifyEmailOtpDto.otp,
         });
 
         return {
@@ -36,8 +36,8 @@ export class OtpController {
     }
 
     @Post('resend')
-    async resendOtp(@Body() dto: ResendOtpDto) {
-        await this.resendEmailOtpUseCase.execute(dto);
+    async resendOtp(@Body() resendOtpDto: ResendOtpDto) {
+        await this._resendEmailOtpUseCase.execute(resendOtpDto);
         return { message: OTP_MESSAGES.OTP_RESENT };
     }
 }

@@ -8,7 +8,7 @@ export class CompanyPolicyUseCase implements ICompanyPolicyUseCase {
   constructor(
     @Inject(POLICY_MESSAGES.COMPANY_POLICY_REPOSITORY)
     private readonly _companyRepo: ICompanyPolicyRepository,
-  ) { }
+  ) {}
 
   async createOrUpdatePolicies(companyId: string, policies: any[]) {
     const validPolicies = policies.filter(

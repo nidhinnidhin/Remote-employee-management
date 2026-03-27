@@ -147,16 +147,20 @@ export class EmailService implements IEmailService {
           </p>
         </div>
         <p style="color:#64748b;font-size:16px;line-height:24px;">
-          ${isSuspended 
-            ? 'Access for all users within your organization has been disabled until further notice.' 
-            : 'Your organization is now fully operational. Users can once again access the platform.'}
+          ${
+            isSuspended
+              ? 'Access for all users within your organization has been disabled until further notice.'
+              : 'Your organization is now fully operational. Users can once again access the platform.'
+          }
         </p>
       </div>
     `);
 
     await this.sendMail({
       to: email,
-      subject: isSuspended ? `Important: ${companyName} has been Suspended` : `Important: ${companyName} has been Re-activated`,
+      subject: isSuspended
+        ? `Important: ${companyName} has been Suspended`
+        : `Important: ${companyName} has been Re-activated`,
       html,
     });
   }

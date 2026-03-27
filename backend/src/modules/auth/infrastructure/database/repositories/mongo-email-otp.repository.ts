@@ -10,7 +10,7 @@ export class MongoEmailOtpRepository implements IEmailOtpRepository {
   constructor(
     @InjectModel('EmailOtp')
     private readonly _emailOtpModel: Model<any>,
-  ) { }
+  ) {}
 
   async create(otp: EmailOtpEntity): Promise<void> {
     await this._emailOtpModel.create({
@@ -50,17 +50,17 @@ export class MongoEmailOtpRepository implements IEmailOtpRepository {
     await this._emailOtpModel.updateOne({ _id: id }, { verified: true });
   }
 
-  private toEntity(otpDoc: any): EmailOtpEntity {
+  private toEntity(otp: any): EmailOtpEntity {
     return new EmailOtpEntity(
-      otpDoc._id.toString(),
-      otpDoc.userId,
-      otpDoc.email,
-      otpDoc.otpHash,
-      otpDoc.expiresAt,
-      otpDoc.verified,
-      otpDoc.createdAt,
-      otpDoc.newEmail,
-      otpDoc.purpose,
+      otp._id.toString(),
+      otp.userId,
+      otp.email,
+      otp.otpHash,
+      otp.expiresAt,
+      otp.verified,
+      otp.createdAt,
+      otp.newEmail,
+      otp.purpose,
     );
   }
 }

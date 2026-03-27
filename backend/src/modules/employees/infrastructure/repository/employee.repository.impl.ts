@@ -21,18 +21,18 @@ export class EmployeeRepositoryImpl
     super(_userModel);
   }
 
-  protected toEntity(doc: UserDocument): Employee {
+  protected toEntity(userDoc: UserDocument): Employee {
     return new Employee(
-      (doc as any)._id?.toString() ?? (doc as any).id,
-      `${doc.firstName} ${doc.lastName}`.trim(),
-      doc.email,
-      doc.role,
-      doc.department || '',
-      doc.phone || '',
-      doc.status === UserStatus.ACTIVE,
-      doc.hasPassword,
-      (doc.inviteStatus as InviteStatus) || InviteStatus.PENDING,
-      doc.companyId,
+      (userDoc as any)._id?.toString() ?? (userDoc as any).id,
+      `${userDoc.firstName} ${userDoc.lastName}`.trim(),
+      userDoc.email,
+      userDoc.role,
+      userDoc.department || '',
+      userDoc.phone || '',
+      userDoc.status === UserStatus.ACTIVE,
+      userDoc.hasPassword,
+      (userDoc.inviteStatus as InviteStatus) || InviteStatus.PENDING,
+      userDoc.companyId,
     );
   }
 

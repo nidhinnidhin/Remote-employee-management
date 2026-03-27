@@ -6,10 +6,10 @@ import type { IGetEmployeesUseCase } from '../interfaces/employee-use-cases.inte
 export class GetEmployeesUseCase implements IGetEmployeesUseCase {
     constructor(
         @Inject('IEmployeeRepository')
-        private readonly employeeRepo: IEmployeeRepository,
+        private readonly _employeeRepo: IEmployeeRepository,
     ) { }
 
     async execute(companyId: string) {
-        return await this.employeeRepo.findAllByCompanyId(companyId);
+        return await this._employeeRepo.findAllByCompanyId(companyId);
     }
 }
