@@ -7,7 +7,20 @@ export const clientApi = axios.create({
 });
 
 clientApi.interceptors.response.use(
-  (res) => res,
+  (res) => {
+    // Standard response handling: Automatically unwrap 'data' ONLY if it's a standardized wrapper
+    // This provides 100% backward compatibility with zero code changes needed in components.
+    if (
+      res.data &&
+      typeof res.data === 'object' &&
+      res.data.success === true &&
+      'data' in res.data &&
+      'message' in res.data
+    ) {
+      res.data = res.data.data;
+    }
+    return res;
+  },
   async (err) => {
     const originalRequest = err.config;
     console.log("CLIENT API ERROR:", {

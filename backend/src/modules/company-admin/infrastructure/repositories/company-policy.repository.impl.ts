@@ -47,7 +47,13 @@ export class CompanyPolicyRepositoryImpl
 
   private toPolicyItems(policies: any[]): PolicyItemEntity[] {
     return policies.map(
-      (p) => new PolicyItemEntity(p.type, p.value, p.isEnabled),
+      (p) =>
+        new PolicyItemEntity(
+          p.type,
+          p.title,
+          p.content ?? { sections: [] },
+          p.isActive ?? true,
+        ),
     );
   }
 }

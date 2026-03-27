@@ -12,8 +12,14 @@ export class CompanyPolicyEntity {
 
 export class PolicyItemEntity {
   constructor(
-    public readonly type: PolicyType,
-    public readonly value: string,
-    public readonly isEnabled: boolean,
+    public readonly type: string,
+    public readonly title: string,
+    public readonly content: {
+      sections: Array<{
+        title: string;
+        points: string[];
+      }>;
+    },
+    public readonly isActive: boolean = true,
   ) {}
 }
