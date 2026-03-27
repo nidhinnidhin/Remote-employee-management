@@ -50,17 +50,17 @@ export class MongoEmailOtpRepository implements IEmailOtpRepository {
     await this._emailOtpModel.updateOne({ _id: id }, { verified: true });
   }
 
-  private toEntity(doc: any): EmailOtpEntity {
+  private toEntity(otpDoc: any): EmailOtpEntity {
     return new EmailOtpEntity(
-      doc._id.toString(),
-      doc.userId,
-      doc.email,
-      doc.otpHash,
-      doc.expiresAt,
-      doc.verified,
-      doc.createdAt,
-      doc.newEmail,
-      doc.purpose,
+      otpDoc._id.toString(),
+      otpDoc.userId,
+      otpDoc.email,
+      otpDoc.otpHash,
+      otpDoc.expiresAt,
+      otpDoc.verified,
+      otpDoc.createdAt,
+      otpDoc.newEmail,
+      otpDoc.purpose,
     );
   }
 }

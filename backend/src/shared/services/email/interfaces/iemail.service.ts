@@ -1,13 +1,19 @@
+import { UserStatus } from 'src/shared/enums/user/user-status.enum';
+
 export interface IEmailService {
   sendOtp(email: string, otp: string): Promise<void>;
   sendEmployeeInvite(email: string, inviteLink: string): Promise<void>;
-  sendBlockNotification(email: string, name: string, reason: string): Promise<void>;
+  sendBlockNotification(
+    email: string,
+    name: string,
+    reason: string,
+  ): Promise<void>;
   sendUnblockNotification(email: string, name: string): Promise<void>;
   sendCompanyStatusNotification(
     email: string,
     adminName: string,
     companyName: string,
-    status: 'ACTIVE' | 'SUSPENDED',
+    status: UserStatus.ACTIVE | UserStatus.SUSPENDED,
     reason: string,
   ): Promise<void>;
 }

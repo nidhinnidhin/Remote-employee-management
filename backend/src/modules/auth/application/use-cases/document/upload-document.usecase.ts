@@ -15,9 +15,9 @@ import type { IUploadDocumentUseCase } from '../../interfaces/documents/document
 export class UploadDocumentUseCase implements IUploadDocumentUseCase {
   constructor(
     @Inject('IUserRepository')
-    private readonly userRepository: IUserRepository,
+    private readonly _userRepository: IUserRepository,
     @Inject('ICloudinaryService')
-    private readonly cloudinaryService: ICloudinaryService,
+    private readonly _cloudinaryService: ICloudinaryService,
   ) { }
 
   async execute({
@@ -26,7 +26,7 @@ export class UploadDocumentUseCase implements IUploadDocumentUseCase {
     name,
     category,
   }: UploadDocumentInput): Promise<UploadDocumentResponse> {
-    const uploadResult = await this.cloudinaryService.uploadFile(
+    const uploadResult = await this._cloudinaryService.uploadFile(
       file,
       CLOUDINARY_PATH.UPLOAD_DOCUMENT_PATH,
     );
@@ -40,9 +40,9 @@ export class UploadDocumentUseCase implements IUploadDocumentUseCase {
       uploadedAt: new Date(),
     };
 
-    await this.userRepository.addDocument(userId, document);
+    await this._userRepository.addDocument(userId, document);
 
-    const updatedUser = await this.userRepository.findById(userId);
+    const updatedUser = await this._userRepository.findById(userId);
 
     if (!updatedUser) {
       throw new Error(DOCUMENT_MESSAGES.USER_NOT_FOUND_AFTER_DOCUMENT_UPLOAD);

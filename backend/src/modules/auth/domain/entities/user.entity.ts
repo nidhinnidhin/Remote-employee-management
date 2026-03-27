@@ -53,5 +53,5 @@ export class UserEntity {
       resourceType: string;
       uploadedAt: Date;
     }[],
-  ) { }
+  ) {}
 }

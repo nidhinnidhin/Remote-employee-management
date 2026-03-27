@@ -11,20 +11,20 @@ export class MongoCompanyRepository implements ICompanyRepository {
   constructor(
     @InjectModel(CompanyDocument.name)
     private readonly _companyModel: Model<CompanyDocument>,
-  ) { }
+  ) {}
 
-  protected toEntity(doc: CompanyDocument): CompanyEntity {
+  protected toEntity(companyDoc: CompanyDocument): CompanyEntity {
     return new CompanyEntity(
-      (doc as any)._id.toString(),
-      doc.name,
-      doc.email,
-      doc.size,
-      doc.industry,
-      doc.website,
-      doc.createdAt,
-      doc.updatedAt,
+      (companyDoc as any)._id.toString(),
+      companyDoc.name,
+      companyDoc.email,
+      companyDoc.size,
+      companyDoc.industry,
+      companyDoc.website,
+      companyDoc.createdAt,
+      companyDoc.updatedAt,
       undefined,
-      doc.status || UserStatus.ACTIVE,
+      companyDoc.status || UserStatus.ACTIVE,
     );
   }
 
@@ -43,12 +43,18 @@ export class MongoCompanyRepository implements ICompanyRepository {
 
   async findById(id: string): Promise<CompanyEntity | null> {
     if (!Types.ObjectId.isValid(id)) return null;
-    const doc = await this._companyModel.findById(id).lean().exec() as CompanyDocument | null;
+    const doc = (await this._companyModel
+      .findById(id)
+      .lean()
+      .exec()) as CompanyDocument | null;
     return doc ? this.toEntity(doc) : null;
   }
 
   async findByEmail(email: string): Promise<CompanyEntity | null> {
-    const doc = await this._companyModel.findOne({ email: email.toLowerCase() }).lean().exec() as CompanyDocument | null;
+    const doc = (await this._companyModel
+      .findOne({ email: email.toLowerCase() })
+      .lean()
+      .exec()) as CompanyDocument | null;
     return doc ? this.toEntity(doc) : null;
   }
 }

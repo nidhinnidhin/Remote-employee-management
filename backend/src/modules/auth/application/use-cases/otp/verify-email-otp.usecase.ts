@@ -7,7 +7,6 @@ import { IVerifyEmailOtpUseCase } from '../../interfaces/otp/otp-use-case.interf
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 import { UserRole } from 'src/shared/enums/user/user-role.enum';
 import { UserEntity } from '../../../domain/entities/user.entity';
-import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
 import type { IOtpService } from 'src/shared/services/auth/interfaces/iotp.service';
 import { VerifyEmailOtpDto } from '../../dto/verify-email-otp.dto';

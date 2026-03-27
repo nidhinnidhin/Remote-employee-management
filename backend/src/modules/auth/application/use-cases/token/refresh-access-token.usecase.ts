@@ -12,6 +12,7 @@ import { RefreshTokenPayload } from 'src/shared/types/jwt/jwt-payload.type';
 import { RefreshAccessTokenResponse } from 'src/shared/types/jwt/refresh-access-token-response.type';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
+import { UserRole } from 'src/shared/enums/user/user-role.enum';
 
 @Injectable()
 export class RefreshAccessTokenUseCase implements IRefreshAccessTokenUseCase {
@@ -44,7 +45,7 @@ export class RefreshAccessTokenUseCase implements IRefreshAccessTokenUseCase {
       throw new ForbiddenException(AUTH_MESSAGES.ACCOUNT_NOT_ACTIVE);
     }
 
-    if (user.role === 'COMPANY_ADMIN' && !user.isOnboarded) {
+    if (user.role === UserRole.COMPANY_ADMIN && !user.isOnboarded) {
       throw new ForbiddenException('Onboarding required');
     }
 

@@ -18,7 +18,6 @@ export class UserDocument extends Document {
   @Prop({ required: true, unique: true })
   email: string;
 
-  // 🔹 Make optional properly
   @Prop({ required: false, default: '' })
   phone?: string;
 
