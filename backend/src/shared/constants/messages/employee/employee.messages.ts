@@ -10,4 +10,5 @@ export const EMPLOYEE_MESSAGES = {
     INVITE_PROCESSED: 'Invite already processed',
     INVITE_SESSION_EXPIRED: 'Invite session expired',
     INVITATION_SENT: 'Invitation sent successfully',
+    EMPLOYEE_ADDED_TO_DEPARTMENT: 'Employee added to department',
 };

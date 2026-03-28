@@ -9,6 +9,7 @@ import { EmployeesModule } from './modules/employees/employees.module';
 import { CompanyPolicyModule } from './modules/company-admin/company-policy.module';
 import { ResponseInterceptor } from './common/response/response.interceptor';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { DepartmentModule } from './modules/department/presentation/department.module';
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
     AuthModule,
     SuperAdminModule,
     EmployeesModule,
-    CompanyPolicyModule
+    CompanyPolicyModule,
+    DepartmentModule,
   ],
   providers: [
     {
