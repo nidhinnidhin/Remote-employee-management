@@ -26,6 +26,7 @@ export interface IEmployeeRepository {
 
   findByEmail(email: string): Promise<Employee | null>;
   findById(id: string): Promise<Employee | null>;
+  findByIds(ids: string[]): Promise<Employee[]>;
   findAllByCompanyId(companyId: string): Promise<Employee[]>;
   updateStatus(id: string, status: UserStatus): Promise<void>;
   activateEmployee(id: string): Promise<void>;

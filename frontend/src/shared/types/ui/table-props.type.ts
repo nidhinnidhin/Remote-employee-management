@@ -10,4 +10,5 @@ export interface TableProps<T> {
     keyExtractor: (item: T) => string | number;
     isLoading?: boolean;
     emptyMessage?: string;
+    variant?: "default" | "ghost";
 }

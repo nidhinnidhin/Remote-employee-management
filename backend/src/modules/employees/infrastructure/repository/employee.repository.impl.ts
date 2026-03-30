@@ -73,6 +73,11 @@ export class EmployeeRepositoryImpl
     return docs.map((doc) => this.toEntity(doc as unknown as UserDocument));
   }
 
+  async findByIds(ids: string[]): Promise<Employee[]> {
+    const docs = await this._userModel.find({ _id: { $in: ids } }).lean().exec();
+    return docs.map((doc) => this.toEntity(doc as unknown as UserDocument));
+  }
+
 
   async updateEmployee(
     id: string,

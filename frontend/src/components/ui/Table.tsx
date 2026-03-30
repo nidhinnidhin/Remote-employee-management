@@ -10,15 +10,19 @@ const Table = <T,>({
   isLoading = false,
   emptyMessage = "No data available",
   theme = "dark",
+  variant = "default",
 }: TableProps<T> & { theme?: "dark" | "light" }) => {
   const isDark = theme === "dark";
+  const isGhost = variant === "ghost";
 
   /* ─── Token map ─────────────────────────────────────────────────────────── */
   const tk = {
     // Wrapper
-    wrapper: isDark
-      ? "bg-[rgb(var(--color-nav-bg))] border border-[rgb(var(--color-border-subtle))] rounded-2xl shadow-xl shadow-black/30"
-      : "bg-[rgb(var(--color-nav-bg))] border border-[rgb(var(--color-border-subtle))] rounded-2xl shadow-sm shadow-gray-200/60",
+    wrapper: isGhost
+      ? "w-full"
+      : isDark
+      ? "bg-[rgb(var(--color-nav-bg))] border border-[rgb(var(--color-border-subtle))] rounded-2xl shadow-xl shadow-black/30 overflow-hidden"
+      : "bg-[rgb(var(--color-nav-bg))] border border-[rgb(var(--color-border-subtle))] rounded-2xl shadow-sm shadow-gray-200/60 overflow-hidden",
 
     // Scroll container
     scroll: "w-full overflow-x-auto",

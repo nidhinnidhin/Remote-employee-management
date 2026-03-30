@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { Inject } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import type { Request } from 'express';
@@ -7,6 +7,9 @@ import type {
   ICreateDepartmentUseCase,
   IGetDepartmentsUseCase,
   IAddEmployeeToDepartmentUseCase,
+  IUpdateDepartmentUseCase,
+  IDeleteDepartmentUseCase,
+  IRemoveEmployeeFromDepartmentUseCase,
 } from '../../application/interfaces/department-usecase.interface';
 
 import { CreateDepartmentDto } from '../../application/dto/create-department.dto';
@@ -26,6 +29,15 @@ export class DepartmentController {
 
     @Inject('IAddEmployeeToDepartmentUseCase')
     private readonly _addEmployeeUseCase: IAddEmployeeToDepartmentUseCase,
+
+    @Inject('IUpdateDepartmentUseCase')
+    private readonly _updateDepartmentUseCase: IUpdateDepartmentUseCase,
+
+    @Inject('IDeleteDepartmentUseCase')
+    private readonly _deleteDepartmentUseCase: IDeleteDepartmentUseCase,
+
+    @Inject('IRemoveEmployeeFromDepartmentUseCase')
+    private readonly _removeEmployeeUseCase: IRemoveEmployeeFromDepartmentUseCase,
   ) {}
 
   @Post()
@@ -50,6 +62,30 @@ export class DepartmentController {
   async addEmployee(@Body() addEmployeeDto: AddEmployeeToDepartmentDto) {
     await this._addEmployeeUseCase.execute(addEmployeeDto.departmentId, addEmployeeDto.employeeId);
 
-    return { message: EMPLOYEE_MESSAGES.EMPLOYEE_ADDED_TO_DEPARTMENT};
+    return { message: EMPLOYEE_MESSAGES.EMPLOYEE_ADDED_TO_DEPARTMENT };
+  }
+
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(CompanyAdminGuard)
+  async update(@Param('id') id: string, @Body() updateDepartmentDto: CreateDepartmentDto) {
+    await this._updateDepartmentUseCase.execute(id, updateDepartmentDto.name);
+    return { message: 'Department updated successfully' };
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(CompanyAdminGuard)
+  async delete(@Param('id') id: string) {
+    await this._deleteDepartmentUseCase.execute(id);
+    return { message: 'Department deleted successfully' };
+  }
+
+  @Post('remove-employee')
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(CompanyAdminGuard)
+  async removeEmployee(@Body() removeEmployeeDto: AddEmployeeToDepartmentDto) {
+    await this._removeEmployeeUseCase.execute(removeEmployeeDto.departmentId, removeEmployeeDto.employeeId);
+    return { message: 'Employee removed from department successfully' };
   }
 }

@@ -27,7 +27,7 @@ export const FRONTEND_ROUTES = {
         }
     },
     COMPANY: {
-        DEPARTMENTS: "/company-admin/departments",
+        DEPARTMENTS: "/admin/departments",
         PROJECTS: "/company-admin/projects",
         TASKS: "/company-admin/tasks",
         DISCUSSIONS: "/company-admin/discussions",

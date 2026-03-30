@@ -45,6 +45,18 @@ export class MongoDepartmentRepository
     return super.findAllByCompanyId(companyId);
   }
 
+  async findById(id: string): Promise<DepartmentEntity | null> {
+    return super.findById(id);
+  }
+
+  async update(id: string, name: string): Promise<void> {
+    await this._departmentModel.updateOne({ _id: id }, { name });
+  }
+
+  async delete(id: string): Promise<void> {
+    await this._departmentModel.deleteOne({ _id: id });
+  }
+
   async existsByNameAndCompany(
     name: string,
     companyId: string,
@@ -59,6 +71,13 @@ export class MongoDepartmentRepository
     await this._departmentModel.updateOne(
       { _id: departmentId },
       { $addToSet: { employeeIds: employeeId } },
+    );
+  }
+
+  async removeEmployee(departmentId: string, employeeId: string) {
+    await this._departmentModel.updateOne(
+      { _id: departmentId },
+      { $pull: { employeeIds: employeeId } },
     );
   }
 }
