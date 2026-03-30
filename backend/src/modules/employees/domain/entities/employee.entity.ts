@@ -12,5 +12,6 @@ export class Employee {
     public readonly hasPassword: boolean,
     public readonly inviteStatus: InviteStatus,
     public readonly companyId?: string,
+    public readonly avatar?: string,
   ) { }
 }

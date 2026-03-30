@@ -96,29 +96,40 @@ export const AssignEmployeeModal = ({
           {loading ? (
             <div className="p-10 flex flex-col items-center justify-center gap-3">
               <Loader2 className="animate-spin text-accent" size={24} />
-              <span className="text-xs text-muted font-medium">Loading professionals...</span>
+              <span className="text-xs text-muted font-medium">
+                Loading professionals...
+              </span>
             </div>
           ) : filteredEmployees.length > 0 ? (
             filteredEmployees.map((emp) => {
               const isAlreadyMember = existingMemberIds.includes(emp.id);
-              
+
               return (
                 <div
                   key={emp.id}
                   className={`flex items-center gap-4 p-4 transition-all ${
-                    isAlreadyMember ? "opacity-50 grayscale" : "hover:bg-white/5"
+                    isAlreadyMember
+                      ? "opacity-50 grayscale"
+                      : "hover:bg-white/5"
                   }`}
                 >
-                  <div className="h-10 w-10 rounded-full overflow-hidden border border-white/10 ring-2 ring-black/20 shrink-0">
+                  <div className="h-10 w-10 rounded-full overflow-hidden border border-white/10 ring-2 ring-black/20 shrink-0 bg-white/5 flex items-center justify-center">
                     <Image
-                      src={emp.avatar || `https://i.pravatar.cc/150?u=${emp.id}`}
+                      src={
+                        emp.avatar ||
+                        `https://ui-avatars.com/api/?name=${encodeURIComponent(emp.name)}&background=random`
+                      }
                       alt={emp.name}
                       width={40}
                       height={40}
-                      className="object-cover"
+                      sizes="40px"
+                      className="w-full h-full object-cover"
+                      onError={(e: any) => {
+                        e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(emp.name)}`;
+                      }}
                     />
                   </div>
-                  
+
                   <div className="flex flex-col min-w-0 flex-1">
                     <span className="text-[13px] font-bold text-primary truncate leading-none mb-1">
                       {emp.name}
@@ -151,7 +162,9 @@ export const AssignEmployeeModal = ({
             })
           ) : (
             <div className="p-12 text-center">
-              <p className="text-sm text-muted font-medium italic">No matching employees found.</p>
+              <p className="text-sm text-muted font-medium italic">
+                No matching employees found.
+              </p>
             </div>
           )}
         </div>

@@ -33,6 +33,7 @@ export class EmployeeRepositoryImpl
       userDoc.hasPassword,
       (userDoc.inviteStatus as InviteStatus) || InviteStatus.PENDING,
       userDoc.companyId,
+      userDoc.profileImageUrl,
     );
   }
 

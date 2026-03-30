@@ -35,7 +35,7 @@ export class GetDepartmentsUseCase implements IGetDepartmentsUseCase {
           id: e.id,
           name: e.name,
           email: e.email,
-          avatar: `https://i.pravatar.cc/150?u=${e.id}`,
+          avatar: e.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(e.name)}&background=random`,
         }));
 
       return {

@@ -1,12 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import {
-  ChevronDown,
-  ChevronRight,
-  FolderOpen,
-  Users,
-} from "lucide-react";
+import { ChevronDown, ChevronRight, FolderOpen, Users } from "lucide-react";
 import Image from "next/image";
 import { Department } from "@/shared/types/company/departments/department.type";
 import { getDepartmentsAction } from "@/actions/company/departments/department.actions";
@@ -17,9 +12,9 @@ import { DepartmentDetailsModal } from "./DepartmentDetailsModal";
 import { DepartmentFormModal } from "./DepartmentFormModal";
 import { DeleteConfirmationModal } from "./DeleteConfirmationModal";
 import { AssignEmployeeModal } from "./AssignEmployeeModal";
-import { 
-  deleteDepartmentAction, 
-  removeEmployeeFromDepartmentAction 
+import {
+  deleteDepartmentAction,
+  removeEmployeeFromDepartmentAction,
 } from "@/actions/company/departments/department.actions";
 import { toast } from "sonner";
 
@@ -27,9 +22,11 @@ const DepartmentsTable = ({ refreshTrigger }: { refreshTrigger?: number }) => {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
-  const [menuAnchor, setMenuAnchor] = useState<{ x: number; y: number } | null>(null);
+  const [menuAnchor, setMenuAnchor] = useState<{ x: number; y: number } | null>(
+    null,
+  );
   const [selectedDept, setSelectedDept] = useState<Department | null>(null);
-  
+
   // Modal states
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -41,7 +38,7 @@ const DepartmentsTable = ({ refreshTrigger }: { refreshTrigger?: number }) => {
 
   // ✅ FIX: dynamic expansion
   const [expandedDepts, setExpandedDepts] = useState<Record<string, boolean>>(
-    {}
+    {},
   );
 
   const toggleDept = (id: string) => {
@@ -52,7 +49,7 @@ const DepartmentsTable = ({ refreshTrigger }: { refreshTrigger?: number }) => {
   };
 
   const toggleMenu = (e: React.MouseEvent, dept: Department) => {
-    e.stopPropagation(); // Prevent accordion toggle
+    e.stopPropagation();
     if (openMenuId === dept.id) {
       setOpenMenuId(null);
     } else {
@@ -96,7 +93,10 @@ const DepartmentsTable = ({ refreshTrigger }: { refreshTrigger?: number }) => {
   const handleRemoveMember = async () => {
     if (!selectedDept || !selectedMember) return;
     try {
-      await removeEmployeeFromDepartmentAction(selectedDept.id, selectedMember.id);
+      await removeEmployeeFromDepartmentAction(
+        selectedDept.id,
+        selectedMember.id,
+      );
       toast.success("Employee removed from department");
       fetchDepartments();
     } catch (error: any) {
@@ -126,36 +126,26 @@ const DepartmentsTable = ({ refreshTrigger }: { refreshTrigger?: number }) => {
 
   useEffect(() => {
     const handleScroll = () => setOpenMenuId(null);
-    window.addEventListener('scroll', handleScroll, true);
-    return () => window.removeEventListener('scroll', handleScroll, true);
+    window.addEventListener("scroll", handleScroll, true);
+    return () => window.removeEventListener("scroll", handleScroll, true);
   }, []);
 
   useEffect(() => {
     fetchDepartments();
   }, [refreshTrigger]);
 
-
   // ✅ LOADING STATE
   if (loading) {
-    return (
-      <div className="p-6 text-sm text-muted">
-        Loading departments...
-      </div>
-    );
+    return <div className="p-6 text-sm text-muted">Loading departments...</div>;
   }
 
   // ✅ EMPTY STATE
   if (!departments.length) {
-    return (
-      <div className="p-6 text-sm text-muted">
-        No departments found.
-      </div>
-    );
+    return <div className="p-6 text-sm text-muted">No departments found.</div>;
   }
 
   return (
     <div className="portal-card overflow-hidden bg-[rgb(var(--color-bg-subtle))]/60 border border-[rgb(var(--color-border-subtle))] shadow-2xl backdrop-blur-md w-full">
-      
       {/* Header */}
       <div className="grid grid-cols-[1fr_100px_80px] px-6 py-4 bg-[rgb(var(--color-surface-raised))]/30 border-b border-[rgb(var(--color-border-subtle))]">
         <span className="text-[10px] font-bold text-muted uppercase tracking-widest px-8">
@@ -172,7 +162,6 @@ const DepartmentsTable = ({ refreshTrigger }: { refreshTrigger?: number }) => {
       <div className="divide-y divide-[rgb(var(--color-border-subtle))]/30">
         {departments.map((dept) => (
           <div key={dept.id} className="group transition-colors duration-200">
-            
             {/* Department Row */}
             <div
               className="grid grid-cols-[1fr_100px_80px] items-center px-6 py-4 hover:bg-white/5 cursor-pointer relative transition-all"
@@ -198,7 +187,7 @@ const DepartmentsTable = ({ refreshTrigger }: { refreshTrigger?: number }) => {
               </div>
 
               <div className="flex justify-end px-1 relative">
-                <button 
+                <button
                   className="p-1.5 rounded-lg hover:bg-white/10 text-muted transition-all opacity-40 group-hover:opacity-100"
                   onClick={(e) => toggleMenu(e, dept)}
                 >
@@ -208,42 +197,53 @@ const DepartmentsTable = ({ refreshTrigger }: { refreshTrigger?: number }) => {
             </div>
 
             {/* Actions Dropdown Portal */}
-            {openMenuId === dept.id && menuAnchor && createPortal(
-              <div
-                className="fixed glass-dropdown rounded-xl z-[9999] overflow-hidden animate-in fade-in zoom-in-95 duration-200"
-                style={{
-                  top: `${menuAnchor.y + 8}px`,
-                  right: `${window.innerWidth - menuAnchor.x}px`,
-                  minWidth: '180px'
-                }}
-              >
-                <div className="flex flex-col p-1.5">
-                  <button
-                    className="flex items-center gap-3 px-4 py-2 text-[13px] text-secondary hover:bg-white/10 hover:text-primary rounded-lg transition-all font-bold group"
-                    onClick={() => handleAction("DETAILS")}
-                  >
-                    <Eye size={14} className="group-hover:scale-110 transition-transform" />
-                    <span>View Details</span>
-                  </button>
-                  <button
-                    className="flex items-center gap-3 px-4 py-2 text-[13px] text-secondary hover:bg-white/10 hover:text-primary rounded-lg transition-all font-bold group"
-                    onClick={() => handleAction("EDIT")}
-                  >
-                    <Edit3 size={14} className="group-hover:scale-110 transition-transform" />
-                    <span>Edit Dept</span>
-                  </button>
-                  <div className="h-px bg-white/5 my-1 mx-2" />
-                  <button
-                    className="flex items-center gap-3 px-4 py-2 text-[13px] text-danger hover:bg-danger/10 rounded-lg transition-all font-bold group"
-                    onClick={() => handleAction("DELETE")}
-                  >
-                    <Trash2 size={14} className="group-hover:scale-110 transition-transform" />
-                    <span>Delete</span>
-                  </button>
-                </div>
-              </div>,
-              document.body
-            )}
+            {openMenuId === dept.id &&
+              menuAnchor &&
+              createPortal(
+                <div
+                  className="fixed glass-dropdown rounded-xl z-[9999] overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+                  style={{
+                    top: `${menuAnchor.y + 8}px`,
+                    right: `${window.innerWidth - menuAnchor.x}px`,
+                    minWidth: "180px",
+                  }}
+                >
+                  <div className="flex flex-col p-1.5">
+                    <button
+                      className="flex items-center gap-3 px-4 py-2 text-[13px] text-secondary hover:bg-white/10 hover:text-primary rounded-lg transition-all font-bold group"
+                      onClick={() => handleAction("DETAILS")}
+                    >
+                      <Eye
+                        size={14}
+                        className="group-hover:scale-110 transition-transform"
+                      />
+                      <span>View Details</span>
+                    </button>
+                    <button
+                      className="flex items-center gap-3 px-4 py-2 text-[13px] text-secondary hover:bg-white/10 hover:text-primary rounded-lg transition-all font-bold group"
+                      onClick={() => handleAction("EDIT")}
+                    >
+                      <Edit3
+                        size={14}
+                        className="group-hover:scale-110 transition-transform"
+                      />
+                      <span>Edit Dept</span>
+                    </button>
+                    <div className="h-px bg-white/5 my-1 mx-2" />
+                    <button
+                      className="flex items-center gap-3 px-4 py-2 text-[13px] text-danger hover:bg-danger/10 rounded-lg transition-all font-bold group"
+                      onClick={() => handleAction("DELETE")}
+                    >
+                      <Trash2
+                        size={14}
+                        className="group-hover:scale-110 transition-transform"
+                      />
+                      <span>Delete</span>
+                    </button>
+                  </div>
+                </div>,
+                document.body,
+              )}
 
             {/* Expanded Section - Employee List */}
             {expandedDepts[dept.id] && (
@@ -252,7 +252,7 @@ const DepartmentsTable = ({ refreshTrigger }: { refreshTrigger?: number }) => {
                   <h4 className="text-[11px] font-black text-muted uppercase tracking-[0.2em]">
                     Department Members ({dept.employeeIds?.length || 0})
                   </h4>
-                  <button 
+                  <button
                     onClick={(e) => {
                       e.stopPropagation();
                       setSelectedDept(dept);
@@ -268,24 +268,32 @@ const DepartmentsTable = ({ refreshTrigger }: { refreshTrigger?: number }) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                   {dept.employeeIds && dept.employeeIds.length > 0 ? (
                     dept.employeeIds.map((employee: any) => (
-                      <div 
+                      <div
                         key={employee.id}
                         className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.06] hover:border-white/10 transition-all cursor-default group/emp"
                       >
-                        <div className="relative">
-                          <div className="h-10 w-10 rounded-full overflow-hidden border border-white/10 ring-2 ring-black/20">
+                        <div className="relative flex-shrink-0">
+                          <div className="h-10 w-10 rounded-full overflow-hidden border border-white/10 ring-2 ring-black/20 bg-white/5 flex items-center justify-center">
                             <Image
-                              src={employee.avatar}
+                              src={
+                                employee.avatar ||
+                                `https://ui-avatars.com/api/?name=${encodeURIComponent(employee.name)}&background=random`
+                              }
                               alt={employee.name}
                               width={40}
                               height={40}
-                              className="object-cover group-hover/emp:scale-110 transition-transform duration-500"
+                              sizes="40px"
+                              className="w-full h-full object-cover"
+                              onError={(e: any) => {
+                                e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(employee.name)}`;
+                              }}
                             />
                           </div>
-                   {/* Status Dot */}
+
+                          {/* Status Dot */}
                           <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-[rgb(var(--color-bg))] rounded-full shadow-lg shadow-green-500/20" />
                         </div>
-                        
+
                         <div className="flex flex-col min-w-0">
                           <span className="text-[13px] font-bold text-primary truncate leading-tight">
                             {employee.name}
@@ -294,14 +302,15 @@ const DepartmentsTable = ({ refreshTrigger }: { refreshTrigger?: number }) => {
                             {employee.email}
                           </span>
                         </div>
-                        
+
                         <div className="ml-auto relative">
-                          <button 
+                          <button
                             onClick={(e) => {
                               e.stopPropagation();
                               setSelectedDept(dept);
                               setSelectedMember(employee);
-                              const rect = e.currentTarget.getBoundingClientRect();
+                              const rect =
+                                e.currentTarget.getBoundingClientRect();
                               setMenuAnchor({ x: rect.right, y: rect.bottom });
                               setOpenMenuId(`member-${employee.id}`);
                             }}
@@ -311,38 +320,42 @@ const DepartmentsTable = ({ refreshTrigger }: { refreshTrigger?: number }) => {
                           </button>
 
                           {/* Member Specific Menu */}
-                          {openMenuId === `member-${employee.id}` && menuAnchor && createPortal(
-                            <div
-                              className="fixed glass-dropdown rounded-xl z-[9999] overflow-hidden animate-in fade-in zoom-in-95 duration-200"
-                              style={{
-                                top: `${menuAnchor.y + 8}px`,
-                                right: `${window.innerWidth - menuAnchor.x}px`,
-                                minWidth: '160px'
-                              }}
-                            >
-                              <div className="flex flex-col p-1.5">
-                                <button
-                                  className="flex items-center gap-3 px-4 py-2 text-[13px] text-danger hover:bg-danger/10 rounded-lg transition-all font-bold group"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setOpenMenuId(null);
-                                    setIsRemoveMemberOpen(true);
-                                  }}
-                                >
-                                  <Trash2 size={14} />
-                                  <span>Remove Dept</span>
-                                </button>
-                              </div>
-                            </div>,
-                            document.body
-                          )}
+                          {openMenuId === `member-${employee.id}` &&
+                            menuAnchor &&
+                            createPortal(
+                              <div
+                                className="fixed glass-dropdown rounded-xl z-[9999] overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+                                style={{
+                                  top: `${menuAnchor.y + 8}px`,
+                                  right: `${window.innerWidth - menuAnchor.x}px`,
+                                  minWidth: "160px",
+                                }}
+                              >
+                                <div className="flex flex-col p-1.5">
+                                  <button
+                                    className="flex items-center gap-3 px-4 py-2 text-[13px] text-danger hover:bg-danger/10 rounded-lg transition-all font-bold group"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setOpenMenuId(null);
+                                      setIsRemoveMemberOpen(true);
+                                    }}
+                                  >
+                                    <Trash2 size={14} />
+                                    <span>Remove Dept</span>
+                                  </button>
+                                </div>
+                              </div>,
+                              document.body,
+                            )}
                         </div>
                       </div>
                     ))
                   ) : (
                     <div className="col-span-full py-8 flex flex-col items-center justify-center border border-dashed border-white/5 rounded-2xl bg-white/[0.01]">
                       <Users size={24} className="text-muted/20 mb-2" />
-                      <p className="text-xs text-muted/40 font-medium italic">No employees assigned to this department</p>
+                      <p className="text-xs text-muted/40 font-medium italic">
+                        No employees assigned to this department
+                      </p>
                     </div>
                   )}
                 </div>
@@ -389,7 +402,9 @@ const DepartmentsTable = ({ refreshTrigger }: { refreshTrigger?: number }) => {
         departmentId={selectedDept?.id || ""}
         departmentName={selectedDept?.name || ""}
         onSuccess={fetchDepartments}
-        existingMemberIds={selectedDept?.employeeIds?.map((e: any) => e.id) || []}
+        existingMemberIds={
+          selectedDept?.employeeIds?.map((e: any) => e.id) || []
+        }
       />
 
       <DeleteConfirmationModal
