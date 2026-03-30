@@ -1,6 +1,7 @@
 import { Inject, Injectable, UnauthorizedException, ForbiddenException } from '@nestjs/common';
 import type { IUserRepository } from '../../../domain/repositories/iuser.repository';
 import type { ICompanyRepository } from '../../../domain/repositories/icompany.repository';
+import type { IDepartmentRepository } from '../../../../department/domain/repositories/idepartment.repository';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { CompanyStatus } from 'src/shared/enums/company/company-status.enum';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
@@ -14,6 +15,8 @@ export class GetUserProfileUseCase implements IGetUserProfileUseCase {
     private readonly _userRepository: IUserRepository,
     @Inject('ICompanyRepository')
     private readonly _companyRepository: ICompanyRepository,
+    @Inject('IDepartmentRepository')
+    private readonly _departmentRepository: IDepartmentRepository,
   ) { }
 
   async execute(userId: string) {
@@ -31,7 +34,14 @@ export class GetUserProfileUseCase implements IGetUserProfileUseCase {
       await this.checkCompanySuspension(user.companyId);
     }
 
-    return { ...user };
+    // List all departments the user belongs to
+    const departments = await this._departmentRepository.findAllByEmployeeId(userId);
+    const departmentNames = departments.map(d => d.name);
+
+    return {
+      ...JSON.parse(JSON.stringify(user)),
+      departments: departmentNames,
+    };
   }
 
   private async checkCompanySuspension(

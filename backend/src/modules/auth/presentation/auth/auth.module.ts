@@ -47,6 +47,11 @@ import { DeleteDocumentUseCase } from '../../application/use-cases/document/dele
 import { EditDocumentUseCase } from '../../application/use-cases/document/edit-document.usecase';
 import { CookieHelperService } from 'src/shared/services/auth/cookie-helper.service';
 import { PasswordService } from 'src/shared/services/auth/password.service';
+import {
+  DepartmentDocument,
+  DepartmentSchema,
+} from 'src/modules/department/infrastructure/database/mongoose/schemas/department.schema';
+import { MongoDepartmentRepository } from 'src/modules/department/infrastructure/database/repositories/mongo-department.repository';
 
 @Module({
   imports: [
@@ -55,6 +60,7 @@ import { PasswordService } from 'src/shared/services/auth/password.service';
       { name: UserDocument.name, schema: UserSchema },
       { name: CompanyDocument.name, schema: CompanySchema },
       { name: 'EmailOtp', schema: EmailOtpSchema },
+      { name: DepartmentDocument.name, schema: DepartmentSchema },
     ]),
   ],
   controllers: [
@@ -191,6 +197,10 @@ import { PasswordService } from 'src/shared/services/auth/password.service';
     {
       provide: 'IEmailOtpRepository',
       useClass: MongoEmailOtpRepository,
+    },
+    {
+      provide: 'IDepartmentRepository',
+      useClass: MongoDepartmentRepository,
     },
   ],
   exports: [

@@ -352,6 +352,38 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
       <div className="portal-card p-7">
         <SectionHeader
           icon={User}
+          title="Work & Account Information"
+          subtitle="Your professional account details"
+        />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-7 gap-y-5 mb-8 p-4 bg-gray-50/50 rounded-xl border border-gray-100" style={{ borderColor: 'rgb(var(--color-border-subtle))', backgroundColor: 'rgb(var(--color-bg-subtle))/40' }}>
+          <div className="flex flex-col gap-1">
+            <span className="text-[10px] font-bold text-muted uppercase tracking-widest">Role</span>
+            <span className="text-sm font-bold text-accent">{user.role}</span>
+          </div>
+          <div className="flex flex-col gap-1">
+            <span className="text-[10px] font-bold text-muted uppercase tracking-widest">Account Status</span>
+            <span className={`text-[11px] font-black uppercase px-2 py-0.5 rounded w-fit ${user.status === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
+              {user.status}
+            </span>
+          </div>
+          <div className="flex flex-col gap-1">
+            <span className="text-[10px] font-bold text-muted uppercase tracking-widest">Joined On</span>
+            <span className="text-sm text-secondary">{new Date(user.createdAt).toLocaleDateString()}</span>
+          </div>
+          <div className="flex flex-col gap-1">
+            <span className="text-[10px] font-bold text-muted uppercase tracking-widest">Login Provider</span>
+            <span className="text-sm text-secondary uppercase font-bold">{user.provider || "Standard"}</span>
+          </div>
+          <div className="flex flex-col gap-1">
+            <span className="text-[10px] font-bold text-muted uppercase tracking-widest">Onboarding Status</span>
+            <span className={`text-[11px] font-black uppercase px-2 py-0.5 rounded w-fit ${user.isOnboarded ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'}`}>
+              {user.isOnboarded ? "Completed" : "In Progress"}
+            </span>
+          </div>
+        </div>
+
+        <SectionHeader
+          icon={User}
           title="Basic Information"
           subtitle="Your personal details"
         />

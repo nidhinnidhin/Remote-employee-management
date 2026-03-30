@@ -16,6 +16,8 @@ export interface UserProfile {
   profileImageUrl?: string;
   companyId: string;
   department: string;
+  departments?: string[];
+  title?: string;
   status: string;
   inviteStatus: string;
   hasPassword: boolean;
@@ -43,6 +45,9 @@ export interface UserProfile {
 
   linkedInUrl?: string;
   personalWebsite?: string;
+
+  isOnboarded?: boolean;
+  provider?: string;
 
   skills?: string[];
   documents?: {

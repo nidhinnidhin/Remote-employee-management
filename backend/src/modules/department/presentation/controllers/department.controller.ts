@@ -50,7 +50,6 @@ export class DepartmentController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  @UseGuards(CompanyAdminGuard)
   async getAll(@Req() req: Request) {
     const companyId = (req.user as any).companyId;
     return this._getDepartmentsUseCase.execute(companyId);

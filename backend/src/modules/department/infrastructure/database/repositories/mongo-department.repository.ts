@@ -10,8 +10,7 @@ import { DepartmentDocument } from '../mongoose/schemas/department.schema';
 @Injectable()
 export class MongoDepartmentRepository
   extends BaseRepository<DepartmentDocument, DepartmentEntity>
-  implements IDepartmentRepository
-{
+  implements IDepartmentRepository {
   constructor(
     @InjectModel(DepartmentDocument.name)
     private readonly _departmentModel: Model<DepartmentDocument>,
@@ -79,5 +78,14 @@ export class MongoDepartmentRepository
       { _id: departmentId },
       { $pull: { employeeIds: employeeId } },
     );
+  }
+
+  async findAllByEmployeeId(employeeId: string): Promise<DepartmentEntity[]> {
+    const docs = (await this._departmentModel
+      .find({ employeeIds: employeeId })
+      .lean()
+      .exec()) as unknown as DepartmentDocument[];
+
+    return docs.map((doc) => this.toEntity(doc));
   }
 }

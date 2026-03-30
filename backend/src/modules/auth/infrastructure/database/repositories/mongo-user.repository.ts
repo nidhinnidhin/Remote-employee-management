@@ -24,6 +24,11 @@ export class MongoUserRepository
   }
 
   protected toEntity(user: UserDocument): UserEntity {
+    // If department was populated, extract the name, otherwise use the ID string
+    const departmentValue = user.department && typeof user.department === 'object' 
+      ? (user.department as any).name || (user.department as any)._id?.toString()
+      : user.department?.toString();
+
     return new UserEntity(
       (user as any)._id.toString(),
       user.firstName,
@@ -33,10 +38,11 @@ export class MongoUserRepository
       user.phone,
       user.passwordHash,
       user.status as UserStatus,
+      user.title,
       user.createdAt,
       user.updatedAt,
       user.companyId,
-      user.department,
+      departmentValue,
       user.inviteStatus,
       user.hasPassword,
       user.dateOfBirth,
@@ -64,6 +70,16 @@ export class MongoUserRepository
       user.providerId,
       user.documents,
     );
+  }
+
+  async findById(id: string): Promise<UserEntity | null> {
+    if (!Types.ObjectId.isValid(id)) return null;
+    const doc = await this._userModel
+      .findById(id)
+      .populate('department')
+      .exec();
+    
+    return doc ? this.toEntity(doc) : null;
   }
 
   // --- Override create: input is UserEntity not Partial<UserDocument> ---

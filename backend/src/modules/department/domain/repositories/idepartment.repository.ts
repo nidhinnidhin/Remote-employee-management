@@ -10,5 +10,6 @@ export interface IDepartmentRepository {
 
   addEmployee(departmentId: string, employeeId: string): Promise<void>;
   removeEmployee(departmentId: string, employeeId: string): Promise<void>;
+  findAllByEmployeeId(employeeId: string): Promise<DepartmentEntity[]>;
   existsByNameAndCompany(name: string, companyId: string): Promise<boolean>;
 }

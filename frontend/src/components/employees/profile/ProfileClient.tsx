@@ -30,17 +30,29 @@ export default function ProfileClient({ user }: { user: UserProfile }) {
     }
   };
 
+  // ✅ Construct Address String
+  const fullAddress = [
+    user.streetAddress,
+    user.city,
+    user.state,
+    user.country,
+    user.zipCode
+  ].filter(Boolean).join(", ");
+
   return (
     <DashboardLayout>
       <div className="flex flex-col gap-4 p-4 sm:p-6 max-w-5xl mx-auto w-full">
         <ProfileHeader
           name={`${user.firstName} ${user.lastName}`.trim()}
+          title={user.title || user.role || "Employee"}
           department={user.department}
+          departments={user.departments || []}
           email={user.email}
           phone={user.phone}
-          joinedDate={new Date(user.createdAt).toISOString().split("T")[0]}
-          avatarUrl={avatarUrl} // ✅ USE STATE
-          onAvatarUploaded={(url) => setAvatarUrl(url)} // ✅ UPDATE STATE
+          address={fullAddress}
+          joinedDate={new Date(user.createdAt).toLocaleDateString()}
+          avatarUrl={avatarUrl}
+          onAvatarUploaded={(url) => setAvatarUrl(url)}
         />
 
         <ProfileTabs activeTab={activeTab} onChange={setActiveTab} />

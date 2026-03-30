@@ -10,6 +10,7 @@ interface ProfileHeaderProps {
   name?: string;
   title?: string;
   department?: string;
+  departments?: string[];
   email?: string;
   phone?: string;
   address?: string;
@@ -20,13 +21,14 @@ interface ProfileHeaderProps {
 }
 
 export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
-  name = "John Doe",
-  title = "Senior Backend Developer",
-  department = "Engineering",
-  email = "john.doe@company.com",
-  phone = "+1 (555) 123-4567",
-  address = "123 Tech Street, San Francisco, CA 94105",
-  joinedDate = "3/15/2020",
+  name = "",
+  title = "",
+  department = "",
+  departments = [],
+  email = "",
+  phone = "",
+  address = "",
+  joinedDate = "",
   avatarUrl,
   onEditProfile,
   onAvatarUploaded,
@@ -118,10 +120,22 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             <h1 className="text-2xl font-bold text-primary leading-tight">
               {name}
             </h1>
-            <p className="text-sm text-secondary mt-0.5">{title}</p>
-            <span className="portal-badge inline-block mt-2">
-              {department}
-            </span>
+            {title && (
+              <p className="text-sm text-secondary mt-0.5 font-medium">{title}</p>
+            )}
+
+            {/* Department Badges */}
+            <div className="flex flex-wrap gap-2 mt-2">
+              {departments.length > 0
+                ? departments.map((dept) => (
+                    <span key={dept} className="portal-badge inline-block">
+                      {dept}
+                    </span>
+                  ))
+                : department && (
+                    <span className="portal-badge inline-block">{department}</span>
+                  )}
+            </div>
 
             {/* Contact info grid */}
             <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-1.5">
@@ -133,10 +147,12 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 <Phone className="w-4 h-4 text-muted flex-shrink-0" />
                 <span>{phone}</span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-secondary">
-                <MapPin className="w-4 h-4 text-muted flex-shrink-0" />
-                <span>{address}</span>
-              </div>
+              {address && (
+                <div className="flex items-center gap-2 text-sm text-secondary">
+                  <MapPin className="w-4 h-4 text-muted flex-shrink-0" />
+                  <span>{address}</span>
+                </div>
+              )}
               <div className="flex items-center gap-2 text-sm text-secondary">
                 <Calendar className="w-4 h-4 text-muted flex-shrink-0" />
                 <span>Joined {joinedDate}</span>
