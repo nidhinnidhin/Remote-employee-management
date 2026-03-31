@@ -36,6 +36,7 @@ export const API_ROUTES = {
         },
         DEPARTMENTS: {
             GET_ALL: "/departments",
+            GET_MY_DEPARTMENTS: "/departments/my-departments",
             CREATE: "/departments",
             UPDATE: (id: string) => `/departments/${id}`,
             DELETE: (id: string) => `/departments/${id}`,

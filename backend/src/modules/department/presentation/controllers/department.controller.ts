@@ -10,6 +10,7 @@ import type {
   IUpdateDepartmentUseCase,
   IDeleteDepartmentUseCase,
   IRemoveEmployeeFromDepartmentUseCase,
+  IGetEmployeeDepartmentsUseCase,
 } from '../../application/interfaces/department-usecase.interface';
 
 import { CreateDepartmentDto } from '../../application/dto/create-department.dto';
@@ -38,6 +39,9 @@ export class DepartmentController {
 
     @Inject('IRemoveEmployeeFromDepartmentUseCase')
     private readonly _removeEmployeeUseCase: IRemoveEmployeeFromDepartmentUseCase,
+
+    @Inject('IGetEmployeeDepartmentsUseCase')
+    private readonly _getEmployeeDepartmentsUseCase: IGetEmployeeDepartmentsUseCase,
   ) {}
 
   @Post()
@@ -53,6 +57,14 @@ export class DepartmentController {
   async getAll(@Req() req: Request) {
     const companyId = (req.user as any).companyId;
     return this._getDepartmentsUseCase.execute(companyId);
+  }
+
+  @Get('my-departments')
+  @UseGuards(JwtAuthGuard)
+  async getMyDepartments(@Req() req: Request) {
+    const employeeId = (req.user as any).userId;
+    const companyId = (req.user as any).companyId;
+    return this._getEmployeeDepartmentsUseCase.execute(employeeId, companyId);
   }
 
   @Post('add-employee')

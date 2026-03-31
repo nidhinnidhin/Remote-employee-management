@@ -1,4 +1,4 @@
-import { Model, Document, FilterQuery, UpdateQuery, Types } from "mongoose";
+import { Model, Document, FilterQuery, UpdateQuery, Types, ClientSession } from "mongoose";
 import { IBaseRepository } from "./interfaces/base.repository.interface";
 
 export abstract class BaseRepository<TDocument extends Document, TEntity = TDocument>
@@ -75,7 +75,7 @@ export abstract class BaseRepository<TDocument extends Document, TEntity = TDocu
     filter: FilterQuery<TDocument>,
     skip: number,
     limit: number,
-    sort: any = { createdAt: -1 }
+    sort: Record<string, 1 | -1 | 'asc' | 'desc'> | string = { createdAt: -1 }
   ): Promise<{ data: TEntity[]; total: number }> {
     const [data, total] = await Promise.all([
       this.model.find(filter).sort(sort).skip(skip).limit(limit).lean().exec() as Promise<TDocument[]>,
@@ -99,17 +99,17 @@ export abstract class BaseRepository<TDocument extends Document, TEntity = TDocu
 
   async softDelete(id: string): Promise<boolean> {
     if (!Types.ObjectId.isValid(id)) return false;
-    const result = await this.model.findByIdAndUpdate(id, {
+    const result = await this.model.findByIdAndUpdate(id, <UpdateQuery<TDocument>>{
       $set: { deletedAt: new Date() }
-    } as any).exec();
+    }).exec();
     return !!result;
   }
 
   async restore(id: string): Promise<boolean> {
     if (!Types.ObjectId.isValid(id)) return false;
-    const result = await this.model.findByIdAndUpdate(id, {
+    const result = await this.model.findByIdAndUpdate(id, <UpdateQuery<TDocument>>{
       $unset: { deletedAt: 1 }
-    } as any).exec();
+    }).exec();
     return !!result;
   }
 
@@ -121,7 +121,7 @@ export abstract class BaseRepository<TDocument extends Document, TEntity = TDocu
     return this.toEntity(doc);
   }
 
-  async withTransaction<R>(fn: (session: any) => Promise<R>): Promise<R> {
+  async withTransaction<R>(fn: (session: ClientSession) => Promise<R>): Promise<R> {
     const session = await this.model.db.startSession();
     session.startTransaction();
     try {

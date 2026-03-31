@@ -20,6 +20,10 @@ export interface IUpdateDepartmentUseCase {
   execute(id: string, name: string): Promise<void>;
 }
 
+export interface IGetEmployeeDepartmentsUseCase {
+  execute(employeeId: string, companyId: string): Promise<any[]>;
+}
+
 export interface IDeleteDepartmentUseCase {
   execute(id: string): Promise<void>;
 }

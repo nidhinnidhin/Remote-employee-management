@@ -24,6 +24,8 @@ export class EmailOtpDocument extends Document {
 
   @Prop({ enum: OtpPurpose })
   purpose?: OtpPurpose;
+
+  createdAt: Date;
 }
 
 export const EmailOtpSchema = SchemaFactory.createForClass(EmailOtpDocument);

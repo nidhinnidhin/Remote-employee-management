@@ -3,15 +3,15 @@ import { UpdateProfileDto } from "src/modules/auth/application/dto/update-profil
 
 
 export interface IProfileRepository {
-  getUserProfile(userId: string): Promise<any>;
+  getUserProfile(userId: string): Promise<unknown>;
 
-  updateProfile(userId: string, input: UpdateProfileDto): Promise<any>;
+  updateProfile(userId: string, input: UpdateProfileDto): Promise<unknown>;
 
-  uploadProfileImage(userId: string, file: any): Promise<any>;
+  uploadProfileImage(userId: string, file: Express.Multer.File): Promise<unknown>;
 
-  updateSkills(userId: string, skills: string[]): Promise<any>;
+  updateSkills(userId: string, skills: string[]): Promise<unknown>;
 
-  requestEmailChange(userId: string, input: RequestEmailChangeDto): Promise<any>;
+  requestEmailChange(userId: string, input: RequestEmailChangeDto): Promise<unknown>;
 
-  verifyEmailChange(userId: string, otp: string): Promise<any>;
+  verifyEmailChange(userId: string, otp: string): Promise<unknown>;
 }

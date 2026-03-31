@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 import { BaseRepository } from 'src/shared/repositories/base.repository';
 import { IDepartmentRepository } from '../../../domain/repositories/idepartment.repository';
@@ -20,7 +20,7 @@ export class MongoDepartmentRepository
 
   protected toEntity(departmentDoc: DepartmentDocument): DepartmentEntity {
     return new DepartmentEntity(
-      (departmentDoc as any)._id.toString(),
+      (departmentDoc._id as Types.ObjectId).toString(),
       departmentDoc.name,
       departmentDoc.companyId,
       departmentDoc.employeeIds,

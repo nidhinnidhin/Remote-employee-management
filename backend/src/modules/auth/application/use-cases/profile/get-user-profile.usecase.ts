@@ -7,6 +7,7 @@ import { CompanyStatus } from 'src/shared/enums/company/company-status.enum';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 import { isValidObjectId } from 'mongoose';
 import { IGetUserProfileUseCase } from '../../interfaces/profile/profile-use-case.interface';
+import { EnrichedUserProfile } from 'src/shared/types/profile/enriched-user-profile.type';
 
 @Injectable()
 export class GetUserProfileUseCase implements IGetUserProfileUseCase {
@@ -19,7 +20,7 @@ export class GetUserProfileUseCase implements IGetUserProfileUseCase {
     private readonly _departmentRepository: IDepartmentRepository,
   ) { }
 
-  async execute(userId: string) {
+  async execute(userId: string): Promise<EnrichedUserProfile> {
     const user = await this._userRepository.findById(userId);
 
     if (!user) {
@@ -38,10 +39,9 @@ export class GetUserProfileUseCase implements IGetUserProfileUseCase {
     const departments = await this._departmentRepository.findAllByEmployeeId(userId);
     const departmentNames = departments.map(d => d.name);
 
-    return {
-      ...JSON.parse(JSON.stringify(user)),
-      departments: departmentNames,
-    };
+    const serialized = JSON.parse(JSON.stringify(user)) as EnrichedUserProfile;
+    serialized.departments = departmentNames;
+    return serialized;
   }
 
   private async checkCompanySuspension(

@@ -1,15 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, FilterQuery } from 'mongoose';
 import { EmailOtpEntity } from '../../../domain/entities/email-otp.entity';
 import type { IEmailOtpRepository } from '../../../domain/repositories/iemail-otp.repository';
 import { OtpPurpose } from 'src/shared/enums/reset-password/otp-purpose.enum';
+import { EmailOtpDocument } from '../mongoose/schemas/email-otp.schema';
 
 @Injectable()
 export class MongoEmailOtpRepository implements IEmailOtpRepository {
   constructor(
     @InjectModel('EmailOtp')
-    private readonly _emailOtpModel: Model<any>,
+    private readonly _emailOtpModel: Model<EmailOtpDocument>,
   ) {}
 
   async create(otp: EmailOtpEntity): Promise<void> {
@@ -37,7 +38,7 @@ export class MongoEmailOtpRepository implements IEmailOtpRepository {
     email: string,
     purpose?: OtpPurpose,
   ): Promise<EmailOtpEntity | null> {
-    const query: any = { userId, email, verified: false };
+    const query: FilterQuery<EmailOtpDocument> = { userId, email, verified: false };
     if (purpose) query.purpose = purpose;
     const doc = await this._emailOtpModel
       .findOne(query)
@@ -50,9 +51,9 @@ export class MongoEmailOtpRepository implements IEmailOtpRepository {
     await this._emailOtpModel.updateOne({ _id: id }, { verified: true });
   }
 
-  private toEntity(otp: any): EmailOtpEntity {
+  private toEntity(otp: EmailOtpDocument): EmailOtpEntity {
     return new EmailOtpEntity(
-      otp._id.toString(),
+      (otp._id as import('mongoose').Types.ObjectId).toString(),
       otp.userId,
       otp.email,
       otp.otpHash,

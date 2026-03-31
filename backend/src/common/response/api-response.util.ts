@@ -35,7 +35,7 @@ export class ApiResponse {
    */
   static error(
     message: string,
-    errors: any = null,
+    errors: unknown = null,
     meta?: Partial<IApiMeta>,
   ): IApiResponse<null> {
     return {

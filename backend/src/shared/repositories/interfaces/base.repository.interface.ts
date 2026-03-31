@@ -1,4 +1,4 @@
-import type { FilterQuery, UpdateQuery } from "mongoose";
+import type { FilterQuery, UpdateQuery, ClientSession } from "mongoose";
 
 export interface IBaseRepository<TDocument, TEntity = TDocument> {
   save(data: Partial<TDocument>): Promise<TEntity>;
@@ -15,12 +15,12 @@ export interface IBaseRepository<TDocument, TEntity = TDocument> {
     filter: FilterQuery<TDocument>,
     skip: number,
     limit: number,
-    sort?: any
+    sort?: Record<string, 1 | -1 | 'asc' | 'desc'> | string
   ): Promise<{ data: TEntity[]; total: number }>;
   createMany(data: Partial<TDocument>[]): Promise<TEntity[]>;
   updateMany(filter: FilterQuery<TDocument>, data: UpdateQuery<TDocument>): Promise<void>;
   softDelete(id: string): Promise<boolean>;
   restore(id: string): Promise<boolean>;
   upsert(filter: FilterQuery<TDocument>, data: UpdateQuery<TDocument>): Promise<TEntity>;
-  withTransaction<R>(fn: (session: any) => Promise<R>): Promise<R>;
+  withTransaction<R>(fn: (session: ClientSession) => Promise<R>): Promise<R>;
 }

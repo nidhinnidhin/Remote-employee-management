@@ -28,19 +28,25 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     // Handle common NestJS error structures
     let message = 'Internal server error';
-    let errors = null;
+    let errors: unknown = null;
+
+    interface ExceptionResponse {
+      message?: string | string[];
+      errors?: unknown;
+    }
 
     if (typeof exceptionResponse === 'string') {
       message = exceptionResponse;
     } else if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
-      message = (exceptionResponse as any).message || message;
-      errors = (exceptionResponse as any).errors || exceptionResponse;
+      const response = exceptionResponse as ExceptionResponse;
+      message = (Array.isArray(response.message) ? response.message[0] : response.message) || message;
+      errors = response.errors || exceptionResponse;
     }
 
     // Special handling for validation errors (usually an array in 'message')
-    if (status === HttpStatus.BAD_REQUEST && Array.isArray((exceptionResponse as any)?.message)) {
+    if (status === HttpStatus.BAD_REQUEST && Array.isArray((exceptionResponse as ExceptionResponse)?.message)) {
       message = 'Validation failed';
-      errors = (exceptionResponse as any).message;
+      errors = (exceptionResponse as ExceptionResponse).message;
     }
 
     response.status(status).json(

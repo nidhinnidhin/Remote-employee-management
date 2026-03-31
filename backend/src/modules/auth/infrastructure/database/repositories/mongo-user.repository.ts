@@ -8,6 +8,7 @@ import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 import { UserRole } from 'src/shared/enums/user/user-role.enum';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { DocumentPayload } from 'src/shared/types/profile/document.type';
+import { PopulatedDepartment } from 'src/shared/types/profile/populated-department.type';
 
 import { BaseRepository } from 'src/shared/repositories/base.repository';
 
@@ -26,11 +27,11 @@ export class MongoUserRepository
   protected toEntity(user: UserDocument): UserEntity {
     // If department was populated, extract the name, otherwise use the ID string
     const departmentValue = user.department && typeof user.department === 'object' 
-      ? (user.department as any).name || (user.department as any)._id?.toString()
+      ? (user.department as unknown as PopulatedDepartment).name || (user.department as unknown as PopulatedDepartment)._id?.toString()
       : user.department?.toString();
 
     return new UserEntity(
-      (user as any)._id.toString(),
+      (user._id as Types.ObjectId).toString(),
       user.firstName,
       user.lastName,
       user.email,
@@ -190,9 +191,9 @@ export class MongoUserRepository
     documentId: string,
     update: Partial<DocumentPayload>,
   ): Promise<void> {
-    const setFields: Record<string, any> = {};
-    Object.keys(update).forEach((key) => {
-      setFields[`documents.$.${key}`] = (update as any)[key];
+    const setFields: Record<string, DocumentPayload[keyof DocumentPayload]> = {};
+    (Object.keys(update) as Array<keyof DocumentPayload>).forEach((key) => {
+      setFields[`documents.$.${key}`] = update[key];
     });
     await this._userModel.updateOne(
       { _id: userId, 'documents._id': documentId },

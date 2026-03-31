@@ -45,7 +45,6 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       <div className="relative px-8 py-7 flex items-start justify-between gap-6">
         {/* Left: Avatar + Info */}
         <div className="flex items-start gap-5">
-          {/* Avatar */}
           <div
             className="relative w-20 h-20 rounded-full overflow-hidden border-2 shadow group cursor-pointer"
             style={{ borderColor: "rgb(var(--color-surface))" }}

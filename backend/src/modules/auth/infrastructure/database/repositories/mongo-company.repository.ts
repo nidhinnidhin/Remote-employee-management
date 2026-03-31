@@ -15,7 +15,7 @@ export class MongoCompanyRepository implements ICompanyRepository {
 
   protected toEntity(companyDoc: CompanyDocument): CompanyEntity {
     return new CompanyEntity(
-      (companyDoc as any)._id.toString(),
+      (companyDoc._id as Types.ObjectId).toString(),
       companyDoc.name,
       companyDoc.email,
       companyDoc.size,
@@ -23,7 +23,7 @@ export class MongoCompanyRepository implements ICompanyRepository {
       companyDoc.website,
       companyDoc.createdAt,
       companyDoc.updatedAt,
-      undefined,
+      (companyDoc as unknown as { employeeCount?: number }).employeeCount,
       companyDoc.status || UserStatus.ACTIVE,
     );
   }

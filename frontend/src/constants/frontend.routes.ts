@@ -44,7 +44,7 @@ export const FRONTEND_ROUTES = {
         LEAVES: "/leaves",
         TASKS: "/tasks",
         PROJECTS: "/projects",
-        TEAMS: "/teams",
+        TEAMS: "/employee/teams",
         DISCUSSIONS: "/discussions",
         CALENDAR: "/calendar",
         ANNOUNCEMENTS: "/announcements",

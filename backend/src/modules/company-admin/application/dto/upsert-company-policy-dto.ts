@@ -17,7 +17,7 @@ class PolicyContentDto {
   sections: PolicySectionDto[];
 }
 
-class PolicyDto {
+export class PolicyDto {
   @IsString()
   type: string;
 
