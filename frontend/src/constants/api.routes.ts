@@ -44,6 +44,10 @@ export const API_ROUTES = {
             REMOVE_EMPLOYEE: "/departments/remove-employee",
         },
         POLICIES: "/company-policies",
+        PROJECTS: {
+            BASE: "/projects",
+            BY_ID: (id: string) => `/projects/${id}`,
+        },
     },
     SUPER_ADMIN: {
         COMPANIES: "/super-admin/companies",
