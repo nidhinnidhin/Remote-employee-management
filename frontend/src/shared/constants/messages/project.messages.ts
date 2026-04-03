@@ -6,4 +6,7 @@ export const PROJECT_MESSAGES = {
     PROJECT_CREATE_FAILED: 'Failed to create project',
     PROJECT_UPDATE_FAILED: 'Failed to update project',
     PROJECT_DELETE_FAILED: 'Failed to delete project',
+    STORY_CREATED: 'User story created successfully',
+    STORY_UPDATED: 'User story updated successfully',
+    STORY_DELETED: 'User story deleted successfully',
 };

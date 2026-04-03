@@ -48,6 +48,11 @@ export const API_ROUTES = {
             BASE: "/projects",
             BY_ID: (id: string) => `/projects/${id}`,
         },
+        STORIES: {
+            BASE: "/stories",
+            BY_PROJECT: (projectId: string) => `/stories?projectId=${projectId}`,
+            BY_ID: (id: string) => `/stories/${id}`,
+        },
     },
     SUPER_ADMIN: {
         COMPANIES: "/super-admin/companies",
