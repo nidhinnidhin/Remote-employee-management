@@ -10,6 +10,7 @@ import { CompanyPolicyModule } from './modules/company-admin/company-policy.modu
 import { ResponseInterceptor } from './common/response/response.interceptor';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { DepartmentModule } from './modules/department/presentation/department.module';
+import { ProjectModule } from './modules/project/project.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { DepartmentModule } from './modules/department/presentation/department.m
     EmployeesModule,
     CompanyPolicyModule,
     DepartmentModule,
+    ProjectModule,
   ],
   providers: [
     {
