@@ -53,6 +53,13 @@ export const API_ROUTES = {
             BY_PROJECT: (projectId: string) => `/stories?projectId=${projectId}`,
             BY_ID: (id: string) => `/stories/${id}`,
         },
+        TASKS: {
+            BASE: "/tasks",
+            BY_STORY: (storyId: string) => `/tasks?storyId=${storyId}`,
+            BY_ID: (id: string) => `/tasks/${id}`,
+            MOVE: (id: string) => `/tasks/${id}/move`,
+            MY_TASKS: "/tasks/my",
+        },
     },
     SUPER_ADMIN: {
         COMPANIES: "/super-admin/companies",

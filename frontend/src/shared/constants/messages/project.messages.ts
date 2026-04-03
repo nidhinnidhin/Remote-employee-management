@@ -9,4 +9,8 @@ export const PROJECT_MESSAGES = {
     STORY_CREATED: 'User story created successfully',
     STORY_UPDATED: 'User story updated successfully',
     STORY_DELETED: 'User story deleted successfully',
+    TASK_CREATED: 'Task created successfully',
+    TASK_UPDATED: 'Task updated successfully',
+    TASK_DELETED: 'Task deleted successfully',
+    TASK_MOVED: 'Task moved successfully',
 };

@@ -12,6 +12,7 @@ import StoryPointsBadge from "./StoryPointsBadge";
 import AssigneeDisplay from "./AssigneeDisplay";
 import AcceptanceCriteriaList from "./AcceptanceCriteriaList";
 import Button from "@/components/ui/Button";
+import InlineTaskList from "../tasks/InlineTaskList";
 
 interface StoryCardProps {
   story: UserStory;
@@ -135,6 +136,13 @@ const StoryCard: React.FC<StoryCardProps> = ({
                 <StoryStatusBadge status={story.status} />
                 <AssigneeDisplay name={assignee?.name} avatar={assignee?.avatar} className="ml-auto" />
               </div>
+
+              {/* Tasks Section */}
+              <InlineTaskList 
+                storyId={story.id} 
+                projectId={story.projectId} 
+                employees={employees} 
+              />
             </div>
           </motion.div>
         )}

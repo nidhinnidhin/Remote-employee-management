@@ -7,6 +7,8 @@ import { FormInputProps } from "@/shared/types/ui/form-input.type";
 // Extend the type to accept an optional icon
 interface ExtendedFormInputProps extends FormInputProps {
   icon?: React.ReactNode;
+  step?: string;
+  min?: string;
 }
 
 const FormInput: React.FC<ExtendedFormInputProps> = ({
@@ -19,6 +21,8 @@ const FormInput: React.FC<ExtendedFormInputProps> = ({
   required = false,
   placeholder,
   icon,
+  step,
+  min,
 }) => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const inputType = type === "password" && showPassword ? "text" : type;
@@ -45,6 +49,8 @@ const FormInput: React.FC<ExtendedFormInputProps> = ({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
+          step={step}
+          min={min}
           className={`field-input transition-all duration-200 ${error ? "border-danger" : ""
             } ${icon ? "pl-10" : "pl-4"} pr-${type === "password" ? "10" : "4"} py-3.5`}
         />

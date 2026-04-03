@@ -11,6 +11,7 @@ import { Project } from "@/shared/types/company/projects/project.type";
 import { getProjectByIdAction } from "@/actions/company/projects/project.actions";
 import { toast } from "sonner";
 import BacklogView from "@/components/admin/stories/BacklogView";
+import BoardView from "@/components/admin/tasks/BoardView";
 
 const ProjectDetailsPage = () => {
   const { id } = useParams();
@@ -143,15 +144,7 @@ const ProjectDetailsPage = () => {
             {activeTab === "Backlog" ? (
               <BacklogView projectId={id as string} />
             ) : (
-              <div className="portal-card p-12 flex flex-col items-center justify-center text-center gap-4 bg-[rgb(var(--color-bg-subtle))]/30">
-                <div className="w-16 h-16 rounded-3xl bg-accent/5 flex items-center justify-center text-accent/20 border border-accent/10">
-                   <Layout size={32} />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-primary mb-1">Board View</h3>
-                  <p className="text-muted text-xs">Kanban board and project tracking coming soon...</p>
-                </div>
-              </div>
+              <BoardView projectId={id as string} />
             )}
           </div>
         </div>
