@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { cn } from "@/lib/utils";
 import { TaskStatus } from "@/shared/types/company/projects/task.type";
@@ -7,32 +9,35 @@ interface TaskStatusBadgeProps {
   className?: string;
 }
 
-const TaskStatusBadge: React.FC<TaskStatusBadgeProps> = ({ status, className }) => {
+const TaskStatusBadge: React.FC<TaskStatusBadgeProps> = ({
+  status,
+  className,
+}) => {
   const getStatusStyles = () => {
     switch (status) {
       case TaskStatus.TODO:
       case "Todo":
-        return "bg-secondary/10 text-secondary border-secondary/20 shadow-[0_0_10px_rgba(var(--color-secondary),0.05)]";
+        return "bg-slate-500/10 text-slate-400 border-white/5";
       case TaskStatus.IN_PROGRESS:
       case "In Progress":
-        return "bg-accent/10 text-accent border-accent/20 shadow-[0_0_10px_rgba(var(--color-accent),0.05)]";
+        return "bg-amber-500/10 text-amber-500 border-amber-500/20 shadow-[0_0_12px_rgba(245,158,11,0.1)]";
       case TaskStatus.DONE:
       case "Done":
-        return "bg-success/10 text-success border-success/20 shadow-[0_0_10px_rgba(var(--color-success),0.05)]";
+        return "bg-emerald-500/10 text-emerald-500 border-emerald-500/20 shadow-[0_0_12px_rgba(16,185,129,0.1)]";
       default:
-        return "bg-muted/10 text-muted border-muted/20";
+        return "bg-white/5 text-slate-500 border-white/5";
     }
   };
 
   return (
     <span
       className={cn(
-        "px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all duration-300",
+        "px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border transition-all duration-300",
         getStatusStyles(),
-        className
+        className,
       )}
     >
-      {status}
+      {typeof status === "string" ? status.replace("_", " ") : status}
     </span>
   );
 };

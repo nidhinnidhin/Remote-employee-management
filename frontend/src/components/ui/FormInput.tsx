@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { FormInputProps } from "@/shared/types/ui/form-input.type";
+import { cn } from "@/lib/utils";
 
-// Extend the type to accept an optional icon
 interface ExtendedFormInputProps extends FormInputProps {
   icon?: React.ReactNode;
   step?: string;
@@ -28,17 +28,16 @@ const FormInput: React.FC<ExtendedFormInputProps> = ({
   const inputType = type === "password" && showPassword ? "text" : type;
 
   return (
-    <div className="mb-0">
+    <div className="w-full space-y-1.5">
       {label && (
-        <label className="block text-sm font-semibold mb-1.5" style={{ color: "rgb(var(--color-text-secondary))" }}>
-          {label} {required && <span className="text-danger">*</span>}
+        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 block">
+          {label} {required && <span className="text-accent">*</span>}
         </label>
       )}
 
-      <div className="relative">
-        {/* Left icon */}
+      <div className="relative group">
         {icon && (
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted">
+          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-accent transition-colors duration-300">
             {icon}
           </div>
         )}
@@ -51,23 +50,32 @@ const FormInput: React.FC<ExtendedFormInputProps> = ({
           placeholder={placeholder}
           step={step}
           min={min}
-          className={`field-input transition-all duration-200 ${error ? "border-danger" : ""
-            } ${icon ? "pl-10" : "pl-4"} pr-${type === "password" ? "10" : "4"} py-3.5`}
+          className={cn(
+            "field-input w-full px-4 py-2.5 text-sm transition-all duration-300",
+            "bg-white/[0.02] border border-white/10 rounded-xl outline-none text-white",
+            "placeholder:text-slate-700 focus:border-accent/40 focus:bg-accent/[0.01]",
+            icon ? "pl-11" : "pl-4",
+            type === "password" ? "pr-11" : "pr-4",
+            error ? "border-red-500/50 focus:border-red-500" : "",
+          )}
         />
 
-        {/* Right eye toggle for password */}
         {type === "password" && (
           <button
             type="button"
             onClick={() => setShowPassword((prev) => !prev)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-secondary transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-600 hover:text-accent transition-colors p-1"
           >
             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
           </button>
         )}
       </div>
 
-      {error && <p className="text-danger text-xs mt-1">{error}</p>}
+      {error && (
+        <p className="text-red-400 text-[10px] font-bold uppercase tracking-tight mt-1 ml-1">
+          {error}
+        </p>
+      )}
     </div>
   );
 };

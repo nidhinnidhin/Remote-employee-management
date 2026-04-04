@@ -34,17 +34,14 @@ interface PersonalInfoFormData {
   bloodGroup: string;
   timeZone: string;
   bio: string;
-  // Address
   street: string;
   city: string;
   state: string;
   country: string;
   zipCode: string;
-  // Emergency Contact
   emergencyContactName: string;
   emergencyContactPhone: string;
   emergencyContactRelation: string;
-  // Online Presence
   linkedIn: string;
   personalWebsite: string;
 }
@@ -88,7 +85,10 @@ const SectionHeader = ({
   title: string;
   subtitle?: string;
 }) => (
-  <div className="flex items-center gap-3 mb-5 pb-4 border-b border-gray-100" style={{ borderColor: "rgb(var(--color-border-subtle))" }}>
+  <div
+    className="flex items-center gap-3 mb-5 pb-4 border-b border-gray-100"
+    style={{ borderColor: "rgb(var(--color-border-subtle))" }}
+  >
     <div className="section-icon-wrap">
       <Icon className="section-icon" />
     </div>
@@ -132,8 +132,9 @@ const InputField = ({
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className={`field-input transition placeholder:text-muted ${Icon ? "pl-9" : ""
-          }`}
+        className={`field-input transition placeholder:text-slate-700 ${
+          Icon ? "pl-9" : ""
+        }`}
       />
     </div>
   </div>
@@ -163,15 +164,17 @@ const SelectField = ({
         name={name}
         value={value}
         onChange={onChange}
-        className="field-input transition pr-9 cursor-pointer appearance-none"
+        className={`field-input transition pr-9 cursor-pointer appearance-none ${
+          !value ? "text-slate-700" : "text-primary"
+        }`}
       >
         {placeholder && (
-          <option value="" disabled>
+          <option value="" disabled className="bg-[#08090a] text-slate-500">
             {placeholder}
           </option>
         )}
         {options.map((opt) => (
-          <option key={opt} value={opt}>
+          <option key={opt} value={opt} className="bg-[#08090a] text-primary">
             {opt}
           </option>
         ))}
@@ -259,15 +262,14 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
         country: formData.country,
         zipCode: formData.zipCode,
 
-        streetAddress: formData.street, // 🔥 FIXED
-        linkedInUrl: formData.linkedIn, // 🔥 FIXED
+        streetAddress: formData.street,
+        linkedInUrl: formData.linkedIn,
         personalWebsite: formData.personalWebsite,
 
         emergencyContactName: formData.emergencyContactName,
         emergencyContactPhone: formData.emergencyContactPhone,
         emergencyContactRelation: formData.emergencyContactRelation,
 
-        // Only send date if not empty
         ...(formData.dateOfBirth && {
           dateOfBirth: formData.dateOfBirth,
         }),
@@ -322,7 +324,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
       setEmailEditMode(false);
       setNewEmail("");
       setOtp("");
-      window.location.reload(); // refresh profile
+      window.location.reload();
     } catch (err: any) {
       setOtpError(err.response?.data?.message || "OTP verification failed.");
     } finally {
@@ -355,28 +357,60 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
           title="Work & Account Information"
           subtitle="Your professional account details"
         />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-7 gap-y-5 mb-8 p-4 bg-gray-50/50 rounded-xl border border-gray-100" style={{ borderColor: 'rgb(var(--color-border-subtle))', backgroundColor: 'rgb(var(--color-bg-subtle))/40' }}>
+        <div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-7 gap-y-5 mb-8 p-4 bg-gray-50/50 rounded-xl border border-gray-100"
+          style={{
+            borderColor: "rgb(var(--color-border-subtle))",
+            backgroundColor: "rgb(var(--color-bg-subtle))/40",
+          }}
+        >
           <div className="flex flex-col gap-1">
-            <span className="text-[10px] font-bold text-muted uppercase tracking-widest">Role</span>
+            <span className="text-[10px] font-bold text-muted uppercase tracking-widest">
+              Role
+            </span>
             <span className="text-sm font-bold text-accent">{user.role}</span>
           </div>
           <div className="flex flex-col gap-1">
-            <span className="text-[10px] font-bold text-muted uppercase tracking-widest">Account Status</span>
-            <span className={`text-[11px] font-black uppercase px-2 py-0.5 rounded w-fit ${user.status === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
+            <span className="text-[10px] font-bold text-muted uppercase tracking-widest">
+              Account Status
+            </span>
+            <span
+              className={`text-[11px] font-black uppercase px-2 py-0.5 rounded w-fit ${
+                user.status === "ACTIVE"
+                  ? "bg-green-100 text-green-700"
+                  : "bg-amber-100 text-amber-700"
+              }`}
+            >
               {user.status}
             </span>
           </div>
           <div className="flex flex-col gap-1">
-            <span className="text-[10px] font-bold text-muted uppercase tracking-widest">Joined On</span>
-            <span className="text-sm text-secondary">{new Date(user.createdAt).toLocaleDateString()}</span>
+            <span className="text-[10px] font-bold text-muted uppercase tracking-widest">
+              Joined On
+            </span>
+            <span className="text-sm text-secondary">
+              {new Date(user.createdAt).toLocaleDateString()}
+            </span>
           </div>
           <div className="flex flex-col gap-1">
-            <span className="text-[10px] font-bold text-muted uppercase tracking-widest">Login Provider</span>
-            <span className="text-sm text-secondary uppercase font-bold">{user.provider || "Standard"}</span>
+            <span className="text-[10px] font-bold text-muted uppercase tracking-widest">
+              Login Provider
+            </span>
+            <span className="text-sm text-secondary uppercase font-bold">
+              {user.provider || "Standard"}
+            </span>
           </div>
           <div className="flex flex-col gap-1">
-            <span className="text-[10px] font-bold text-muted uppercase tracking-widest">Onboarding Status</span>
-            <span className={`text-[11px] font-black uppercase px-2 py-0.5 rounded w-fit ${user.isOnboarded ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'}`}>
+            <span className="text-[10px] font-bold text-muted uppercase tracking-widest">
+              Onboarding Status
+            </span>
+            <span
+              className={`text-[11px] font-black uppercase px-2 py-0.5 rounded w-fit ${
+                user.isOnboarded
+                  ? "bg-blue-100 text-blue-700"
+                  : "bg-gray-100 text-gray-500"
+              }`}
+            >
               {user.isOnboarded ? "Completed" : "In Progress"}
             </span>
           </div>
@@ -394,6 +428,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
             name="firstName"
             value={formData.firstName}
             onChange={handleChange}
+            placeholder="Enter first name"
             required
           />
           <InputField
@@ -401,6 +436,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
             name="lastName"
             value={formData.lastName}
             onChange={handleChange}
+            placeholder="Enter last name"
           />
           <InputField
             label="Phone"
@@ -460,7 +496,6 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
             />
           </div>
 
-          {/* Bio */}
           <div className="flex flex-col gap-1.5 md:col-span-2">
             <label className="text-xs font-medium text-secondary uppercase tracking-wide">
               Bio
@@ -471,7 +506,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
               onChange={handleChange}
               rows={3}
               placeholder="Tell us a little about yourself..."
-              className="field-input transition resize-none placeholder:text-muted"
+              className="field-input transition resize-none placeholder:text-slate-700"
             />
           </div>
         </div>
@@ -495,7 +530,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
               value={formData.street}
               onChange={handleChange}
               placeholder="123 Main Street, Apt 4B"
-              className="field-input transition placeholder:text-muted"
+              className="field-input transition placeholder:text-slate-700"
             />
           </div>
           <InputField
@@ -619,7 +654,10 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
         </div>
 
         {emailEditMode && (
-          <div className="mt-5 pt-5 border-t border-gray-100 flex flex-col gap-4 max-w-md" style={{ borderColor: "rgb(var(--color-border-subtle))" }}>
+          <div
+            className="mt-5 pt-5 border-t border-gray-100 flex flex-col gap-4 max-w-md"
+            style={{ borderColor: "rgb(var(--color-border-subtle))" }}
+          >
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-medium text-secondary uppercase tracking-wide">
                 New Email Address
@@ -631,7 +669,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
                   value={newEmail}
                   onChange={(e) => setNewEmail(e.target.value)}
                   placeholder="Enter new email address"
-                  className="field-input pl-9"
+                  className="field-input pl-9 placeholder:text-slate-700"
                 />
               </div>
               <p className="text-xs text-muted">
@@ -686,6 +724,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
           {saving ? "Saving..." : "Save Changes"}
         </button>
       </div>
+
       <BaseModal
         isOpen={otpModalOpen}
         onClose={() => setOtpModalOpen(false)}
@@ -694,10 +733,16 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
         footer={
           <div className="flex flex-col w-full gap-4">
             <div className="flex justify-between items-center w-full">
-              <Button variant="secondary" onClick={() => setOtpModalOpen(false)}>
+              <Button
+                variant="secondary"
+                onClick={() => setOtpModalOpen(false)}
+              >
                 Cancel
               </Button>
-              <Button onClick={handleVerifyOtp} disabled={verifyingOtp || expired}>
+              <Button
+                onClick={handleVerifyOtp}
+                disabled={verifyingOtp || expired}
+              >
                 {verifyingOtp ? "Verifying..." : "Verify OTP"}
               </Button>
             </div>
@@ -705,7 +750,8 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
             <div className="text-center">
               {!expired ? (
                 <p className="text-xs text-muted font-medium">
-                  Resend OTP in <span className="text-accent font-bold">{remaining}s</span>
+                  Resend OTP in{" "}
+                  <span className="text-accent font-bold">{remaining}s</span>
                 </p>
               ) : (
                 <button

@@ -11,7 +11,7 @@ import LogHoursModal from "./LogHoursModal";
 interface EmployeeTaskCardProps {
   task: Task;
   projectName?: string;
-  projectColor?: string; // Optional hex or class for consistent project coloring
+  projectColor?: string;
   storyTitle?: string;
   isDraggable?: boolean;
   innerRef?: any;
@@ -47,7 +47,7 @@ export default function EmployeeTaskCard({
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric'
-    });
+    }).toUpperCase();
   };
 
   return (
@@ -57,80 +57,78 @@ export default function EmployeeTaskCard({
         {...draggableProps}
         {...dragHandleProps}
         className={cn(
-          "group portal-card p-5 bg-[rgb(var(--color-surface))]/40 border-[rgba(var(--color-border-subtle),0.3)] hover:border-[rgba(var(--color-accent),0.4)] hover:bg-[rgb(var(--color-surface-raised))]/60 transition-all duration-300 shadow-sm hover:shadow-xl",
-          isDraggable && "cursor-grab active:cursor-grabbing"
+          "group p-5 rounded-xl border border-white/[0.08] bg-white/[0.02] transition-all duration-300",
+          isDraggable && "cursor-grab active:cursor-grabbing",
+          "flex flex-col gap-5"
         )}
       >
-        <div className="flex flex-col gap-4">
-          {/* Header Area: Project Badge & Status */}
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex flex-col gap-1.5 min-w-0">
-               {showProjectBadge && projectName && (
-                 <div 
-                    className="inline-flex items-center self-start px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest border"
-                    style={{ 
-                        color: projectColor, 
-                        borderColor: `${projectColor}20`,
-                        backgroundColor: `${projectColor}10`
-                    }}
-                 >
-                   {projectName}
-                 </div>
-               )}
-               <h4 className="text-sm font-bold text-primary leading-snug group-hover:text-accent transition-colors">
-                  {currentTask.title}
-               </h4>
-               {storyTitle && (
-                 <p className="text-[10px] text-muted font-medium italic opacity-60">
-                   Part of: {storyTitle}
-                 </p>
-               )}
+        <div className="space-y-3">
+          {/* Top Row: Badge & Status */}
+          <div className="flex items-start justify-between gap-3">
+            <div className="space-y-1.5 min-w-0">
+              {showProjectBadge && projectName && (
+                <span 
+                  className="text-[9px] font-black uppercase tracking-[0.15em] px-2 py-0.5 rounded-md border border-white/[0.05]"
+                  style={{ 
+                    color: projectColor, 
+                    backgroundColor: `${projectColor}10`
+                  }}
+                >
+                  {projectName}
+                </span>
+              )}
+              <h4 className="text-sm font-bold text-slate-100 leading-snug group-hover:text-accent transition-colors truncate">
+                {currentTask.title}
+              </h4>
             </div>
             <TaskStatusBadge status={currentTask.status} className="scale-90 origin-top-right shrink-0" />
           </div>
 
-          {/* Time & Deadline Metrics */}
-          <div className="grid grid-cols-2 gap-3 py-3 border-y border-[rgba(var(--color-border-subtle),0.2)]">
-            <div className="space-y-1">
-               <p className="text-[9px] font-black uppercase tracking-tighter text-muted/50">Time Tracking</p>
-               <div className="flex items-center gap-1.5 text-muted">
-                  <Timer size={14} className="text-accent/40" />
-                  <span className="text-[11px] font-bold">
-                    {currentTask.actualHours || 0}
-                    <span className="text-[10px] font-medium opacity-50 ml-0.5">/ {currentTask.estimatedHours || 0}h</span>
-                  </span>
-               </div>
-            </div>
+          {storyTitle && (
+            <p className="text-[10px] text-slate-500 font-medium">
+              <span className="opacity-50 italic">Part of:</span> {storyTitle}
+            </p>
+          )}
+        </div>
 
-            <div className="space-y-1">
-               <p className="text-[9px] font-black uppercase tracking-tighter text-muted/50">Deadline</p>
-               {currentTask.dueDate ? (
-                 <div className={cn(
-                    "flex items-center gap-1.5",
-                    isOverdue() ? "text-danger" : "text-muted"
-                 )}>
-                    {isOverdue() ? <AlertCircle size={14} /> : <Calendar size={14} className="text-accent/40" />}
-                    <span className="text-[11px] font-bold">
-                      {formatDate(currentTask.dueDate)}
-                    </span>
-                 </div>
-               ) : (
-                 <span className="text-[11px] font-medium text-muted/40 italic">No date</span>
-               )}
+        {/* Metrics Section: Clean Grid with Thin Divider */}
+        <div className="grid grid-cols-2 gap-4 py-3 border-y border-white/[0.05]">
+          <div className="space-y-1">
+            <p className="text-[9px] font-black uppercase tracking-[0.15em] text-slate-600">Hours</p>
+            <div className="flex items-center gap-1.5 text-slate-300">
+              <Timer size={13} className="text-accent/60" strokeWidth={1.5} />
+              <span className="text-[11px] font-bold tabular-nums">
+                {currentTask.actualHours || 0}
+                <span className="text-slate-600 font-medium ml-1">/ {currentTask.estimatedHours || 0}h</span>
+              </span>
             </div>
           </div>
 
-          {/* Quick Actions */}
-          <div className="flex items-center justify-between gap-3 pt-1">
-             <Button
-                variant="ghost"
-                onClick={() => setIsLogModalOpen(true)}
-                className="h-8 px-3 text-[11px] font-bold rounded-xl text-accent hover:bg-accent/10 transition-colors flex items-center gap-1.5"
-             >
-                <Clock size={12} />
-                Log Hours
-             </Button>
+          <div className="space-y-1">
+            <p className="text-[9px] font-black uppercase tracking-[0.15em] text-slate-600">Due Date</p>
+            <div className={cn(
+              "flex items-center gap-1.5",
+              isOverdue() ? "text-red-400" : "text-slate-300"
+            )}>
+              {isOverdue() ? <AlertCircle size={13} strokeWidth={1.5} /> : <Calendar size={13} className="text-accent/60" strokeWidth={1.5} />}
+              <span className="text-[11px] font-bold tracking-tight">
+                {currentTask.dueDate ? formatDate(currentTask.dueDate) : "NO DATE"}
+              </span>
+            </div>
           </div>
+        </div>
+
+        {/* Action Row */}
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => setIsLogModalOpen(true)}
+            className="text-[10px] font-black uppercase tracking-[0.15em] text-accent hover:text-accent/80 transition-colors flex items-center gap-2 group/btn"
+          >
+            <Clock size={12} className="group-hover/btn:rotate-12 transition-transform" />
+            Log Hours
+          </button>
+          
+          <div className="w-1.5 h-1.5 rounded-full bg-white/[0.05]" />
         </div>
       </div>
 

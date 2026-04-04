@@ -42,7 +42,9 @@ const BoardView: React.FC<BoardViewProps> = ({ projectId }) => {
       setEmployees(employeesData);
 
       // 2. Fetch Tasks for each story (Parallel)
-      const tasksPromises = storiesResult.data.map(story => getTasksByStoryAction(story.id));
+      const tasksPromises = storiesResult.data.map((story) =>
+        getTasksByStoryAction(story.id),
+      );
       const tasksResults = await Promise.all(tasksPromises);
 
       const allTasks: Task[] = [];
@@ -69,12 +71,20 @@ const BoardView: React.FC<BoardViewProps> = ({ projectId }) => {
     return (
       <div className="flex flex-col items-center justify-center py-32 gap-6 animate-in fade-in duration-700">
         <div className="relative">
-          <Loader2 className="animate-spin text-accent" size={56} strokeWidth={1} />
+          <Loader2
+            className="animate-spin text-accent"
+            size={56}
+            strokeWidth={1}
+          />
           <div className="absolute inset-0 blur-2xl bg-accent/30 animate-pulse" />
         </div>
         <div className="space-y-1 text-center">
-          <p className="text-secondary font-black tracking-widest text-xs uppercase">Assembling Board View...</p>
-          <p className="text-muted text-[10px] font-bold">Synchronizing stories and task states</p>
+          <p className="text-secondary font-black tracking-widest text-xs uppercase">
+            Assembling Board View...
+          </p>
+          <p className="text-muted text-[10px] font-bold">
+            Synchronizing stories and task states
+          </p>
         </div>
       </div>
     );
@@ -86,11 +96,18 @@ const BoardView: React.FC<BoardViewProps> = ({ projectId }) => {
         <div className="w-24 h-24 rounded-[3rem] bg-accent/5 flex items-center justify-center text-accent/20 border border-accent/10 mb-8 border-dashed">
           <Layout size={48} className="translate-y-0.5" />
         </div>
-        <h3 className="text-2xl font-black text-primary mb-3 tracking-tight">Board Restricted</h3>
+        <h3 className="text-2xl font-black text-primary mb-3 tracking-tight">
+          Board Restricted
+        </h3>
         <p className="text-muted text-sm max-w-[320px] leading-relaxed mb-10 font-bold opacity-80">
-          The Kanban board requires at least one User Story to track tasks. Please define a requirement in the Backlog first.
+          The Kanban board requires at least one User Story to track tasks.
+          Please define a requirement in the Backlog first.
         </p>
-        <Button variant="primary" className="shadow-2xl shadow-accent/20 px-10 py-4 h-auto text-xs uppercase tracking-widest font-black" onClick={() => window.location.hash = "backlog"}>
+        <Button
+          variant="primary"
+          className="shadow-2xl shadow-accent/20 px-10 py-4 h-auto text-xs uppercase tracking-widest font-black"
+          onClick={() => (window.location.hash = "backlog")}
+        >
           Return to Backlog
         </Button>
       </div>
@@ -106,19 +123,28 @@ const BoardView: React.FC<BoardViewProps> = ({ projectId }) => {
             <Sparkles size={24} />
           </div>
           <div>
-            <h2 className="text-xl font-black text-primary tracking-tighter">Project Kanban</h2>
+            <h2 className="text-xl font-black text-primary tracking-tighter">
+              Project Kanban
+            </h2>
             <p className="text-[10px] font-black text-muted uppercase tracking-widest">
-              Visualizing {tasks.length} {tasks.length === 1 ? 'active task' : 'active tasks'}
+              Visualizing {tasks.length}{" "}
+              {tasks.length === 1 ? "active task" : "active tasks"}
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="ghost" className="rounded-xl border border-border-subtle/20 gap-2 h-10 text-[10px] uppercase tracking-widest font-black">
+          <Button
+            variant="ghost"
+            className="rounded-xl border border-border-subtle/20 gap-2 h-10 text-[10px] uppercase tracking-widest font-black"
+          >
             <Filter size={14} />
             Filters
           </Button>
-          <Button variant="ghost" className="rounded-xl border border-border-subtle/20 gap-2 h-10 text-[10px] uppercase tracking-widest font-black">
+          <Button
+            variant="ghost"
+            className="rounded-xl border border-border-subtle/20 gap-2 h-10 text-[10px] uppercase tracking-widest font-black"
+          >
             <Search size={14} />
             Find
           </Button>

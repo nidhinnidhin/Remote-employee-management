@@ -14,63 +14,62 @@ interface EmployeeKanbanColumnProps {
   onRefresh?: () => void;
 }
 
-export default function EmployeeKanbanColumn({
-  status,
-  tasks,
-  projects,
-  onRefresh,
-}: EmployeeKanbanColumnProps) {
+export default function EmployeeKanbanColumn({ status, tasks, projects, onRefresh }: EmployeeKanbanColumnProps) {
   
-  const getColumnColor = () => {
+  const getStatusConfig = () => {
     switch (status) {
-      case TaskStatus.TODO:
-        return "rgb(var(--color-secondary-text))";
-      case TaskStatus.IN_PROGRESS:
-        return "rgb(var(--color-accent))";
-      case TaskStatus.DONE:
-        return "rgb(var(--color-success))";
-      default:
-        return "rgb(var(--color-text-muted))";
+      case TaskStatus.TODO: 
+        return { label: "To Do", color: "text-slate-400", dot: "bg-slate-500", bg: "bg-slate-500/[0.02]" };
+      case TaskStatus.IN_PROGRESS: 
+        return { label: "In Progress", color: "text-amber-500", dot: "bg-amber-500", bg: "bg-amber-500/[0.02]" };
+      case TaskStatus.DONE: 
+        return { label: "Done", color: "text-emerald-500", dot: "bg-emerald-500", bg: "bg-emerald-500/[0.02]" };
+      default: 
+        return { label: status, color: "text-slate-400", dot: "bg-slate-400", bg: "bg-white/[0.02]" };
     }
   };
 
   const getProjectInfo = (projectId: string) => {
-    const project = projects.find(p => p.id === projectId);
+    const project = projects.find(p => p.id === projectId || p._id === projectId);
     return {
-      name: project?.name || "Unknown Project",
-      // Simple hash-based color for the project if not provided
-      color: `hsl(${(project?.name?.length || 0) * 40 % 360}, 70%, 60%)`
+      name: project?.name || "Untitled",
+      color: `hsl(${(project?.name?.length || 0) * 40 % 360}, 65%, 55%)`
     };
   };
 
+  const config = getStatusConfig();
+
   return (
-    <div className="flex flex-col w-full min-w-[320px] lg:w-[350px] shrink-0 h-full bg-[rgb(var(--color-surface))]/20 rounded-[2.5rem] border border-[rgba(var(--color-border-subtle),0.15)] overflow-hidden transition-all duration-500">
-      {/* Column Header */}
-      <div 
-        className="p-6 pb-4 flex items-center justify-between sticky top-0 bg-[rgb(var(--color-bg))]/40 backdrop-blur-xl z-10"
-        style={{ borderTop: `6px solid ${getColumnColor()}` }}
-      >
-        <div className="flex items-center gap-3">
-          <div 
-            className="w-2 h-2 rounded-full animate-pulse" 
-            style={{ backgroundColor: getColumnColor() }}
-          />
-          <h3 className="text-sm font-black text-primary uppercase tracking-[0.2em]">{status}</h3>
-          <span className="px-3 py-1 rounded-full bg-surface-raised/60 border border-border-subtle/10 text-[10px] font-black text-accent shadow-sm">
+    <div className={cn(
+      "flex flex-col rounded-2xl border border-white/[0.04] transition-all duration-500 h-fit",
+      "w-[320px] lg:flex-1 lg:min-w-[300px] lg:max-w-[450px]",
+      config.bg
+    )}>
+      {/* Header with Glowing Status Indicator */}
+      <div className="p-5 flex items-center justify-between border-b border-white/[0.04] bg-white/[0.01] rounded-t-2xl">
+        <div className="flex items-center gap-2.5">
+          <div className={cn(
+            "w-1.5 h-1.5 rounded-full shadow-[0_0_10px_currentColor] animate-pulse", 
+            config.dot, 
+            config.color
+          )} />
+          <h3 className={cn("text-[10px] font-black uppercase tracking-[0.2em]", config.color)}>
+            {config.label}
+          </h3>
+          <span className="text-[10px] font-bold text-slate-500 tabular-nums bg-white/[0.05] px-2 py-0.5 rounded-md">
             {tasks.length}
           </span>
         </div>
       </div>
 
-      {/* Droppable Area */}
       <Droppable droppableId={status}>
         {(provided, snapshot) => (
           <div
             {...provided.droppableProps}
             ref={provided.innerRef}
             className={cn(
-              "flex-1 p-4 overflow-y-auto space-y-4 custom-scrollbar transition-colors duration-300 min-h-[400px]",
-              snapshot.isDraggingOver ? "bg-accent/[0.03]" : ""
+              "p-3 space-y-3 min-h-[150px] transition-colors duration-300",
+              snapshot.isDraggingOver ? "bg-white/[0.03]" : "bg-transparent"
             )}
           >
             {tasks.map((task, index) => {
@@ -82,17 +81,15 @@ export default function EmployeeKanbanColumn({
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
-                      style={{
-                        ...provided.draggableProps.style,
-                        opacity: snapshot.isDragging ? 0.9 : 1,
-                      }}
+                      className={cn("outline-none", snapshot.isDragging && "z-50")}
+                      style={provided.draggableProps.style}
                     >
                       <EmployeeTaskCard
                         task={task}
                         projectName={project.name}
                         projectColor={project.color}
                         onRefresh={onRefresh}
-                        isDraggable
+                        showProjectBadge
                       />
                     </div>
                   )}
@@ -100,15 +97,10 @@ export default function EmployeeKanbanColumn({
               );
             })}
             {provided.placeholder}
-
-            {tasks.length === 0 && !snapshot.isDraggingOver && (
-              <div className="flex flex-col items-center justify-center py-20 px-8 text-center border-2 border-dashed border-[rgba(var(--color-border-subtle),0.1)] rounded-[2rem] animate-in zoom-in-95 duration-700">
-                <div className="w-12 h-12 rounded-full bg-surface-raised/40 flex items-center justify-center mb-4 opacity-20">
-                    <div className="w-6 h-6 rounded-full border-2 border-primary" />
-                </div>
-                <p className="text-xs font-bold text-muted/40 uppercase tracking-widest leading-loose">
-                  No tasks <br /> currently in {status}
-                </p>
+            
+            {tasks.length === 0 && (
+              <div className="py-12 flex flex-col items-center justify-center border border-dashed border-white/[0.05] rounded-xl">
+                 <p className="text-[9px] font-black text-slate-800 uppercase tracking-[0.2em]">Drop Zone</p>
               </div>
             )}
           </div>

@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import BaseModal from "@/components/ui/BaseModal";
 import { Trash2, AlertTriangle, Loader2 } from "lucide-react";
 import Button from "@/components/ui/Button";
+import { cn } from "@/lib/utils";
 
 interface DeleteProjectConfirmationProps {
   isOpen: boolean;
@@ -36,44 +37,64 @@ const DeleteProjectConfirmation: React.FC<DeleteProjectConfirmationProps> = ({
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
+      theme="theme-company" // Locks to Admin Purple theme variables
       title="Delete Project"
-      description="This action cannot be undone. Please confirm to proceed."
+      description="Administrative override required for permanent record deletion."
       maxWidth="max-w-md"
     >
-      <div className="space-y-6">
-        <div className="flex flex-col items-center text-center p-6 bg-danger/5 border border-danger/20 rounded-2xl">
-          <div className="w-14 h-14 rounded-full bg-danger/10 flex items-center justify-center mb-4 ring-8 ring-danger/5 animate-pulse">
-            <AlertTriangle className="text-danger" size={28} />
+      <div className="space-y-8 py-2 px-1">
+        {/* --- DANGER CARD --- */}
+        <div className="flex flex-col items-center text-center p-8 bg-red-500/[0.02] border border-red-500/10 rounded-[2rem] group">
+          <div className="w-16 h-16 rounded-2xl bg-red-500/10 flex items-center justify-center mb-5 border border-red-500/20 shadow-[0_0_20px_rgba(239,68,68,0.1)] group-hover:scale-105 transition-transform duration-500">
+            <AlertTriangle
+              className="text-red-500"
+              size={32}
+              strokeWidth={1.5}
+            />
           </div>
-          <h4 className="text-sm font-bold text-primary mb-1 uppercase tracking-tight">
-            Permanently Delete ?
+
+          <h4 className="text-[10px] font-black text-red-500 uppercase tracking-[0.3em] mb-2">
+            Critical Action
           </h4>
-          <p className="text-xs text-secondary font-medium px-4">
-            You are about to delete <span className="text-danger font-bold">"{projectName}"</span>. All related user stories and tasks will be removed.
+
+          <p className="text-sm text-slate-400 font-medium leading-relaxed">
+            You are about to purge{" "}
+            <span className="text-white font-black underline decoration-red-500/30 underline-offset-4">
+              "{projectName}"
+            </span>
+            . All associated data nodes will be permanently unlinked.
           </p>
         </div>
 
-        <div className="flex gap-3">
+        {/* --- ACTIONS --- */}
+        <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-white/[0.06]">
           <Button
             variant="ghost"
             onClick={onClose}
-            className="flex-1 font-bold"
             disabled={loading}
+            className="flex-1 h-12 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-white"
           >
-            Cancel
+            Abort
           </Button>
+
           <Button
-            variant="ghost"
+            variant="primary"
             onClick={handleConfirm}
-            className="flex-1 bg-danger hover:bg-danger/90 text-white font-bold flex items-center justify-center gap-2"
             disabled={loading}
+            className={cn(
+              "flex-1 h-12 rounded-xl transition-all duration-300",
+              "bg-red-500/10 border border-red-500/20 text-red-500",
+              "text-[10px] font-black uppercase tracking-[0.2em]",
+              "hover:bg-red-500 hover:text-white hover:shadow-[0_0_25px_rgba(239,68,68,0.4)]",
+              "active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2",
+            )}
           >
             {loading ? (
               <Loader2 className="animate-spin" size={16} />
             ) : (
               <>
-                <Trash2 size={16} />
-                Delete Project
+                <Trash2 size={16} strokeWidth={3} />
+                <span>Confirm Purge</span>
               </>
             )}
           </Button>
