@@ -103,7 +103,7 @@ const BoardView: React.FC<BoardViewProps> = ({ projectId }) => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 py-2">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent shadow-inner">
-             <Sparkles size={24} />
+            <Sparkles size={24} />
           </div>
           <div>
             <h2 className="text-xl font-black text-primary tracking-tighter">Project Kanban</h2>
@@ -114,14 +114,14 @@ const BoardView: React.FC<BoardViewProps> = ({ projectId }) => {
         </div>
 
         <div className="flex items-center gap-2">
-           <Button variant="ghost" className="rounded-xl border border-border-subtle/20 gap-2 h-10 text-[10px] uppercase tracking-widest font-black">
-             <Filter size={14} />
-             Filters
-           </Button>
-           <Button variant="ghost" className="rounded-xl border border-border-subtle/20 gap-2 h-10 text-[10px] uppercase tracking-widest font-black">
-             <Search size={14} />
-             Find
-           </Button>
+          <Button variant="ghost" className="rounded-xl border border-border-subtle/20 gap-2 h-10 text-[10px] uppercase tracking-widest font-black">
+            <Filter size={14} />
+            Filters
+          </Button>
+          <Button variant="ghost" className="rounded-xl border border-border-subtle/20 gap-2 h-10 text-[10px] uppercase tracking-widest font-black">
+            <Search size={14} />
+            Find
+          </Button>
         </div>
       </div>
 

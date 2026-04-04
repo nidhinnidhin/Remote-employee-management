@@ -97,9 +97,9 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-full gap-6 animate-in fade-in duration-700">
+    <div className="flex flex-col w-full gap-6 animate-in fade-in duration-700 overflow-hidden">
       <DragDropContext onDragEnd={onDragEnd}>
-        <div className="flex items-start gap-6 overflow-x-auto pb-6 h-[calc(100vh-320px)] min-h-[500px]">
+        <div className="flex items-start gap-6 overflow-x-auto overflow-y-hidden pb-8 pr-12 w-full h-[calc(100vh-340px)] min-h-[500px] custom-scrollbar">
           {columns.map((status) => (
             <KanbanColumn
               key={status}

@@ -43,7 +43,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
   };
 
   return (
-    <div className="flex flex-col w-[320px] shrink-0 h-full bg-[rgb(var(--color-surface))]/30 rounded-3xl border border-border-subtle/20 overflow-hidden shadow-sm">
+    <div className="flex flex-col w-[300px] shrink-0 h-full bg-[rgb(var(--color-surface))]/30 rounded-3xl border border-border-subtle/20 overflow-hidden shadow-sm hover:border-border-subtle/40 transition-all duration-300">
       {/* Column Header */}
       <div 
         className="p-4 border-b border-border-subtle/10 flex items-center justify-between sticky top-0 bg-[rgb(var(--color-surface))]/80 backdrop-blur-md z-10"

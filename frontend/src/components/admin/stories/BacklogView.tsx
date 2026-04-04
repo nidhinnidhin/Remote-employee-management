@@ -56,7 +56,7 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId }) => {
     fetchData();
   }, [fetchData]);
 
-  const filteredStories = stories.filter(story => 
+  const filteredStories = stories.filter(story =>
     story.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     story.description?.toLowerCase().includes(searchQuery.toLowerCase())
   ).sort((a, b) => a.order - b.order);
@@ -84,8 +84,8 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId }) => {
           <p className="text-muted text-sm max-w-[280px] leading-relaxed mb-8 font-medium">
             No user stories found for this project. Start by defining your first requirement.
           </p>
-          <Button 
-            variant="primary" 
+          <Button
+            variant="primary"
             onClick={() => setIsCreateModalOpen(true)}
             className="shadow-xl shadow-accent/20 px-8 py-3"
           >
@@ -133,17 +133,17 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId }) => {
         </div>
 
         <div className="flex items-center gap-3">
-           <div className="relative flex-1 md:w-64">
-             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-             <input
-               type="text"
-               placeholder="Search stories..."
-               value={searchQuery}
-               onChange={(e) => setSearchQuery(e.target.value)}
-               className="field-input !pl-9 h-10 py-0 bg-surface-raised/30 border-border-subtle/40 focus:bg-surface focus:border-accent"
-             />
-           </div>
-           <Button
+          <div className="relative flex-1 md:w-64">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+            <input
+              type="text"
+              placeholder="Search stories..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="field-input !pl-9 h-10 py-0 bg-surface-raised/30 border-border-subtle/40 focus:bg-surface focus:border-accent"
+            />
+          </div>
+          <Button
             variant="primary"
             onClick={() => setIsCreateModalOpen(true)}
             className="h-10 px-4 text-xs font-black uppercase tracking-widest gap-2 bg-gradient-to-r from-accent to-accent-muted shadow-lg shadow-accent/20"
