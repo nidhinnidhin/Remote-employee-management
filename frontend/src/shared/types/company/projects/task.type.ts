@@ -43,3 +43,16 @@ export interface MoveTaskPayload {
   status: TaskStatus;
   order: number;
 }
+
+export interface EmployeeTaskStats {
+  total: number;
+  todo: number;
+  inProgress: number;
+  done: number;
+  overdue: number;
+}
+
+export interface MyTasksResponse {
+  tasks: Task[];
+  stats: EmployeeTaskStats;
+}

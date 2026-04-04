@@ -1,6 +1,6 @@
 import { clientApi } from "@/lib/axios/axiosClient";
 import { API_ROUTES } from "@/constants/api.routes";
-import { Task, CreateTaskPayload, UpdateTaskPayload, MoveTaskPayload } from "@/shared/types/company/projects/task.type";
+import { Task, CreateTaskPayload, UpdateTaskPayload, MoveTaskPayload, MyTasksResponse } from "@/shared/types/company/projects/task.type";
 
 export const TaskService = {
   async getTasksByStory(storyId: string): Promise<Task[]> {
@@ -30,5 +30,10 @@ export const TaskService = {
 
   async deleteTask(id: string): Promise<void> {
     await clientApi.delete(API_ROUTES.COMPANY.TASKS.BY_ID(id));
+  },
+
+  async getMyTasks(): Promise<MyTasksResponse> {
+    const response = await clientApi.get(API_ROUTES.COMPANY.TASKS.MY_TASKS);
+    return response.data;
   },
 };

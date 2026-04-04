@@ -13,4 +13,6 @@ export const PROJECT_MESSAGES = {
     TASK_UPDATED: 'Task updated successfully',
     TASK_DELETED: 'Task deleted successfully',
     TASK_MOVED: 'Task moved successfully',
+    TASK_STATUS_UPDATED: 'Task status updated successfully',
+    ACTUAL_HOURS_UPDATED: 'Actual hours updated successfully',
 };

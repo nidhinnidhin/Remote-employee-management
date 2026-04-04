@@ -1,5 +1,5 @@
 import { TaskService } from "@/services/company/projects/task.service";
-import { CreateTaskPayload, UpdateTaskPayload, MoveTaskPayload, Task } from "@/shared/types/company/projects/task.type";
+import { CreateTaskPayload, UpdateTaskPayload, MoveTaskPayload, Task, MyTasksResponse } from "@/shared/types/company/projects/task.type";
 
 export const getTasksByStoryAction = async (storyId: string) => {
   try {
@@ -69,6 +69,18 @@ export const deleteTaskAction = async (id: string) => {
     return {
       success: false,
       error: error.response?.data?.message || "Failed to delete task",
+    };
+  }
+};
+
+export const fetchMyTasksAction = async () => {
+  try {
+    const data = await TaskService.getMyTasks();
+    return { success: true, data };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to fetch your tasks",
     };
   }
 };

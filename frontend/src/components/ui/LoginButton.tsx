@@ -24,6 +24,10 @@ const LoginButton: React.FC<ButtonProps> = ({
       "bg-[rgb(var(--color-btn-secondary-bg))] text-[rgb(var(--color-btn-secondary-text))] hover:bg-[rgb(var(--color-bg-subtle))] active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
     outline:
       "bg-transparent border border-[rgb(var(--color-border-subtle))] text-primary hover:bg-[rgb(var(--color-bg-subtle))] active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
+    ghost:
+      "bg-transparent text-primary hover:bg-[rgb(var(--color-bg-subtle))] active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
+    danger:
+      "bg-[rgb(var(--color-danger))] text-white hover:opacity-90 active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
   };
 
   return (
