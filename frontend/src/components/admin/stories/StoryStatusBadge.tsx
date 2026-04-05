@@ -1,6 +1,12 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { StoryStatus } from '@/shared/types/company/projects/user-story.type';
+import { 
+  CheckCircle2, 
+  CircleDashed, 
+  CircleDot, 
+  Clock 
+} from 'lucide-react';
 
 interface StoryStatusBadgeProps {
   status: StoryStatus;
@@ -8,29 +14,40 @@ interface StoryStatusBadgeProps {
 }
 
 const StoryStatusBadge: React.FC<StoryStatusBadgeProps> = ({ status, className }) => {
-  const getStatusStyles = (s: StoryStatus) => {
-    switch (s) {
-      case 'Done':
-        return 'bg-[rgb(var(--color-success-subtle))] text-[rgb(var(--color-success))] border-[rgb(var(--color-success-border))]';
-      case 'In Progress':
-        return 'bg-[rgb(var(--color-accent-subtle))] text-[rgb(var(--color-accent))] border-[rgb(var(--color-accent))] shadow-[0_0_12px_rgba(var(--color-accent),0.2)]';
-      case 'Backlog':
-        return 'bg-muted/10 text-muted border-muted/20';
-      default:
-        return 'bg-muted/10 text-muted border-muted/20';
+  const config = {
+    'Done': {
+      icon: CheckCircle2,
+      styles: 'text-emerald-600 border-emerald-500/20 bg-emerald-500/5 dark:text-emerald-400 dark:border-emerald-500/20',
+    },
+    'In Progress': {
+      icon: CircleDot,
+      styles: 'text-blue-600 border-blue-500/20 bg-blue-500/5 dark:text-blue-400 dark:border-blue-500/20',
+    },
+    'Backlog': {
+      icon: CircleDashed,
+      styles: 'text-zinc-500 border-zinc-500/20 bg-zinc-500/5 dark:text-zinc-400 dark:border-zinc-500/20',
+    },
+    'Todo': {
+      icon: Clock,
+      styles: 'text-zinc-600 border-zinc-500/20 bg-zinc-500/5 dark:text-zinc-400 dark:border-zinc-500/20',
     }
   };
 
+  const { icon: Icon, styles } = config[status as keyof typeof config] || config['Todo'];
+
   return (
-    <span
+    <div
       className={cn(
-        'inline-flex items-center px-2 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider border transition-all duration-300',
-        getStatusStyles(status),
+        // The SaaS Look: Low-saturation background, thin border, tight padding
+        'inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md border',
+        'text-[11px] font-semibold tracking-tight leading-none transition-all duration-200',
+        styles,
         className
       )}
     >
-      {status}
-    </span>
+      <Icon className="w-3 h-3 shrink-0 stroke-[2.5px]" />
+      <span>{status}</span>
+    </div>
   );
 };
 

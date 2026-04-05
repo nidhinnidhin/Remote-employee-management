@@ -2,7 +2,13 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, Edit3, Trash2, AlignLeft, CheckSquare } from "lucide-react";
+import {
+  ChevronDown,
+  Edit3,
+  Trash2,
+  AlignLeft,
+  CheckSquare,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { UserStory } from "@/shared/types/company/projects/user-story.type";
 import { Employee } from "@/shared/types/company/employees/employee-listing.type";
@@ -11,7 +17,6 @@ import StoryStatusBadge from "./StoryStatusBadge";
 import StoryPointsBadge from "./StoryPointsBadge";
 import AssigneeDisplay from "./AssigneeDisplay";
 import AcceptanceCriteriaList from "./AcceptanceCriteriaList";
-import Button from "@/components/ui/Button";
 import InlineTaskList from "../tasks/InlineTaskList";
 
 interface StoryCardProps {
@@ -30,119 +35,142 @@ const StoryCard: React.FC<StoryCardProps> = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const assignee = employees.find((e) => e.id === story.assigneeId);
 
+  // REFINED: Thicker Zinc border for better structure
+  const zincBorder = "border-zinc-700/80";
+
   return (
     <div
       className={cn(
-        "group portal-card overflow-hidden transition-all duration-300 border-[rgba(var(--color-border-subtle),0.3)] hover:border-[rgba(var(--color-accent),0.3)]",
-        isExpanded ? "bg-[rgb(var(--color-surface-raised))]/80 ring-1 ring-accent/20 shadow-lg" : "bg-[rgb(var(--color-surface))]/50 hover:bg-[rgb(var(--color-bg-subtle))]/60"
+        "group transition-all duration-200 border-b",
+        zincBorder,
+        isExpanded
+          ? "bg-[rgb(var(--color-surface-raised))]/30"
+          : "bg-transparent hover:bg-[rgb(var(--color-bg-subtle))]/20",
       )}
     >
-      {/* Card Header/Row */}
+      {/* --- HEADER ROW --- */}
       <div
-        className="flex items-center justify-between p-4 cursor-pointer"
+        className="flex items-center h-14 px-4 cursor-pointer gap-4"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <div className="flex items-center gap-4 flex-1 min-w-0">
-          <div className="flex flex-col min-w-0">
-            <h4 className="text-[15px] font-bold text-primary truncate">
-              {story.title}
-            </h4>
-            {story.description && !isExpanded && (
-              <p className="text-[11px] text-muted truncate max-w-[300px]">
-                {story.description}
-              </p>
-            )}
-          </div>
+        <div className="flex flex-col min-w-0 flex-1">
+          <h4 className="text-[14px] font-bold text-primary truncate leading-tight">
+            {story.title}
+          </h4>
+          {!isExpanded && story.description && (
+            <p className="text-[11px] text-muted/40 truncate max-w-[400px] mt-0.5">
+              {story.description}
+            </p>
+          )}
         </div>
 
-        <div className="flex items-center gap-3 shrink-0 ml-4">
+        <div className="flex items-center gap-4 shrink-0">
           <div className="hidden sm:flex items-center gap-2">
             <StoryPriorityBadge priority={story.priority} />
             <StoryPointsBadge points={story.storyPoints} />
             <StoryStatusBadge status={story.status} />
           </div>
 
-          <AssigneeDisplay name={assignee?.name} avatar={assignee?.avatar} className="hidden md:flex ml-2" />
+          <AssigneeDisplay
+            name={assignee?.name}
+            avatar={assignee?.avatar}
+            className="hidden md:flex"
+          />
 
-          <div className="flex items-center gap-1 border-l border-border-subtle/30 pl-2 ml-2">
-            <Button
-              variant="ghost"
-              className="p-1.5 h-auto rounded-lg text-muted hover:text-accent hover:bg-accent/10"
+          {/* Action Bar Vertical Divider - Matching the Zinc Border */}
+          <div
+            className={cn(
+              "flex items-center h-8 gap-0.5 ml-2 pl-3 border-l",
+              zincBorder,
+            )}
+          >
+            <button
+              type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 onEdit(story);
               }}
+              className="flex items-center justify-center h-8 w-8 rounded-md text-zinc-300 hover:text-white hover:bg-white/10 transition-all active:scale-95"
             >
-              <Edit3 size={14} />
-            </Button>
-            <Button
-              variant="ghost"
-              className="p-1.5 h-auto rounded-lg text-muted hover:text-danger hover:bg-danger/10"
+              <Edit3 size={15} strokeWidth={2} />
+            </button>
+
+            <button
+              type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 onDelete(story);
               }}
+              className="flex items-center justify-center h-8 w-8 rounded-md text-zinc-300 hover:text-red-400 hover:bg-red-500/10 transition-all active:scale-95"
             >
-              <Trash2 size={14} />
-            </Button>
+              <Trash2 size={15} strokeWidth={2} />
+            </button>
+
+            {/* Small action divider */}
+            <div className={cn("w-[1px] h-4 mx-1 bg-zinc-700/50")} />
+
             <motion.div
               animate={{ rotate: isExpanded ? 180 : 0 }}
-              className="text-muted/40 ml-1"
+              className="flex items-center justify-center w-8 h-8 text-zinc-400"
             >
-              <ChevronDown size={16} />
+              <ChevronDown size={18} strokeWidth={2.5} />
             </motion.div>
           </div>
         </div>
       </div>
 
-      {/* Expanded Content */}
+      {/* --- EXPANDED CONTENT --- */}
       <AnimatePresence>
         {isExpanded && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
           >
-            <div className="px-5 pb-5 pt-2 border-t border-border-subtle/20 bg-black/5">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Description Section */}
+            <div
+              className={cn("px-6 pb-5 pt-4 border-t bg-black/5", zincBorder)}
+            >
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                {/* Description */}
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-accent/80">
-                    <AlignLeft size={14} />
-                    <span className="text-[10px] font-black uppercase tracking-widest pt-0.5">Description</span>
+                  <div className="flex items-center gap-2 text-zinc-400 uppercase">
+                    <AlignLeft size={13} strokeWidth={2.5} />
+                    <span className="text-[10px] font-bold tracking-widest pt-0.5">
+                      Description
+                    </span>
                   </div>
-                  <p className="text-secondary text-[13px] leading-relaxed pl-6">
-                    {story.description || "No description provided."}
-                  </p>
+                  <div className={cn("pl-5 border-l-2", zincBorder)}>
+                    <p className="text-secondary text-[13px] leading-relaxed">
+                      {story.description || "No description provided."}
+                    </p>
+                  </div>
                 </div>
 
-                {/* Acceptance Criteria Section */}
+                {/* Acceptance Criteria */}
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-accent/80">
-                    <CheckSquare size={14} />
-                    <span className="text-[10px] font-black uppercase tracking-widest pt-0.5">Acceptance Criteria</span>
+                  <div className="flex items-center gap-2 text-zinc-400 uppercase">
+                    <CheckSquare size={13} strokeWidth={2.5} />
+                    <span className="text-[10px] font-bold tracking-widest pt-0.5">
+                      Acceptance Criteria
+                    </span>
                   </div>
-                  <div className="pl-6">
-                    <AcceptanceCriteriaList criteria={story.acceptanceCriteria} />
+                  <div className={cn("pl-5 border-l-2", zincBorder)}>
+                    <AcceptanceCriteriaList
+                      criteria={story.acceptanceCriteria}
+                    />
                   </div>
                 </div>
               </div>
 
-              {/* Mobile Badges (Shown only when expanded on mobile) */}
-              <div className="flex sm:hidden flex-wrap items-center gap-2 mt-6 pt-4 border-t border-border-subtle/10">
-                <StoryPriorityBadge priority={story.priority} />
-                <StoryPointsBadge points={story.storyPoints} />
-                <StoryStatusBadge status={story.status} />
-                <AssigneeDisplay name={assignee?.name} avatar={assignee?.avatar} className="ml-auto" />
+              {/* Task Section Divider - Thickened to match */}
+              <div className={cn("pt-6 border-t", zincBorder)}>
+                <InlineTaskList
+                  storyId={story.id}
+                  projectId={story.projectId}
+                  employees={employees}
+                />
               </div>
-
-              {/* Tasks Section */}
-              <InlineTaskList 
-                storyId={story.id} 
-                projectId={story.projectId} 
-                employees={employees} 
-              />
             </div>
           </motion.div>
         )}

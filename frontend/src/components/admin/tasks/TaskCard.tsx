@@ -1,18 +1,17 @@
 "use client";
 
 import React from "react";
-import { Edit3, Trash2, Clock, Calendar, User, MoreVertical } from "lucide-react";
+import { Edit3, Trash2, Clock, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Task, TaskStatus } from "@/shared/types/company/projects/task.type";
 import { Employee } from "@/shared/types/company/employees/employee-listing.type";
 import TaskStatusBadge from "./TaskStatusBadge";
-import Button from "@/components/ui/Button";
 import AssigneeDisplay from "@/components/admin/stories/AssigneeDisplay";
 
 interface TaskCardProps {
   task: Task;
   employees: Employee[];
-  storyTitle?: string; // Optional story title for board view
+  storyTitle?: string;
   onEdit: (task: Task) => void;
   onDelete: (task: Task) => void;
   isDraggable?: boolean;
@@ -34,6 +33,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
 }) => {
   const assignee = employees.find((e) => e.id === task.assignedTo);
   
+  // Using your Zinc border variable to maintain the "perfect" look we achieved
+  const zincBorder = "border-zinc-700/80";
+
   const isOverdue = () => {
     if (!task.dueDate || task.status === TaskStatus.DONE) return false;
     const today = new Date();
@@ -54,55 +56,57 @@ const TaskCard: React.FC<TaskCardProps> = ({
       {...draggableProps}
       {...dragHandleProps}
       className={cn(
-        "group portal-card p-4 bg-[rgb(var(--color-surface))]/60 border-[rgba(var(--color-border-subtle),0.4)] hover:border-[rgba(var(--color-accent),0.5)] hover:bg-[rgb(var(--color-surface-raised))]/80 transition-all duration-300 shadow-sm hover:shadow-lg",
+        "group p-3 transition-all duration-200 rounded-md border",
+        zincBorder,
+        "bg-[rgb(var(--color-surface))]/60 hover:bg-[rgb(var(--color-surface-raised))]/80 shadow-sm",
         isDraggable && "cursor-grab active:cursor-grabbing"
       )}
     >
-      <div className="flex flex-col gap-3">
-        {/* Header: Status & Actions */}
-        <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-col gap-2.5">
+        {/* --- HEADER: STATUS & ACTIONS --- */}
+        <div className="flex items-center justify-between h-5">
           <TaskStatusBadge status={task.status} />
           
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <Button
-              variant="ghost"
-              className="p-1 h-auto rounded-lg text-muted hover:text-accent hover:bg-accent/10"
+            <button
+              type="button"
+              className="p-1 text-muted hover:text-accent transition-colors"
               onClick={() => onEdit(task)}
             >
-              <Edit3 size={12} />
-            </Button>
-            <Button
-              variant="ghost"
-              className="p-1 h-auto rounded-lg text-muted hover:text-danger hover:bg-danger/10"
+              <Edit3 size={13} strokeWidth={2.5} />
+            </button>
+            <button
+              type="button"
+              className="p-1 text-muted hover:text-danger transition-colors"
               onClick={() => onDelete(task)}
             >
-              <Trash2 size={12} />
-            </Button>
+              <Trash2 size={13} strokeWidth={2.5} />
+            </button>
           </div>
         </div>
 
-        {/* Title */}
-        <div className="space-y-1">
+        {/* --- TITLE --- */}
+        <div className="min-h-[1.5rem]">
           <h5 className="text-[13px] font-bold text-primary leading-snug">
             {task.title}
           </h5>
           {storyTitle && (
-            <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-muted/5 border border-muted/10">
-              <span className="text-[9px] font-black uppercase tracking-tighter text-muted/60">Story</span>
-              <span className="text-[10px] font-bold text-muted truncate max-w-[120px]">{storyTitle}</span>
+            <div className="mt-1 flex items-center gap-1.5 opacity-40">
+              <span className="text-[9px] font-bold uppercase tracking-tighter text-muted">Story:</span>
+              <span className="text-[10px] text-muted truncate max-w-[150px]">{storyTitle}</span>
             </div>
           )}
         </div>
 
-        {/* Metadata: Estimates & Dates */}
-        <div className="flex flex-wrap items-center gap-3 py-2 border-y border-border-subtle/10">
+        {/* --- METADATA (DATES & HOURS) --- */}
+        <div className={cn("flex flex-wrap items-center gap-x-4 gap-y-2 pt-2 border-t", zincBorder)}>
           {task.estimatedHours !== undefined && (
             <div className="flex items-center gap-1.5 text-muted" title="Estimated Hours">
-              <Clock size={12} className="text-secondary/40" />
-              <span className="text-[11px] font-bold">{task.estimatedHours}h</span>
+              <Clock size={12} className="opacity-40" strokeWidth={2.5} />
+              <span className="text-[11px] font-bold tabular-nums">{task.estimatedHours}h</span>
               {task.actualHours !== undefined && (
-                <span className="text-[10px] font-medium opacity-60">
-                  ({task.actualHours}h actual)
+                <span className="text-[10px] font-medium opacity-40">
+                  ({task.actualHours}h act.)
                 </span>
               )}
             </div>
@@ -112,24 +116,24 @@ const TaskCard: React.FC<TaskCardProps> = ({
             <div 
               className={cn(
                 "flex items-center gap-1.5",
-                isOverdue() ? "text-danger animate-pulse" : "text-muted"
+                isOverdue() ? "text-danger" : "text-muted"
               )}
               title="Due Date"
             >
-              <Calendar size={12} className={cn(isOverdue() ? "text-danger" : "text-secondary/40")} />
-              <span className="text-[11px] font-black uppercase tracking-tighter">
+              <Calendar size={12} className="opacity-40" strokeWidth={2.5} />
+              <span className="text-[10px] font-bold uppercase tracking-widest">
                 {formatDate(task.dueDate)}
               </span>
             </div>
           )}
         </div>
 
-        {/* Footer: Assignee */}
+        {/* --- FOOTER: ASSIGNEE --- */}
         <div className="flex items-center justify-between pt-1">
           <AssigneeDisplay 
             name={assignee?.name} 
             avatar={assignee?.avatar} 
-            className="!gap-1.5 scale-90 -ml-1 text-[10px]" 
+            className="scale-90 -ml-1" 
           />
         </div>
       </div>

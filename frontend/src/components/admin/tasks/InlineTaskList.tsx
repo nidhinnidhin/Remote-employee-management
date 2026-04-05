@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { Plus, ListTodo, Loader2, ListChecks } from "lucide-react";
+import { Plus, ListChecks } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Task } from "@/shared/types/company/projects/task.type";
 import { Employee } from "@/shared/types/company/employees/employee-listing.type";
@@ -11,7 +11,6 @@ import TaskCard from "./TaskCard";
 import CreateTaskModal from "./modals/CreateTaskModal";
 import EditTaskModal from "./modals/EditTaskModal";
 import DeleteTaskConfirmation from "./modals/DeleteTaskConfirmation";
-import Button from "@/components/ui/Button";
 
 interface InlineTaskListProps {
   storyId: string;
@@ -26,6 +25,9 @@ const InlineTaskList: React.FC<InlineTaskListProps> = ({ storyId, projectId, emp
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedTaskForEdit, setSelectedTaskForEdit] = useState<Task | null>(null);
   const [selectedTaskForDelete, setSelectedTaskForDelete] = useState<Task | null>(null);
+
+  // Sync with StoryCard border style
+  const zincBorder = "border-zinc-700/80";
 
   const fetchTasks = useCallback(async () => {
     setLoading(true);
@@ -43,40 +45,51 @@ const InlineTaskList: React.FC<InlineTaskListProps> = ({ storyId, projectId, emp
   }, [fetchTasks]);
 
   return (
-    <div className="mt-8 space-y-4 animate-in fade-in slide-in-from-top-1 duration-500">
-      <div className="flex items-center justify-between border-b border-border-subtle/10 pb-2">
+    <div className="space-y-4 animate-in fade-in slide-in-from-top-1 duration-400">
+      {/* --- HEADER SECTION --- */}
+      <div className={cn("flex items-center justify-between pb-3 border-b", zincBorder)}>
         <div className="flex items-center gap-2">
-          <ListChecks size={14} className="text-accent/60" />
-          <h6 className="text-[10px] font-black uppercase tracking-widest text-primary">Task List</h6>
-          <span className="px-1.5 py-0.5 rounded bg-accent/10 border border-accent/20 text-[9px] font-bold text-accent">
+          <ListChecks size={14} className="text-zinc-500" strokeWidth={2.5} />
+          <h6 className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">
+            Task List
+          </h6>
+          <span className="ml-1 px-1.5 py-0.5 rounded bg-zinc-800 text-[10px] font-bold text-zinc-400 tabular-nums">
             {tasks.length}
           </span>
         </div>
-        <Button
-          variant="ghost"
-          className="h-7 py-0 px-2.5 rounded-lg text-accent hover:bg-accent/10 text-[10px] font-black uppercase tracking-widest gap-1.5 shadow-sm border border-accent/10 hover:border-accent/40"
+
+        {/* --- CUSTOM ADD TASK BUTTON --- */}
+        <button
           onClick={() => setIsCreateModalOpen(true)}
+          className="flex items-center gap-1.5 h-7 px-3 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-[10px] font-bold uppercase tracking-widest transition-all border border-zinc-700 active:scale-95"
         >
-          <Plus size={12} />
+          <Plus size={12} strokeWidth={3} />
           <span>Add Task</span>
-        </Button>
+        </button>
       </div>
 
-      <div className="space-y-2">
+      {/* --- TASKS GRID --- */}
+      <div className="min-h-[40px]">
         {loading ? (
-          <div className="flex flex-col gap-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {[1, 2].map((i) => (
-              <div key={i} className="h-16 w-full rounded-2xl bg-surface-raised/20 animate-pulse border border-border-subtle/5" />
+              <div 
+                key={i} 
+                className={cn("h-24 w-full rounded-md bg-zinc-900/40 animate-pulse border", zincBorder)} 
+              />
             ))}
           </div>
         ) : tasks.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-8 gap-3 border-2 border-dashed border-border-subtle/10 rounded-2xl bg-black/5">
-            <p className="text-[11px] font-bold text-muted italic">No tasks created yet for this story.</p>
+          <div className={cn(
+            "flex flex-col items-center justify-center py-10 gap-3 border border-dashed rounded-md bg-zinc-900/20", 
+            zincBorder
+          )}>
+            <p className="text-[11px] font-medium text-zinc-500">No tasks created yet for this story.</p>
             <button 
               onClick={() => setIsCreateModalOpen(true)}
-              className="text-[10px] font-black uppercase tracking-widest text-accent hover:underline flex items-center gap-1.5"
+              className="text-[10px] font-bold uppercase tracking-widest text-accent hover:text-accent/80 flex items-center gap-1.5 transition-colors"
             >
-              <Plus size={10} />
+              <Plus size={12} strokeWidth={2.5} />
               Create First Task
             </button>
           </div>
@@ -95,7 +108,7 @@ const InlineTaskList: React.FC<InlineTaskListProps> = ({ storyId, projectId, emp
         )}
       </div>
 
-      {/* Modals */}
+      {/* --- MODALS --- */}
       <CreateTaskModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
@@ -104,7 +117,6 @@ const InlineTaskList: React.FC<InlineTaskListProps> = ({ storyId, projectId, emp
         storyId={storyId}
         employees={employees}
       />
-
       <EditTaskModal
         isOpen={!!selectedTaskForEdit}
         onClose={() => setSelectedTaskForEdit(null)}
@@ -112,7 +124,6 @@ const InlineTaskList: React.FC<InlineTaskListProps> = ({ storyId, projectId, emp
         task={selectedTaskForEdit}
         employees={employees}
       />
-
       <DeleteTaskConfirmation
         isOpen={!!selectedTaskForDelete}
         onClose={() => setSelectedTaskForDelete(null)}
