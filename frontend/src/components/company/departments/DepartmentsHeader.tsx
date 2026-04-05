@@ -19,7 +19,7 @@ const DepartmentsHeader = ({ onAdd }: { onAdd: () => void }) => {
         </p>
       </div>
 
-      <button 
+      <button
         onClick={onAdd}
         className="btn-primary group relative overflow-hidden flex items-center gap-2 px-5 py-2 transition-all active:scale-95 shadow-lg shadow-accent/20 text-sm"
       >

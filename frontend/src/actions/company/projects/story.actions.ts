@@ -1,9 +1,13 @@
+"use server";
+
 import { StoryService } from "@/services/company/projects/story.service";
 import { CreateStoryPayload, UpdateStoryPayload } from "@/shared/types/company/projects/user-story.type";
+import { getServerApi } from "@/lib/axios/axiosServer";
 
 export const getStoriesByProjectAction = async (projectId: string) => {
   try {
-    const data = await StoryService.getStoriesByProject(projectId);
+    const api = await getServerApi();
+    const data = await StoryService.getStoriesByProject(projectId, api);
     return { success: true, data };
   } catch (error: any) {
     console.error("Error fetching stories:", error?.message);
@@ -13,7 +17,8 @@ export const getStoriesByProjectAction = async (projectId: string) => {
 
 export const createStoryAction = async (payload: CreateStoryPayload) => {
   try {
-    const data = await StoryService.createStory(payload);
+    const api = await getServerApi();
+    const data = await StoryService.createStory(payload, api);
     return { success: true, data };
   } catch (error: any) {
     console.error("Error creating story:", error?.message);
@@ -23,7 +28,8 @@ export const createStoryAction = async (payload: CreateStoryPayload) => {
 
 export const updateStoryAction = async (id: string, payload: UpdateStoryPayload) => {
   try {
-    const data = await StoryService.updateStory(id, payload);
+    const api = await getServerApi();
+    const data = await StoryService.updateStory(id, payload, api);
     return { success: true, data };
   } catch (error: any) {
     console.error("Error updating story:", error?.message);
@@ -33,7 +39,8 @@ export const updateStoryAction = async (id: string, payload: UpdateStoryPayload)
 
 export const deleteStoryAction = async (id: string) => {
   try {
-    await StoryService.deleteStory(id);
+    const api = await getServerApi();
+    await StoryService.deleteStory(id, api);
     return { success: true };
   } catch (error: any) {
     console.error("Error deleting story:", error?.message);

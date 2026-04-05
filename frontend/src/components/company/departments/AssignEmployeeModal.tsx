@@ -91,9 +91,9 @@ export const AssignEmployeeModal = ({
           </div>
 
           <div className="relative group">
-            <Search 
-              size={16} 
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-accent transition-colors duration-300" 
+            <Search
+              size={16}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-accent transition-colors duration-300"
             />
             <input
               type="text"
@@ -103,7 +103,7 @@ export const AssignEmployeeModal = ({
               className={cn(
                 "w-full pl-11 pr-4 h-11 text-sm transition-all duration-300",
                 "bg-white/[0.02] border border-white/10 rounded-xl outline-none text-white",
-                "placeholder:text-slate-600 focus:border-accent/40"
+                "placeholder:text-slate-600 focus:border-accent/40",
               )}
             />
           </div>
@@ -120,7 +120,11 @@ export const AssignEmployeeModal = ({
           <div className="rounded-xl border border-white/10 bg-white/[0.02] overflow-hidden max-h-[350px] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             {loading ? (
               <div className="py-16 flex flex-col items-center justify-center gap-4 opacity-60">
-                <Loader2 className="animate-spin text-accent" size={28} strokeWidth={2} />
+                <Loader2
+                  className="animate-spin text-accent"
+                  size={28}
+                  strokeWidth={2}
+                />
                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
                   Accessing Records...
                 </span>
@@ -137,7 +141,7 @@ export const AssignEmployeeModal = ({
                         "flex items-center gap-4 p-4 transition-all duration-300",
                         isAlreadyMember
                           ? "opacity-50 grayscale bg-transparent"
-                          : "hover:bg-white/[0.04]"
+                          : "hover:bg-white/[0.04]",
                       )}
                     >
                       {/* Avatar */}
@@ -146,7 +150,7 @@ export const AssignEmployeeModal = ({
                           src={
                             emp.avatar ||
                             `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                              emp.name
+                              emp.name,
                             )}&background=random`
                           }
                           alt={emp.name}
@@ -155,7 +159,7 @@ export const AssignEmployeeModal = ({
                           className="object-cover w-full h-full"
                           onError={(e: any) => {
                             e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                              emp.name
+                              emp.name,
                             )}`;
                           }}
                         />
@@ -174,7 +178,11 @@ export const AssignEmployeeModal = ({
                       {/* Action */}
                       {isAlreadyMember ? (
                         <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-slate-300 text-[9px] font-black uppercase tracking-widest shrink-0">
-                          <Check size={12} strokeWidth={2.5} className="text-green-400" />
+                          <Check
+                            size={12}
+                            strokeWidth={2.5}
+                            className="text-green-400"
+                          />
                           Assigned
                         </div>
                       ) : (
@@ -184,15 +192,21 @@ export const AssignEmployeeModal = ({
                           className={cn(
                             "h-9 px-4 rounded-lg flex items-center justify-center gap-2 transition-all duration-300 shrink-0",
                             "bg-accent/10 text-accent hover:bg-accent hover:text-[#08090a] border border-accent/20 hover:shadow-lg hover:shadow-accent/20",
-                            "disabled:opacity-50 disabled:cursor-not-allowed"
+                            "disabled:opacity-50 disabled:cursor-not-allowed",
                           )}
                         >
                           {assigningId === emp.id ? (
-                            <Loader2 className="animate-spin" size={14} strokeWidth={3} />
+                            <Loader2
+                              className="animate-spin"
+                              size={14}
+                              strokeWidth={3}
+                            />
                           ) : (
                             <>
                               <UserPlus size={14} strokeWidth={2.5} />
-                              <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline-block">Add</span>
+                              <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline-block">
+                                Add
+                              </span>
                             </>
                           )}
                         </button>
