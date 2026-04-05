@@ -32,9 +32,10 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
   const getColumnColor = () => {
     switch (status) {
       case TaskStatus.TODO:
-        return "rgb(var(--color-secondary))";
-      case TaskStatus.IN_PROGRESS:
         return "rgb(var(--color-accent))";
+      case TaskStatus.IN_PROGRESS:
+        // A soft, light gold / warm amber color
+        return "rgb(251, 191, 36)";
       case TaskStatus.DONE:
         return "rgb(var(--color-success))";
       default:
@@ -43,19 +44,27 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
   };
 
   return (
-    <div className="flex flex-col w-[300px] shrink-0 h-full bg-[rgb(var(--color-surface))]/30 rounded-3xl border border-border-subtle/20 overflow-hidden shadow-sm hover:border-border-subtle/40 transition-all duration-300">
+    <div
+      className="flex flex-col w-[300px] shrink-0 h-full rounded-xl transition-all duration-300"
+      style={{
+        backgroundColor: `color-mix(in srgb, ${getColumnColor()} 10%, transparent)`,
+      }}
+    >
       {/* Column Header */}
-      <div 
-        className="p-4 border-b border-border-subtle/10 flex items-center justify-between sticky top-0 bg-[rgb(var(--color-surface))]/80 backdrop-blur-md z-10"
-        style={{ borderTop: `4px solid ${getColumnColor()}` }}
-      >
+      <div className="p-3.5 flex items-center justify-between sticky top-0 bg-background/50 backdrop-blur-md z-10 rounded-t-xl">
         <div className="flex items-center gap-2.5">
-          <h3 className="text-sm font-black text-primary tracking-tight">{status}</h3>
-          <span className="px-2 py-0.5 rounded-full bg-surface-raised/40 border border-border-subtle/10 text-[10px] font-black text-muted transition-all group-hover:scale-110">
+          <div
+            className="w-2.5 h-2.5 rounded-full shadow-sm"
+            style={{ backgroundColor: getColumnColor() }}
+          />
+          <h3 className="text-sm font-semibold text-primary tracking-tight">
+            {status}
+          </h3>
+          <span className="flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-md bg-muted/10 text-[11px] font-medium text-muted-foreground transition-all group-hover:scale-110">
             {tasks.length}
           </span>
         </div>
-        <button className="text-muted/40 hover:text-accent transition-colors">
+        <button className="p-1.5 text-muted-foreground/50 hover:text-primary hover:bg-muted/10 rounded-md transition-colors">
           <MoreHorizontal size={16} />
         </button>
       </div>
@@ -67,35 +76,44 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
             {...provided.droppableProps}
             ref={provided.innerRef}
             className={cn(
-              "flex-1 p-3 overflow-y-auto space-y-3 transition-colors duration-200 min-h-[200px]",
-              snapshot.isDraggingOver ? "bg-accent/5" : ""
+              "flex-1 p-2.5 overflow-y-auto space-y-2.5 transition-all duration-200 min-h-[200px] rounded-lg mx-1",
+              "[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
+              snapshot.isDraggingOver ? "ring-1 ring-inset" : "",
             )}
+            style={{
+              backgroundColor: snapshot.isDraggingOver
+                ? `color-mix(in srgb, ${getColumnColor()} 15%, transparent)`
+                : "transparent",
+              borderColor: snapshot.isDraggingOver
+                ? `color-mix(in srgb, ${getColumnColor()} 40%, transparent)`
+                : "transparent",
+            }}
           >
             {tasks.map((task, index) => (
               <Draggable key={task.id} draggableId={task.id} index={index}>
                 {(provided, snapshot) => {
-                   const story = stories.find(s => s.id === task.storyId);
-                   return (
-                     <TaskCard
-                       task={task}
-                       employees={employees}
-                       storyTitle={story?.title}
-                       onEdit={onEditTask}
-                       onDelete={onDeleteTask}
-                       isDraggable
-                       innerRef={provided.innerRef}
-                       draggableProps={provided.draggableProps}
-                       dragHandleProps={provided.dragHandleProps}
-                     />
-                   );
+                  const story = stories.find((s) => s.id === task.storyId);
+                  return (
+                    <TaskCard
+                      task={task}
+                      employees={employees}
+                      storyTitle={story?.title}
+                      onEdit={onEditTask}
+                      onDelete={onDeleteTask}
+                      isDraggable
+                      innerRef={provided.innerRef}
+                      draggableProps={provided.draggableProps}
+                      dragHandleProps={provided.dragHandleProps}
+                    />
+                  );
                 }}
               </Draggable>
             ))}
             {provided.placeholder}
 
             {tasks.length === 0 && !snapshot.isDraggingOver && (
-              <div className="flex flex-col items-center justify-center py-12 px-6 text-center border-2 border-dashed border-border-subtle/10 rounded-2xl animate-in fade-in duration-500">
-                <p className="text-[11px] font-bold text-muted/60 italic leading-relaxed">
+              <div className="flex flex-col items-center justify-center py-10 px-6 text-center rounded-xl animate-in fade-in duration-500 mt-2">
+                <p className="text-[11px] font-medium text-muted-foreground/70 leading-relaxed">
                   No tasks in <br /> {status}
                 </p>
               </div>
@@ -104,11 +122,11 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
         )}
       </Droppable>
 
-      {/* Add Task Button (Always at bottom for Todo, or per-column UX) */}
-      <div className="p-3 border-t border-border-subtle/10 bg-[rgb(var(--color-surface))]/20">
+      {/* Add Task Button */}
+      <div className="p-2 bg-[rgb(var(--color-surface))]/30 rounded-b-xl">
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2 h-10 px-3 text-[11px] font-black uppercase tracking-widest text-muted hover:text-accent hover:bg-accent/10 rounded-xl"
+          className="w-full justify-start gap-2 h-9 px-3 text-xs font-medium text-muted-foreground hover:text-primary hover:bg-surface/60 rounded-xl transition-all"
           onClick={onAddTask}
         >
           <Plus size={14} />
