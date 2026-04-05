@@ -73,13 +73,9 @@ export default function EmployeeProjectList({
       {/* Header Area */}
       <div className="flex flex-col gap-2">
          <div className="flex items-center gap-3">
-            <h2 className="text-2xl font-black text-primary tracking-tight font-heading">My Active Portfolio</h2>
+            <h2 className="text-2xl font-black text-primary tracking-tight font-heading">My Active Projects</h2>
             <div className="h-[1px] flex-1 bg-gradient-to-r from-accent/20 to-transparent" />
          </div>
-         <p className="text-sm text-muted font-medium flex items-center gap-2">
-            <Info size={14} className="text-accent/60" />
-            Showing only projects with assigned tasks or stories.
-         </p>
       </div>
 
       {/* Grid */}

@@ -23,20 +23,23 @@ export default function EmployeeProjectCard({
   const formatDate = (dateString?: string) => {
     if (!dateString) return "N/A";
     const date = new Date(dateString);
+    // Added 'day: "2-digit"' to include the actual date
     return date.toLocaleDateString('en-US', {
+      day: '2-digit',
       month: 'short',
       year: 'numeric'
     }).toUpperCase();
   };
 
-  const projectUrl = `${FRONTEND_ROUTES.EMPLOYEE.PROJECTS}/${project.id || project._id}`;
+  const projectId = project.id || project._id;
+  const projectUrl = `${FRONTEND_ROUTES.EMPLOYEE.PROJECTS}/${projectId}`;
 
   return (
     <Link 
       href={projectUrl}
       className={cn(
         "group block p-5 rounded-xl border border-white/[0.08] bg-white/[0.02] overflow-hidden",
-        "flex flex-col gap-5 h-full"
+        "flex flex-col gap-5 h-full transition-all hover:border-accent/20 hover:bg-white/[0.04]"
       )}
     >
       {/* Top Row: Icon and Status */}

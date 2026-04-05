@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, AlignLeft, CheckSquare, Layers } from "lucide-react";
+import { ChevronDown, AlignLeft, CheckSquare, Layers, Target } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { UserStory } from "@/shared/types/company/projects/user-story.type";
 import { Task } from "@/shared/types/company/projects/task.type";
@@ -14,7 +14,7 @@ import EmployeeInlineTaskList from "../tasks/EmployeeInlineTaskList";
 
 interface EmployeeStoryCardProps {
   story: UserStory;
-  tasks: Task[]; // Scoped to this story and current user
+  tasks: Task[];
   onRefresh?: () => void;
 }
 
@@ -28,94 +28,113 @@ export default function EmployeeStoryCard({
   return (
     <div
       className={cn(
-        "group portal-card overflow-hidden transition-all duration-500",
-        isExpanded 
-            ? "bg-[rgb(var(--color-surface-raised))]/60 border-[rgba(var(--color-accent),0.3)] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.4)]" 
-            : "bg-[rgb(var(--color-surface))]/30 border-[rgba(var(--color-border-subtle),0.1)] hover:border-[rgba(var(--color-accent),0.2)] hover:bg-[rgb(var(--color-surface-raised))]/40"
+        "group rounded-xl transition-all duration-300 border overflow-hidden",
+        isExpanded
+          ? "bg-white/[0.03] border-accent/20 shadow-xl"
+          : "bg-white/[0.01] border-white/5 hover:border-white/10 hover:bg-white/[0.02]"
       )}
     >
+      {/* Header */}
       <div
-        className="flex items-center justify-between p-5 cursor-pointer"
+        className="flex items-center justify-between p-4 cursor-pointer select-none"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <div className="flex items-center gap-5 flex-1 min-w-0">
-          <div className="w-10 h-10 rounded-2xl bg-accent-subtle/20 flex items-center justify-center text-accent shrink-0 transition-transform group-hover:scale-110">
-             <Layers size={20} />
+        <div className="flex items-center gap-4 flex-1 min-w-0">
+          <div className={cn(
+            "w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-300 shrink-0",
+            isExpanded ? "bg-accent text-[#08090a]" : "bg-white/5 text-slate-500 group-hover:text-accent"
+          )}>
+            <Layers size={16} />
           </div>
+
           <div className="flex flex-col min-w-0">
-             <h4 className="text-[15px] font-bold text-primary truncate tracking-tight">
+            <div className="flex items-center gap-2">
+               <span className="text-[9px] font-black text-accent/50 uppercase tracking-tighter">US-{story.id?.toString().slice(-3) || '00'}</span>
+               <h4 className="text-[14px] font-bold text-white tracking-tight truncate">
                 {story.title}
-             </h4>
-             {!isExpanded && story.description && (
-                <p className="text-[11px] text-muted truncate max-w-[280px] opacity-60">
-                   {story.description}
-                </p>
-             )}
+              </h4>
+            </div>
+            {!isExpanded && (
+              <p className="text-[11px] text-slate-500 truncate max-w-[450px]">
+                {story.description || "No description provided."}
+              </p>
+            )}
           </div>
         </div>
 
-        <div className="flex items-center gap-4 shrink-0">
-          <div className="hidden sm:flex items-center gap-2">
-            <StoryPriorityBadge priority={story.priority} className="scale-90" />
-            <StoryPointsBadge points={story.storyPoints} className="scale-90" />
-            <StoryStatusBadge status={story.status} className="scale-90" />
+        <div className="flex items-center gap-3 shrink-0">
+          <div className="hidden md:flex items-center gap-2 scale-90">
+            <StoryPriorityBadge priority={story.priority} />
+            <StoryPointsBadge points={story.storyPoints} />
+            <StoryStatusBadge status={story.status} />
           </div>
-
           <motion.div
             animate={{ rotate: isExpanded ? 180 : 0 }}
-            className="text-muted/40 ml-2"
+            className={cn("text-slate-600 transition-colors", isExpanded && "text-white")}
           >
-            <ChevronDown size={18} />
+            <ChevronDown size={16} strokeWidth={3} />
           </motion.div>
         </div>
       </div>
 
+      {/* Expanded Content */}
       <AnimatePresence>
         {isExpanded && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
+            transition={{ duration: 0.2 }}
           >
-            <div className="px-6 pb-6 pt-2 border-t border-[rgba(var(--color-border-subtle),0.1)] bg-black/[0.05]">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                {/* Description */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2.5 text-accent/60">
-                     <AlignLeft size={14} />
-                     <span className="text-[10px] font-black uppercase tracking-[0.2em] pt-0.5">Objective</span>
+            <div className="px-4 pb-5">
+              {/* Main Info Block - Tightened Grid */}
+              <div className="flex flex-col lg:flex-row gap-4 p-4 rounded-xl bg-white/[0.02] border border-white/5">
+                
+                {/* Objective - Flexible width */}
+                <div className="flex-1 space-y-2">
+                  <div className="flex items-center gap-2 text-accent/70">
+                    <Target size={14} />
+                    <span className="text-[9px] font-black uppercase tracking-widest">Objective</span>
                   </div>
-                  <p className="text-secondary text-[13.5px] leading-relaxed pl-7 font-medium">
-                    {story.description || "No detailed description provided."}
+                  <p className="text-slate-300 text-[13px] leading-relaxed pl-5">
+                    {story.description || "Detailed scope for this user story."}
                   </p>
                 </div>
 
-                {/* Acceptance Criteria */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2.5 text-accent/60">
-                     <CheckSquare size={14} />
-                     <span className="text-[10px] font-black uppercase tracking-[0.2em] pt-0.5">Success Criteria</span>
+                {/* Vertical Divider for Desktop */}
+                <div className="hidden lg:block w-px bg-white/5 self-stretch" />
+
+                {/* Success Criteria - Fixed width on large screens to fill space */}
+                <div className="lg:w-[40%] space-y-2">
+                  <div className="flex items-center gap-2 text-accent/70">
+                    <CheckSquare size={14} />
+                    <span className="text-[9px] font-black uppercase tracking-widest">Success Criteria</span>
                   </div>
-                  <div className="pl-7">
-                    <AcceptanceCriteriaList criteria={story.acceptanceCriteria} className="!text-[13px] !text-muted/80 !leading-relaxed" />
+                  <div className="pl-5">
+                    <AcceptanceCriteriaList 
+                        criteria={story.acceptanceCriteria} 
+                        className="!text-[12px] !text-slate-400 !space-y-1.5" 
+                    />
                   </div>
                 </div>
               </div>
 
               {/* Tasks Section */}
-              <div className="mt-10 pt-6 border-t border-[rgba(var(--color-border-subtle),0.05)]">
+              <div className="mt-5">
+                 <div className="flex items-center gap-3 mb-3">
+                    <span className="text-[9px] font-black text-slate-600 uppercase tracking-[0.2em] whitespace-nowrap">Roster & Tasks</span>
+                    <div className="h-px w-full bg-white/5"></div>
+                 </div>
                  <EmployeeInlineTaskList 
                     tasks={tasks} 
                     onRefresh={onRefresh}
                  />
               </div>
 
-              {/* Mobile Badges */}
-              <div className="flex sm:hidden flex-wrap items-center gap-2 mt-8 pt-4 border-t border-border-subtle/10">
+              {/* Mobile View Badges */}
+              <div className="flex md:hidden items-center gap-2 mt-4 pt-4 border-t border-white/5">
                 <StoryPriorityBadge priority={story.priority} />
                 <StoryStatusBadge status={story.status} />
-                <StoryPointsBadge points={story.storyPoints} />
               </div>
             </div>
           </motion.div>

@@ -119,7 +119,7 @@ const BoardView: React.FC<BoardViewProps> = ({ projectId }) => {
       {/* Board Header Bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 py-2">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent shadow-inner">
+          <div className="w-12 h-12 rounded-2xl bg-accent/10  flex items-center justify-center text-accent shadow-inner">
             <Sparkles size={24} />
           </div>
           <div>

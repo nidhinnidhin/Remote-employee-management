@@ -41,12 +41,12 @@ export default function EmployeeKanbanColumn({ status, tasks, projects, onRefres
 
   return (
     <div className={cn(
-      "flex flex-col rounded-2xl border border-white/[0.04] transition-all duration-500 h-fit",
-      "w-[320px] lg:flex-1 lg:min-w-[300px] lg:max-w-[450px]",
+      "flex flex-col rounded-2xl border border-white/[0.04] transition-all duration-500",
+      "w-[320px] lg:flex-1 lg:min-w-[300px] lg:max-w-[450px] min-h-screen",
       config.bg
     )}>
       {/* Header with Glowing Status Indicator */}
-      <div className="p-5 flex items-center justify-between border-b border-white/[0.04] bg-white/[0.01] rounded-t-2xl">
+      <div className="p-5 flex items-center justify-between border-b border-white/[0.04] bg-white/[0.01] rounded-t-2xl shrink-0">
         <div className="flex items-center gap-2.5">
           <div className={cn(
             "w-1.5 h-1.5 rounded-full shadow-[0_0_10px_currentColor] animate-pulse", 
@@ -68,7 +68,7 @@ export default function EmployeeKanbanColumn({ status, tasks, projects, onRefres
             {...provided.droppableProps}
             ref={provided.innerRef}
             className={cn(
-              "p-3 space-y-3 min-h-[150px] transition-colors duration-300",
+              "p-3 space-y-3 min-w-0 transition-colors duration-300",
               snapshot.isDraggingOver ? "bg-white/[0.03]" : "bg-transparent"
             )}
           >

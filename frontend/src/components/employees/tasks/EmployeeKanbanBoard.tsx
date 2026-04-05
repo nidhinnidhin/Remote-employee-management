@@ -50,7 +50,7 @@ export default function EmployeeKanbanBoard({ tasks: initialTasks, projects, onR
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className="w-full overflow-x-auto pb-12 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      <div className="w-full overflow-x-auto pb-6 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         <div className="flex items-start gap-6 min-w-max lg:min-w-0">
           {statuses.map((status) => (
             <EmployeeKanbanColumn

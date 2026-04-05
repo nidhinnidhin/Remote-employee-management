@@ -209,7 +209,7 @@ const ProjectDetailsPage = () => {
           </div>
 
           {/* --- TAB CONTENT: FLUID CONTAINER --- */}
-          <div className="relative min-h-[500px] w-full bg-white/[0.01] border border-white/[0.03] rounded-[2rem] p-1 overflow-hidden">
+          <div className="relative min-h-[500px] w-full bg-white/[0.01] border border-white/[0.03] rounded-[2rem] p-1">
             {/* Subtle inner glow for the workspace area */}
             <div className="absolute inset-0 bg-gradient-to-b from-accent/[0.02] to-transparent pointer-events-none" />
 
