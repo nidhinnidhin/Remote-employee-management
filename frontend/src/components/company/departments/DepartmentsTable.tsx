@@ -341,7 +341,7 @@ const DepartmentsTable = ({ refreshTrigger }: { refreshTrigger?: number }) => {
                                     }}
                                   >
                                     <Trash2 size={14} />
-                                    <span>Remove Dept</span>
+                                    <span>Remove employee</span>
                                   </button>
                                 </div>
                               </div>,

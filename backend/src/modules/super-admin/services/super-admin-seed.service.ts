@@ -73,8 +73,9 @@ export class SuperAdminSeedService implements ISuperAdminSeedService {
         '0000000000',
         passwordHash,
         UserStatus.ACTIVE,
-        new Date(),
-        new Date(),
+        undefined, // title
+        new Date(), // createdAt
+        new Date(), // updatedAt
         companyId,
       );
 

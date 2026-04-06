@@ -45,8 +45,9 @@ export class SocialLoginUseCase implements ISocialLoginUseCase {
         '',
         undefined,
         UserStatus.ACTIVE,
-        new Date(),
-        new Date(),
+        undefined, // title
+        new Date(), // createdAt
+        new Date(), // updatedAt
         undefined,
         undefined,
         undefined,

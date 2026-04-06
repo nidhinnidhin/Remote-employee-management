@@ -53,8 +53,9 @@ export class VerifyEmailOtpUseCase implements IVerifyEmailOtpUseCase {
       pending.admin.phone,
       pending.admin.password,
       UserStatus.ACTIVE,
-      new Date(),
-      new Date(),
+      undefined, // title
+      new Date(), // createdAt
+      new Date(), // updatedAt
       undefined, 
       undefined, 
       undefined, 

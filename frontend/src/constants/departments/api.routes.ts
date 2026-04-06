@@ -8,7 +8,6 @@ export const API_ROUTES = {
       VERIFY_INVITE: "/company/employees/verify-invite",
     },
 
-    // ✅ ADD THIS
     DEPARTMENTS: {
       GET_ALL: "/departments",
       CREATE: "/departments",

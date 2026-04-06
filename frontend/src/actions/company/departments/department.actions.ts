@@ -3,6 +3,24 @@
 import { DepartmentService } from "@/services/company/departments/department.service";
 import { Department } from "@/shared/types/company/departments/department.type";
 
+const handleActionError = (error: any, context: string) => {
+  const serverData = error.response?.data;
+  let message = "An unexpected error occurred";
+
+  if (serverData) {
+    if (Array.isArray(serverData.message)) {
+      message = serverData.message[0]; 
+    } else if (typeof serverData.message === 'string') {
+      message = serverData.message;
+    }
+  } else {
+    message = error.message || "Connection failed";
+  }
+  
+  console.error(`[Department Action] ${context} failed:`, message);
+  throw new Error(message); 
+};
+
 export const getDepartmentsAction = async (): Promise<Department[]> => {
   try {
     return await DepartmentService.getDepartments();
@@ -16,17 +34,16 @@ export const createDepartmentAction = async (name: string) => {
   try {
     return await DepartmentService.createDepartment(name);
   } catch (error: any) {
-    console.error("Error creating department:", error?.message);
-    throw error;
+    throw handleActionError(error, "Create");
   }
 };
 
 export const updateDepartmentAction = async (id: string, name: string) => {
   try {
+    if (!id) throw new Error("Missing department ID");
     return await DepartmentService.updateDepartment(id, name);
   } catch (error: any) {
-    console.error("Error updating department:", error?.message);
-    throw error;
+    throw handleActionError(error, "Update");
   }
 };
 
@@ -56,4 +73,4 @@ export const removeEmployeeFromDepartmentAction = async (departmentId: string, e
     throw error;
   }
 };
-
+

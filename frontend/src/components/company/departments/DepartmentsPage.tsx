@@ -22,11 +22,10 @@ const DepartmentsPage = () => {
       <div className="flex flex-col gap-6 w-full">
         <DepartmentsHeader onAdd={() => setIsAddModalOpen(true)} /> 
         <DepartmentsStats />
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6 pb-10">
+        <div className="grid grid-cols-1 gap-6 pb-10">
           <div className="flex flex-col gap-6 min-w-0">
              <DepartmentsTable refreshTrigger={refreshKey} />
           </div>
-          <ActionSidebar />
         </div>
       </div>
 

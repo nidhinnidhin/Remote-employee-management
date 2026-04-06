@@ -3,7 +3,7 @@ import { ProjectStatus } from 'src/shared/enums/project/project-status.enum';
 
 export class CreateProjectDto {
   @IsString()
-  name: string;
+  name!: string;
 
   @IsString()
   @IsOptional()
@@ -17,7 +17,7 @@ export class CreateProjectDto {
   @IsOptional()
   endDate?: string;
 
-  @IsEnum(ProjectStatus)
+  @IsEnum(ProjectStatus)4
   @IsOptional()
   status?: ProjectStatus;
 }
