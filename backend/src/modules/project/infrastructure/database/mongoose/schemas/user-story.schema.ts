@@ -14,17 +14,14 @@ export class UserStoryDocument extends Document {
   @Prop({ required: true })
   title: string;
 
-  @Prop({ required: false })
-  description?: string;
+  @Prop({ required: true })
+  description: string;
 
-  @Prop({ type: [String], default: [] })
-  acceptanceCriteria?: string[];
+  @Prop({ required: true, type: [String], default: [] })
+  acceptanceCriteria: string[];
 
-  @Prop({ required: false, enum: [1, 2, 3, 5, 8, 13] })
-  storyPoints?: number;
-
-  @Prop({ required: false, type: Types.ObjectId, ref: 'UserDocument', index: true })
-  assigneeId?: string;
+  @Prop({ required: true, type: Types.ObjectId, ref: 'UserDocument', index: true })
+  assigneeId: string;
 
   @Prop({
     required: true,

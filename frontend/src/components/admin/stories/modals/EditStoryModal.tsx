@@ -16,7 +16,7 @@ import BaseModal from "@/components/ui/BaseModal";
 import FormInput from "@/components/ui/FormInput";
 import FormDropdown from "@/components/ui/FormDropdown";
 import Button from "@/components/ui/Button";
-import { StoryPriority, StoryPoints, StoryStatus, UserStory, UpdateStoryPayload } from "@/shared/types/company/projects/user-story.type";
+import { StoryPriority, StoryStatus, UserStory, UpdateStoryPayload } from "@/shared/types/company/projects/user-story.type";
 import { Employee } from "@/shared/types/company/employees/employee-listing.type";
 import { updateStoryAction } from "@/actions/company/projects/story.actions";
 import { toast } from "sonner";
@@ -42,7 +42,6 @@ const EditStoryModal: React.FC<EditStoryModalProps> = ({
     title: "",
     description: "",
     priority: "Medium",
-    storyPoints: 5,
     status: "Backlog",
     assigneeId: "",
     acceptanceCriteria: [],
@@ -56,11 +55,10 @@ const EditStoryModal: React.FC<EditStoryModalProps> = ({
     if (story) {
       setFormData({
         title: story.title,
-        description: story.description || "",
+        description: story.description,
         priority: story.priority,
-        storyPoints: story.storyPoints,
         status: story.status,
-        assigneeId: story.assigneeId || "",
+        assigneeId: story.assigneeId,
         acceptanceCriteria: [...story.acceptanceCriteria],
       });
     }
@@ -68,11 +66,17 @@ const EditStoryModal: React.FC<EditStoryModalProps> = ({
 
   const priorityOptions = ["Low", "Medium", "High"];
   const statusOptions = ["Backlog", "In Progress", "Done"];
-  const pointOptions: StoryPoints[] = [1, 2, 3, 5, 8, 13];
 
   const handleChange = (e: any) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next[name];
+        return next;
+      });
+    }
   };
 
   const addCriterion = () => {
@@ -97,7 +101,20 @@ const EditStoryModal: React.FC<EditStoryModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.title?.trim() || !story) return;
+    if (!story) return;
+
+    const newErrors: Record<string, string> = {};
+    if (!formData.title?.trim()) newErrors.title = "Story summary is required";
+    if (!formData.description?.trim()) newErrors.description = "Story description is required";
+    if (!formData.assigneeId) newErrors.assigneeId = "Assignee is required";
+    if (!formData.acceptanceCriteria || formData.acceptanceCriteria.length === 0) {
+      newErrors.acceptanceCriteria = "At least one acceptance criterion is required";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
 
     setLoading(true);
     const result = await updateStoryAction(story.id, formData);
@@ -107,6 +124,8 @@ const EditStoryModal: React.FC<EditStoryModalProps> = ({
       toast.success(PROJECT_MESSAGES.STORY_UPDATED);
       onSuccess();
       onClose();
+    } else {
+      toast.error(result.error || "Failed to update story");
     }
   };
 
@@ -142,7 +161,7 @@ const EditStoryModal: React.FC<EditStoryModalProps> = ({
 
           <div className="space-y-1.5">
             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
-              Description & Details
+              Description & Details <span className="text-accent">*</span>
             </label>
             <div className="relative group">
               <AlignLeft
@@ -158,9 +177,15 @@ const EditStoryModal: React.FC<EditStoryModalProps> = ({
                   "field-input w-full pl-11 pr-4 py-3 text-sm transition-all duration-300",
                   "bg-white/[0.02] border border-white/10 rounded-xl min-h-[100px] outline-none text-white resize-none",
                   "placeholder:text-slate-700 focus:border-accent/40",
+                  errors.description && "border-red-500/50",
                 )}
               />
             </div>
+            {errors.description && (
+              <p className="text-[9px] text-red-400 mt-1 font-bold uppercase tracking-tighter">
+                {errors.description}
+              </p>
+            )}
           </div>
         </div>
 
@@ -179,6 +204,7 @@ const EditStoryModal: React.FC<EditStoryModalProps> = ({
               value={formData.priority || "Medium"}
               onChange={handleChange}
               options={priorityOptions}
+              required
             />
             <FormDropdown
               label="Status"
@@ -186,30 +212,8 @@ const EditStoryModal: React.FC<EditStoryModalProps> = ({
               value={formData.status || "Backlog"}
               onChange={handleChange}
               options={statusOptions}
+              required
             />
-          </div>
-
-          <div className="space-y-3 pt-1">
-            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
-              <Zap size={13} className="text-accent" /> Complexity (Story Points)
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {pointOptions.map((pts) => (
-                <button
-                  key={pts}
-                  type="button"
-                  onClick={() => setFormData(prev => ({ ...prev, storyPoints: pts }))}
-                  className={cn(
-                    "flex-1 py-2.5 rounded-xl text-[11px] font-black transition-all border duration-300",
-                    Number(formData.storyPoints) === pts
-                      ? "bg-accent text-[#08090a] border-accent shadow-lg shadow-accent/20 scale-[1.02]"
-                      : "bg-white/[0.02] text-slate-500 border-white/10 hover:border-white/20"
-                  )}
-                >
-                  {pts}
-                </button>
-              ))}
-            </div>
           </div>
         </div>
 
@@ -217,9 +221,9 @@ const EditStoryModal: React.FC<EditStoryModalProps> = ({
         <div className="space-y-4 pt-2 border-t border-white/[0.04]">
           <div className="flex items-center justify-between px-1 border-l-2 border-accent/30 pl-3">
             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
-              Success Indicators
+              Success Indicators <span className="text-accent">*</span>
             </span>
-            <span className="text-[9px] font-black text-slate-600 uppercase">
+            <span className="text-[9px] font-black text-slate-600 uppercase tracking-tighter">
                {(formData.acceptanceCriteria?.length || 0)} / 20 Criteria
             </span>
           </div>
@@ -233,7 +237,10 @@ const EditStoryModal: React.FC<EditStoryModalProps> = ({
                 onChange={(e) => setNewCriterion(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addCriterion())}
                 placeholder="Define acceptance criterion..."
-                className="field-input w-full pl-11 pr-4 h-11 bg-white/[0.02] border border-white/10 rounded-xl outline-none text-white text-sm focus:border-accent/40 transition-all"
+                className={cn(
+                  "field-input w-full pl-11 pr-4 h-11 bg-white/[0.02] border border-white/10 rounded-xl outline-none text-white text-sm focus:border-accent/40 transition-all",
+                  errors.acceptanceCriteria && "border-red-500/50",
+                )}
               />
             </div>
             <button
@@ -244,6 +251,11 @@ const EditStoryModal: React.FC<EditStoryModalProps> = ({
               Add
             </button>
           </div>
+          {errors.acceptanceCriteria && (
+            <p className="text-[9px] text-red-400 mt-1 font-bold uppercase tracking-tighter">
+              {errors.acceptanceCriteria}
+            </p>
+          )}
 
           <div className="grid grid-cols-1 gap-2 max-h-[160px] overflow-y-auto custom-scrollbar pr-1">
             {(formData.acceptanceCriteria || []).map((criterion, idx) => (
@@ -271,22 +283,31 @@ const EditStoryModal: React.FC<EditStoryModalProps> = ({
         <div className="pt-2 border-t border-white/[0.04]">
           <div className="space-y-1.5">
             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
-              <User size={13} strokeWidth={2} /> Reassign Story Owner
+              <User size={13} strokeWidth={2} /> Reassign Story Owner <span className="text-accent">*</span>
             </label>
-            <select
-              name="assigneeId"
-              value={formData.assigneeId}
-              onChange={handleChange}
-              className={cn(
-                "w-full bg-white/[0.02] border border-white/10 rounded-xl h-11 px-4 text-sm text-slate-300 outline-none",
-                "focus:border-accent/40 appearance-none cursor-pointer hover:bg-white/[0.04] transition-all"
-              )}
-            >
-              <option value="">Unassigned</option>
-              {employees.map((emp) => (
-                <option key={emp.id} value={emp.id}>{emp.name}</option>
-              ))}
-            </select>
+            <div className="relative group">
+              <select
+                name="assigneeId"
+                value={formData.assigneeId}
+                onChange={handleChange}
+                className={cn(
+                  "w-full bg-white/[0.02] border border-white/10 rounded-xl h-11 px-4 text-sm text-slate-300 outline-none",
+                  "focus:border-accent/40 appearance-none cursor-pointer hover:bg-white/[0.04] transition-all",
+                  errors.assigneeId && "border-red-500/50",
+                )}
+                required
+              >
+                <option value="">Select Assignee</option>
+                {employees.map((emp) => (
+                  <option key={emp.id} value={emp.id}>{emp.name}</option>
+                ))}
+              </select>
+            </div>
+            {errors.assigneeId && (
+              <p className="text-[9px] text-red-400 mt-1 font-bold uppercase tracking-tighter">
+                {errors.assigneeId}
+              </p>
+            )}
           </div>
         </div>
 

@@ -66,11 +66,25 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (!formData.title?.trim()) newErrors.title = "Task title is required";
-    if (formData.estimatedHours !== undefined && Number(formData.estimatedHours) < 0) {
-      newErrors.estimatedHours = "Hours cannot be negative";
+    if (!formData.description?.trim()) newErrors.description = "Task description is required";
+    if (!formData.assignedTo) newErrors.assignedTo = "Assignee is required";
+    if (!formData.dueDate) newErrors.dueDate = "Due date is required";
+    
+    if (formData.estimatedHours === undefined || Number(formData.estimatedHours) <= 0) {
+      newErrors.estimatedHours = "Estimated hours must be greater than 0";
     }
     if (formData.actualHours !== undefined && Number(formData.actualHours) < 0) {
       newErrors.actualHours = "Actual hours cannot be negative";
+    }
+
+    if (formData.dueDate) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const [year, month, day] = formData.dueDate.split("-").map(Number);
+      const selectedDate = new Date(year, month - 1, day);
+      if (selectedDate < today) {
+        newErrors.dueDate = "Due date cannot be in the past";
+      }
     }
 
     setErrors(newErrors);
@@ -85,12 +99,12 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
     
     const payload: UpdateTaskPayload = {
       title: formData.title?.trim(),
-      description: formData.description?.trim() || "",
+      description: formData.description?.trim(),
       status: formData.status as TaskStatus,
-      estimatedHours: formData.estimatedHours ? Number(formData.estimatedHours) : 0,
-      actualHours: formData.actualHours ? Number(formData.actualHours) : 0,
-      assignedTo: formData.assignedTo || "",
-      dueDate: formData.dueDate || "",
+      estimatedHours: Number(formData.estimatedHours),
+      actualHours: Number(formData.actualHours),
+      assignedTo: formData.assignedTo,
+      dueDate: formData.dueDate,
     };
 
     const result = await updateTaskAction(task.id, payload);
@@ -137,7 +151,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
 
           <div className="space-y-1.5">
             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
-              Refined Instructions
+              Refined Instructions <span className="text-accent">*</span>
             </label>
             <div className="relative group">
               <AlignLeft
@@ -153,9 +167,15 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                   "field-input w-full pl-11 pr-4 py-3 text-sm transition-all duration-300",
                   "bg-white/[0.02] border border-white/10 rounded-xl min-h-[90px] outline-none text-white resize-none",
                   "placeholder:text-slate-700 focus:border-accent/40",
+                  errors.description && "border-red-500/50",
                 )}
               />
             </div>
+            {errors.description && (
+              <p className="text-[9px] text-red-400 mt-1 font-bold uppercase tracking-tighter">
+                {errors.description}
+              </p>
+            )}
           </div>
         </div>
 
@@ -174,17 +194,19 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
               value={formData.status || "Todo"}
               onChange={handleChange}
               options={statusOptions}
+              required
             />
             <div className="grid grid-cols-2 gap-2">
               <FormInput
                 label="Est. (h)"
                 name="estimatedHours"
                 type="number"
-                value={String(formData.estimatedHours || 0)}
+                value={String(formData.estimatedHours || "")}
                 onChange={handleChange}
                 error={errors.estimatedHours}
                 step="0.5"
                 icon={<Clock size={16} strokeWidth={1.5} className="text-accent/60" />}
+                required
               />
               <FormInput
                 label="Actual (h)"
@@ -195,6 +217,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                 error={errors.actualHours}
                 step="0.5"
                 icon={<Activity size={16} strokeWidth={1.5} className="text-accent" />}
+                required
               />
             </div>
           </div>
@@ -211,7 +234,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
-                Due Date
+                Due Date <span className="text-accent">*</span>
               </label>
               <div className="relative group">
                 <Calendar size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-accent transition-colors" />
@@ -225,13 +248,19 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                     "focus:border-accent/40",
                     errors.dueDate && "border-red-500/50"
                   )}
+                  required
                 />
               </div>
+              {errors.dueDate && (
+                <p className="text-[9px] text-red-400 mt-1 font-bold uppercase tracking-tighter">
+                  {errors.dueDate}
+                </p>
+              )}
             </div>
 
             <div className="space-y-1.5">
               <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
-                Reassign Owner
+                Reassign Owner <span className="text-accent">*</span>
               </label>
               <div className="relative group">
                 <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-accent transition-colors" />
@@ -239,14 +268,23 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                   name="assignedTo"
                   value={formData.assignedTo || ""}
                   onChange={handleChange}
-                  className="field-input w-full pl-11 pr-4 h-11 bg-white/[0.02] border border-white/10 rounded-xl text-white text-sm outline-none appearance-none cursor-pointer focus:border-accent/40 transition-all"
+                  className={cn(
+                    "field-input w-full pl-11 pr-4 h-11 bg-white/[0.02] border border-white/10 rounded-xl text-white text-sm outline-none appearance-none cursor-pointer focus:border-accent/40 transition-all",
+                    errors.assignedTo && "border-red-500/50"
+                  )}
+                  required
                 >
-                  <option value="">Unassigned</option>
+                  <option value="">Select Assignee</option>
                   {employees.map((emp) => (
                     <option key={emp.id} value={emp.id}>{emp.name}</option>
                   ))}
                 </select>
               </div>
+              {errors.assignedTo && (
+                <p className="text-[9px] text-red-400 mt-1 font-bold uppercase tracking-tighter">
+                  {errors.assignedTo}
+                </p>
+              )}
             </div>
           </div>
         </div>

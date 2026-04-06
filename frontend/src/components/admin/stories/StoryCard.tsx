@@ -14,7 +14,6 @@ import { UserStory } from "@/shared/types/company/projects/user-story.type";
 import { Employee } from "@/shared/types/company/employees/employee-listing.type";
 import StoryPriorityBadge from "./StoryPriorityBadge";
 import StoryStatusBadge from "./StoryStatusBadge";
-import StoryPointsBadge from "./StoryPointsBadge";
 import AssigneeDisplay from "./AssigneeDisplay";
 import AcceptanceCriteriaList from "./AcceptanceCriteriaList";
 import InlineTaskList from "../tasks/InlineTaskList";
@@ -67,7 +66,6 @@ const StoryCard: React.FC<StoryCardProps> = ({
         <div className="flex items-center gap-4 shrink-0">
           <div className="hidden sm:flex items-center gap-2">
             <StoryPriorityBadge priority={story.priority} />
-            <StoryPointsBadge points={story.storyPoints} />
             <StoryStatusBadge status={story.status} />
           </div>
 

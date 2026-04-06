@@ -67,14 +67,19 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (!formData.title.trim()) newErrors.title = "Task title is required";
-    if (formData.estimatedHours !== undefined && formData.estimatedHours < 0) {
-      newErrors.estimatedHours = "Hours cannot be negative";
+    if (!formData.description.trim()) newErrors.description = "Task description is required";
+    if (!formData.assignedTo) newErrors.assignedTo = "Assignee is required";
+    if (!formData.dueDate) newErrors.dueDate = "Due date is required";
+    if (formData.estimatedHours === undefined || formData.estimatedHours <= 0) {
+      newErrors.estimatedHours = "Estimated hours must be greater than 0";
     }
 
     if (formData.dueDate) {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      if (new Date(formData.dueDate) < today) {
+      const [year, month, day] = formData.dueDate.split("-").map(Number);
+      const selectedDate = new Date(year, month - 1, day);
+      if (selectedDate < today) {
         newErrors.dueDate = "Due date cannot be in the past";
       }
     }
@@ -93,16 +98,12 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
       projectId,
       storyId,
       title: formData.title.trim(),
+      description: formData.description.trim(),
       status: formData.status as TaskStatus,
-      estimatedHours: formData.estimatedHours
-        ? Number(formData.estimatedHours)
-        : 0,
+      estimatedHours: Number(formData.estimatedHours),
+      assignedTo: formData.assignedTo,
+      dueDate: formData.dueDate,
     };
-
-    if (formData.description?.trim())
-      payload.description = formData.description.trim();
-    if (formData.assignedTo) payload.assignedTo = formData.assignedTo;
-    if (formData.dueDate) payload.dueDate = formData.dueDate;
 
     const result = await createTaskAction(payload);
     setLoading(false);
@@ -162,7 +163,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
 
           <div className="space-y-1.5">
             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
-              Instructions & Details
+              Instructions & Details <span className="text-accent">*</span>
             </label>
             <div className="relative group">
               <AlignLeft
@@ -178,9 +179,15 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
                   "field-input w-full pl-11 pr-4 py-3 text-sm transition-all duration-300",
                   "bg-white/[0.02] border border-white/10 rounded-xl min-h-[90px] outline-none text-white resize-none",
                   "placeholder:text-slate-700 focus:border-accent/40",
+                  errors.description && "border-red-500/50",
                 )}
               />
             </div>
+            {errors.description && (
+              <p className="text-[9px] text-red-400 mt-1 font-bold uppercase tracking-tighter">
+                {errors.description}
+              </p>
+            )}
           </div>
         </div>
 
@@ -199,12 +206,13 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
               value={formData.status || "Todo"}
               onChange={handleChange}
               options={statusOptions}
+              required
             />
             <FormInput
               label="Estimated Hours"
               name="estimatedHours"
               type="number"
-              value={String(formData.estimatedHours || 0)}
+              value={String(formData.estimatedHours || "")}
               onChange={handleChange}
               error={errors.estimatedHours}
               placeholder="e.g. 4.5"
@@ -212,6 +220,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
               icon={
                 <Clock size={16} strokeWidth={1.5} className="text-accent" />
               }
+              required
             />
           </div>
         </div>
@@ -227,7 +236,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
-                Due Date
+                Due Date <span className="text-accent">*</span>
               </label>
               <div className="relative group">
                 <Calendar
@@ -244,6 +253,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
                     "focus:border-accent/40",
                     errors.dueDate && "border-red-500/50",
                   )}
+                  required
                 />
               </div>
               {errors.dueDate && (
@@ -255,7 +265,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
 
             <div className="space-y-1.5">
               <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
-                Assign To
+                Assign To <span className="text-accent">*</span>
               </label>
               <div className="relative group">
                 <User
@@ -266,9 +276,13 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
                   name="assignedTo"
                   value={formData.assignedTo}
                   onChange={handleChange}
-                  className="field-input w-full pl-11 pr-4 h-11 bg-white/[0.02] border border-white/10 rounded-xl text-white text-sm outline-none appearance-none cursor-pointer focus:border-accent/40"
+                  className={cn(
+                    "field-input w-full pl-11 pr-4 h-11 bg-white/[0.02] border border-white/10 rounded-xl text-white text-sm outline-none appearance-none cursor-pointer focus:border-accent/40",
+                    errors.assignedTo && "border-red-500/50",
+                  )}
+                  required
                 >
-                  <option value="">Unassigned</option>
+                  <option value="">Select Assignee</option>
                   {employees.map((emp) => (
                     <option key={emp.id} value={emp.id}>
                       {emp.name}
@@ -276,6 +290,11 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
                   ))}
                 </select>
               </div>
+              {errors.assignedTo && (
+                <p className="text-[9px] text-red-400 mt-1 font-bold uppercase tracking-tighter">
+                  {errors.assignedTo}
+                </p>
+              )}
             </div>
           </div>
         </div>

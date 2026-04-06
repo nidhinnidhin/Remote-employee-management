@@ -26,7 +26,6 @@ export class MongoUserStoryRepository implements IUserStoryRepository {
       doc.createdBy,
       doc.description,
       doc.acceptanceCriteria,
-      doc.storyPoints,
       doc.assigneeId?.toString(),
       doc.createdAt,
       doc.updatedAt,

@@ -8,7 +8,6 @@ import { UserStory } from "@/shared/types/company/projects/user-story.type";
 import { Task } from "@/shared/types/company/projects/task.type";
 import StoryPriorityBadge from "@/components/admin/stories/StoryPriorityBadge";
 import StoryStatusBadge from "@/components/admin/stories/StoryStatusBadge";
-import StoryPointsBadge from "@/components/admin/stories/StoryPointsBadge";
 import AcceptanceCriteriaList from "@/components/admin/stories/AcceptanceCriteriaList";
 import EmployeeInlineTaskList from "../tasks/EmployeeInlineTaskList";
 
@@ -65,7 +64,6 @@ export default function EmployeeStoryCard({
         <div className="flex items-center gap-3 shrink-0">
           <div className="hidden md:flex items-center gap-2 scale-90">
             <StoryPriorityBadge priority={story.priority} />
-            <StoryPointsBadge points={story.storyPoints} />
             <StoryStatusBadge status={story.status} />
           </div>
           <motion.div

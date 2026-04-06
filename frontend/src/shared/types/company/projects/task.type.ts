@@ -10,15 +10,15 @@ export interface Task {
   projectId: string;
   storyId: string;
   title: string;
-  description?: string;
+  description: string;
   status: TaskStatus;
   order: number;
-  assignedTo?: string;
-  assignedBy?: string;
+  assignedTo: string;
+  assignedBy: string;
   createdBy: string;
-  estimatedHours?: number;
+  estimatedHours: number;
   actualHours?: number;
-  dueDate?: string;
+  dueDate: string;
   createdAt: string;
   updatedAt: string;
   isDeleted: boolean;
@@ -28,11 +28,11 @@ export interface CreateTaskPayload {
   projectId: string;
   storyId: string;
   title: string;
-  description?: string;
-  status?: TaskStatus;
-  estimatedHours?: number;
-  assignedTo?: string;
-  dueDate?: string;
+  description: string;
+  status: TaskStatus;
+  estimatedHours: number;
+  assignedTo: string;
+  dueDate: string;
 }
 
 export interface UpdateTaskPayload extends Partial<Omit<CreateTaskPayload, 'projectId' | 'storyId'>> {

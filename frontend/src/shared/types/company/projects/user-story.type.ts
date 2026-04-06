@@ -1,17 +1,15 @@
 export type StoryStatus = 'Backlog' | 'In Progress' | 'Done';
 export type StoryPriority = 'Low' | 'Medium' | 'High';
-export type StoryPoints = 1 | 2 | 3 | 5 | 8 | 13;
 
 export interface UserStory {
   id: string;
   companyId: string;
   projectId: string;
   title: string;
-  description?: string;
+  description: string;
   status: StoryStatus;
   priority: StoryPriority;
-  storyPoints: StoryPoints;
-  assigneeId?: string;
+  assigneeId: string;
   acceptanceCriteria: string[];
   order: number;
   createdBy: string;
@@ -23,11 +21,10 @@ export interface UserStory {
 export interface CreateStoryPayload {
   projectId: string;
   title: string;
-  description?: string;
-  status?: StoryStatus;
+  description: string;
+  status: StoryStatus;
   priority: StoryPriority;
-  storyPoints: StoryPoints;
-  assigneeId?: string;
+  assigneeId: string;
   acceptanceCriteria: string[];
 }
 
