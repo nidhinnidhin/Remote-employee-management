@@ -61,14 +61,66 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
+    const validationErrors: Record<string, string> = {};
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     
     if (!formData.name?.trim()) {
-      setErrors({ name: "Project name is required" });
+      validationErrors.name = "Project name is required";
+    } else if (formData.name.trim().length < 3) {
+      validationErrors.name = "Project name must be at least 3 characters long";
+    }
+
+    if (!formData.description?.trim()) {
+      validationErrors.description = "Project description is required";
+    }
+
+    if (!formData.startDate) {
+      validationErrors.startDate = "Start date is required";
+    } else {
+      const [year, month, day] = formData.startDate.split("-").map(Number);
+      const start = new Date(year, month - 1, day);
+      if (start < today) {
+        validationErrors.startDate = "Start date cannot be in the past";
+      }
+    }
+
+    if (!formData.endDate) {
+      validationErrors.endDate = "End date is required";
+    } else {
+      const [year, month, day] = formData.endDate.split("-").map(Number);
+      const end = new Date(year, month - 1, day);
+      if (end < today) {
+        validationErrors.endDate = "End date cannot be in the past";
+      }
+    }
+
+    if (formData.startDate && formData.endDate) {
+      const [sYear, sMonth, sDay] = formData.startDate.split("-").map(Number);
+      const [eYear, eMonth, eDay] = formData.endDate.split("-").map(Number);
+      const start = new Date(sYear, sMonth - 1, sDay);
+      const end = new Date(eYear, eMonth - 1, eDay);
+      if (start > end) {
+        validationErrors.endDate = "End date cannot be earlier than start date";
+      }
+    }
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
       return;
     }
 
     setLoading(true);
-    const result = await createProjectAction(formData);
+    
+    // Sanitize payload: convert empty strings to undefined for optional backend fields
+    const payload = {
+      ...formData,
+      startDate: formData.startDate || undefined,
+      endDate: formData.endDate || undefined,
+      description: formData.description || undefined,
+    };
+
+    const result = await createProjectAction(payload);
     setLoading(false);
 
     if (result.success) {
@@ -82,10 +134,12 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
        */
       const actionResult = result as { success: boolean; errors?: Record<string, string>; error?: string };
       
-      if (actionResult.errors) {
+      if (actionResult.errors && Object.keys(actionResult.errors).length > 0) {
         setErrors(actionResult.errors);
       } else if (actionResult.error) {
         toast.error(actionResult.error);
+      } else {
+        toast.error("An unexpected error occurred. Please try again.");
       }
     }
   };
@@ -120,7 +174,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
 
           <div className="space-y-1.5">
             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
-              Objectives & Description
+              Objectives & Description <span className="text-accent">*</span>
             </label>
             <div className="relative group">
               <FileText
@@ -138,10 +192,10 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
                 className={cn(
                   "field-input w-full pl-11 pr-4 py-3 text-sm transition-all duration-300",
                   "bg-white/[0.02] border rounded-xl min-h-[100px] outline-none text-white resize-none",
-                  "placeholder:text-slate-700 focus:bg-accent/[0.01]",
+                  "placeholder:text-slate-700 focus:bg-accent/[0.01] group-focus-within:border-accent/40",
                   errors.description 
-                    ? "border-red-500/50 focus:border-red-500 bg-red-500/5" 
-                    : "border-white/10 focus:border-accent/40"
+                    ? "border-red-500/50 focus:border-red-500" 
+                    : "border-white/10"
                 )}
               />
             </div>
@@ -170,6 +224,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
               onChange={handleChange}
               error={errors.startDate}
               icon={<Calendar size={16} strokeWidth={1.5} />}
+              required
             />
             <FormInput
               label="End Date"
@@ -179,6 +234,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
               onChange={handleChange}
               error={errors.endDate}
               icon={<Calendar size={16} strokeWidth={1.5} />}
+              required
             />
           </div>
 
@@ -187,7 +243,9 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
             name="status"
             value={formData.status ?? "Active"}
             onChange={handleChange}
+            error={errors.status}
             options={["Active", "On Hold", "Completed"]}
+            required
           />
         </div>
 
