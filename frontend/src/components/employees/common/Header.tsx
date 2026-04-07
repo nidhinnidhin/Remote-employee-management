@@ -44,6 +44,7 @@ export const Header: React.FC = () => {
                         userName={fullName} 
                         userEmail={userProfile?.email} 
                         avatarUrl={userProfile?.profileImageUrl} 
+                        theme="theme-employee"
                     />
                 </div>
             </div>

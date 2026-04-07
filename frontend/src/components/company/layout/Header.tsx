@@ -55,7 +55,7 @@ const Header: React.FC<HeaderProps> = ({ onMobileMenuDatas }) => {
 
           {/* User Profile */}
           <div className="pl-4 border-l border-white/10">
-            <UserNav />
+            <UserNav theme="theme-company" />
           </div>
         </div>
       </div>

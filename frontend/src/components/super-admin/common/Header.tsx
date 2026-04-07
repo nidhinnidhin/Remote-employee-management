@@ -23,7 +23,7 @@ export const Header: React.FC = () => {
                 </button>
 
                 <div className="pl-4 border-l border-border-subtle">
-                    <UserNav userEmail="admin@issuehub.com" userName="Super Admin" />
+                    <UserNav userEmail="admin@issuehub.com" userName="Super Admin" theme="theme-super" />
                 </div>
             </div>
         </header>

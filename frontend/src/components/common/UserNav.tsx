@@ -10,12 +10,14 @@ interface UserNavProps {
   userEmail?: string;
   userName?: string;
   avatarUrl?: string;
+  theme?: "theme-employee" | "theme-company" | "theme-super";
 }
 
 export const UserNav: React.FC<UserNavProps> = ({
   userEmail,
   userName,
   avatarUrl,
+  theme = "theme-employee",
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
@@ -121,6 +123,7 @@ export const UserNav: React.FC<UserNavProps> = ({
         onClose={() => setIsLogoutModalOpen(false)}
         onConfirm={handleLogout}
         loading={isLoggingOut}
+        theme={theme}
       />
     </div>
   );
