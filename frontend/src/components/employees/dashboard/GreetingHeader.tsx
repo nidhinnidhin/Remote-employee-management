@@ -5,8 +5,11 @@ import { motion } from "framer-motion";
 import { Clock, Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+import { useProfileStore } from "@/store/profile.store";
+
 export function GreetingHeader() {
   const [time, setTime] = useState<Date | null>(null);
+  const { userProfile, isLoading } = useProfileStore();
 
   useEffect(() => {
     setTime(new Date());
@@ -16,20 +19,20 @@ export function GreetingHeader() {
 
   const formattedTime = time
     ? time.toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
-      })
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    })
     : "--:--";
 
   const formattedDate = time
     ? time
-        .toLocaleDateString("en-US", {
-          weekday: "short",
-          month: "short",
-          day: "numeric",
-        })
-        .toUpperCase()
+      .toLocaleDateString("en-US", {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+      })
+      .toUpperCase()
     : "";
 
   return (
@@ -42,10 +45,10 @@ export function GreetingHeader() {
       <div className="space-y-1">
         <div className="flex items-center gap-3">
           <h1 className="text-3xl font-black text-white tracking-tighter">
-            Hello, John <span className="text-accent animate-pulse">.</span>
+            Hello, {isLoading ? "..." : (userProfile?.firstName || "Team Member")} <span className="text-accent animate-pulse">.</span>
           </h1>
           <span className="px-2 py-0.5 rounded-md bg-accent/10 border border-accent/20 text-[9px] font-black text-accent uppercase tracking-widest">
-            Senior Developer
+            {userProfile?.title || userProfile?.role?.replace(/_/g, " ") || "Member"}
           </span>
         </div>
         <p className="text-sm text-slate-500 font-medium">

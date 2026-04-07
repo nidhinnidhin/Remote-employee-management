@@ -69,7 +69,6 @@ const InviteEmployeeModal = ({
       maxWidth="max-w-xl"
     >
       <div className="space-y-7 py-2">
-        {/* --- IDENTITY & CONTACT SECTION --- */}
         <div className="space-y-4">
           <div className="flex items-center gap-2 px-1 border-l-2 border-accent/30 pl-3">
             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">

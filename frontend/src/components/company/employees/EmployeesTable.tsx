@@ -4,27 +4,44 @@ import React, { useEffect, useState } from "react";
 import Table from "@/components/ui/Table";
 import { Column } from "@/shared/types/ui/table-props.type";
 import Pagination from "@/components/ui/Pagination";
-import { MoreVertical, UserX, UserCheck, Eye, Loader2 } from "lucide-react";
+import {
+  MoreVertical,
+  UserX,
+  UserCheck,
+  Eye,
+  Loader2,
+  Send,
+} from "lucide-react";
 import Image from "next/image";
 import { Employee } from "@/shared/types/company/employees/employee-listing.type";
-import { getEmployees, updateEmployeeStatus } from "@/services/company/employee-management.service";
+import {
+  getEmployees,
+  updateEmployeeStatus,
+} from "@/services/company/employee-management.service";
 import { toast } from "sonner";
 import { EmployeeDetailsModal } from "./EmployeeDetailsModal";
 import ActionReasonModal from "@/components/ui/ActionReasonModal";
 import { createPortal } from "react-dom";
 import { resendInvitationAction } from "@/actions/company/resend-invitation.action";
-import { Send } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const EmployeesTable = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
-  const [menuAnchor, setMenuAnchor] = useState<{ x: number; y: number } | null>(null);
-  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+  const [menuAnchor, setMenuAnchor] = useState<{ x: number; y: number } | null>(
+    null,
+  );
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(
+    null,
+  );
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isReasonModalOpen, setIsReasonModalOpen] = useState(false);
-  const [pendingStatusUpdate, setPendingStatusUpdate] = useState<{ employee: Employee; status: string } | null>(null);
+  const [pendingStatusUpdate, setPendingStatusUpdate] = useState<{
+    employee: Employee;
+    status: string;
+  } | null>(null);
 
   const itemsPerPage = 10;
 
@@ -42,10 +59,9 @@ const EmployeesTable = () => {
 
   useEffect(() => {
     fetchEmployees();
-
     const handleScroll = () => setOpenMenuId(null);
-    window.addEventListener('scroll', handleScroll, true);
-    return () => window.removeEventListener('scroll', handleScroll, true);
+    window.addEventListener("scroll", handleScroll, true);
+    return () => window.removeEventListener("scroll", handleScroll, true);
   }, []);
 
   const handleStatusToggle = (employee: Employee) => {
@@ -58,8 +74,14 @@ const EmployeesTable = () => {
   const handleConfirmStatusUpdate = async (reason: string) => {
     if (!pendingStatusUpdate) return;
     try {
-      await updateEmployeeStatus(pendingStatusUpdate.employee.id, pendingStatusUpdate.status, reason);
-      toast.success(`Employee ${pendingStatusUpdate.status === "SUSPENDED" ? "blocked" : "unblocked"} successfully`);
+      await updateEmployeeStatus(
+        pendingStatusUpdate.employee.id,
+        pendingStatusUpdate.status,
+        reason,
+      );
+      toast.success(
+        `Employee ${pendingStatusUpdate.status === "SUSPENDED" ? "blocked" : "unblocked"} successfully`,
+      );
       fetchEmployees();
     } catch (error) {
       toast.error("Failed to update status");
@@ -110,28 +132,33 @@ const EmployeesTable = () => {
     {
       header: "Employee",
       accessor: (employee: Employee) => (
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-full bg-[rgb(var(--color-accent))] flex items-center justify-center text-white font-medium text-sm overflow-hidden border border-white/10">
+        <div className="flex items-center gap-3 text-left py-1">
+          <div className="h-10 w-10 shrink-0 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold text-xs overflow-hidden border border-slate-200">
             {employee.avatar ? (
               <Image
                 src={employee.avatar}
                 alt={employee.name}
                 width={40}
                 height={40}
-                className="object-cover"
+                className="h-full w-full object-cover"
               />
             ) : (
-              <span>
+              <span className="uppercase text-slate-500">
                 {employee.name
-                  .split(" ")
-                  .map((n: string) => n[0])
+                  ?.split(" ")
+                  .map((n) => n[0])
+                  .slice(0, 2)
                   .join("")}
               </span>
             )}
           </div>
-          <div className="flex flex-col">
-            <span className="text-primary font-bold tracking-tight">{employee.name}</span>
-            <span className="text-muted text-[11px] font-medium">{employee.email}</span>
+          <div className="flex flex-col min-w-0">
+            <span className="text-sm font-semibold text-slate-900 truncate tracking-tight">
+              {employee.name}
+            </span>
+            <span className="text-[11px] text-slate-500 truncate font-normal">
+              {employee.email}
+            </span>
           </div>
         </div>
       ),
@@ -139,13 +166,15 @@ const EmployeesTable = () => {
     {
       header: "Department",
       accessor: (employee) => (
-        <span className="text-secondary font-semibold text-[13px]">{employee.department || "N/A"}</span>
+        <span className="text-slate-600 text-sm font-medium">
+          {employee.department || "—"}
+        </span>
       ),
     },
     {
       header: "Role",
       accessor: (employee: Employee) => (
-        <span className="chip-vibrant">
+        <span className="inline-flex px-3 py-1 rounded-full border border-slate-200 bg-transparent text-slate-500 text-[10px] font-bold uppercase tracking-wider">
           {employee.role}
         </span>
       ),
@@ -155,94 +184,120 @@ const EmployeesTable = () => {
       accessor: (employee: Employee) => {
         if (employee.inviteStatus === "PENDING") {
           return (
-            <span className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-[11px] font-bold border border-amber-200 uppercase tracking-wider">
-              Invitation Pending
+            <span className="text-amber-600 text-[11px] font-bold flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
+              Pending
             </span>
           );
         }
         return (
           <span
-            className={employee.isActive ? "status-active" : "status-suspended"}
+            className={cn(
+              "text-[11px] font-bold flex items-center gap-1.5",
+              employee.isActive ? "text-emerald-600" : "text-rose-500",
+            )}
           >
+            <span
+              className={cn(
+                "h-1.5 w-1.5 rounded-full",
+                employee.isActive ? "bg-emerald-500" : "bg-rose-500",
+              )}
+            />
             {employee.isActive ? "Active" : "Suspended"}
           </span>
         );
       },
     },
     {
-      header: "Actions",
+      header: "",
       accessor: (employee: Employee) => (
-        <div className="flex justify-end">
+        <div className="flex justify-end pr-2">
           <button
             onClick={(e) => toggleMenu(e, employee)}
-            className="text-primary hover:text-accent transition-all p-2 rounded-xl hover:bg-accent/10 active:scale-90"
+            className="text-slate-400  transition-colors p-1.5 rounded-lg "
           >
-            <MoreVertical size={20} />
+            <MoreVertical size={18} />
           </button>
 
-          {openMenuId === employee.id && menuAnchor && createPortal(
-            <div
-              className="fixed glass-dropdown rounded-xl z-[9999] overflow-hidden animate-in fade-in zoom-in-95 duration-200"
-              style={{
-                top: `${menuAnchor.y + 8}px`,
-                right: `${window.innerWidth - menuAnchor.x}px`,
-                minWidth: '200px'
-              }}
-            >
-              <div className="flex flex-col p-1.5">
-                <button
-                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-secondary hover:bg-accent/10 hover:text-accent rounded-lg transition-all font-bold group"
-                  onClick={() => handleViewDetails(employee)}
+          {openMenuId === employee.id &&
+            menuAnchor &&
+            createPortal(
+              <>
+                {/* Transparent backdrop to handle closing */}
+                <div
+                  className="fixed inset-0 z-[9998]"
+                  onClick={() => setOpenMenuId(null)}
+                />
+
+                <div
+                  className={cn(
+                    "fixed z-[9999] py-2 min-w-[190px] rounded-xl shadow-2xl",
+                    "bg-[#1a1c1e] border border-white/5", // Light black background with a very subtle border
+                    "animate-in fade-in slide-in-from-top-1 duration-150",
+                  )}
+                  style={{
+                    top: `${menuAnchor.y + 4}px`,
+                    right: `${window.innerWidth - menuAnchor.x}px`,
+                  }}
                 >
-                  <Eye size={16} className="group-hover:scale-110 transition-transform" />
-                  <span>View Details</span>
-                </button>
-                {employee.inviteStatus === "PENDING" && (
-                  <button
-                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-amber-600 hover:bg-amber-50 rounded-lg transition-all font-bold group"
-                    onClick={() => handleResendInvite(employee)}
-                  >
-                    <Send size={16} className="group-hover:scale-110 transition-transform" />
-                    <span>Resend Invitation</span>
-                  </button>
-                )}
-                <div className="h-px bg-white/5 my-1 mx-2" />
-                <button
-                  className={`flex items-center gap-3 px-4 py-2.5 text-sm rounded-lg transition-all font-bold group ${employee.isActive
-                    ? "text-danger hover:bg-danger/10"
-                    : "text-success hover:bg-success/10"
-                    }`}
-                  onClick={() => handleStatusToggle(employee)}
-                >
-                  {employee.isActive ?
-                    <UserX size={16} className="group-hover:scale-110 transition-transform" /> :
-                    <UserCheck size={16} className="group-hover:scale-110 transition-transform" />
-                  }
-                  <span>{employee.isActive ? "Block User" : "Unblock User"}</span>
-                </button>
-              </div>
-            </div>,
-            document.body
-          )}
+                  <div className="flex flex-col">
+                    <button
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-white hover:bg-white/[0.05] transition-colors font-medium text-left"
+                      onClick={() => handleViewDetails(employee)}
+                    >
+                      <Eye
+                        size={16}
+                        className="text-slate-400 group-hover:text-white"
+                      />
+                      View Details
+                    </button>
+
+                    {employee.inviteStatus === "PENDING" && (
+                      <button
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-white hover:bg-white/[0.05] transition-colors font-medium text-left"
+                        onClick={() => handleResendInvite(employee)}
+                      >
+                        <Send
+                          size={16}
+                          className="text-slate-400 group-hover:text-white"
+                        />
+                        Resend Invitation
+                      </button>
+                    )}
+
+                    {/* Subtle divider for dark theme */}
+                    <div className="h-px bg-white/5 my-1.5 mx-2" />
+
+                    <button
+                      className={cn(
+                        "w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-colors text-left",
+                        employee.isActive
+                          ? "text-red-400 hover:bg-red-500/10"
+                          : "text-emerald-400 hover:bg-emerald-500/10",
+                      )}
+                      onClick={() => handleStatusToggle(employee)}
+                    >
+                      {employee.isActive ? (
+                        <UserX size={16} />
+                      ) : (
+                        <UserCheck size={16} />
+                      )}
+                      {employee.isActive ? "Block User" : "Unblock User"}
+                    </button>
+                  </div>
+                </div>
+              </>,
+              document.body,
+            )}
         </div>
       ),
-      className: "text-right",
     },
   ];
 
-  if (loading && employees.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center p-20 gap-4">
-        <Loader2 className="animate-spin text-accent" size={40} />
-        <p className="text-muted font-medium">Loading employees...</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex flex-col gap-4">
+    <div className="w-full">
       {employees.length > 0 ? (
-        <>
+        <div className="space-y-4">
           <Table
             data={paginatedData}
             columns={columns}
@@ -254,11 +309,10 @@ const EmployeesTable = () => {
             totalPages={totalPages}
             onPageChange={setCurrentPage}
           />
-        </>
+        </div>
       ) : (
-        <div className="portal-card p-20 text-center space-y-4 border-dashed border-2">
-          <p className="text-secondary">No employees found in your company.</p>
-          <button className="btn-primary text-sm px-6 py-2">Invite Employee</button>
+        <div className="flex flex-col items-center justify-center p-24 text-center border border-dashed border-slate-200 rounded-2xl bg-[#0B1026]">
+          <p className="text-slate-500 font-medium mb-4">No employees found.</p>
         </div>
       )}
 
@@ -277,10 +331,20 @@ const EmployeesTable = () => {
           setPendingStatusUpdate(null);
         }}
         onConfirm={handleConfirmStatusUpdate}
-        title={pendingStatusUpdate?.status === "SUSPENDED" ? "Block Employee" : "Unblock Employee"}
-        description={`Please provide a reason for ${pendingStatusUpdate?.status === "SUSPENDED" ? "blocking" : "unblocking"} ${pendingStatusUpdate?.employee?.name}. They will receive an email with this content.`}
-        actionLabel={pendingStatusUpdate?.status === "SUSPENDED" ? "Block User" : "Unblock User"}
-        actionColor={pendingStatusUpdate?.status === "SUSPENDED" ? "danger" : "success"}
+        title={
+          pendingStatusUpdate?.status === "SUSPENDED"
+            ? "Block Employee"
+            : "Unblock Employee"
+        }
+        description={`Set access for ${pendingStatusUpdate?.employee?.name}. User will be notified.`}
+        actionLabel={
+          pendingStatusUpdate?.status === "SUSPENDED"
+            ? "Block User"
+            : "Unblock User"
+        }
+        actionColor={
+          pendingStatusUpdate?.status === "SUSPENDED" ? "danger" : "success"
+        }
       />
     </div>
   );
