@@ -38,8 +38,6 @@ export class InviteEmployeeUseCase implements IInviteEmployeeUseCase {
       await this._employeeRepo.updateEmployee(existing.id, {
         name: inviteEmployeeDto.name,
         role: inviteEmployeeDto.role,
-        department: inviteEmployeeDto.department,
-        phone: inviteEmployeeDto.phone,
         companyId: inviteEmployeeDto.companyId,
       });
       employee = existing;

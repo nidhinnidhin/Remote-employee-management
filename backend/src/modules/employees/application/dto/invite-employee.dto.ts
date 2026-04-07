@@ -9,13 +9,6 @@ export class InviteEmployeeDto {
   email: string;
 
   @IsString()
+  @IsNotEmpty()
   role: string;
-
-  @IsString()
-  @IsNotEmpty()
-  department: string;
-
-  @IsString()
-  @IsNotEmpty()
-  phone: string;
 }

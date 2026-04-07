@@ -7,8 +7,8 @@ export interface IEmployeeRepository {
     name: string;
     email: string;
     role: string;
-    department: string;
-    phone: string;
+    department?: string;
+    phone?: string;
     companyId: string;
     isActive: boolean;
     hasPassword: boolean;

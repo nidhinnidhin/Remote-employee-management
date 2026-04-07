@@ -25,7 +25,11 @@ import { createPortal } from "react-dom";
 import { resendInvitationAction } from "@/actions/company/resend-invitation.action";
 import { cn } from "@/lib/utils";
 
-const EmployeesTable = () => {
+interface EmployeesTableProps {
+  refreshKey?: number;
+}
+
+const EmployeesTable: React.FC<EmployeesTableProps> = ({ refreshKey }) => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -49,6 +53,7 @@ const EmployeesTable = () => {
     try {
       setLoading(true);
       const data = await getEmployees();
+      console.log(data)
       setEmployees(data);
     } catch (error) {
       toast.error("Failed to load employees");
@@ -62,7 +67,7 @@ const EmployeesTable = () => {
     const handleScroll = () => setOpenMenuId(null);
     window.addEventListener("scroll", handleScroll, true);
     return () => window.removeEventListener("scroll", handleScroll, true);
-  }, []);
+  }, [refreshKey]);
 
   const handleStatusToggle = (employee: Employee) => {
     const newStatus = employee.isActive ? "SUSPENDED" : "ACTIVE";
@@ -164,10 +169,10 @@ const EmployeesTable = () => {
       ),
     },
     {
-      header: "Department",
+      header: "Name",
       accessor: (employee) => (
         <span className="text-slate-600 text-sm font-medium">
-          {employee.department || "—"}
+          {employee.name || "—"}
         </span>
       ),
     },

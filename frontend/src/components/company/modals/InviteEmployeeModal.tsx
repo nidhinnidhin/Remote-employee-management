@@ -7,16 +7,14 @@ import FormInput from "@/components/ui/FormInput";
 import FormDropdown from "@/components/ui/FormDropdown";
 import { InviteEmployeePayload } from "@/shared/types/company/employees/auth/invite-employee-payload.type";
 import {
-  EmployeeDepartment,
   EmployeeRole,
 } from "@/shared/enum/company/auth/employee.enum";
 import { InviteEmployeeModalProps } from "@/shared/types/company/employees/auth/invite-employee-modal-props.type";
 import { AUTH_MESSAGES } from "@/shared/constants/messages/auth.messages";
 import { cn } from "@/lib/utils";
-import { User, Mail, Phone, Info, Send } from "lucide-react";
+import { User, Mail, Info, Send } from "lucide-react";
 
 const ROLE_OPTIONS = Object.values(EmployeeRole);
-const DEPARTMENT_OPTIONS = Object.values(EmployeeDepartment);
 
 const InviteEmployeeModal = ({
   isOpen,
@@ -27,8 +25,6 @@ const InviteEmployeeModal = ({
     name: "",
     email: "",
     role: "",
-    department: "",
-    phone: "",
   });
 
   const [error, setError] = useState("");
@@ -40,9 +36,9 @@ const InviteEmployeeModal = ({
   };
 
   const handleInvite = async () => {
-    const { name, email, role, department, phone } = form;
+    const { name, email, role } = form;
 
-    if (!name || !email || !role || !department || !phone) {
+    if (!name || !email || !role) {
       setError(AUTH_MESSAGES.ALL_FIELDS_REQUIRED);
       return;
     }
@@ -86,7 +82,7 @@ const InviteEmployeeModal = ({
             required
           />
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <FormInput
               label="Work Email"
               name="email"
@@ -95,17 +91,6 @@ const InviteEmployeeModal = ({
               onChange={handleChange}
               placeholder="employee@company.com"
               icon={<Mail size={16} strokeWidth={1.5} className="text-accent" />}
-              required
-            />
-
-            <FormInput
-              label="Phone Number"
-              name="phone"
-              type="tel"
-              value={form.phone}
-              onChange={handleChange}
-              placeholder="+1 234 567 8900"
-              icon={<Phone size={16} strokeWidth={1.5} className="text-accent" />}
               required
             />
           </div>
@@ -119,7 +104,7 @@ const InviteEmployeeModal = ({
             </span>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <FormDropdown
               label="Role"
               name="role"
@@ -127,16 +112,6 @@ const InviteEmployeeModal = ({
               onChange={handleChange}
               options={ROLE_OPTIONS}
               placeholder="Select role"
-              required
-            />
-
-            <FormDropdown
-              label="Department"
-              name="department"
-              value={form.department}
-              onChange={handleChange}
-              options={DEPARTMENT_OPTIONS}
-              placeholder="Select department"
               required
             />
           </div>

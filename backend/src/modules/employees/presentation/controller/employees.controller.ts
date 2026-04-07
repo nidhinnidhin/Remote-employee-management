@@ -225,8 +225,6 @@ export class EmployeesController {
       name: employee.name,
       email: employee.email,
       role: employee.role,
-      department: employee.department,
-      phone: employee.phone,
       companyId,
     });
 
