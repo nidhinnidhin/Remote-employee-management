@@ -13,14 +13,12 @@ export default async function EmployeeDashboardPage() {
       {/* Greeting and Status */}
       <GreetingHeader />
 
-      <div className="grid grid-cols-1 xl:grid-cols-4 gap-8 mt-2">
+      <div className="space-y-12 mt-2">
         {/* Main Content: Live Focus Dashboard */}
-        <div className="xl:col-span-3 space-y-0">
-          <EmployeeFocusedDashboard />
-        </div>
+        <EmployeeFocusedDashboard />
 
-        {/* Right Sidebar: Context Widgets */}
-        <div className="xl:col-span-1 space-y-8">
+        {/* Bottom Sections: Context Widgets */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-8 border-t border-white/[0.05]">
           <QuickActions />
           <TeamPresence />
         </div>

@@ -100,7 +100,7 @@ export default function LoginForm() {
         !result.data.user.isOnboarded
       ) {
         localStorage.setItem("registration_user_id", result.data.user.id);
-        router.push(FRONTEND_ROUTES.AUTH.ONBOARDING);
+        router.push(`${FRONTEND_ROUTES.AUTH.ONBOARDING}?userId=${result.data.user.id}`);
         return;
       }
 

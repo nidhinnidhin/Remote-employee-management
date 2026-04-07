@@ -147,7 +147,7 @@ export default function EmployeeFocusedDashboard() {
             </span>
             <div className="h-[1px] flex-1 bg-warning/10" />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-5">
             {dueToday.map((task, i) => (
               <motion.div
                 key={task.id}
@@ -188,7 +188,7 @@ export default function EmployeeFocusedDashboard() {
               View Board →
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-5">
             {inProgress.slice(0, 6).map((task, i) => (
               <motion.div
                 key={task.id}
@@ -221,7 +221,7 @@ export default function EmployeeFocusedDashboard() {
             </span>
             <div className="h-[1px] flex-1 bg-danger/10" />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-5">
             {overdue.map((task, i) => (
               <motion.div
                 key={task.id}

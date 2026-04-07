@@ -63,7 +63,7 @@ const navigationGroups = [
         label: "Leaves",
         href: FRONTEND_ROUTES.EMPLOYEE.LEAVES,
       },
-      { icon: Users2, label: "Teams", href: FRONTEND_ROUTES.EMPLOYEE.TEAMS },
+      { icon: Users2, label: "Department", href: FRONTEND_ROUTES.EMPLOYEE.TEAMS },
       {
         icon: Search,
         label: "Directory",
