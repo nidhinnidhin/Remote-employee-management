@@ -131,9 +131,9 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
       <form onSubmit={handleSubmit} className="space-y-7 py-2">
         
         {/* --- IDENTITY SECTION --- */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 px-1 border-l-2 border-accent/30 pl-3">
-            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
+        <div className="space-y-6">
+          <div className="flex items-center gap-3 px-1 border-l-[3px] border-accent/40 pl-4 py-0.5">
+            <span className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-400">
               Identity & Scope
             </span>
           </div>
@@ -145,18 +145,18 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
             onChange={handleChange}
             error={errors.title}
             placeholder="e.g. Implement form validation logic"
-            icon={<Target size={16} strokeWidth={1.5} className="text-accent" />}
+            icon={<Target size={16} strokeWidth={2} className="text-accent" />}
             required
           />
 
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">
               Refined Instructions <span className="text-accent">*</span>
             </label>
             <div className="relative group">
               <AlignLeft
                 size={16}
-                className="absolute left-3.5 top-3.5 text-slate-500 group-focus-within:text-accent transition-colors duration-300"
+                className="absolute left-4 top-4 text-slate-500 group-focus-within:text-accent transition-colors duration-300"
               />
               <textarea
                 name="description"
@@ -164,15 +164,15 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                 onChange={handleChange}
                 placeholder="Detailed technical notes..."
                 className={cn(
-                  "field-input w-full pl-11 pr-4 py-3 text-sm transition-all duration-300",
-                  "bg-white/[0.02] border border-white/10 rounded-xl min-h-[90px] outline-none text-white resize-none",
-                  "placeholder:text-slate-700 focus:border-accent/40",
-                  errors.description && "border-red-500/50",
+                  "field-input w-full pl-12 pr-4 py-4 text-sm transition-all duration-300",
+                  "bg-white/[0.01] border border-white/10 rounded-xl min-h-[110px] outline-none text-white resize-none",
+                  "placeholder:text-slate-700 focus:border-accent/40 hover:border-white/20",
+                  errors.description && "border-red-500/40 bg-red-500/[0.01]",
                 )}
               />
             </div>
             {errors.description && (
-              <p className="text-[9px] text-red-400 mt-1 font-bold uppercase tracking-tighter">
+              <p className="text-[9px] text-red-400 mt-2 font-black uppercase tracking-widest ml-1">
                 {errors.description}
               </p>
             )}
@@ -180,14 +180,14 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
         </div>
 
         {/* --- PROGRESS TRACKING SECTION --- */}
-        <div className="space-y-4 pt-2 border-t border-white/[0.04]">
-          <div className="flex items-center gap-2 px-1 border-l-2 border-accent/30 pl-3">
-            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
+        <div className="space-y-6 pt-6 border-t border-white/[0.06]">
+          <div className="flex items-center gap-3 px-1 border-l-[3px] border-accent/40 pl-4 py-0.5">
+            <span className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-400">
               Execution & Progress
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <FormDropdown
               label="Task Status"
               name="status"
@@ -195,8 +195,9 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
               onChange={handleChange}
               options={statusOptions}
               required
+              icon={<Info size={14} className="text-accent/60" />}
             />
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-3">
               <FormInput
                 label="Est. (h)"
                 name="estimatedHours"
@@ -205,7 +206,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                 onChange={handleChange}
                 error={errors.estimatedHours}
                 step="0.5"
-                icon={<Clock size={16} strokeWidth={1.5} className="text-accent/60" />}
+                icon={<Clock size={16} strokeWidth={2} className="text-accent/50" />}
                 required
               />
               <FormInput
@@ -216,7 +217,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                 onChange={handleChange}
                 error={errors.actualHours}
                 step="0.5"
-                icon={<Activity size={16} strokeWidth={1.5} className="text-accent" />}
+                icon={<Activity size={16} strokeWidth={2} className="text-accent" />}
                 required
               />
             </div>
@@ -224,86 +225,69 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
         </div>
 
         {/* --- ASSIGNMENT SECTION --- */}
-        <div className="space-y-4 pt-2 border-t border-white/[0.04]">
-          <div className="flex items-center gap-2 px-1 border-l-2 border-accent/30 pl-3">
-            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
+        <div className="space-y-6 pt-6 border-t border-white/[0.06]">
+          <div className="flex items-center gap-3 px-1 border-l-[3px] border-accent/40 pl-4 py-0.5">
+            <span className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-400">
               Timeline & Ownership
             </span>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
+          <div className="grid grid-cols-2 gap-5">
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">
                 Due Date <span className="text-accent">*</span>
               </label>
               <div className="relative group">
-                <Calendar size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-accent transition-colors" />
+                <Calendar size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-accent transition-colors" />
                 <input
                   type="date"
                   name="dueDate"
                   value={formData.dueDate || ""}
                   onChange={handleChange}
                   className={cn(
-                    "field-input w-full pl-11 pr-4 h-11 bg-white/[0.02] border border-white/10 rounded-xl text-white text-sm outline-none",
-                    "focus:border-accent/40",
-                    errors.dueDate && "border-red-500/50"
+                    "field-input w-full pl-12 pr-4 h-12 bg-white/[0.01] border border-white/10 rounded-xl text-white text-sm outline-none",
+                    "focus:border-accent/40 hover:border-white/20 transition-all",
+                    errors.dueDate && "border-red-500/40 bg-red-500/[0.01]"
                   )}
                   required
                 />
               </div>
               {errors.dueDate && (
-                <p className="text-[9px] text-red-400 mt-1 font-bold uppercase tracking-tighter">
+                <p className="text-[9px] text-red-400 mt-2 font-black uppercase tracking-widest ml-1">
                   {errors.dueDate}
                 </p>
               )}
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
-                Reassign Owner <span className="text-accent">*</span>
-              </label>
-              <div className="relative group">
-                <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-accent transition-colors" />
-                <select
-                  name="assignedTo"
-                  value={formData.assignedTo || ""}
-                  onChange={handleChange}
-                  className={cn(
-                    "field-input w-full pl-11 pr-4 h-11 bg-white/[0.02] border border-white/10 rounded-xl text-white text-sm outline-none appearance-none cursor-pointer focus:border-accent/40 transition-all",
-                    errors.assignedTo && "border-red-500/50"
-                  )}
-                  required
-                >
-                  <option value="">Select Assignee</option>
-                  {employees.map((emp) => (
-                    <option key={emp.id} value={emp.id}>{emp.name}</option>
-                  ))}
-                </select>
-              </div>
-              {errors.assignedTo && (
-                <p className="text-[9px] text-red-400 mt-1 font-bold uppercase tracking-tighter">
-                  {errors.assignedTo}
-                </p>
-              )}
-            </div>
+            <FormDropdown
+              label="Reassign Owner"
+              name="assignedTo"
+              value={formData.assignedTo || ""}
+              onChange={handleChange}
+              options={employees.map(emp => ({ label: emp.name, value: emp.id }))}
+              required
+              placeholder="Select owner..."
+              icon={<User size={14} strokeWidth={2} className="text-accent/60" />}
+              error={errors.assignedTo}
+            />
           </div>
         </div>
 
         {/* --- FOOTER ACTIONS --- */}
-        <div className="flex items-center justify-between gap-4 pt-6 mt-2 border-t border-white/[0.06]">
-          <div className="hidden sm:flex items-center gap-2 text-slate-600">
-            <Info size={14} strokeWidth={2} />
-            <span className="text-[9px] font-black uppercase tracking-widest text-slate-500/60">
-              Live State Persistence
+        <div className="flex items-center justify-between gap-6 pt-8 mt-4 border-t border-white/[0.1]">
+          <div className="hidden sm:flex items-center gap-3 text-slate-600">
+            <div className="w-1.5 h-1.5 rounded-full bg-accent/40 animate-pulse" />
+            <span className="text-[10px] font-black uppercase tracking-[0.3em]">
+              Synchronous Persistence Active
             </span>
           </div>
 
-          <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="flex items-center gap-4 w-full sm:w-auto">
             <Button
               variant="ghost"
               type="button"
               onClick={onClose}
-              className="flex-1 sm:flex-none h-11 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-white transition-all"
+              className="flex-1 sm:flex-none h-12 px-8 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-white hover:bg-white/5 transition-all"
             >
               Discard
             </Button>
@@ -312,16 +296,16 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
               type="submit"
               disabled={loading}
               className={cn(
-                "flex-1 sm:flex-none h-11 px-10 rounded-xl transition-all duration-300",
-                "bg-accent text-[#08090a] font-black text-[10px] uppercase tracking-[0.2em]",
-                "shadow-lg shadow-accent/10 hover:shadow-accent/30 flex items-center justify-center gap-2",
+                "flex-1 sm:flex-none h-12 px-12 rounded-xl transition-all duration-300",
+                "bg-accent text-[#08090a] font-black text-[11px] uppercase tracking-[0.3em]",
+                "shadow-[0_8px_30px_rgb(var(--color-accent),.15)] hover:shadow-[0_8px_30px_rgb(var(--color-accent),.3)] flex items-center justify-center gap-3",
               )}
             >
               {loading ? (
-                <div className="w-4 h-4 border-2 border-[#08090a]/20 border-t-[#08090a] rounded-full animate-spin" />
+                <div className="w-5 h-5 border-[3px] border-[#08090a]/20 border-t-[#08090a] rounded-full animate-spin" />
               ) : (
                 <>
-                  <Target size={16} strokeWidth={3} />
+                  <Target size={18} strokeWidth={3} />
                   <span>Update Task</span>
                 </>
               )}
