@@ -14,22 +14,22 @@ export class MongoUserStoryRepository implements IUserStoryRepository {
     private readonly _storyModel: Model<UserStoryDocument>,
   ) {}
 
-  private toEntity(doc: UserStoryDocument): UserStoryEntity {
+  private toEntity(userDocument: UserStoryDocument): UserStoryEntity {
     return new UserStoryEntity(
-      (doc._id as Types.ObjectId).toString(),
-      doc.companyId,
-      doc.projectId?.toString(),
-      doc.title,
-      doc.status as UserStoryStatus,
-      doc.priority as UserStoryPriority,
-      doc.order,
-      doc.createdBy,
-      doc.description,
-      doc.acceptanceCriteria,
-      doc.assigneeId?.toString(),
-      doc.createdAt,
-      doc.updatedAt,
-      doc.isDeleted,
+      (userDocument._id as Types.ObjectId).toString(),
+      userDocument.companyId,
+      userDocument.projectId?.toString(),
+      userDocument.title,
+      userDocument.status as UserStoryStatus,
+      userDocument.priority as UserStoryPriority,
+      userDocument.order,
+      userDocument.createdBy,
+      userDocument.description,
+      userDocument.acceptanceCriteria,
+      userDocument.assigneeId?.toString(),
+      userDocument.createdAt,
+      userDocument.updatedAt,
+      userDocument.isDeleted,
     );
   }
 
@@ -42,7 +42,10 @@ export class MongoUserStoryRepository implements IUserStoryRepository {
     return this.toEntity(saved);
   }
 
-  async findById(id: string, companyId: string): Promise<UserStoryEntity | null> {
+  async findById(
+    id: string,
+    companyId: string,
+  ): Promise<UserStoryEntity | null> {
     if (!Types.ObjectId.isValid(id)) return null;
     const doc = await this._storyModel
       .findOne({ _id: id, companyId, isDeleted: false })

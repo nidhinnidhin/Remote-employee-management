@@ -11,8 +11,17 @@ export class UpdateUserStoryUseCase implements IUpdateUserStoryUseCase {
     private readonly _storyRepository: IUserStoryRepository,
   ) {}
 
-  async execute(id: string, companyId: string, adminId: string, dto: UpdateStoryDto): Promise<UserStoryEntity> {
-    const updated = await this._storyRepository.update(id, companyId, dto as Partial<UserStoryEntity>);
+  async execute(
+    id: string,
+    companyId: string,
+    adminId: string,
+    storyDto: UpdateStoryDto,
+  ): Promise<UserStoryEntity> {
+    const updated = await this._storyRepository.update(
+      id,
+      companyId,
+      storyDto as Partial<UserStoryEntity>,
+    );
     if (!updated) {
       throw new NotFoundException('User story not found');
     }

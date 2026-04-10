@@ -11,13 +11,23 @@ export class UpdateProjectUseCase implements IUpdateProjectUseCase {
     private readonly _projectRepository: IProjectRepository,
   ) {}
 
-  async execute(id: string, companyId: string, dto: UpdateProjectDto): Promise<ProjectEntity> {
+  async execute(
+    id: string,
+    companyId: string,
+    projectDto: UpdateProjectDto,
+  ): Promise<ProjectEntity> {
     const updateData: Partial<ProjectEntity> = {
-      ...dto,
-      startDate: dto.startDate ? new Date(dto.startDate) : undefined,
-      endDate: dto.endDate ? new Date(dto.endDate) : undefined,
+      ...projectDto,
+      startDate: projectDto.startDate
+        ? new Date(projectDto.startDate)
+        : undefined,
+      endDate: projectDto.endDate ? new Date(projectDto.endDate) : undefined,
     };
-    const updated = await this._projectRepository.update(id, companyId, updateData);
+    const updated = await this._projectRepository.update(
+      id,
+      companyId,
+      updateData,
+    );
     if (!updated) {
       throw new NotFoundException('Project not found');
     }

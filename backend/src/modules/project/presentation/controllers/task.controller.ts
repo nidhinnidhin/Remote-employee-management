@@ -46,35 +46,39 @@ export class TaskController {
 
   @Post()
   @UseGuards(CompanyAdminGuard)
-  async create(@Req() req: Request, @Body() dto: CreateTaskDto) {
-    return this._createTaskUseCase.execute(req.user!.companyId!, req.user!.userId, dto);
+  async create(@Req() req: Request, @Body() taskDto: CreateTaskDto) {
+    return this._createTaskUseCase.execute(
+      req.user!.companyId!,
+      req.user!.userId,
+      taskDto,
+    );
   }
 
   @Get()
-  async findByStory(
-    @Req() req: Request,
-    @Query('storyId') storyId: string,
-  ) {
+  async findByStory(@Req() req: Request, @Query('storyId') storyId: string) {
     return this._getTasksByStoryUseCase.execute(storyId, req.user!.companyId!);
   }
 
   @Get('my')
   async findMyTasks(@Req() req: Request) {
-    return this._getMyTasksUseCase.execute(req.user!.userId, req.user!.companyId!);
+    return this._getMyTasksUseCase.execute(
+      req.user!.userId,
+      req.user!.companyId!,
+    );
   }
 
   @Patch(':id')
   async update(
     @Req() req: Request,
     @Param('id') id: string,
-    @Body() dto: UpdateTaskDto,
+    @Body() taskDto: UpdateTaskDto,
   ) {
     return this._updateTaskUseCase.execute(
       id,
       req.user!.userId,
       req.user!.companyId!,
       req.user!.role!,
-      dto,
+      taskDto,
     );
   }
 
@@ -82,14 +86,14 @@ export class TaskController {
   async move(
     @Req() req: Request,
     @Param('id') id: string,
-    @Body() dto: MoveTaskDto,
+    @Body() taskDto: MoveTaskDto,
   ) {
     return this._moveTaskUseCase.execute(
       id,
       req.user!.userId,
       req.user!.companyId!,
       req.user!.role!,
-      dto,
+      taskDto,
     );
   }
 

@@ -13,25 +13,25 @@ export class MongoTaskRepository implements ITaskRepository {
     private readonly _taskModel: Model<TaskDocument>,
   ) {}
 
-  private toEntity(doc: TaskDocument): TaskEntity {
+  private toEntity(taskDocument: TaskDocument): TaskEntity {
     return new TaskEntity(
-      (doc._id as Types.ObjectId).toString(),
-      doc.companyId,
-      doc.projectId?.toString(),
-      doc.storyId?.toString(),
-      doc.title,
-      doc.status as TaskStatus,
-      doc.order,
-      doc.createdBy,
-      doc.description,
-      doc.assignedTo?.toString(),
-      doc.assignedBy?.toString(),
-      doc.estimatedHours,
-      doc.actualHours,
-      doc.dueDate,
-      doc.createdAt,
-      doc.updatedAt,
-      doc.isDeleted,
+      (taskDocument._id as Types.ObjectId).toString(),
+      taskDocument.companyId,
+      taskDocument.projectId?.toString(),
+      taskDocument.storyId?.toString(),
+      taskDocument.title,
+      taskDocument.status as TaskStatus,
+      taskDocument.order,
+      taskDocument.createdBy,
+      taskDocument.description,
+      taskDocument.assignedTo?.toString(),
+      taskDocument.assignedBy?.toString(),
+      taskDocument.estimatedHours,
+      taskDocument.actualHours,
+      taskDocument.dueDate,
+      taskDocument.createdAt,
+      taskDocument.updatedAt,
+      taskDocument.isDeleted,
     );
   }
 
@@ -56,11 +56,11 @@ export class MongoTaskRepository implements ITaskRepository {
     storyId: string,
     companyId: string,
   ): Promise<TaskEntity[]> {
-    const docs = await this._taskModel
+    const taskDocument = await this._taskModel
       .find({ storyId, companyId, isDeleted: false })
       .sort({ order: 1 })
       .exec();
-    return docs.map((doc) => this.toEntity(doc));
+    return taskDocument.map((doc) => this.toEntity(doc));
   }
 
   async findByProjectId(

@@ -39,8 +39,8 @@ export class StoryController {
 
   @Post()
   @UseGuards(CompanyAdminGuard)
-  async create(@Req() req: Request, @Body() dto: CreateStoryDto) {
-    return this._createStoryUseCase.execute(req.user!.companyId!, req.user!.userId, dto);
+  async create(@Req() req: Request, @Body() storyDto: CreateStoryDto) {
+    return this._createStoryUseCase.execute(req.user!.companyId!, req.user!.userId, storyDto);
   }
 
   @Get()
@@ -56,13 +56,13 @@ export class StoryController {
   async update(
     @Req() req: Request,
     @Param('id') id: string,
-    @Body() dto: UpdateStoryDto,
+    @Body() storyDto: UpdateStoryDto,
   ) {
     return this._updateStoryUseCase.execute(
       id,
       req.user!.companyId!,
       req.user!.userId,
-      dto,
+      storyDto,
     );
   }
 

@@ -13,19 +13,19 @@ export class MongoProjectRepository implements IProjectRepository {
     private readonly _projectModel: Model<ProjectDocument>,
   ) {}
 
-  private toEntity(doc: ProjectDocument): ProjectEntity {
+  private toEntity(projectDocument: ProjectDocument): ProjectEntity {
     return new ProjectEntity(
-      (doc._id as Types.ObjectId).toString(),
-      doc.companyId,
-      doc.name,
-      doc.status as ProjectStatus,
-      doc.createdBy,
-      doc.description,
-      doc.startDate,
-      doc.endDate,
-      doc.createdAt,
-      doc.updatedAt,
-      doc.isDeleted,
+      (projectDocument._id as Types.ObjectId).toString(),
+      projectDocument.companyId,
+      projectDocument.name,
+      projectDocument.status as ProjectStatus,
+      projectDocument.createdBy,
+      projectDocument.description,
+      projectDocument.startDate,
+      projectDocument.endDate,
+      projectDocument.createdAt,
+      projectDocument.updatedAt,
+      projectDocument.isDeleted,
     );
   }
 
@@ -47,10 +47,10 @@ export class MongoProjectRepository implements IProjectRepository {
   }
 
   async findAll(companyId: string): Promise<ProjectEntity[]> {
-    const docs = await this._projectModel
+    const projectDocument = await this._projectModel
       .find({ companyId, isDeleted: false })
       .exec();
-    return docs.map((doc) => this.toEntity(doc));
+    return projectDocument.map((doc) => this.toEntity(doc));
   }
 
   async update(

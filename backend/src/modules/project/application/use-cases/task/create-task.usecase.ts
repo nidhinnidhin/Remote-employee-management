@@ -18,24 +18,34 @@ export class CreateTaskUseCase implements ICreateTaskUseCase {
     private readonly _projectRepository: IProjectRepository,
   ) {}
 
-  async execute(companyId: string, adminId: string, dto: CreateTaskDto): Promise<TaskEntity> {
-    const project = await this._projectRepository.findById(dto.projectId, companyId);
+  async execute(
+    companyId: string,
+    adminId: string,
+    taskDto: CreateTaskDto,
+  ): Promise<TaskEntity> {
+    const project = await this._projectRepository.findById(
+      taskDto.projectId,
+      companyId,
+    );
     if (!project) {
       throw new NotFoundException('Project not found');
     }
 
-    const story = await this._storyRepository.findById(dto.storyId, companyId);
+    const story = await this._storyRepository.findById(
+      taskDto.storyId,
+      companyId,
+    );
     if (!story) {
       throw new NotFoundException('User story not found');
     }
 
     const task = {
-      ...dto,
-      dueDate: dto.dueDate ? new Date(dto.dueDate) : undefined,
+      ...taskDto,
+      dueDate: taskDto.dueDate ? new Date(taskDto.dueDate) : undefined,
       companyId,
       createdBy: adminId,
-      status: dto.status || TaskStatus.TODO,
-      order: dto.order || 0,
+      status: taskDto.status || TaskStatus.TODO,
+      order: taskDto.order || 0,
       isDeleted: false,
     };
 

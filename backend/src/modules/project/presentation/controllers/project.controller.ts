@@ -41,8 +41,8 @@ export class ProjectController {
 
   @Post()
   @UseGuards(CompanyAdminGuard)
-  async create(@Req() req: Request, @Body() dto: CreateProjectDto) {
-    return this._createProjectUseCase.execute(req.user!.companyId!, req.user!.userId, dto);
+  async create(@Req() req: Request, @Body() projectDto: CreateProjectDto) {
+    return this._createProjectUseCase.execute(req.user!.companyId!, req.user!.userId, projectDto);
   }
 
   @Get()
@@ -60,9 +60,9 @@ export class ProjectController {
   async update(
     @Req() req: Request,
     @Param('id') id: string,
-    @Body() dto: UpdateProjectDto,
+    @Body() projectDto: UpdateProjectDto,
   ) {
-    return this._updateProjectUseCase.execute(id, req.user!.companyId!, dto);
+    return this._updateProjectUseCase.execute(id, req.user!.companyId!, projectDto);
   }
 
   @Delete(':id')

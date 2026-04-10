@@ -22,7 +22,7 @@ export class UpdateTaskUseCase implements IUpdateTaskUseCase {
     userId: string,
     companyId: string,
     role: string,
-    dto: UpdateTaskDto,
+    taskDto: UpdateTaskDto,
   ): Promise<TaskEntity> {
     const task = await this._taskRepository.findById(id, companyId);
     if (!task) {
@@ -35,8 +35,8 @@ export class UpdateTaskUseCase implements IUpdateTaskUseCase {
     }
 
     const updateData: Partial<TaskEntity> = {
-      ...dto,
-      dueDate: dto.dueDate ? new Date(dto.dueDate) : undefined,
+      ...taskDto,
+      dueDate: taskDto.dueDate ? new Date(taskDto.dueDate) : undefined,
     };
 
     const updated = await this._taskRepository.update(

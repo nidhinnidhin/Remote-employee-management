@@ -17,7 +17,7 @@ export class MoveTaskUseCase implements IMoveTaskUseCase {
     userId: string,
     companyId: string,
     role: string,
-    dto: MoveTaskDto,
+    taskDto: MoveTaskDto,
   ): Promise<TaskEntity> {
     const task = await this._taskRepository.findById(id, companyId);
     if (!task) {
@@ -29,8 +29,8 @@ export class MoveTaskUseCase implements IMoveTaskUseCase {
     }
 
     const updated = await this._taskRepository.update(id, companyId, {
-      status: dto.status,
-      order: dto.order,
+      status: taskDto.status,
+      order: taskDto.order,
     });
     if (!updated) {
       throw new NotFoundException('Task not found');

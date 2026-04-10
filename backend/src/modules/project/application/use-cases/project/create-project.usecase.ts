@@ -12,14 +12,14 @@ export class CreateProjectUseCase implements ICreateProjectUseCase {
     private readonly _projectRepository: IProjectRepository,
   ) {}
 
-  async execute(companyId: string, adminId: string, dto: CreateProjectDto): Promise<ProjectEntity> {
+  async execute(companyId: string, adminId: string, projectDto: CreateProjectDto): Promise<ProjectEntity> {
     const project = {
-      ...dto,
-      startDate: dto.startDate ? new Date(dto.startDate) : undefined,
-      endDate: dto.endDate ? new Date(dto.endDate) : undefined,
+      ...projectDto,
+      startDate: projectDto.startDate ? new Date(projectDto.startDate) : undefined,
+      endDate: projectDto.endDate ? new Date(projectDto.endDate) : undefined,
       companyId,
       createdBy: adminId,
-      status: dto.status || ProjectStatus.ACTIVE,
+      status: projectDto.status || ProjectStatus.ACTIVE,
       isDeleted: false,
     };
     return this._projectRepository.create(project as Partial<ProjectEntity>);

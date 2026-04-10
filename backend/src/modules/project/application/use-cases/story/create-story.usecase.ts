@@ -16,21 +16,30 @@ export class CreateUserStoryUseCase implements ICreateUserStoryUseCase {
     private readonly _projectRepository: IProjectRepository,
   ) {}
 
-  async execute(companyId: string, adminId: string, dto: CreateStoryDto): Promise<UserStoryEntity> {
-    const project = await this._projectRepository.findById(dto.projectId, companyId);
+  async execute(
+    companyId: string,
+    adminId: string,
+    storyDto: CreateStoryDto,
+  ): Promise<UserStoryEntity> {
+    const project = await this._projectRepository.findById(
+      storyDto.projectId,
+      companyId,
+    );
     if (!project) {
       throw new NotFoundException('Project not found');
     }
 
     const story = {
-      ...dto,
+      ...storyDto,
       companyId,
       createdBy: adminId,
-      status: dto.status || UserStoryStatus.BACKLOG,
-      priority: dto.priority || UserStoryPriority.MEDIUM,
-      order: dto.order || 0,
+      status: storyDto.status || UserStoryStatus.BACKLOG,
+      priority: storyDto.priority || UserStoryPriority.MEDIUM,
+      order: storyDto.order || 0,
       isDeleted: false,
     };
+
+    
 
     return this._storyRepository.create(story as Partial<UserStoryEntity>);
   }
