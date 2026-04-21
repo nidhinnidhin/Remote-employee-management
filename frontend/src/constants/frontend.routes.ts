@@ -27,8 +27,8 @@ export const FRONTEND_ROUTES = {
         }
     },
     COMPANY: {
-        DEPARTMENTS: "/company-admin/departments",
-        PROJECTS: "/company-admin/projects",
+        DEPARTMENTS: "/admin/departments",
+        PROJECTS: "/admin/projects",
         TASKS: "/company-admin/tasks",
         DISCUSSIONS: "/company-admin/discussions",
         ATTENDANCE: "/company-admin/attendance",
@@ -42,9 +42,9 @@ export const FRONTEND_ROUTES = {
         POLICY: "/employee/policy",
         ATTENDANCE: "/attendance",
         LEAVES: "/leaves",
-        TASKS: "/tasks",
-        PROJECTS: "/projects",
-        TEAMS: "/teams",
+        TASKS: "/employee/tasks",
+        PROJECTS: "/employee/projects",
+        TEAMS: "/employee/teams",
         DISCUSSIONS: "/discussions",
         CALENDAR: "/calendar",
         ANNOUNCEMENTS: "/announcements",

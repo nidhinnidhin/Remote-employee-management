@@ -4,21 +4,24 @@ import {
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
-import type { UserRepository } from '../../../domain/repositories/user.repository';
-import { SendEmailOtpUseCase } from '../otp/send-email-otp.usecase';
+import type { IUserRepository } from '../../../domain/repositories/iuser.repository';
+import type { ISendEmailOtpUseCase } from '../../interfaces/otp/otp-use-case.interface';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
+import { ForgotPasswordDto } from '../../dto/forgot-password.dto';
+import { IForgotPasswordUseCase } from '../../interfaces/auth/auth-use-case.interface';
 
 @Injectable()
-export class ForgotPasswordUseCase {
+export class ForgotPasswordUseCase implements IForgotPasswordUseCase {
   constructor(
-    @Inject('UserRepository')
-    private readonly _userRepository: UserRepository,
-    private readonly _sendEmailOtpUseCase: SendEmailOtpUseCase,
-  ) {}
+    @Inject('IUserRepository')
+    private readonly _userRepository: IUserRepository,
+    @Inject('ISendEmailOtpUseCase')
+    private readonly _sendEmailOtpUseCase: ISendEmailOtpUseCase,
+  ) { }
 
-  async execute({ email }: { email: string }) {
-    const user = await this._userRepository.findByEmail(email.toLowerCase());
+  async execute(input: ForgotPasswordDto) {
+    const user = await this._userRepository.findByEmail(input.email.toLowerCase());
 
     if (!user) {
       throw new NotFoundException(AUTH_MESSAGES.USER_NOT_FOUND);

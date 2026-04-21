@@ -1,40 +1,47 @@
 import { Inject, Injectable, UnauthorizedException, ForbiddenException } from '@nestjs/common';
-import type { UserRepository } from '../../../domain/repositories/user.repository';
-import type { CompanyRepository } from '../../../domain/repositories/company.repository';
+import type { IUserRepository } from '../../../domain/repositories/iuser.repository';
+import type { ICompanyRepository } from '../../../domain/repositories/icompany.repository';
+import type { IDepartmentRepository } from '../../../../department/domain/repositories/idepartment.repository';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { CompanyStatus } from 'src/shared/enums/company/company-status.enum';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 import { isValidObjectId } from 'mongoose';
+import { IGetUserProfileUseCase } from '../../interfaces/profile/profile-use-case.interface';
+import { EnrichedUserProfile } from 'src/shared/types/profile/enriched-user-profile.type';
 
 @Injectable()
-export class GetUserProfileUseCase {
+export class GetUserProfileUseCase implements IGetUserProfileUseCase {
   constructor(
-    @Inject('UserRepository')
-    private readonly _userRepository: UserRepository,
-    @Inject('CompanyRepository')
-    private readonly _companyRepository: CompanyRepository,
+    @Inject('IUserRepository')
+    private readonly _userRepository: IUserRepository,
+    @Inject('ICompanyRepository')
+    private readonly _companyRepository: ICompanyRepository,
+    @Inject('IDepartmentRepository')
+    private readonly _departmentRepository: IDepartmentRepository,
   ) { }
 
-  async execute(userId: string) {
+  async execute(userId: string): Promise<EnrichedUserProfile> {
     const user = await this._userRepository.findById(userId);
 
     if (!user) {
       throw new UnauthorizedException(AUTH_MESSAGES.USER_NOT_FOUND);
     }
 
-    // Check if user is suspended (blocked)
     if (user.status === UserStatus.SUSPENDED) {
       throw new ForbiddenException(AUTH_MESSAGES.USER_BLOCKED);
     }
 
-    // Check company suspension if user is associated with a company
     if (user.companyId) {
       await this.checkCompanySuspension(user.companyId);
     }
 
-    return {
-      ...user,
-    };
+    // List all departments the user belongs to
+    const departments = await this._departmentRepository.findAllByEmployeeId(userId);
+    const departmentNames = departments.map(d => d.name);
+
+    const serialized = JSON.parse(JSON.stringify(user)) as EnrichedUserProfile;
+    serialized.departments = departmentNames;
+    return serialized;
   }
 
   private async checkCompanySuspension(

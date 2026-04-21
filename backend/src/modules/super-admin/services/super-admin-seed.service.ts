@@ -1,18 +1,20 @@
 import { Injectable, OnModuleInit, Inject, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
-import type { UserRepository } from 'src/modules/auth/domain/repositories/user.repository';
+import type { IUserRepository } from 'src/modules/auth/domain/repositories/iuser.repository';
 import { UserEntity } from 'src/modules/auth/domain/entities/user.entity';
 import { UserRole } from 'src/shared/enums/user/user-role.enum';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 
+import type { ISuperAdminSeedService } from './isuper-admin-seed.service';
+
 @Injectable()
-export class SuperAdminSeedService implements OnModuleInit {
+export class SuperAdminSeedService implements ISuperAdminSeedService {
   private readonly logger = new Logger(SuperAdminSeedService.name);
 
   constructor(
-    @Inject('UserRepository') private readonly userRepository: UserRepository,
-    private readonly configService: ConfigService,
+    @Inject('IUserRepository') private readonly userRepository: IUserRepository,
+    private readonly _configService: ConfigService,
   ) { }
 
   async onModuleInit() {
@@ -21,8 +23,8 @@ export class SuperAdminSeedService implements OnModuleInit {
   }
 
   private async seedSuperAdmin() {
-    const email = this.configService.get<string>('SUPER_ADMIN_EMAIL');
-    const password = this.configService.get<string>('SUPER_ADMIN_PASSWORD');
+    const email = this._configService.get<string>('SUPER_ADMIN_EMAIL');
+    const password = this._configService.get<string>('SUPER_ADMIN_PASSWORD');
 
     if (!email || !password) {
       this.logger.warn(
@@ -60,9 +62,6 @@ export class SuperAdminSeedService implements OnModuleInit {
       const salt = await bcrypt.genSalt(10);
       const passwordHash = await bcrypt.hash(password, salt);
 
-      // Create a dummy companyId or handle it appropriately.
-      // UserEntity requires companyId. For Super Admin, it might not be relevant but required by schema.
-      // We'll generate a random string or use a static one.
       const companyId = 'super-admin-company';
 
       const newUser = new UserEntity(
@@ -74,8 +73,9 @@ export class SuperAdminSeedService implements OnModuleInit {
         '0000000000',
         passwordHash,
         UserStatus.ACTIVE,
-        new Date(),
-        new Date(),
+        undefined, // title
+        new Date(), // createdAt
+        new Date(), // updatedAt
         companyId,
       );
 

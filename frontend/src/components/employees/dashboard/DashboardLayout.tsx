@@ -3,14 +3,18 @@
 import React, { useEffect } from "react";
 import { Sidebar } from "../common/Sidebar";
 import { Header } from "../common/Header";
+import { useProfileStore } from "@/store/profile.store";
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const fetchProfile = useProfileStore((s) => s.fetchProfile);
+
   useEffect(() => {
     document.documentElement.classList.add("theme-employee");
+    fetchProfile();
     return () => {
       document.documentElement.classList.remove("theme-employee");
     };
-  }, []);
+  }, [fetchProfile]);
 
   return (
     <div className="theme-employee portal-page h-screen flex flex-col lg:flex-row overflow-hidden">
@@ -20,7 +24,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-y-auto p-4 md:p-8">
+        <main className="flex-1 overflow-y-auto p-4 md:p-8 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           <div className="max-w-7xl mx-auto space-y-8 pb-8">{children}</div>
         </main>
       </div>

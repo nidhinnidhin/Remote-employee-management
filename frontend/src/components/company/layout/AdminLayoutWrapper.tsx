@@ -1,23 +1,26 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
-import { useEffect } from "react";
 
 const AdminLayoutWrapper = ({ children }: { children: React.ReactNode }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   useEffect(() => {
+    // Forces the entire document to use the Company Admin palette
     document.documentElement.classList.add("theme-company");
+    document.documentElement.classList.remove("theme-employee"); // Ensure no conflict
+    
     return () => {
       document.documentElement.classList.remove("theme-company");
     };
   }, []);
 
   return (
-    <div className="theme-company portal-page min-h-screen">
+    // Applying theme-company here ensures all standard children use the correct vars
+    <div className="theme-company portal-page min-h-screen selection:bg-accent/30">
       <Sidebar
         isMobileOpen={sidebarOpen}
         closeMobileSidebar={() => setSidebarOpen(false)}
@@ -32,7 +35,7 @@ const AdminLayoutWrapper = ({ children }: { children: React.ReactNode }) => {
       >
         <Header onMobileMenuDatas={() => setSidebarOpen(true)} />
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-x-hidden">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-x-hidden [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           {children}
         </main>
       </div>

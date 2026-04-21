@@ -4,7 +4,7 @@ import FormInput from "@/components/ui/FormInput";
 import { registerAdmin } from "@/services/company/auth/register.service";
 import { Loader2, ArrowRight } from "lucide-react";
 import { useAuthStore } from "@/store/auth.store";
-import VerifyOtpModal from "../../modals/VerifyOtpModal";
+import VerifyOtpModal from "@/components/company/modals/VerifyOtpModal";
 import { verifyOtpAction } from "@/actions/otp/otp.action";
 import { resendOtp } from "@/services/company/otp/resend-otp.service";
 import { useRouter } from "next/navigation";

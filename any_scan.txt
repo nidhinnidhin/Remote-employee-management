@@ -1,0 +1,34 @@
+﻿http-exception.filter.ts:36: message = (exceptionResponse as any).message || message;
+http-exception.filter.ts:37: errors = (exceptionResponse as any).errors || exceptionResponse;
+http-exception.filter.ts:41: if (status === HttpStatus.BAD_REQUEST && Array.isArray((exceptionResponse as any)?.message)) {
+http-exception.filter.ts:43: errors = (exceptionResponse as any).message;
+api-response.util.ts:38: errors: any = null,
+response.interface.ts:17: errors?: any;
+profile-use-case.interface.ts:21: execute(userId: string, file: any): Promise<any>;
+profile.repository.ts:10: uploadProfileImage(userId: string, file: any): Promise<any>;
+mongo-company.repository.ts:18: (companyDoc as any)._id.toString(),
+mongo-email-otp.repository.ts:40: const query: any = { userId, email, verified: false };
+mongo-email-otp.repository.ts:53: private toEntity(otp: any): EmailOtpEntity {
+company-policy-use-cases.interface.ts:2: createOrUpdatePolicies(companyId: string, policies: any[]): Promise<any>;
+company-policy.usecase.ts:13: async createOrUpdatePolicies(companyId: string, policies: any[]) {
+company-policy.repository.impl.ts:41: (companyPolicy as any)._id.toString(),
+company-policy.repository.impl.ts:44: (companyPolicy as any).createdAt,
+company-policy.repository.impl.ts:45: (companyPolicy as any).updatedAt,
+company-policy.repository.impl.ts:49: private toPolicyItems(policies: any[]): PolicyItemEntity[] {
+company-policy.schema.ts:27: policies: any[];
+department-usecase.interface.ts:8: execute(companyId: string): Promise<any[]>;
+department.controller.ts:47: const companyId = (req.user as any).companyId;
+department.controller.ts:54: const companyId = (req.user as any).companyId;
+employee.repository.impl.ts:26: (userDoc as any)._id?.toString() ?? (userDoc as any).id,
+invite-link.repository.impl.ts:29: } as any);
+super-admin-use-cases.interface.ts:4: execute(): Promise<any[]>;
+suspend-company.use-case.ts:42: status as any,
+mongo-company.repository.ts:24: (companyDoc as any)._id.toString(),
+mongo-company.repository.ts:32: (companyDoc as any).employeeCount,
+document-file.filter.ts:9: if (!ALLOWED_DOCUMENT_MIME_TYPES.includes(file.mimetype as any)) {
+base.repository.ts:78: sort: any = { createdAt: -1 }
+base.repository.ts:104: } as any).exec();
+base.repository.ts:112: } as any).exec();
+base.repository.ts:124: async withTransaction<R>(fn: (session: any) => Promise<R>): Promise<R> {
+base.repository.interface.ts:18: sort?: any
+base.repository.interface.ts:25: withTransaction<R>(fn: (session: any) => Promise<R>): Promise<R>;

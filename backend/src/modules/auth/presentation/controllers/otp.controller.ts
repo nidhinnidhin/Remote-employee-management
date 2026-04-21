@@ -2,35 +2,42 @@ import {
     Body,
     Controller,
     Post,
+    Inject,
 } from '@nestjs/common';
 import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
-import { VerifyEmailOtpUseCase } from '../../application/use-cases/otp/verify-email-otp.usecase';
-import { ResendEmailOtpUseCase } from '../../application/use-cases/otp/resend-email-otp.usecase';
-import { VerifyEmailOtpDto } from '../../presentation/dto/verify-email-otp.dto';
-import { ResendOtpDto } from '../dto/resend-otp.dto';
+import type {
+    IVerifyEmailOtpUseCase,
+    IResendEmailOtpUseCase,
+} from '../../application/interfaces/otp/otp-use-case.interface';
+import { VerifyEmailOtpDto } from '../../application/dto/verify-email-otp.dto';
+import { ResendOtpDto } from '../../application/dto/resend-otp.dto';
 
 @Controller('auth/otp')
 export class OtpController {
     constructor(
-        private readonly verifyEmailOtpUseCase: VerifyEmailOtpUseCase,
-        private readonly resendEmailOtpUseCase: ResendEmailOtpUseCase,
+        @Inject('IVerifyEmailOtpUseCase')
+        private readonly _verifyEmailOtpUseCase: IVerifyEmailOtpUseCase,
+        @Inject('IResendEmailOtpUseCase')
+        private readonly _resendEmailOtpUseCase: IResendEmailOtpUseCase,
     ) { }
 
     @Post('verify')
-    async verifyOtp(@Body() dto: VerifyEmailOtpDto) {
-        const result = await this.verifyEmailOtpUseCase.execute({
-            email: dto.email,
-            otp: dto.otp,
+    async verifyOtp(@Body() verifyEmailOtpDto: VerifyEmailOtpDto) {
+        const result = await this._verifyEmailOtpUseCase.execute({
+            email: verifyEmailOtpDto.email,
+            otp: verifyEmailOtpDto.otp,
         });
 
         return {
             user: result.user,
+            accessToken: result.accessToken,
+            refreshToken: result.refreshToken,
         };
     }
 
     @Post('resend')
-    async resendOtp(@Body() dto: ResendOtpDto) {
-        await this.resendEmailOtpUseCase.execute(dto.email);
+    async resendOtp(@Body() resendOtpDto: ResendOtpDto) {
+        await this._resendEmailOtpUseCase.execute(resendOtpDto);
         return { message: OTP_MESSAGES.OTP_RESENT };
     }
 }

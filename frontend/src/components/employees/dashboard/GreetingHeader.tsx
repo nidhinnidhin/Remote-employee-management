@@ -1,16 +1,19 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Clock } from "lucide-react";
+import { Clock, Calendar as CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+import { useProfileStore } from "@/store/profile.store";
 
 export function GreetingHeader() {
-  const [time, setTime] = React.useState<Date | null>(null);
+  const [time, setTime] = useState<Date | null>(null);
+  const { userProfile, isLoading } = useProfileStore();
 
-  React.useEffect(() => {
-    const updateTime = () => setTime(new Date());
-    updateTime();
-    const timer = setInterval(updateTime, 1000);
+  useEffect(() => {
+    setTime(new Date());
+    const timer = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
@@ -18,53 +21,71 @@ export function GreetingHeader() {
     ? time.toLocaleTimeString("en-US", {
       hour: "2-digit",
       minute: "2-digit",
-      second: "2-digit",
       hour12: true,
     })
-    : "--:--:--";
+    : "--:--";
 
   const formattedDate = time
-    ? time.toLocaleDateString("en-US", {
-      weekday: "long",
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    })
+    ? time
+      .toLocaleDateString("en-US", {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+      })
+      .toUpperCase()
     : "";
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="portal-card relative overflow-hidden p-8"
+      className="relative flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-white/[0.06]"
     >
-      {/* Decorative blob */}
-      <div
-        className="absolute top-0 right-0 w-64 h-64 blur-3xl -mr-20 -mt-20 rounded-full opacity-50"
-        style={{ backgroundColor: "rgb(var(--color-accent-subtle))" }}
-      />
-
-      <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-          <h1 className="text-2xl font-bold text-primary flex items-center gap-2 tracking-tight">
-            Hello, John 👋
+      {/* Left Side: Greeting */}
+      <div className="space-y-1">
+        <div className="flex items-center gap-3">
+          <h1 className="text-3xl font-black text-white tracking-tighter">
+            Hello, {isLoading ? "..." : (userProfile?.firstName || "Team Member")} <span className="text-accent animate-pulse">.</span>
           </h1>
-          <p className="text-secondary text-sm mt-1">
-            Senior Backend Developer
+          <span className="px-2 py-0.5 rounded-md bg-accent/10 border border-accent/20 text-[9px] font-black text-accent uppercase tracking-widest">
+            {userProfile?.title || userProfile?.role?.replace(/_/g, " ") || "Member"}
+          </span>
+        </div>
+        <p className="text-sm text-slate-500 font-medium">
+          Here is what’s happening with your projects today.
+        </p>
+      </div>
+
+      {/* Right Side: Subtle Time/Date Readout */}
+      <div className="flex items-center gap-6 text-slate-500">
+        <div className="flex flex-col items-end gap-1">
+          <p className="text-[9px] font-black uppercase tracking-[0.2em] opacity-50">
+            Current Time
           </p>
+          <div className="flex items-center gap-2 text-slate-200">
+            <Clock size={14} className="text-accent/60" strokeWidth={1.5} />
+            <span className="text-sm font-bold tabular-nums tracking-tight">
+              {formattedTime}
+            </span>
+          </div>
         </div>
 
-        <div
-          className="flex items-center gap-3 text-xs font-semibold px-4 py-2 rounded-lg border portal-card-inner"
-          style={{ color: "rgb(var(--color-text-secondary))" }}
-        >
-          <Clock size={14} className="text-accent" />
-          <span className="tabular-nums">{formattedTime}</span>
-          <span
-            className="w-px h-3"
-            style={{ backgroundColor: "rgb(var(--color-border))" }}
-          />
-          <span>{formattedDate}</span>
+        <div className="w-px h-8 bg-white/[0.06]" />
+
+        <div className="flex flex-col items-end gap-1">
+          <p className="text-[9px] font-black uppercase tracking-[0.2em] opacity-50">
+            Today
+          </p>
+          <div className="flex items-center gap-2 text-slate-200">
+            <CalendarIcon
+              size={14}
+              className="text-accent/60"
+              strokeWidth={1.5}
+            />
+            <span className="text-sm font-bold tracking-tight">
+              {formattedDate}
+            </span>
+          </div>
         </div>
       </div>
     </motion.div>

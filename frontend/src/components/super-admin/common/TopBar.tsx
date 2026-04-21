@@ -40,7 +40,7 @@ export default function TopBar() {
 
         {/* Profile / Logout */}
         <div className="pl-4 border-l border-white/[0.05]">
-          <UserNav userEmail="admin@issuehub.com" userName="Super Admin" />
+          <UserNav userEmail="admin@issuehub.com" userName="Super Admin" theme="theme-super" />
         </div>
       </div>
     </header>

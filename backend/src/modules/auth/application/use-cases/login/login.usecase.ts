@@ -4,25 +4,27 @@ import {
   Inject,
   ForbiddenException,
 } from '@nestjs/common';
-import type { CompanyRepository } from '../../../domain/repositories/company.repository';
-import type { UserRepository } from '../../../domain/repositories/user.repository';
+import { ILoginUseCase } from '../../interfaces/auth/auth-use-case.interface';
+import type { IUserRepository } from '../../../domain/repositories/iuser.repository';
+import type { ICompanyRepository } from '../../../domain/repositories/icompany.repository';
 import { isValidObjectId } from 'mongoose';
 import { CompanyStatus } from 'src/shared/enums/company/company-status.enum';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
-import { JwtService } from 'src/shared/services/jwt.service';
+import type { IJwtService } from 'src/shared/services/auth/interfaces/ijwt.service';
 import { LoginInput } from 'src/shared/types/auth/login-input.type';
 import { LoginResponse } from 'src/shared/types/auth/login-response.type';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { comparePassword } from 'src/shared/utils/password.util';
 
 @Injectable()
-export class LoginUseCase {
+export class LoginUseCase implements ILoginUseCase {
   constructor(
-    @Inject('UserRepository')
-    private readonly _userRepository: UserRepository,
-    @Inject('CompanyRepository')
-    private readonly _companyRepository: CompanyRepository,
-    private readonly _jwtService: JwtService,
+    @Inject('IUserRepository')
+    private readonly _userRepository: IUserRepository,
+    @Inject('ICompanyRepository')
+    private readonly _companyRepository: ICompanyRepository,
+    @Inject('IJwtService')
+    private readonly _jwtService: IJwtService,
   ) { }
 
   async execute({ email, password }: LoginInput): Promise<LoginResponse> {

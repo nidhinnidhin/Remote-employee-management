@@ -8,14 +8,17 @@ export default tseslint.config(
     ignores: ['eslint.config.mjs', 'dist/**'],
   },
 
-  // Basic JS rules
   eslint.configs.recommended,
 
-  // Basic TypeScript rules (not type-check heavy)
+  // enable recommended typescript rules
   ...tseslint.configs.recommended,
 
   {
     languageOptions: {
+      parserOptions: {
+        project: './tsconfig.json',
+        tsconfigRootDir: import.meta.dirname,
+      },
       globals: {
         ...globals.node,
       },
@@ -25,16 +28,14 @@ export default tseslint.config(
 
   {
     rules: {
-      // Allow flexibility in backend coding
       '@typescript-eslint/no-explicit-any': 'off',
 
-      // These two actually prevent real bugs in backend
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-misused-promises': 'error',
 
-      // Turn off style & noise rules
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
+
       '@typescript-eslint/no-unused-vars': [
         'warn',
         { argsIgnorePattern: '^_' },

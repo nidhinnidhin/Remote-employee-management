@@ -1,0 +1,18 @@
+export const PROJECT_MESSAGES = {
+    PROJECT_CREATED: 'Project created successfully',
+    PROJECT_UPDATED: 'Project updated successfully',
+    PROJECT_DELETED: 'Project deleted successfully',
+    PROJECT_FETCH_FAILED: 'Failed to fetch projects',
+    PROJECT_CREATE_FAILED: 'Failed to create project',
+    PROJECT_UPDATE_FAILED: 'Failed to update project',
+    PROJECT_DELETE_FAILED: 'Failed to delete project',
+    STORY_CREATED: 'User story created successfully',
+    STORY_UPDATED: 'User story updated successfully',
+    STORY_DELETED: 'User story deleted successfully',
+    TASK_CREATED: 'Task created successfully',
+    TASK_UPDATED: 'Task updated successfully',
+    TASK_DELETED: 'Task deleted successfully',
+    TASK_MOVED: 'Task moved successfully',
+    TASK_STATUS_UPDATED: 'Task status updated successfully',
+    ACTUAL_HOURS_UPDATED: 'Actual hours updated successfully',
+};

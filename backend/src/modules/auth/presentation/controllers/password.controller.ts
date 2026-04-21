@@ -1,43 +1,44 @@
-import {
-    Body,
-    Controller,
-    Post,
-} from '@nestjs/common';
+import { Body, Controller, Post, Inject } from '@nestjs/common';
 import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
-import { ForgotPasswordUseCase } from '../../application/use-cases/reset-password/forgot-password.usecase';
-import { VerifyResetPasswordOtpUseCase } from '../../application/use-cases/reset-password/verify-reset-password-otp.usecase';
-import { ResetPasswordUseCase } from '../../application/use-cases/reset-password/reset-password.usecase';
-import { ForgotPasswordDto } from '../../presentation/dto/forgot-password.dto';
-import { VerifyResetPasswordOtpDto } from '../../presentation/dto/verify-reset-password-otp.dto';
-import { ResetPasswordDto } from '../../presentation/dto/reset-password.dto';
+import type {
+  IForgotPasswordUseCase,
+  IVerifyResetPasswordOtpUseCase,
+  IResetPasswordUseCase,
+} from '../../application/interfaces/auth/auth-use-case.interface';
+import { ForgotPasswordDto } from '../../application/dto/forgot-password.dto';
+import { VerifyResetPasswordOtpDto } from '../../application/dto/verify-reset-password-otp.dto';
+import { ResetPasswordDto } from '../../application/dto/reset-password.dto';
 
 @Controller('auth/password')
 export class PasswordController {
-    constructor(
-        private readonly forgotPasswordUseCase: ForgotPasswordUseCase,
-        private readonly verifyResetPasswordOtpUseCase: VerifyResetPasswordOtpUseCase,
-        private readonly resetPasswordUseCase: ResetPasswordUseCase,
-    ) { }
+  constructor(
+    @Inject('IForgotPasswordUseCase')
+    private readonly _forgotPasswordUseCase: IForgotPasswordUseCase,
+    @Inject('IVerifyResetPasswordOtpUseCase')
+    private readonly _verifyResetPasswordOtpUseCase: IVerifyResetPasswordOtpUseCase,
+    @Inject('IResetPasswordUseCase')
+    private readonly _resetPasswordUseCase: IResetPasswordUseCase,
+  ) {}
 
-    @Post('forgot')
-    async forgotPassword(@Body() dto: ForgotPasswordDto) {
-        await this.forgotPasswordUseCase.execute({ email: dto.email });
-        return { message: OTP_MESSAGES.OTP_SENT };
-    }
+  @Post('forgot')
+  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+    await this._forgotPasswordUseCase.execute({ email: forgotPasswordDto.email });
+    return { message: OTP_MESSAGES.OTP_SENT };
+  }
 
-    @Post('verify-reset')
-    verifyResetOtp(@Body() dto: VerifyResetPasswordOtpDto) {
-        return this.verifyResetPasswordOtpUseCase.execute({
-            email: dto.email,
-            otp: dto.otp,
-        });
-    }
+  @Post('verify-reset')
+  verifyResetOtp(@Body() resetPasswordDto: VerifyResetPasswordOtpDto) {
+    return this._verifyResetPasswordOtpUseCase.execute({
+      email: resetPasswordDto.email,
+      otp: resetPasswordDto.otp,
+    });
+  }
 
-    @Post('reset')
-    resetPassword(@Body() dto: ResetPasswordDto) {
-        return this.resetPasswordUseCase.execute({
-            email: dto.email,
-            newPassword: dto.newPassword,
-        });
-    }
+  @Post('reset')
+  resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return this._resetPasswordUseCase.execute({
+      email: resetPasswordDto.email,
+      newPassword: resetPasswordDto.newPassword,
+    });
+  }
 }

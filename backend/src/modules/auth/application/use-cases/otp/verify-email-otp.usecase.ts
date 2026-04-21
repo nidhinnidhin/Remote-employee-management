@@ -1,24 +1,33 @@
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import type { PendingRegistrationRepository } from '../../../domain/repositories/cache/auth-repository/pending-registration.repository';
-import type { UserRepository } from '../../../domain/repositories/user.repository';
-import { UserEntity } from '../../../domain/entities/user.entity';
-import { VerifyEmailOtpInput } from 'src/shared/types/company/otp/verify-email-otp-input.type';
+import type { IPendingRegistrationRepository } from '../../../domain/repositories/cache/auth-repository/ipending-registration.repository';
+import type { IUserRepository } from '../../../domain/repositories/iuser.repository';
+import type { IJwtService } from 'src/shared/services/auth/interfaces/ijwt.service';
+import { IVerifyEmailOtpUseCase } from '../../interfaces/otp/otp-use-case.interface';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
-import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
 import { UserRole } from 'src/shared/enums/user/user-role.enum';
+import { UserEntity } from '../../../domain/entities/user.entity';
+import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
+import type { IOtpService } from 'src/shared/services/auth/interfaces/iotp.service';
+import { VerifyEmailOtpDto } from '../../dto/verify-email-otp.dto';
 
 @Injectable()
-export class VerifyEmailOtpUseCase {
+export class VerifyEmailOtpUseCase implements IVerifyEmailOtpUseCase {
   constructor(
-    @Inject('PendingRegistrationRepository')
-    private readonly _pendingRepository: PendingRegistrationRepository,
+    @Inject('IPendingRegistrationRepository')
+    private readonly _pendingRepository: IPendingRegistrationRepository,
 
-    @Inject('UserRepository')
-    private readonly _userRepository: UserRepository,
+    @Inject('IUserRepository')
+    private readonly _userRepository: IUserRepository,
+
+    @Inject('IJwtService')
+    private readonly _jwtService: IJwtService,
+
+    @Inject('IOtpService')
+    private readonly _otpService: IOtpService,
   ) { }
 
-  async execute(input: VerifyEmailOtpInput) {
+  async execute(input: VerifyEmailOtpDto) {
     const pending = await this._pendingRepository.find(input.email);
     if (!pending) {
       throw new BadRequestException(OTP_MESSAGES.OTP_EXPIRED);
@@ -44,41 +53,55 @@ export class VerifyEmailOtpUseCase {
       pending.admin.phone,
       pending.admin.password,
       UserStatus.ACTIVE,
-      new Date(),
-      new Date(),
-      undefined, // companyId
-      undefined, // department
-      undefined, // inviteStatus
-      true,      // hasPassword
-      undefined, // dateOfBirth
-      undefined, // gender
-      undefined, // maritalStatus
-      undefined, // nationality
-      undefined, // bloodGroup
-      undefined, // timeZone
-      undefined, // bio
-      undefined, // streetAddress
-      undefined, // city
-      undefined, // state
-      undefined, // country
-      undefined, // zipCode
-      undefined, // emergencyContactName
-      undefined, // emergencyContactPhone
-      undefined, // emergencyContactRelation
-      undefined, // linkedInUrl
-      undefined, // personalWebsite
-      undefined, // profileImageUrl
-      undefined, // profileImagePublicId
-      [],        // skills
-      false,     // isOnboarded
+      undefined, // title
+      new Date(), // createdAt
+      new Date(), // updatedAt
+      undefined, 
+      undefined, 
+      undefined, 
+      true,      
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+      undefined, 
+      [],        
+      false,     
     );
 
     const createdUser = await this._userRepository.create(userEntity);
+
+    // Generate Tokens
+    const accessToken = await this._jwtService.generateAccessToken({
+      userId: createdUser.id,
+      role: createdUser.role,
+      companyId: createdUser.companyId,
+    });
+
+    const refreshToken = await this._jwtService.generateRefreshToken({
+      userId: createdUser.id,
+    });
 
     // Clear Redis
     await this._pendingRepository.delete(input.email);
 
     return {
+      accessToken,
+      refreshToken,
       user: {
         id: createdUser.id,
         email: createdUser.email,

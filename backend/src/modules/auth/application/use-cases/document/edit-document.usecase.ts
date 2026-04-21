@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type { UserRepository } from 'src/modules/auth/domain/repositories/user.repository';
+import type { IUserRepository } from '../../../domain/repositories/iuser.repository';
 import { CLOUDINARY_PATH } from 'src/shared/constants/path/cloudinary.path';
 import { CloudinaryResourceType } from 'src/shared/enums/employees/media/cloudinary-resource.enum';
-import { CloudinaryService } from 'src/shared/services/cloudinary.service';
+import type { ICloudinaryService } from 'src/shared/services/cloudinary/interfaces/icloudinary.service';
 import {
   EditDocumentInput,
   UpdateDocumentPayload,
@@ -10,14 +10,16 @@ import {
   EditDocumentResponse,
 } from 'src/shared/types/profile/edit-document.type';
 import { DOCUMENT_MESSAGES } from 'src/shared/constants/messages/profile/document.messages';
+import type { IEditDocumentUseCase } from '../../interfaces/documents/document-use-case.interface';
 
 @Injectable()
-export class EditDocumentUseCase {
+export class EditDocumentUseCase implements IEditDocumentUseCase {
   constructor(
-    @Inject('UserRepository')
-    private readonly _userRepository: UserRepository,
-    private readonly _cloudinaryService: CloudinaryService,
-  ) {}
+    @Inject('IUserRepository')
+    private readonly _userRepository: IUserRepository,
+    @Inject('ICloudinaryService')
+    private readonly _cloudinaryService: ICloudinaryService,
+  ) { }
 
   async execute({
     userId,
@@ -39,7 +41,7 @@ export class EditDocumentUseCase {
         await this._cloudinaryService.deleteFile(
           existingDoc.publicId,
           (existingDoc.resourceType as CloudinaryResourceType) ??
-            CloudinaryResourceType.IMAGE,
+          CloudinaryResourceType.IMAGE,
         );
       }
 

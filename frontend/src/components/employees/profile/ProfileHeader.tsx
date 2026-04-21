@@ -1,15 +1,24 @@
 "use client";
 
-import React, { useState } from "react";
-import { Pencil, Mail, MapPin, Phone, Calendar } from "lucide-react";
+import React, { useState, useRef } from "react";
+import {
+  Pencil,
+  Mail,
+  MapPin,
+  Phone,
+  Calendar,
+  Camera,
+  Briefcase,
+} from "lucide-react";
 import { clientApi } from "@/lib/axios/axiosClient";
-import { useRef } from "react";
 import { API_ROUTES } from "@/constants/api.routes";
+import { cn } from "@/lib/utils";
 
 interface ProfileHeaderProps {
   name?: string;
   title?: string;
   department?: string;
+  departments?: string[];
   email?: string;
   phone?: string;
   address?: string;
@@ -20,33 +29,56 @@ interface ProfileHeaderProps {
 }
 
 export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
-  name = "John Doe",
-  title = "Senior Backend Developer",
-  department = "Engineering",
-  email = "john.doe@company.com",
-  phone = "+1 (555) 123-4567",
-  address = "123 Tech Street, San Francisco, CA 94105",
-  joinedDate = "3/15/2020",
+  name = "User Name",
+  title = "Position",
+  department = "",
+  departments = [],
+  email = "",
+  phone = "",
+  address = "",
+  joinedDate = "",
   avatarUrl,
-  onEditProfile,
   onAvatarUploaded,
 }) => {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      alert("Please upload an image file");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      setUploading(true);
+      const res = await clientApi.post(
+        API_ROUTES.AUTH.PROFILE.UPLOAD_IMAGE,
+        formData,
+      );
+      onAvatarUploaded?.(res.data.imageUrl);
+    } catch (error) {
+      console.error(error);
+      alert("Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   return (
-    <div className="portal-card relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute top-0 right-0 w-64 h-full rounded-2xl pointer-events-none" style={{ background: `linear-gradient(to bottom left, rgb(var(--color-accent-subtle)), transparent)` }} />
+    <div className="relative p-8 rounded-[2rem] bg-white/[0.01] border border-white/[0.06] overflow-hidden">
+      {/* SaaS Decorative Glow */}
+      <div className="absolute top-0 right-0 w-[400px] h-full bg-gradient-to-bl from-accent/5 to-transparent pointer-events-none" />
 
-      <div className="relative px-8 py-7 flex items-start justify-between gap-6">
-        {/* Left: Avatar + Info */}
-        <div className="flex items-start gap-5">
-          {/* Avatar */}
+      <div className="relative flex flex-col md:flex-row items-center md:items-start gap-8">
+        {/* --- Avatar Section --- */}
+        <div className="relative group shrink-0">
           <div
-            className="relative w-20 h-20 rounded-full overflow-hidden border-2 shadow group cursor-pointer"
-            style={{ borderColor: "rgb(var(--color-surface))" }}
+            className="w-32 h-32 rounded-3xl overflow-hidden bg-[#08090a] border border-white/[0.1] shadow-2xl flex items-center justify-center transition-all duration-300 group-hover:border-accent/50 cursor-pointer"
             onClick={() => fileInputRef.current?.click()}
           >
             {avatarUrl ? (
@@ -56,92 +88,100 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: "rgb(var(--color-accent-subtle))" }}>
-                <span className="text-2xl font-semibold" style={{ color: "rgb(var(--color-accent))" }}>
-                  {name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")
-                    .slice(0, 2)}
-                </span>
+              <div className="w-full h-full flex items-center justify-center bg-accent/5 text-accent text-3xl font-black">
+                {name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")
+                  .slice(0, 2)
+                  .toUpperCase()}
               </div>
             )}
 
-            {/* Overlay */}
+            {/* Hover Overlay */}
             <div
-              className={`absolute inset-0 bg-black/40 flex items-center justify-center text-white text-xs font-medium transition ${uploading ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-                }`}
+              className={cn(
+                "absolute inset-0 bg-black/60 flex flex-col items-center justify-center gap-2 transition-opacity duration-300",
+                uploading ? "opacity-100" : "opacity-0 group-hover:opacity-100",
+              )}
             >
-              {uploading ? "Uploading..." : "Change"}
+              {uploading ? (
+                <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+              ) : (
+                <>
+                  <Camera size={20} className="text-white" />
+                  <span className="text-[10px] font-black uppercase text-white tracking-widest">
+                    Update
+                  </span>
+                </>
+              )}
             </div>
-
-            {/* Hidden Input */}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={async (e) => {
-                const file = e.target.files?.[0];
-                if (!file) return;
-
-                if (!file.type.startsWith("image/")) {
-                  alert("Please upload an image file");
-                  return;
-                }
-
-                const formData = new FormData();
-                formData.append("file", file);
-
-                try {
-                  setUploading(true);
-
-                  const res = await clientApi.post(
-                    API_ROUTES.AUTH.PROFILE.UPLOAD_IMAGE,
-                    formData,
-                  );
-
-                  // Save permanent Cloudinary URL
-                  onAvatarUploaded?.(res.data.imageUrl);
-                } catch (error) {
-                  console.error(error);
-                  alert("Upload failed");
-                } finally {
-                  setUploading(false);
-                }
-              }}
-            />
           </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleFileUpload}
+          />
+        </div>
 
-          {/* Name, title, badge */}
-          <div>
-            <h1 className="text-2xl font-bold text-primary leading-tight">
+        {/* --- Content Section --- */}
+        <div className="flex-1 text-center md:text-left">
+          <div className="mb-4">
+            <h1 className="text-3xl font-black text-white tracking-tighter uppercase mb-1">
               {name}
             </h1>
-            <p className="text-sm text-secondary mt-0.5">{title}</p>
-            <span className="portal-badge inline-block mt-2">
-              {department}
-            </span>
-
-            {/* Contact info grid */}
-            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-1.5">
-              <div className="flex items-center gap-2 text-sm text-secondary">
-                <Mail className="w-4 h-4 text-muted flex-shrink-0" />
-                <span>{email}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-secondary">
-                <Phone className="w-4 h-4 text-muted flex-shrink-0" />
-                <span>{phone}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-secondary">
-                <MapPin className="w-4 h-4 text-muted flex-shrink-0" />
-                <span>{address}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-secondary">
-                <Calendar className="w-4 h-4 text-muted flex-shrink-0" />
-                <span>Joined {joinedDate}</span>
-              </div>
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+              <span className="flex items-center gap-2 text-sm font-bold text-accent">
+                <Briefcase size={14} strokeWidth={2.5} />
+                {title}
+              </span>
+              {(departments.length > 0 ? departments : [department])
+                .filter(Boolean)
+                .map((dept) => (
+                  <span
+                    key={dept}
+                    className="px-2 py-0.5 rounded-md bg-white/[0.05] border border-white/[0.06] text-[10px] font-black uppercase tracking-widest text-slate-500"
+                  >
+                    {dept}
+                  </span>
+                ))}
             </div>
+          </div>
+
+          {/* Metadata Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-6 border-t border-white/[0.04]">
+            {[
+              { icon: Mail, label: "Email Address", value: email },
+              {
+                icon: Phone,
+                label: "Phone Contact",
+                value: phone || "Not Provided",
+              },
+              {
+                icon: MapPin,
+                label: "Office Location",
+                value: address || "Remote",
+              },
+              { icon: Calendar, label: "Date Joined", value: joinedDate },
+            ].map((item, i) => (
+              <div key={i} className="space-y-1.5">
+                <div className="flex items-center justify-center md:justify-start gap-2">
+                  <item.icon
+                    size={12}
+                    className="text-slate-600"
+                    strokeWidth={2}
+                  />
+                  <p className="text-[9px] font-black uppercase tracking-[0.15em] text-slate-600">
+                    {item.label}
+                  </p>
+                </div>
+                <p className="text-xs font-bold text-slate-300 truncate">
+                  {item.value}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </div>

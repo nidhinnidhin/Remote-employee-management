@@ -1,20 +1,22 @@
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import type { EmailOtpRepository } from '../../../domain/repositories/email-otp.repository';
-import { VerifyResetPasswordOtpInput } from 'src/shared/types/company/otp/verify-reset-password-otp-input.type';
+import type { IEmailOtpRepository } from '../../../domain/repositories/iemail-otp.repository';
+import { VerifyResetPasswordOtpDto } from '../../dto/verify-reset-password-otp.dto';
 import { OTP_MESSAGES } from 'src/shared/constants/messages/otp/otp.messages';
-import { RedisService } from 'src/shared/services/redis.service';
+import type { IRedisService } from 'src/shared/services/redis/interfaces/iredis.service';
+import { IVerifyResetPasswordOtpUseCase } from '../../interfaces/auth/auth-use-case.interface';
 
 @Injectable()
-export class VerifyResetPasswordOtpUseCase {
+export class VerifyResetPasswordOtpUseCase implements IVerifyResetPasswordOtpUseCase {
   constructor(
-    @Inject('EmailOtpRepository')
-    private readonly _otpRepository: EmailOtpRepository,
+    @Inject('IEmailOtpRepository')
+    private readonly _otpRepository: IEmailOtpRepository,
 
-    private readonly _redisService: RedisService,
-  ) {}
+    @Inject('IRedisService')
+    private readonly _redisService: IRedisService,
+  ) { }
 
-  async execute(input: VerifyResetPasswordOtpInput) {
+  async execute(input: VerifyResetPasswordOtpDto) {
     const record = await this._otpRepository.findLatestByEmail(
       input.email.toLowerCase(),
     );

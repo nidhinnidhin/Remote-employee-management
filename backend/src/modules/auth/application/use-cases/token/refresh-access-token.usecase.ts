@@ -5,19 +5,22 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
-import { JwtService } from 'src/shared/services/jwt.service';
-import type { UserRepository } from '../../../domain/repositories/user.repository';
+import type { IUserRepository } from '../../../domain/repositories/iuser.repository';
+import { IRefreshAccessTokenUseCase } from '../../interfaces/auth/auth-use-case.interface';
+import type { IJwtService } from 'src/shared/services/auth/interfaces/ijwt.service';
 import { RefreshTokenPayload } from 'src/shared/types/jwt/jwt-payload.type';
 import { RefreshAccessTokenResponse } from 'src/shared/types/jwt/refresh-access-token-response.type';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
+import { UserRole } from 'src/shared/enums/user/user-role.enum';
 
 @Injectable()
-export class RefreshAccessTokenUseCase {
+export class RefreshAccessTokenUseCase implements IRefreshAccessTokenUseCase {
   constructor(
-    @Inject('UserRepository')
-    private readonly _userRepository: UserRepository,
-    private readonly _jwtService: JwtService,
+    @Inject('IUserRepository')
+    private readonly _userRepository: IUserRepository,
+    @Inject('IJwtService')
+    private readonly _jwtService: IJwtService,
   ) { }
 
   async execute(refreshToken: string): Promise<RefreshAccessTokenResponse> {
@@ -42,7 +45,7 @@ export class RefreshAccessTokenUseCase {
       throw new ForbiddenException(AUTH_MESSAGES.ACCOUNT_NOT_ACTIVE);
     }
 
-    if (user.role === 'COMPANY_ADMIN' && !user.isOnboarded) {
+    if (user.role === UserRole.COMPANY_ADMIN && !user.isOnboarded) {
       throw new ForbiddenException('Onboarding required');
     }
 

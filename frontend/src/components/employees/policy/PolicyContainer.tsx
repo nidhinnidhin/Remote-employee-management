@@ -51,14 +51,14 @@ export function PolicyContainer() {
       case "working-hours":
         return (
           <WorkingHours
-            sections={workingHoursPolicy?.content.sections || []}
+            sections={workingHoursPolicy?.content?.sections || []}
           />
         );
 
       case "leave-policy":
         return (
           <LeavePolicy
-            sections={leavePolicy?.content.sections || []}
+            sections={leavePolicy?.content?.sections || []}
           />
         );
 

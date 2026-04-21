@@ -1,17 +1,22 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { EmailService } from 'src/shared/services/email.service';
-import type { EmailOtpRepository } from '../../../domain/repositories/email-otp.repository';
+import type { IEmailService } from 'src/shared/services/email/interfaces/iemail.service';
+import type { IEmailOtpRepository } from '../../../domain/repositories/iemail-otp.repository';
+import { ISendEmailOtpUseCase } from '../../interfaces/otp/otp-use-case.interface';
 import { EmailOtpEntity } from '../../../domain/entities/email-otp.entity';
 import { SendEmailOtpInput } from 'src/shared/types/company/otp/send-email-otp-input.type';
-import { OtpService } from 'src/shared/services/otp.service';
+import type { IOtpService } from 'src/shared/services/auth/interfaces/iotp.service';
 
 @Injectable()
-export class SendEmailOtpUseCase {
+export class SendEmailOtpUseCase implements ISendEmailOtpUseCase {
   constructor(
-    @Inject('EmailOtpRepository')
-    private readonly _emailOtpRepository: EmailOtpRepository,
-    private readonly _emailService: EmailService,
-    private readonly _otpService: OtpService,
+    @Inject('IEmailOtpRepository')
+    private readonly _emailOtpRepository: IEmailOtpRepository,
+
+    @Inject('IEmailService')
+    private readonly _emailService: IEmailService,
+
+    @Inject('IOtpService')
+    private readonly _otpService: IOtpService,
   ) { }
 
   async execute(input: SendEmailOtpInput): Promise<void> {

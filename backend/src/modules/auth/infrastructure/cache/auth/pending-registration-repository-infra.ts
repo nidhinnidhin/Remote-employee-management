@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRedis } from '@nestjs-modules/ioredis';
 import type { Redis } from 'ioredis';
-import type { PendingRegistrationRepository } from '../../../domain/repositories/cache/auth-repository/pending-registration.repository';
+import type { IPendingRegistrationRepository } from '../../../domain/repositories/cache/auth-repository/ipending-registration.repository';
 import { PendingRegistrationData } from 'src/shared/types/cache/pending-registration.type';
 import { CACHE_MESSAGES } from 'src/shared/constants/messages/cache/cache.messages';
 
 @Injectable()
-export class RedisPendingRegistrationRepository implements PendingRegistrationRepository {
+export class RedisPendingRegistrationRepository implements IPendingRegistrationRepository {
   constructor(@InjectRedis() private readonly redis: Redis) {}
 
   private readonly PREFIX = CACHE_MESSAGES.CACHE_PREFIX;

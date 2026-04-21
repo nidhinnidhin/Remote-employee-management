@@ -1,13 +1,11 @@
 import { requireRole } from "@/lib/auth/unified-auth";
 import { DashboardLayout } from "@/components/employees/dashboard/DashboardLayout";
 import { GreetingHeader } from "@/components/employees/dashboard/GreetingHeader";
-import { StatCards } from "@/components/employees/dashboard/StatCards";
 import { QuickActions } from "@/components/employees/dashboard/QuickActions";
-import { TaskList } from "@/components/employees/dashboard/TaskList";
 import { TeamPresence } from "@/components/employees/dashboard/TeamPresence";
+import EmployeeFocusedDashboard from "@/components/employees/dashboard/EmployeeFocusedDashboard";
 
 export default async function EmployeeDashboardPage() {
-  // Protect the route - only allow EMPLOYEE
   await requireRole("EMPLOYEE");
 
   return (
@@ -15,18 +13,13 @@ export default async function EmployeeDashboardPage() {
       {/* Greeting and Status */}
       <GreetingHeader />
 
-      {/* Summary statistics */}
-      <StatCards />
+      <div className="space-y-12 mt-2">
+        {/* Main Content: Live Focus Dashboard */}
+        <EmployeeFocusedDashboard />
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        {/* Left Column: Quick Actions & Tasks */}
-        <div className="xl:col-span-2 space-y-8">
+        {/* Bottom Sections: Context Widgets */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-8 border-t border-white/[0.05]">
           <QuickActions />
-          <TaskList />
-        </div>
-
-        {/* Right Column: Team Presence */}
-        <div className="xl:col-span-1">
           <TeamPresence />
         </div>
       </div>

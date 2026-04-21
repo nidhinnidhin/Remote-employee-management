@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 import { InviteStatus } from 'src/shared/enums/user/user-invite-status.enum';
 import { UserRole } from 'src/shared/enums/user/user-role.enum';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
@@ -18,12 +18,14 @@ export class UserDocument extends Document {
   @Prop({ required: true, unique: true })
   email: string;
 
-  // 🔹 Make optional properly
   @Prop({ required: false, default: '' })
   phone?: string;
 
   @Prop({ required: true, enum: UserRole })
   role: string;
+
+  @Prop({ required: false })
+  title?: string;
 
   @Prop({ required: false })
   passwordHash?: string;
@@ -35,7 +37,7 @@ export class UserDocument extends Document {
   })
   status: string;
 
-  @Prop()
+  @Prop({ type: Types.ObjectId, ref: 'DepartmentDocument' })
   department?: string;
 
   @Prop({ enum: InviteStatus })

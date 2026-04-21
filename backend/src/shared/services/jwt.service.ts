@@ -4,9 +4,10 @@ import {
   JwtPayload,
   RefreshTokenPayload,
 } from 'src/shared/types/jwt/jwt-payload.type';
+import { IJwtService } from './auth/interfaces/ijwt.service';
 
 @Injectable()
-export class JwtService {
+export class JwtService implements IJwtService {
   generateAccessToken(payload: JwtPayload) {
     console.log("JWT_SERVICE: Generating Access Token for:", payload.userId);
     console.log("JWT_SERVICE: Access Secret present:", !!process.env.JWT_ACCESS_SECRET);

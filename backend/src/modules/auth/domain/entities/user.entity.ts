@@ -11,6 +11,7 @@ export class UserEntity {
     public readonly phone?: string,
     public readonly passwordHash?: string,
     public readonly status?: UserStatus,
+    public readonly title?: string,
     public readonly createdAt?: Date,
     public readonly updatedAt?: Date,
     public readonly companyId?: string,
@@ -53,5 +54,5 @@ export class UserEntity {
       resourceType: string;
       uploadedAt: Date;
     }[],
-  ) { }
+  ) {}
 }

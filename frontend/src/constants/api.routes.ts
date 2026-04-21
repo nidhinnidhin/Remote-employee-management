@@ -34,7 +34,32 @@ export const API_ROUTES = {
             RESEND_INVITE: (id: string) => `/company/employees/${id}/resend-invite`,
             VERIFY_INVITE: "/company/employees/verify-invite",
         },
+        DEPARTMENTS: {
+            GET_ALL: "/departments",
+            GET_MY_DEPARTMENTS: "/departments/my-departments",
+            CREATE: "/departments",
+            UPDATE: (id: string) => `/departments/${id}`,
+            DELETE: (id: string) => `/departments/${id}`,
+            ADD_EMPLOYEE: "/departments/add-employee",
+            REMOVE_EMPLOYEE: "/departments/remove-employee",
+        },
         POLICIES: "/company-policies",
+        PROJECTS: {
+            BASE: "/projects",
+            BY_ID: (id: string) => `/projects/${id}`,
+        },
+        STORIES: {
+            BASE: "/stories",
+            BY_PROJECT: (projectId: string) => `/stories?projectId=${projectId}`,
+            BY_ID: (id: string) => `/stories/${id}`,
+        },
+        TASKS: {
+            BASE: "/tasks",
+            BY_STORY: (storyId: string) => `/tasks?storyId=${storyId}`,
+            BY_ID: (id: string) => `/tasks/${id}`,
+            MOVE: (id: string) => `/tasks/${id}/move`,
+            MY_TASKS: "/tasks/my",
+        },
     },
     SUPER_ADMIN: {
         COMPANIES: "/super-admin/companies",

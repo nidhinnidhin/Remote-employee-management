@@ -23,19 +23,6 @@ export async function loginAction(email: string, password: string): Promise<Auth
 
     const { accessToken, refreshToken, user } = response.data;
 
-    // IF NOT ONBOARDED: Only COMPANY_ADMIN needs onboarding before session creation
-    if (user.role === "COMPANY_ADMIN" && !user.isOnboarded) {
-      console.log("-----------------------------------------");
-      console.log(" LOGIN: ONBOARDING REQUIRED (COMPANY_ADMIN)");
-      console.log(" User:", user.email);
-      console.log("-----------------------------------------");
-
-      return {
-        success: true,
-        data: response.data,
-      };
-    }
-
     // Set backend cookies
     if (accessToken) await setAccessTokenCookie(accessToken);
     if (refreshToken) await setRefreshTokenCookie(refreshToken);

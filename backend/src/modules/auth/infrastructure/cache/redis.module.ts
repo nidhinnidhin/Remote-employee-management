@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { RedisModule } from '@nestjs-modules/ioredis';
 
-import { RedisService } from 'src/shared/services/redis.service';
+import { RedisService } from 'src/shared/services/redis/redis.service';
 
 @Module({
   imports: [
@@ -10,7 +10,13 @@ import { RedisService } from 'src/shared/services/redis.service';
       url: process.env.REDIS_URL,
     }),
   ],
-  providers: [RedisService],
-  exports: [RedisModule, RedisService],
+  providers: [
+    {
+      provide: 'IRedisService',
+      useClass: RedisService,
+    },
+    RedisService,
+  ],
+  exports: [RedisModule, 'IRedisService', RedisService],
 })
 export class AppRedisModule {}
