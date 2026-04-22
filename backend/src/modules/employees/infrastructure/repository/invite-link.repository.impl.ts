@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model, Types, UpdateQuery } from 'mongoose';
 import { IInviteLinkRepository } from '../../domain/repositories/invite-link.repository';
 import { InviteLinkToken } from '../../domain/entities/invite-link-token.entity';
 import { InviteLinkDocument } from '../schema/invite-link.schema';
-
-import { BaseRepository } from 'src/shared/repositories/base.repository';
+import { BaseRepository } from 'src/shared/repositories/base.repository'; // Adjust path
 
 @Injectable()
 export class InviteLinkRepositoryImpl
   extends BaseRepository<InviteLinkDocument, InviteLinkToken>
-  implements IInviteLinkRepository {
+  implements IInviteLinkRepository
+{
   constructor(
     @InjectModel(InviteLinkDocument.name)
     private readonly _inviteLinkModel: Model<InviteLinkDocument>,
@@ -18,15 +18,24 @@ export class InviteLinkRepositoryImpl
     super(_inviteLinkModel);
   }
 
-  // Override create to handle entity to document mapping if needed, 
-  // or use base save(data: Partial<InviteLinkDocument>)
+  protected toEntity(doc: any): InviteLinkToken {
+    return new InviteLinkToken(
+      doc.token,
+      doc.employeeId?.toString(),
+      doc.expiresAt,
+      !!doc.used,
+    );
+  }
+
   async create(token: InviteLinkToken): Promise<void> {
-    await super.save({
+    await this.save({
       token: token.token,
-      employeeId: new Types.ObjectId(token.employeeId),
+      employeeId: new Types.ObjectId(
+        token.employeeId,
+      ) as unknown as Types.ObjectId,
       expiresAt: token.expiresAt,
       used: token.used,
-    } as any);
+    } as Partial<InviteLinkDocument>);
   }
 
   async findByToken(token: string): Promise<InviteLinkToken | null> {
@@ -34,29 +43,21 @@ export class InviteLinkRepositoryImpl
   }
 
   async markAsUsed(token: string): Promise<void> {
-    await this.updateMany({ token }, { $set: { used: true } });
+    await this.updateMany({ token }, {
+      $set: { used: true },
+    } as UpdateQuery<InviteLinkDocument>);
   }
 
   async markAllAsUsedByEmployeeId(employeeId: string): Promise<void> {
-    await this.updateMany(
-      { employeeId: new Types.ObjectId(employeeId) },
-      { $set: { used: true } },
-    );
+    await this.updateMany({ employeeId: new Types.ObjectId(employeeId) }, {
+      $set: { used: true },
+    } as UpdateQuery<InviteLinkDocument>);
   }
 
   async deleteExpiredTokens(): Promise<number> {
-    const result = await this._inviteLinkModel.deleteMany({
+    const result = await this.model.deleteMany({
       expiresAt: { $lt: new Date() },
     });
     return result.deletedCount;
-  }
-
-  protected toEntity(doc: InviteLinkDocument): InviteLinkToken {
-    return new InviteLinkToken(
-      doc.token,
-      doc.employeeId.toString(),
-      doc.expiresAt,
-      doc.used,
-    );
   }
 }

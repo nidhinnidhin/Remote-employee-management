@@ -1,8 +1,13 @@
 import { InviteStatus } from 'src/shared/enums/user/user-invite-status.enum';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 import { Employee } from '../entities/employee.entity';
+import { IBaseRepository } from 'src/shared/repositories/interfaces/base.repository.interface';
+import { UserDocument } from 'src/modules/auth/infrastructure/database/mongoose/schemas/userSchema'; // Adjust path
 
-export interface IEmployeeRepository {
+export interface IEmployeeRepository extends IBaseRepository<
+  UserDocument,
+  Employee
+> {
   create(input: {
     name: string;
     email: string;
@@ -16,16 +21,18 @@ export interface IEmployeeRepository {
     isOnboarded: boolean;
   }): Promise<Employee>;
 
-  updateEmployee(id: string, input: {
-    name?: string;
-    role?: string;
-    department?: string;
-    phone?: string;
-    companyId?: string;
-  }): Promise<void>;
+  updateEmployee(
+    id: string,
+    input: {
+      name?: string;
+      role?: string;
+      department?: string;
+      phone?: string;
+      companyId?: string;
+    },
+  ): Promise<void>;
 
   findByEmail(email: string): Promise<Employee | null>;
-  findById(id: string): Promise<Employee | null>;
   findByIds(ids: string[]): Promise<Employee[]>;
   findAllByCompanyId(companyId: string): Promise<Employee[]>;
   updateStatus(id: string, status: UserStatus): Promise<void>;

@@ -11,6 +11,6 @@ export class ListProjectsUseCase implements IListProjectsUseCase {
   ) {}
 
   async execute(companyId: string): Promise<ProjectEntity[]> {
-    return this._projectRepository.findAll(companyId);
+    return this._projectRepository.findAllByCompanyId(companyId);
   }
 }

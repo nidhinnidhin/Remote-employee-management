@@ -23,7 +23,7 @@ export class CreateTaskUseCase implements ICreateTaskUseCase {
     adminId: string,
     taskDto: CreateTaskDto,
   ): Promise<TaskEntity> {
-    const project = await this._projectRepository.findById(
+    const project = await this._projectRepository.findByIdAndCompany(
       taskDto.projectId,
       companyId,
     );
@@ -31,7 +31,7 @@ export class CreateTaskUseCase implements ICreateTaskUseCase {
       throw new NotFoundException('Project not found');
     }
 
-    const story = await this._storyRepository.findById(
+    const story = await this._storyRepository.findByIdAndCompany(
       taskDto.storyId,
       companyId,
     );

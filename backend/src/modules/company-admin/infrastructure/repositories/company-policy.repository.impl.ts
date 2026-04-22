@@ -1,15 +1,13 @@
-// infrastructure/repositories/company-policy.repository.impl.ts
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { CompanyPolicy } from '../schema/company-policy.schema';
 import { ICompanyPolicyRepository } from '../../domain/repositories/company-policy.repository';
 import {
   CompanyPolicyEntity,
   PolicyItemEntity,
 } from '../../domain/entities/company-policy.entity';
-
-import { BaseRepository } from 'src/shared/repositories/base.repository';
+import { BaseRepository } from 'src/shared/repositories/base.repository'; // Adjust path
 
 @Injectable()
 export class CompanyPolicyRepositoryImpl
@@ -36,13 +34,19 @@ export class CompanyPolicyRepositoryImpl
     return companyDoc.policies;
   }
 
-  protected toEntity(companyPolicy: CompanyPolicy): CompanyPolicyEntity {
+  protected toEntity(
+    companyPolicy: CompanyPolicy & {
+      _id?: Types.ObjectId;
+      createdAt?: Date;
+      updatedAt?: Date;
+    },
+  ): CompanyPolicyEntity {
     return new CompanyPolicyEntity(
-      (companyPolicy as any)._id.toString(),
+      (companyPolicy._id as Types.ObjectId).toString(),
       companyPolicy.companyId,
       this.toPolicyItems(companyPolicy.policies ?? []),
-      (companyPolicy as any).createdAt,
-      (companyPolicy as any).updatedAt,
+      companyPolicy.createdAt ?? new Date(),
+      companyPolicy.updatedAt ?? new Date(),
     );
   }
 

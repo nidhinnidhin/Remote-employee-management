@@ -21,7 +21,7 @@ export class CreateUserStoryUseCase implements ICreateUserStoryUseCase {
     adminId: string,
     storyDto: CreateStoryDto,
   ): Promise<UserStoryEntity> {
-    const project = await this._projectRepository.findById(
+    const project = await this._projectRepository.findByIdAndCompany(
       storyDto.projectId,
       companyId,
     );

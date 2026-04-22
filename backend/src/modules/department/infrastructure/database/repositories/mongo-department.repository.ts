@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model, Types, UpdateQuery } from 'mongoose';
 
 import { BaseRepository } from 'src/shared/repositories/base.repository';
 import { IDepartmentRepository } from '../../../domain/repositories/idepartment.repository';
@@ -10,7 +10,8 @@ import { DepartmentDocument } from '../mongoose/schemas/department.schema';
 @Injectable()
 export class MongoDepartmentRepository
   extends BaseRepository<DepartmentDocument, DepartmentEntity>
-  implements IDepartmentRepository {
+  implements IDepartmentRepository
+{
   constructor(
     @InjectModel(DepartmentDocument.name)
     private readonly _departmentModel: Model<DepartmentDocument>,
@@ -18,42 +19,35 @@ export class MongoDepartmentRepository
     super(_departmentModel);
   }
 
-  protected toEntity(departmentDoc: DepartmentDocument): DepartmentEntity {
+  protected toEntity(departmentDoc: any): DepartmentEntity {
     return new DepartmentEntity(
-      (departmentDoc._id as Types.ObjectId).toString(),
+      departmentDoc._id?.toString(),
       departmentDoc.name,
       departmentDoc.companyId,
-      departmentDoc.employeeIds,
-      departmentDoc.createdAt,
-      departmentDoc.updatedAt,
+      departmentDoc.employeeIds || [],
+      departmentDoc.createdAt || new Date(),
+      departmentDoc.updatedAt || new Date(),
     );
   }
 
   async create(departmentEntity: DepartmentEntity): Promise<DepartmentEntity> {
-    const created = new this._departmentModel({
+    return this.save({
       name: departmentEntity.name,
       companyId: departmentEntity.companyId,
       employeeIds: departmentEntity.employeeIds,
-    });
-
-    const saved = await created.save();
-    return this.toEntity(saved);
+    } as Partial<DepartmentDocument>);
   }
 
-  async findAllByCompanyId(companyId: string) {
-    return super.findAllByCompanyId(companyId);
-  }
-
-  async findById(id: string): Promise<DepartmentEntity | null> {
-    return super.findById(id);
+  async findAllByCompanyId(companyId: string): Promise<DepartmentEntity[]> {
+    return this.findAll({ companyId });
   }
 
   async update(id: string, name: string): Promise<void> {
-    await this._departmentModel.updateOne({ _id: id }, { name });
+    await this.model.updateOne({ _id: id }, { name });
   }
 
   async delete(id: string): Promise<void> {
-    await this._departmentModel.deleteOne({ _id: id });
+    await this.model.deleteOne({ _id: id });
   }
 
   async existsByNameAndCompany(
@@ -66,26 +60,22 @@ export class MongoDepartmentRepository
     });
   }
 
-  async addEmployee(departmentId: string, employeeId: string) {
-    await this._departmentModel.updateOne(
-      { _id: departmentId },
-      { $addToSet: { employeeIds: employeeId } },
-    );
+  async addEmployee(departmentId: string, employeeId: string): Promise<void> {
+    await this.model.updateOne({ _id: departmentId }, {
+      $addToSet: { employeeIds: employeeId },
+    } as UpdateQuery<DepartmentDocument>);
   }
 
-  async removeEmployee(departmentId: string, employeeId: string) {
-    await this._departmentModel.updateOne(
-      { _id: departmentId },
-      { $pull: { employeeIds: employeeId } },
-    );
+  async removeEmployee(
+    departmentId: string,
+    employeeId: string,
+  ): Promise<void> {
+    await this.model.updateOne({ _id: departmentId }, {
+      $pull: { employeeIds: employeeId },
+    } as UpdateQuery<DepartmentDocument>);
   }
 
   async findAllByEmployeeId(employeeId: string): Promise<DepartmentEntity[]> {
-    const docs = (await this._departmentModel
-      .find({ employeeIds: employeeId })
-      .lean()
-      .exec()) as unknown as DepartmentDocument[];
-
-    return docs.map((doc) => this.toEntity(doc));
+    return this.findAll({ employeeIds: employeeId });
   }
 }

@@ -24,7 +24,7 @@ export class UpdateTaskUseCase implements IUpdateTaskUseCase {
     role: string,
     taskDto: UpdateTaskDto,
   ): Promise<TaskEntity> {
-    const task = await this._taskRepository.findById(id, companyId);
+    const task = await this._taskRepository.findByIdAndCompany(id, companyId);
     if (!task) {
       throw new NotFoundException('Task not found');
     }
@@ -39,7 +39,7 @@ export class UpdateTaskUseCase implements IUpdateTaskUseCase {
       dueDate: taskDto.dueDate ? new Date(taskDto.dueDate) : undefined,
     };
 
-    const updated = await this._taskRepository.update(
+    const updated = await this._taskRepository.updateTask(
       id,
       companyId,
       updateData,

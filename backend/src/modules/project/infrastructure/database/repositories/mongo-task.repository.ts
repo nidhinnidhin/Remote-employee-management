@@ -5,105 +5,115 @@ import { TaskEntity } from '../../../domain/entities/task.entity';
 import type { ITaskRepository } from '../../../domain/repositories/task.repository.interface';
 import { TaskDocument } from '../mongoose/schemas/task.schema';
 import { TaskStatus } from 'src/shared/enums/project/task-status.enum';
+import { BaseRepository } from 'src/shared/repositories/base.repository'; // Adjust path
 
 @Injectable()
-export class MongoTaskRepository implements ITaskRepository {
+export class MongoTaskRepository
+  extends BaseRepository<TaskDocument, TaskEntity>
+  implements ITaskRepository
+{
   constructor(
     @InjectModel(TaskDocument.name)
     private readonly _taskModel: Model<TaskDocument>,
-  ) {}
+  ) {
+    super(_taskModel);
+  }
 
-  private toEntity(taskDocument: TaskDocument): TaskEntity {
+  protected toEntity(taskDoc: any): TaskEntity {
     return new TaskEntity(
-      (taskDocument._id as Types.ObjectId).toString(),
-      taskDocument.companyId,
-      taskDocument.projectId?.toString(),
-      taskDocument.storyId?.toString(),
-      taskDocument.title,
-      taskDocument.status as TaskStatus,
-      taskDocument.order,
-      taskDocument.createdBy,
-      taskDocument.description,
-      taskDocument.assignedTo?.toString(),
-      taskDocument.assignedBy?.toString(),
-      taskDocument.estimatedHours,
-      taskDocument.actualHours,
-      taskDocument.dueDate,
-      taskDocument.createdAt,
-      taskDocument.updatedAt,
-      taskDocument.isDeleted,
+      taskDoc._id?.toString() || taskDoc.id,
+      taskDoc.companyId,
+      taskDoc.projectId?.toString(),
+      taskDoc.storyId?.toString(),
+      taskDoc.title,
+      (taskDoc.status as TaskStatus) || TaskStatus.TODO, 
+      taskDoc.order || 0,
+      taskDoc.createdBy,
+      taskDoc.description || '',
+      taskDoc.assignedTo?.toString(),
+      taskDoc.assignedBy?.toString(),
+      taskDoc.estimatedHours || 0,
+      taskDoc.actualHours || 0,
+      taskDoc.dueDate,
+      taskDoc.createdAt || new Date(),
+      taskDoc.updatedAt || new Date(),
+      !!taskDoc.isDeleted,
     );
   }
 
   async create(task: Partial<TaskEntity>): Promise<TaskEntity> {
-    const created = new this._taskModel({
+    return this.save({
       ...task,
       isDeleted: false,
-    });
-    const saved = await created.save();
-    return this.toEntity(saved);
+    } as Partial<TaskDocument>);
   }
 
-  async findById(id: string, companyId: string): Promise<TaskEntity | null> {
+  async findByIdAndCompany(
+    id: string,
+    companyId: string,
+  ): Promise<TaskEntity | null> {
     if (!Types.ObjectId.isValid(id)) return null;
-    const doc = await this._taskModel
-      .findOne({ _id: id, companyId, isDeleted: false })
-      .exec();
-    return doc ? this.toEntity(doc) : null;
+    return this.findOne({ _id: id, companyId, isDeleted: false });
   }
 
   async findByStoryId(
     storyId: string,
     companyId: string,
   ): Promise<TaskEntity[]> {
-    const taskDocument = await this._taskModel
+    const docs = (await this.model
       .find({ storyId, companyId, isDeleted: false })
       .sort({ order: 1 })
-      .exec();
-    return taskDocument.map((doc) => this.toEntity(doc));
+      .lean()
+      .exec()) as any[];
+
+    return docs.map((doc) => this.toEntity(doc));
   }
 
   async findByProjectId(
     projectId: string,
     companyId: string,
   ): Promise<TaskEntity[]> {
-    const docs = await this._taskModel
-      .find({ projectId, companyId, isDeleted: false })
-      .exec();
-    return docs.map((doc) => this.toEntity(doc));
+    return this.findAll({ projectId, companyId, isDeleted: false });
   }
 
   async findByAssignee(
     assigneeId: string,
     companyId: string,
   ): Promise<TaskEntity[]> {
-    const docs = await this._taskModel
-      .find({ assignedTo: assigneeId, companyId, isDeleted: false })
-      .exec();
-    return docs.map((doc) => this.toEntity(doc));
+    return this.findAll({
+      assignedTo: assigneeId,
+      companyId,
+      isDeleted: false,
+    });
   }
 
-  async update(
+  async updateTask(
     id: string,
     companyId: string,
     task: Partial<TaskEntity>,
   ): Promise<TaskEntity | null> {
     if (!Types.ObjectId.isValid(id)) return null;
-    const doc = await this._taskModel
+
+    // We use the raw model here because the generic updateById doesn't check for companyId
+    const doc = (await this.model
       .findOneAndUpdate(
         { _id: id, companyId, isDeleted: false },
         { $set: task },
         { new: true },
       )
-      .exec();
+      .lean()
+      .exec()) as TaskDocument | null;
+
     return doc ? this.toEntity(doc) : null;
   }
 
-  async softDelete(id: string, companyId: string): Promise<boolean> {
+  async softDeleteTask(id: string, companyId: string): Promise<boolean> {
     if (!Types.ObjectId.isValid(id)) return false;
-    const result = await this._taskModel
+
+    const result = await this.model
       .updateOne({ _id: id, companyId }, { $set: { isDeleted: true } })
       .exec();
+
     return result.modifiedCount > 0;
   }
 }

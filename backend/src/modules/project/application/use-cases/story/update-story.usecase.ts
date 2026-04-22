@@ -17,7 +17,7 @@ export class UpdateUserStoryUseCase implements IUpdateUserStoryUseCase {
     adminId: string,
     storyDto: UpdateStoryDto,
   ): Promise<UserStoryEntity> {
-    const updated = await this._storyRepository.update(
+    const updated = await this._storyRepository.updateStory(
       id,
       companyId,
       storyDto as Partial<UserStoryEntity>,

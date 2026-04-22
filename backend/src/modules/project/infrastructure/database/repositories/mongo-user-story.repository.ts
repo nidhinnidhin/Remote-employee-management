@@ -1,90 +1,113 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model, Types, FlattenMaps } from 'mongoose';
 import { UserStoryEntity } from '../../../domain/entities/user-story.entity';
 import type { IUserStoryRepository } from '../../../domain/repositories/user-story.repository.interface';
 import { UserStoryDocument } from '../mongoose/schemas/user-story.schema';
 import { UserStoryStatus } from 'src/shared/enums/project/user-story-status.enum';
 import { UserStoryPriority } from 'src/shared/enums/project/user-story-priority.enum';
+import { BaseRepository } from 'src/shared/repositories/base.repository'; // Adjust path
+
+// Strict type for leaned documents to avoid using 'any'
+type LeanStoryDocument = FlattenMaps<UserStoryDocument> & {
+  _id: Types.ObjectId;
+};
 
 @Injectable()
-export class MongoUserStoryRepository implements IUserStoryRepository {
+export class MongoUserStoryRepository
+  extends BaseRepository<UserStoryDocument, UserStoryEntity>
+  implements IUserStoryRepository
+{
   constructor(
     @InjectModel(UserStoryDocument.name)
     private readonly _storyModel: Model<UserStoryDocument>,
-  ) {}
+  ) {
+    super(_storyModel);
+  }
 
-  private toEntity(userDocument: UserStoryDocument): UserStoryEntity {
+  // Accepts both full Mongoose documents and leaned plain objects
+  protected toEntity(
+    userDocument: UserStoryDocument | LeanStoryDocument,
+  ): UserStoryEntity {
     return new UserStoryEntity(
-      (userDocument._id as Types.ObjectId).toString(),
+      userDocument._id.toString(),
       userDocument.companyId,
       userDocument.projectId?.toString(),
       userDocument.title,
-      userDocument.status as UserStoryStatus,
-      userDocument.priority as UserStoryPriority,
-      userDocument.order,
+      (userDocument.status as UserStoryStatus) || UserStoryStatus.TODO,
+      (userDocument.priority as UserStoryPriority) || UserStoryPriority.MEDIUM,
+      userDocument.order || 0,
       userDocument.createdBy,
-      userDocument.description,
-      userDocument.acceptanceCriteria,
+      userDocument.description || '',
+      userDocument.acceptanceCriteria || '',
       userDocument.assigneeId?.toString(),
-      userDocument.createdAt,
-      userDocument.updatedAt,
-      userDocument.isDeleted,
+      userDocument.createdAt || new Date(),
+      userDocument.updatedAt || new Date(),
+      !!userDocument.isDeleted,
     );
   }
 
+  // Override create to enforce isDeleted: false
   async create(story: Partial<UserStoryEntity>): Promise<UserStoryEntity> {
-    const created = new this._storyModel({
+    return this.save({
       ...story,
       isDeleted: false,
-    });
-    const saved = await created.save();
-    return this.toEntity(saved);
+    } as Partial<UserStoryDocument>);
   }
 
-  async findById(
+  async findByIdAndCompany(
     id: string,
     companyId: string,
   ): Promise<UserStoryEntity | null> {
     if (!Types.ObjectId.isValid(id)) return null;
-    const doc = await this._storyModel
-      .findOne({ _id: id, companyId, isDeleted: false })
-      .exec();
-    return doc ? this.toEntity(doc) : null;
+    // Safely utilize the generic findOne
+    return this.findOne({ _id: id, companyId, isDeleted: false });
   }
 
   async findByProjectId(
     projectId: string,
     companyId: string,
   ): Promise<UserStoryEntity[]> {
-    const docs = await this._storyModel
+    // Let TypeScript infer the type naturally without the "as any" cast
+    const docs = await this.model
       .find({ projectId, companyId, isDeleted: false })
       .sort({ order: 1 })
+      .lean()
       .exec();
-    return docs.map((doc) => this.toEntity(doc));
+
+    // Cast to unknown first, then to LeanStoryDocument to safely map it for TS
+    return docs.map((doc) =>
+      this.toEntity(doc as unknown as LeanStoryDocument),
+    );
   }
 
-  async update(
+  async updateStory(
     id: string,
     companyId: string,
     story: Partial<UserStoryEntity>,
   ): Promise<UserStoryEntity | null> {
     if (!Types.ObjectId.isValid(id)) return null;
-    const doc = await this._storyModel
+
+    // Let TypeScript infer the type naturally without the "as any" cast
+    const doc = await this.model
       .findOneAndUpdate(
         { _id: id, companyId, isDeleted: false },
         { $set: story },
         { new: true },
       )
+      .lean()
       .exec();
-    return doc ? this.toEntity(doc) : null;
+
+    return doc ? this.toEntity(doc as unknown as LeanStoryDocument) : null;
   }
 
-  async softDelete(id: string, companyId: string): Promise<boolean> {
+  async softDeleteStory(id: string, companyId: string): Promise<boolean> {
     if (!Types.ObjectId.isValid(id)) return false;
-    const result = await this._storyModel
+
+    const result = await this.model
       .updateOne({ _id: id, companyId }, { $set: { isDeleted: true } })
       .exec();
+
     return result.modifiedCount > 0;
   }
 }

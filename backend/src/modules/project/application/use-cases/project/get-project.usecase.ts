@@ -11,7 +11,7 @@ export class GetProjectUseCase implements IGetProjectUseCase {
   ) {}
 
   async execute(id: string, companyId: string): Promise<ProjectEntity> {
-    const project = await this._projectRepository.findById(id, companyId);
+    const project = await this._projectRepository.findByIdAndCompany(id, companyId);
     if (!project) {
       throw new NotFoundException('Project not found');
     }
