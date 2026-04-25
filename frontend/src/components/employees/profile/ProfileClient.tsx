@@ -11,6 +11,7 @@ import { UserProfile } from "@/app/employee/profile/page";
 import { ProfileHeader } from "./ProfileHeader";
 import { SkillsForm } from "./SkillsForm";
 import DocumentVault from "./DocumentsForm";
+import { formatDate } from "@/lib/date/date-format";
 
 export default function ProfileClient({ user }: { user: UserProfile }) {
   const [activeTab, setActiveTab] = useState<ProfileTab>("personal-info");
@@ -50,7 +51,7 @@ export default function ProfileClient({ user }: { user: UserProfile }) {
           email={user.email}
           phone={user.phone}
           address={fullAddress}
-          joinedDate={new Date(user.createdAt).toLocaleDateString()}
+          joinedDate={formatDate(user.createdAt)}
           avatarUrl={avatarUrl}
           onAvatarUploaded={(url) => setAvatarUrl(url)}
         />

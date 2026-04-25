@@ -22,6 +22,7 @@ import Button from "@/components/ui/Button";
 import OtpInput from "@/components/ui/OtpInput";
 import { useOtpTimer } from "@/hooks/otp/use-otp-timer";
 import { API_ROUTES } from "@/constants/api.routes";
+import { formatDate } from "@/lib/date/date-format";
 
 interface PersonalInfoFormData {
   firstName: string;
@@ -389,7 +390,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
               Joined On
             </span>
             <span className="text-sm text-secondary">
-              {new Date(user.createdAt).toLocaleDateString()}
+              {formatDate(user.createdAt)}
             </span>
           </div>
           <div className="flex flex-col gap-1">

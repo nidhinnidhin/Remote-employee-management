@@ -8,8 +8,11 @@ import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 import { UserRole } from 'src/shared/enums/user/user-role.enum';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { DocumentPayload } from 'src/shared/types/profile/document.type';
-import { PopulatedDepartment } from 'src/shared/types/profile/populated-department.type';
 import { BaseRepository } from 'src/shared/repositories/base.repository';
+import {
+  LeanUserDocument,
+  UserMapper,
+} from 'src/modules/auth/application/mappers/user.mapper';
 
 @Injectable()
 export class MongoUserRepository
@@ -23,54 +26,8 @@ export class MongoUserRepository
     super(_userModel);
   }
 
-  protected toEntity(user: UserDocument): UserEntity {
-    const departmentValue =
-      user.department && typeof user.department === 'object'
-        ? (user.department as unknown as PopulatedDepartment).name ||
-          (user.department as unknown as PopulatedDepartment)._id?.toString()
-        : user.department?.toString();
-
-    return new UserEntity(
-      (user._id as Types.ObjectId).toString(),
-      user.firstName,
-      user.lastName,
-      user.email,
-      user.role,
-      user.phone,
-      user.passwordHash,
-      user.status as UserStatus,
-      user.title,
-      user.createdAt,
-      user.updatedAt,
-      user.companyId,
-      departmentValue,
-      user.inviteStatus,
-      user.hasPassword,
-      user.dateOfBirth,
-      user.gender,
-      user.maritalStatus,
-      user.nationality,
-      user.bloodGroup,
-      user.timeZone,
-      user.bio,
-      user.streetAddress,
-      user.city,
-      user.state,
-      user.country,
-      user.zipCode,
-      user.emergencyContactName,
-      user.emergencyContactPhone,
-      user.emergencyContactRelation,
-      user.linkedInUrl,
-      user.personalWebsite,
-      user.profileImageUrl,
-      user.profileImagePublicId,
-      user.skills,
-      user.isOnboarded,
-      user.provider,
-      user.providerId,
-      user.documents,
-    );
+  protected toEntity(user: UserDocument | LeanUserDocument): UserEntity {
+    return UserMapper.toDomain(user);
   }
 
   async findById(id: string): Promise<UserEntity | null> {
@@ -85,22 +42,8 @@ export class MongoUserRepository
   }
 
   async create(user: UserEntity): Promise<UserEntity> {
-    return this.save({
-      companyId: user.companyId,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      phone: user.phone,
-      role: user.role,
-      passwordHash: user.passwordHash,
-      status: user.status,
-      department: user.department,
-      inviteStatus: user.inviteStatus,
-      hasPassword: user.hasPassword,
-      isOnboarded: user.isOnboarded,
-      provider: user.provider,
-      providerId: user.providerId,
-    } as Partial<UserDocument>);
+    const persistenceData = UserMapper.toPersistence(user);
+    return this.save(persistenceData);
   }
 
   async findAllByCompanyIdAndRole(

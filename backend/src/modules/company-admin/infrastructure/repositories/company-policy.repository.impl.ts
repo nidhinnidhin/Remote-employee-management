@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { CompanyPolicy } from '../schema/company-policy.schema';
 import { ICompanyPolicyRepository } from '../../domain/repositories/company-policy.repository';
 import {
   CompanyPolicyEntity,
   PolicyItemEntity,
 } from '../../domain/entities/company-policy.entity';
-import { BaseRepository } from 'src/shared/repositories/base.repository'; // Adjust path
+import { BaseRepository } from 'src/shared/repositories/base.repository';
+import { CompanyPolicyMapper, LeanCompanyPolicyDocument } from '../../application/mappers/company-policy.mapper';
 
 @Injectable()
 export class CompanyPolicyRepositoryImpl
@@ -21,6 +22,11 @@ export class CompanyPolicyRepositoryImpl
     super(_companyPolicyModel);
   }
 
+  protected toEntity(doc: CompanyPolicy | LeanCompanyPolicyDocument): CompanyPolicyEntity {
+    return CompanyPolicyMapper.toDomain(doc);
+  }
+
+
   async upsertCompanyPolicies(
     companyId: string,
     policies: PolicyItemEntity[],
@@ -30,35 +36,9 @@ export class CompanyPolicyRepositoryImpl
 
   async getCompanyPolicies(companyId: string): Promise<PolicyItemEntity[]> {
     const companyDoc = await this.findOne({ companyId });
+    
     if (!companyDoc) return [];
-    return companyDoc.policies;
-  }
-
-  protected toEntity(
-    companyPolicy: CompanyPolicy & {
-      _id?: Types.ObjectId;
-      createdAt?: Date;
-      updatedAt?: Date;
-    },
-  ): CompanyPolicyEntity {
-    return new CompanyPolicyEntity(
-      (companyPolicy._id as Types.ObjectId).toString(),
-      companyPolicy.companyId,
-      this.toPolicyItems(companyPolicy.policies ?? []),
-      companyPolicy.createdAt ?? new Date(),
-      companyPolicy.updatedAt ?? new Date(),
-    );
-  }
-
-  private toPolicyItems(policies: any[]): PolicyItemEntity[] {
-    return policies.map(
-      (p) =>
-        new PolicyItemEntity(
-          p.type,
-          p.title,
-          p.content ?? { sections: [] },
-          p.isActive ?? true,
-        ),
-    );
+    
+    return companyDoc.policies; 
   }
 }

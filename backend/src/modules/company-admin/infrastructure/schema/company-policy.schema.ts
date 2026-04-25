@@ -1,10 +1,22 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
+export interface PolicyItem {
+  type: string;
+  title: string;
+  content: {
+    sections: Array<{
+      title: string;
+      points: string[];
+    }>;
+  };
+  isActive: boolean;
+}
+
 @Schema({ timestamps: true })
 export class CompanyPolicy extends Document {
   @Prop({ required: true, unique: true })
-  companyId: string;
+  companyId!: string;
 
   @Prop({
     type: [
@@ -24,7 +36,8 @@ export class CompanyPolicy extends Document {
     ],
     default: [],
   })
-  policies: any[];
+  policies!: PolicyItem[];
+  
 }
 
 export const CompanyPolicySchema = SchemaFactory.createForClass(CompanyPolicy);

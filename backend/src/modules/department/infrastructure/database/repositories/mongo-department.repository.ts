@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types, UpdateQuery } from 'mongoose';
+import { Model, UpdateQuery } from 'mongoose';
 
 import { BaseRepository } from 'src/shared/repositories/base.repository';
 import { IDepartmentRepository } from '../../../domain/repositories/idepartment.repository';
 import { DepartmentEntity } from '../../../domain/entities/department.entity';
 import { DepartmentDocument } from '../mongoose/schemas/department.schema';
-
+import {
+  DepartmentMapper,
+  LeanDepartmentDocument,
+} from 'src/modules/department/application/mappers/department.mapper';
 @Injectable()
 export class MongoDepartmentRepository
   extends BaseRepository<DepartmentDocument, DepartmentEntity>
@@ -19,23 +22,15 @@ export class MongoDepartmentRepository
     super(_departmentModel);
   }
 
-  protected toEntity(departmentDoc: any): DepartmentEntity {
-    return new DepartmentEntity(
-      departmentDoc._id?.toString(),
-      departmentDoc.name,
-      departmentDoc.companyId,
-      departmentDoc.employeeIds || [],
-      departmentDoc.createdAt || new Date(),
-      departmentDoc.updatedAt || new Date(),
-    );
+  protected toEntity(
+    departmentDoc: DepartmentDocument | LeanDepartmentDocument,
+  ): DepartmentEntity {
+    return DepartmentMapper.toDomain(departmentDoc);
   }
 
   async create(departmentEntity: DepartmentEntity): Promise<DepartmentEntity> {
-    return this.save({
-      name: departmentEntity.name,
-      companyId: departmentEntity.companyId,
-      employeeIds: departmentEntity.employeeIds,
-    } as Partial<DepartmentDocument>);
+    const persistenceData = DepartmentMapper.toPersistence(departmentEntity);
+    return this.save(persistenceData);
   }
 
   async findAllByCompanyId(companyId: string): Promise<DepartmentEntity[]> {

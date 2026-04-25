@@ -1,14 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types, FlattenMaps } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { ProjectEntity } from '../../../domain/entities/project.entity';
 import type { IProjectRepository } from '../../../domain/repositories/project.repository.interface';
 import { ProjectDocument } from '../mongoose/schemas/project.schema';
-import { ProjectStatus } from 'src/shared/enums/project/project-status.enum';
 import { BaseRepository } from 'src/shared/repositories/base.repository';
-
-// Strict type for leaned documents
-type LeanProjectDocument = FlattenMaps<ProjectDocument> & { _id: Types.ObjectId };
+import { LeanProjectDocument, ProjectMapper } from 'src/modules/project/application/mappers/project.mapper';
 
 @Injectable()
 export class MongoProjectRepository 
@@ -22,27 +19,15 @@ export class MongoProjectRepository
     super(_projectModel);
   }
 
-  // Strictly typed with heavy fallbacks to prevent 500 crashes
   protected toEntity(projectDoc: ProjectDocument | LeanProjectDocument): ProjectEntity {
-    return new ProjectEntity(
-      projectDoc._id.toString(),
-      projectDoc.companyId,
-      projectDoc.name || 'Unnamed Project',
-      (projectDoc.status as ProjectStatus) || ProjectStatus.PLANNING,
-      projectDoc.createdBy?.toString() || '',
-      projectDoc.description || '',
-      projectDoc.startDate || new Date(), // Prevents date crashing
-      projectDoc.endDate || new Date(),   // Prevents date crashing
-      projectDoc.createdAt || new Date(),
-      projectDoc.updatedAt || new Date(),
-      !!projectDoc.isDeleted,
-    );
+    return ProjectMapper.toDomain(projectDoc);
   }
 
   async create(project: Partial<ProjectEntity>): Promise<ProjectEntity> {
+    const persistenceData = ProjectMapper.toPersistence(project);
     return this.save({
-      ...project,
-      isDeleted: false,
+      ...persistenceData,
+      isDeleted: false, 
     } as Partial<ProjectDocument>);
   }
 

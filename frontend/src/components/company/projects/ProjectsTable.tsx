@@ -8,6 +8,7 @@ import { Column } from "@/shared/types/ui/table-props.type";
 import { Project } from "@/shared/types/company/projects/project.type";
 import ProjectStatusBadge from "./ProjectStatusBadge";
 import Button from "@/components/ui/Button";
+import { formatDate } from "@/lib/date/date-format";
 
 interface ProjectsTableProps {
   projects: Project[];
@@ -43,7 +44,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
       accessor: (project) => (
         <div className="flex items-center gap-2 text-xs text-secondary">
           <Calendar size={12} className="text-muted" />
-          {project.startDate ? new Date(project.startDate).toLocaleDateString() : "N/A"}
+          {project.startDate ? formatDate(project.startDate) : "N/A"}
         </div>
       ),
     },
@@ -52,7 +53,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
       accessor: (project) => (
         <div className="flex items-center gap-2 text-xs text-secondary">
           <Calendar size={12} className="text-muted" />
-          {project.endDate ? new Date(project.endDate).toLocaleDateString() : "N/A"}
+          {project.endDate ? formatDate(project.endDate) : "N/A"}
         </div>
       ),
     },

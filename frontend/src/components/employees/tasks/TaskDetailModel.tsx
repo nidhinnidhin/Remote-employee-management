@@ -5,6 +5,7 @@ import BaseModal from "@/components/ui/BaseModal";
 import { Task } from "@/shared/types/company/projects/task.type";
 import { Clock, Calendar, Hash, AlignLeft, User, CheckCircle2 } from "lucide-react";
 import TaskStatusBadge from "@/components/admin/tasks/TaskStatusBadge";
+import { formatDate, formatTime } from "@/lib/date/date-format";
 
 interface TaskDetailModalProps {
   task: Task | null;
@@ -18,7 +19,7 @@ export default function TaskDetailModal({ task, isOpen, onClose }: TaskDetailMod
   const detailItems = [
     { label: "Estimated", value: `${task.estimatedHours || 0} hrs`, icon: Clock },
     { label: "Actual Spent", value: `${task.actualHours || 0} hrs`, icon: CheckCircle2 },
-    { label: "Due Date", value: task.dueDate ? new Date(task.dueDate).toLocaleDateString() : "No Date", icon: Calendar },
+    { label: "Due Date", value: task.dueDate ? formatDate(task.dueDate) : "No Date", icon: Calendar },
     { label: "Task ID", value: task.id.slice(-8).toUpperCase(), icon: Hash },
   ];
 
@@ -70,11 +71,11 @@ export default function TaskDetailModal({ task, isOpen, onClose }: TaskDetailMod
         {/* Timestamps */}
         <div className="flex items-center justify-between py-4 border-t border-white/[0.05]">
            <div className="text-[10px] text-slate-600">
-             Created: {new Date(task.createdAt).toLocaleDateString()}
+             Created: {formatDate(task.createdAt)}
            </div>
-           <div className="text-[10px] text-slate-600">
-             Last Sync: {new Date(task.updatedAt).toLocaleTimeString()}
-           </div>
+            <div className="text-[10px] text-slate-600">
+              Last Sync: {formatTime(task.updatedAt)}
+            </div>
         </div>
       </div>
     </BaseModal>

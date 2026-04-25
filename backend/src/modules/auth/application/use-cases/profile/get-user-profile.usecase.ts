@@ -35,7 +35,6 @@ export class GetUserProfileUseCase implements IGetUserProfileUseCase {
       await this.checkCompanySuspension(user.companyId);
     }
 
-    // List all departments the user belongs to
     const departments = await this._departmentRepository.findAllByEmployeeId(userId);
     const departmentNames = departments.map(d => d.name);
 

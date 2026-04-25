@@ -6,58 +6,43 @@ import { EmailOtpEntity } from '../../../domain/entities/email-otp.entity';
 import { IEmailOtpRepository } from '../../../domain/repositories/iemail-otp.repository';
 import { OtpPurpose } from 'src/shared/enums/reset-password/otp-purpose.enum';
 import { EmailOtpDocument } from '../mongoose/schemas/email-otp.schema';
+import {
+  EmailOtpMapper,
+  LeanEmailOtpDocument,
+} from 'src/modules/auth/application/mappers/email-otp.mapper';
 
 @Injectable()
-export class MongoEmailOtpRepository 
-  extends BaseRepository<EmailOtpDocument, EmailOtpEntity> 
-  implements IEmailOtpRepository 
+export class MongoEmailOtpRepository
+  extends BaseRepository<EmailOtpDocument, EmailOtpEntity>
+  implements IEmailOtpRepository
 {
   constructor(
     @InjectModel('EmailOtp')
     private readonly _emailOtpModel: Model<EmailOtpDocument>,
   ) {
-    // Pass the model up to the BaseRepository
-    super(_emailOtpModel); 
+    super(_emailOtpModel);
   }
 
-  // Must be protected to match the abstract BaseRepository
-  protected toEntity(otp: EmailOtpDocument): EmailOtpEntity {
-    return new EmailOtpEntity(
-      (otp._id as import('mongoose').Types.ObjectId).toString(),
-      otp.userId,
-      otp.email,
-      otp.otpHash,
-      otp.expiresAt,
-      otp.verified,
-      otp.createdAt,
-      otp.newEmail,
-      otp.purpose,
-    );
+  protected toEntity(
+    otp: EmailOtpDocument | LeanEmailOtpDocument,
+  ): EmailOtpEntity {
+    return EmailOtpMapper.toDomain(otp);
   }
 
   async create(otp: EmailOtpEntity): Promise<void> {
-    // Utilize the generic save() method from the BaseRepository
-    await this.save({
-      userId: otp.userId,
-      email: otp.email,
-      otpHash: otp.otpHash,
-      expiresAt: otp.expiresAt,
-      verified: otp.verified,
-      newEmail: otp.newEmail,
-      purpose: otp.purpose,
-    } as Partial<EmailOtpDocument>);
+    const persistenceData = EmailOtpMapper.toPersistence(otp);
+    await this.save(persistenceData);
   }
 
   async findLatestByEmail(email: string): Promise<EmailOtpEntity | null> {
-    // We use this.model directly because the base findOne doesn't support sorting
     const doc = await this.model
       .findOne({ email, verified: false })
       .sort({ createdAt: -1 })
       .lean()
-      .exec() as EmailOtpDocument | null;
-      
+      .exec();
+
     if (!doc) return null;
-    return this.toEntity(doc);
+    return this.toEntity(doc as unknown as LeanEmailOtpDocument);
   }
 
   async findLatestByUserAndEmail(
@@ -65,22 +50,24 @@ export class MongoEmailOtpRepository
     email: string,
     purpose?: OtpPurpose,
   ): Promise<EmailOtpEntity | null> {
-    const query: FilterQuery<EmailOtpDocument> = { userId, email, verified: false };
+    const query: FilterQuery<EmailOtpDocument> = {
+      userId,
+      email,
+      verified: false,
+    };
     if (purpose) query.purpose = purpose;
-    
-    // We use this.model directly because the base findOne doesn't support sorting
+
     const doc = await this.model
       .findOne(query)
       .sort({ createdAt: -1 })
       .lean()
-      .exec() as EmailOtpDocument | null;
-      
+      .exec();
+
     if (!doc) return null;
-    return this.toEntity(doc);
+    return this.toEntity(doc as unknown as LeanEmailOtpDocument);
   }
 
   async markVerified(id: string): Promise<void> {
-    // Utilize the generic updateById() method from the BaseRepository
     await this.updateById(id, { verified: true });
   }
 }

@@ -5,6 +5,7 @@ import { ProjectDocument } from '../../infrastructure/database/mongoose/schemas/
 export interface IProjectRepository extends IBaseRepository<ProjectDocument, ProjectEntity> {
   findByIdAndCompany(id: string, companyId: string): Promise<ProjectEntity | null>;
   findAllByCompanyId(companyId: string): Promise<ProjectEntity[]>;
+  create(project: Partial<ProjectEntity>): Promise<ProjectEntity>;
   updateProject(id: string, companyId: string, project: Partial<ProjectEntity>): Promise<ProjectEntity | null>;
   
   softDeleteProject(id: string, companyId: string): Promise<boolean>;

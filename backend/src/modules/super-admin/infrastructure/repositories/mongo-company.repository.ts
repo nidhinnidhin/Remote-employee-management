@@ -1,16 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types, FlattenMaps } from 'mongoose';
+import { Model } from 'mongoose';
 import { CompanyEntity } from 'src/modules/auth/domain/entities/company.entity';
 import { CompanyStatus } from 'src/shared/enums/company/company-status.enum';
 import { CompanyDocument } from 'src/modules/auth/infrastructure/database/mongoose/schemas/company.schema';
 import { ICompanyRepository } from '../../domain/repositories/company.repository';
 import { BaseRepository } from 'src/shared/repositories/base.repository';
-
-type LeanCompanyDocument = FlattenMaps<CompanyDocument> & {
-  _id: Types.ObjectId;
-  employeeCount?: number;
-};
+import {
+  CompanyMapper,
+  LeanCompanyDocument,
+} from '../../application/mappers/company.mapper';
 
 @Injectable()
 export class MongoCompanyRepository
@@ -27,18 +26,7 @@ export class MongoCompanyRepository
   protected toEntity(
     companyDoc: CompanyDocument | LeanCompanyDocument,
   ): CompanyEntity {
-    return new CompanyEntity(
-      companyDoc._id.toString(),
-      companyDoc.name,
-      companyDoc.email,
-      companyDoc.size,
-      companyDoc.industry,
-      companyDoc.website,
-      companyDoc.createdAt || new Date(),
-      companyDoc.updatedAt || new Date(),
-      (companyDoc as LeanCompanyDocument).employeeCount,
-      companyDoc.status || CompanyStatus.ACTIVE,
-    );
+    return CompanyMapper.toDomain(companyDoc);
   }
 
   async findAllWithEmployeeCount(): Promise<CompanyEntity[]> {

@@ -15,7 +15,7 @@ interface Tab {
 
 const tabs: Tab[] = [
   { id: "personal-info", label: "Personal Info", icon: User },
-  { id: "skills-bio", label: "Skills", icon: GraduationCap },
+  { id: "skills-bio", label: "Skills & Bio", icon: GraduationCap },
   { id: "documents", label: "Documents", icon: FileText },
 ];
 
@@ -26,41 +26,67 @@ interface ProfileTabsProps {
 
 const ProfileTabs: React.FC<ProfileTabsProps> = ({ activeTab, onChange }) => {
   return (
-    /* FIXED BORDER: 
-       1. Changed border to use white/0.06 (very subtle)
-       2. Changed background to a slightly transparent version of your surface
-    */
-    <div className="flex items-center gap-1 p-1 bg-surface/80 backdrop-blur-md border border-white/[0.06] rounded-2xl w-fit shadow-xl shadow-black/20">
+    <div className="flex items-center gap-10 border-b border-white/[0.05] px-2 w-full">
       {tabs.map(({ id, label, icon: Icon }) => {
         const isActive = activeTab === id;
+
         return (
           <button
             key={id}
             onClick={() => onChange(id)}
             className={cn(
-              "relative flex items-center gap-2.5 px-6 py-2.5 text-[13px] font-bold transition-all duration-300 rounded-xl outline-none",
-              isActive 
-                ? "text-accent" 
-                : "text-muted hover:text-slate-300"
+              "group relative flex items-center gap-2.5 pb-4 pt-2 transition-all duration-300 outline-none",
+              // Text is slightly dimmed unless active
+              isActive
+                ? "text-emerald-500/90"
+                : "text-zinc-500 hover:text-zinc-300",
             )}
           >
-            {/* ACTIVE GLIDE:
-               Using a more refined border for the active indicator too
-            */}
-            {isActive && (
-              <motion.div
-                layoutId="profileTabIndicator"
-                className="absolute inset-0 bg-accent/[0.08] border border-accent/20 rounded-xl shadow-[0_0_15px_rgba(var(--color-accent),0.05)]"
-                transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
-              />
-            )}
-
-            <Icon 
-              size={15} 
-              strokeWidth={isActive ? 2.5 : 2} 
-              className="relative z-10" 
+            <Icon
+              size={18}
+              className={cn(
+                "transition-all duration-500",
+                // Icon gets a subtle lift when active
+                isActive
+                  ? "text-emerald-600 -translate-y-0.5"
+                  : "group-hover:text-zinc-400",
+              )}
             />
-            <span className="relative z-10 uppercase tracking-wide text-[11px]">{label}</span>
+            <span className="text-sm font-semibold tracking-tight whitespace-nowrap">
+              {label}
+            </span>
+
+            {/* THE DARK-MIX GREEN HIGHLIGHT */}
+            {isActive && (
+              <div className="absolute bottom-0 left-0 right-0 h-[2.5px]">
+                {/* The "Black-Mixed" Green Base:
+                   We use a very dark emerald (950) with a slight opacity 
+                   layered over a sharp line.
+                */}
+                <motion.div
+                  layoutId="darkGreenUnderline"
+                  className="absolute inset-x-0 bottom-0 h-full bg-[#062c1b] rounded-t-full z-20 border-t border-emerald-500/30"
+                  transition={{
+                    type: "spring",
+                    stiffness: 300,
+                    damping: 30,
+                  }}
+                />
+
+                {/* The Glow:
+                   Kept very subtle so it doesn't look too "neon"
+                */}
+                <motion.div
+                  layoutId="darkGreenGlow"
+                  className="absolute inset-x-0 bottom-0 h-[4px] bg-emerald-900/40 blur-[6px] z-10"
+                  transition={{
+                    type: "spring",
+                    stiffness: 300,
+                    damping: 30,
+                  }}
+                />
+              </div>
+            )}
           </button>
         );
       })}

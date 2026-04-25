@@ -4,8 +4,11 @@ import { Model, Types } from 'mongoose';
 import { TaskEntity } from '../../../domain/entities/task.entity';
 import type { ITaskRepository } from '../../../domain/repositories/task.repository.interface';
 import { TaskDocument } from '../mongoose/schemas/task.schema';
-import { TaskStatus } from 'src/shared/enums/project/task-status.enum';
 import { BaseRepository } from 'src/shared/repositories/base.repository'; // Adjust path
+import {
+  LeanTaskDocument,
+  TaskMapper,
+} from 'src/modules/project/application/mappers/task.mapper';
 
 @Injectable()
 export class MongoTaskRepository
@@ -19,31 +22,14 @@ export class MongoTaskRepository
     super(_taskModel);
   }
 
-  protected toEntity(taskDoc: any): TaskEntity {
-    return new TaskEntity(
-      taskDoc._id?.toString() || taskDoc.id,
-      taskDoc.companyId,
-      taskDoc.projectId?.toString(),
-      taskDoc.storyId?.toString(),
-      taskDoc.title,
-      (taskDoc.status as TaskStatus) || TaskStatus.TODO, 
-      taskDoc.order || 0,
-      taskDoc.createdBy,
-      taskDoc.description || '',
-      taskDoc.assignedTo?.toString(),
-      taskDoc.assignedBy?.toString(),
-      taskDoc.estimatedHours || 0,
-      taskDoc.actualHours || 0,
-      taskDoc.dueDate,
-      taskDoc.createdAt || new Date(),
-      taskDoc.updatedAt || new Date(),
-      !!taskDoc.isDeleted,
-    );
+  protected toEntity(taskDoc: TaskDocument | LeanTaskDocument): TaskEntity {
+    return TaskMapper.toDomain(taskDoc);
   }
 
   async create(task: Partial<TaskEntity>): Promise<TaskEntity> {
+    const persistenceData = TaskMapper.toPersistence(task);
     return this.save({
-      ...task,
+      ...persistenceData,
       isDeleted: false,
     } as Partial<TaskDocument>);
   }
@@ -60,13 +46,13 @@ export class MongoTaskRepository
     storyId: string,
     companyId: string,
   ): Promise<TaskEntity[]> {
-    const docs = (await this.model
+    const docs = await this.model
       .find({ storyId, companyId, isDeleted: false })
       .sort({ order: 1 })
       .lean()
-      .exec()) as any[];
+      .exec();
 
-    return docs.map((doc) => this.toEntity(doc));
+    return docs.map((doc) => this.toEntity(doc as unknown as LeanTaskDocument));
   }
 
   async findByProjectId(
@@ -94,17 +80,17 @@ export class MongoTaskRepository
   ): Promise<TaskEntity | null> {
     if (!Types.ObjectId.isValid(id)) return null;
 
-    // We use the raw model here because the generic updateById doesn't check for companyId
-    const doc = (await this.model
+    // Let TS infer the lean result cleanly
+    const doc = await this.model
       .findOneAndUpdate(
         { _id: id, companyId, isDeleted: false },
         { $set: task },
         { new: true },
       )
       .lean()
-      .exec()) as TaskDocument | null;
+      .exec();
 
-    return doc ? this.toEntity(doc) : null;
+    return doc ? this.toEntity(doc as unknown as LeanTaskDocument) : null;
   }
 
   async softDeleteTask(id: string, companyId: string): Promise<boolean> {

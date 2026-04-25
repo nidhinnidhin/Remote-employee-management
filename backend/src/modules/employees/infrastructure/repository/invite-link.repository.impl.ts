@@ -4,7 +4,11 @@ import { Model, Types, UpdateQuery } from 'mongoose';
 import { IInviteLinkRepository } from '../../domain/repositories/invite-link.repository';
 import { InviteLinkToken } from '../../domain/entities/invite-link-token.entity';
 import { InviteLinkDocument } from '../schema/invite-link.schema';
-import { BaseRepository } from 'src/shared/repositories/base.repository'; // Adjust path
+import { BaseRepository } from 'src/shared/repositories/base.repository';
+import {
+  InviteLinkMapper,
+  LeanInviteLinkDocument,
+} from '../../application/mappers/invite-link.mapper';
 
 @Injectable()
 export class InviteLinkRepositoryImpl
@@ -18,24 +22,15 @@ export class InviteLinkRepositoryImpl
     super(_inviteLinkModel);
   }
 
-  protected toEntity(doc: any): InviteLinkToken {
-    return new InviteLinkToken(
-      doc.token,
-      doc.employeeId?.toString(),
-      doc.expiresAt,
-      !!doc.used,
-    );
+  protected toEntity(
+    doc: InviteLinkDocument | LeanInviteLinkDocument,
+  ): InviteLinkToken {
+    return InviteLinkMapper.toDomain(doc);
   }
 
   async create(token: InviteLinkToken): Promise<void> {
-    await this.save({
-      token: token.token,
-      employeeId: new Types.ObjectId(
-        token.employeeId,
-      ) as unknown as Types.ObjectId,
-      expiresAt: token.expiresAt,
-      used: token.used,
-    } as Partial<InviteLinkDocument>);
+    const persistenceData = InviteLinkMapper.toPersistence(token);
+    await this.save(persistenceData);
   }
 
   async findByToken(token: string): Promise<InviteLinkToken | null> {

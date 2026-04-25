@@ -7,6 +7,7 @@ export interface ITaskRepository extends IBaseRepository<TaskDocument, TaskEntit
   findByStoryId(storyId: string, companyId: string): Promise<TaskEntity[]>;
   findByProjectId(projectId: string, companyId: string): Promise<TaskEntity[]>;
   findByAssignee(assigneeId: string, companyId: string): Promise<TaskEntity[]>;
+  create(task: Partial<TaskEntity>): Promise<TaskEntity>;
   updateTask(id: string, companyId: string, task: Partial<TaskEntity>): Promise<TaskEntity | null>;
   softDeleteTask(id: string, companyId: string): Promise<boolean>;
 }

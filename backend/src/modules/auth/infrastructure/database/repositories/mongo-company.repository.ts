@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { BaseRepository } from 'src/shared/repositories/base.repository';
 import { ICompanyRepository } from '../../../domain/repositories/icompany.repository';
 import { CompanyEntity } from '../../../domain/entities/company.entity';
 import { CompanyDocument } from '../mongoose/schemas/company.schema';
-import { UserStatus } from 'src/shared/enums/user/user-status.enum';
+import { CompanyMapper } from 'src/modules/auth/application/mappers/company.mapper'; // Adjust path as needed
 
 @Injectable()
 export class MongoCompanyRepository
@@ -19,30 +19,14 @@ export class MongoCompanyRepository
     super(_companyModel);
   }
 
-  protected toEntity(companyDoc: CompanyDocument): CompanyEntity {
-    return new CompanyEntity(
-      (companyDoc._id as Types.ObjectId).toString(),
-      companyDoc.name,
-      companyDoc.email,
-      companyDoc.size,
-      companyDoc.industry,
-      companyDoc.website,
-      companyDoc.createdAt,
-      companyDoc.updatedAt,
-      (companyDoc as unknown as { employeeCount?: number }).employeeCount,
-      companyDoc.status || UserStatus.ACTIVE,
-    );
+  protected toEntity(companyDoc: any): CompanyEntity {
+    return CompanyMapper.toDomain(companyDoc);
   }
 
   async create(company: CompanyEntity): Promise<CompanyEntity> {
-    return this.save({
-      name: company.name,
-      email: company.email,
-      size: company.size,
-      industry: company.industry,
-      website: company.website,
-      status: company.status,
-    } as Partial<CompanyDocument>);
+    // Delegate to the Mapper for the payload
+    const persistenceData = CompanyMapper.toPersistence(company);
+    return this.save(persistenceData);
   }
 
   async findByEmail(email: string): Promise<CompanyEntity | null> {
