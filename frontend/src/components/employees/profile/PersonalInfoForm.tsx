@@ -109,6 +109,7 @@ const InputField = ({
   placeholder,
   icon: Icon,
   required,
+  error,
 }: {
   label: string;
   name: string;
@@ -118,26 +119,33 @@ const InputField = ({
   placeholder?: string;
   icon?: React.ElementType;
   required?: boolean;
+  error?: string;
 }) => (
   <div className="flex flex-col gap-1.5">
     <label className="text-xs font-medium text-secondary uppercase tracking-wide">
       {label} {required && <span className="text-danger">*</span>}
     </label>
+
     <div className="relative">
       {Icon && (
         <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted" />
       )}
+
       <input
         type={type}
         name={name}
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className={`field-input transition placeholder:text-slate-700 ${
-          Icon ? "pl-9" : ""
-        }`}
+        className={`field-input transition placeholder:text-slate-700
+          ${Icon ? "pl-9" : ""}
+          ${error ? "border-red-500 focus:ring-red-500" : ""}
+        `}
       />
     </div>
+
+    {/* ✅ Error message */}
+    {error && <p className="text-xs text-red-500 mt-1 font-medium">{error}</p>}
   </div>
 );
 
@@ -225,6 +233,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
   const [verifyingOtp, setVerifyingOtp] = useState(false);
   const [otpError, setOtpError] = useState("");
   const [resendingOtp, setResendingOtp] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
   const { remaining, expired, startTimer } = useOtpTimer();
 
@@ -246,6 +255,8 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
     setSaving(true);
     setError("");
     setSuccessMsg("");
+    setFieldErrors({}); // reset previous errors
+
     try {
       await clientApi.patch(API_ROUTES.AUTH.PROFILE.UPDATE, {
         firstName: formData.firstName,
@@ -257,27 +268,30 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
         bloodGroup: formData.bloodGroup,
         timeZone: formData.timeZone,
         bio: formData.bio,
-
         city: formData.city,
         state: formData.state,
         country: formData.country,
         zipCode: formData.zipCode,
-
         streetAddress: formData.street,
         linkedInUrl: formData.linkedIn,
         personalWebsite: formData.personalWebsite,
-
         emergencyContactName: formData.emergencyContactName,
         emergencyContactPhone: formData.emergencyContactPhone,
         emergencyContactRelation: formData.emergencyContactRelation,
-
         ...(formData.dateOfBirth && {
           dateOfBirth: formData.dateOfBirth,
         }),
       });
+
       setSuccessMsg("Profile updated successfully.");
-    } catch {
-      setError("Failed to save changes. Please try again.");
+    } catch (err: any) {
+      const backendErrors = err.response?.data?.errors;
+
+      if (backendErrors) {
+        setFieldErrors(backendErrors); // ✅ store field errors
+      } else {
+        setError("Failed to save changes. Please try again.");
+      }
     } finally {
       setSaving(false);
     }
@@ -431,6 +445,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
             onChange={handleChange}
             placeholder="Enter first name"
             required
+            error={fieldErrors.firstName?.[0]}
           />
           <InputField
             label="Last Name"

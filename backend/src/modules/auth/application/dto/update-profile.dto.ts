@@ -1,8 +1,24 @@
-import { IsOptional, IsString, IsDateString } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsDateString,
+  MinLength,
+  MaxLength,
+  Matches,
+} from 'class-validator';
 
 export class UpdateProfileDto {
   @IsOptional()
   @IsString()
+  @MinLength(2, {
+    message: 'First name must be at least 2 characters',
+  })
+  @MaxLength(20, {
+    message: 'First name must not exceed 20 characters',
+  })
+  @Matches(/^[A-Za-z]+$/, {
+    message: 'First name must contain only letters',
+  })
   firstName?: string;
 
   @IsOptional()
