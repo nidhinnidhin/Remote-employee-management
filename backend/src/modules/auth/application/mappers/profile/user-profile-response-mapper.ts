@@ -1,4 +1,4 @@
-import { UserEntity } from '../../domain/entities/user.entity';
+import { UserEntity } from '../../../domain/entities/user.entity';
 import { EnrichedUserProfile } from 'src/shared/types/profile/enriched-user-profile.type';
 
 export class UserProfileResponseMapper {

@@ -40,8 +40,8 @@ export class UpdateProfileDto {
 
   @IsOptional()
   @TrimOptional()
-  @IsPhoneNumber(undefined, {
-    message: 'Phone must be a valid international number (e.g., +1234567890)',
+  @Matches(/^\d{10}$/, {
+    message: 'Emergency contact phone must be exactly 10 digits',
   })
   phone?: string | null;
 

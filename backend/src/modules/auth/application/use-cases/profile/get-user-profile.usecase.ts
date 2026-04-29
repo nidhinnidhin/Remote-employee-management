@@ -10,7 +10,7 @@ import { IGetUserProfileUseCase } from '../../interfaces/profile/profile-use-cas
 import { EnrichedUserProfile } from 'src/shared/types/profile/enriched-user-profile.type';
 
 // 1. Add the import for your new mapper
-import { UserProfileResponseMapper } from '../../mappers/user-profile-response-mapper';
+import { UserProfileResponseMapper } from '../../mappers/profile/user-profile-response-mapper';
 
 @Injectable()
 export class GetUserProfileUseCase implements IGetUserProfileUseCase {
