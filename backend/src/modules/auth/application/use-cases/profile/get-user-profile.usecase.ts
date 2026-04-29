@@ -9,6 +9,9 @@ import { isValidObjectId } from 'mongoose';
 import { IGetUserProfileUseCase } from '../../interfaces/profile/profile-use-case.interface';
 import { EnrichedUserProfile } from 'src/shared/types/profile/enriched-user-profile.type';
 
+// 1. Add the import for your new mapper
+import { UserProfileResponseMapper } from '../../mappers/user-profile-response-mapper';
+
 @Injectable()
 export class GetUserProfileUseCase implements IGetUserProfileUseCase {
   constructor(
@@ -38,9 +41,8 @@ export class GetUserProfileUseCase implements IGetUserProfileUseCase {
     const departments = await this._departmentRepository.findAllByEmployeeId(userId);
     const departmentNames = departments.map(d => d.name);
 
-    const serialized = JSON.parse(JSON.stringify(user)) as EnrichedUserProfile;
-    serialized.departments = departmentNames;
-    return serialized;
+    // 2. Replace the JSON.parse hack with your mapper
+    return UserProfileResponseMapper.toEnrichedProfile(user, departmentNames);
   }
 
   private async checkCompanySuspension(

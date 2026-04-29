@@ -19,13 +19,11 @@ export class UpdateProfileUseCase implements IUpdateProfileUseCase {
       throw new UnauthorizedException(AUTH_MESSAGES.USER_NOT_FOUND);
     }
 
-    // ✅ Prepare data
     const updateData = {
       ...dto,
       dateOfBirth: dto.dateOfBirth ? new Date(dto.dateOfBirth) : dto.dateOfBirth,
     };
 
-    // ✅ Remove undefined fields (keep null for clearing)
     const cleanedData = Object.fromEntries(
       Object.entries(updateData).filter(([_, value]) => value !== undefined),
     );
