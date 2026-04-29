@@ -89,12 +89,13 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-accent/5 text-accent text-3xl font-black">
-                {name
+                {(name || "User")
                   .split(" ")
+                  .filter(Boolean)
                   .map((n) => n[0])
                   .join("")
                   .slice(0, 2)
-                  .toUpperCase()}
+                  .toUpperCase() || "U"}
               </div>
             )}
 

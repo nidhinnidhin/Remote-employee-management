@@ -49,12 +49,14 @@ export const UserNav: React.FC<UserNavProps> = ({
     }
   };
 
-  const initials = userName
+  const initials = userName?.trim()
     ? userName
         .split(" ")
+        .filter(Boolean)
         .map((n) => n[0])
         .join("")
         .toUpperCase()
+        .slice(0, 2)
     : userEmail
       ? userEmail[0].toUpperCase()
       : "U";

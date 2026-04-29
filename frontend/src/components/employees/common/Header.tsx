@@ -7,7 +7,9 @@ import { useProfileStore } from "@/store/profile.store";
 
 export const Header: React.FC = () => {
     const { userProfile } = useProfileStore();
-    const fullName = userProfile ? `${userProfile.firstName} ${userProfile.lastName}` : "";
+    const fullName = userProfile 
+        ? `${userProfile.firstName || ""} ${userProfile.lastName || ""}`.trim() 
+        : "";
 
     return (
         <header className="h-16 flex items-center justify-between px-4 md:px-8 border-b border-white/[0.05] bg-bg/50 backdrop-blur-md sticky top-0 z-30">

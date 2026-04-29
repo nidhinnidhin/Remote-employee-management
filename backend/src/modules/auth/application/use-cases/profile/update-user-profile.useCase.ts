@@ -10,7 +10,7 @@ export class UpdateProfileUseCase implements IUpdateProfileUseCase {
   constructor(
     @Inject('IUserRepository')
     private readonly _userRepository: IUserRepository,
-  ) { }
+  ) {}
 
   async execute(userId: string, dto: UpdateProfileDto) {
     const user = await this._userRepository.findById(userId);
@@ -19,10 +19,18 @@ export class UpdateProfileUseCase implements IUpdateProfileUseCase {
       throw new UnauthorizedException(AUTH_MESSAGES.USER_NOT_FOUND);
     }
 
-    await this._userRepository.updateUserFieldsById(userId, {
+    // ✅ Prepare data
+    const updateData = {
       ...dto,
-      dateOfBirth: dto.dateOfBirth ? new Date(dto.dateOfBirth) : undefined,
-    });
+      dateOfBirth: dto.dateOfBirth ? new Date(dto.dateOfBirth) : dto.dateOfBirth,
+    };
+
+    // ✅ Remove undefined fields (keep null for clearing)
+    const cleanedData = Object.fromEntries(
+      Object.entries(updateData).filter(([_, value]) => value !== undefined),
+    );
+
+    await this._userRepository.updateUserFieldsById(userId, cleanedData);
 
     return { message: PROFILE_MESSAGES.PROFILE_UPDATED };
   }

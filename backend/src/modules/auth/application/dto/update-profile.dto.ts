@@ -5,95 +5,164 @@ import {
   MinLength,
   MaxLength,
   Matches,
+  IsIn,
+  IsPhoneNumber,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
+
+const TrimOptional = () =>
+  Transform(({ value }) => {
+    if (value === '' || value === null) return null;
+    if (value === undefined) return undefined;
+    return typeof value === 'string' ? value.trim() : value;
+  });
 
 export class UpdateProfileDto {
   @IsOptional()
+  @TrimOptional()
   @IsString()
-  @MinLength(2, {
-    message: 'First name must be at least 2 characters',
+  @Matches(/^[a-zA-Z\s-]+$/, {
+    message: 'First name must only contain letters, spaces, or hyphens',
   })
-  @MaxLength(20, {
-    message: 'First name must not exceed 20 characters',
+  @MinLength(2, { message: 'First name must be at least 2 characters' })
+  @MaxLength(20, { message: 'First name must not exceed 20 characters' })
+  firstName?: string | null;
+
+  @IsOptional()
+  @TrimOptional()
+  @IsString()
+  @Matches(/^[a-zA-Z\s-]+$/, {
+    message: 'Last name must only contain letters, spaces, or hyphens',
   })
-  @Matches(/^[A-Za-z]+$/, {
-    message: 'First name must contain only letters',
+  @MinLength(1, { message: 'Last name must be at least 1 character' })
+  @MaxLength(20, { message: 'Last name must not exceed 20 characters' })
+  lastName?: string | null;
+
+  @IsOptional()
+  @TrimOptional()
+  @IsPhoneNumber(undefined, {
+    message: 'Phone must be a valid international number (e.g., +1234567890)',
   })
-  firstName?: string;
+  phone?: string | null;
 
   @IsOptional()
+  @TrimOptional()
+  @IsDateString({}, { message: 'Invalid date format (YYYY-MM-DD)' })
+  dateOfBirth?: string | null;
+
+  @IsOptional()
+  @TrimOptional()
+  @IsIn(['Male', 'Female', 'Non-binary', 'Prefer not to say'], {
+    message: 'Invalid gender value',
+  })
+  gender?: string | null;
+
+  @IsOptional()
+  @TrimOptional()
+  @IsIn(['Single', 'Married', 'Divorced', 'Widowed', 'Prefer not to say'], {
+    message: 'Invalid marital status',
+  })
+  maritalStatus?: string | null;
+
+  @IsOptional()
+  @TrimOptional()
   @IsString()
-  lastName?: string;
+  @Matches(/^[a-zA-Z\s-]+$/, {
+    message: 'Nationality must only contain letters, spaces, or hyphens',
+  })
+  @MaxLength(50, { message: 'Nationality must not exceed 50 characters' })
+  nationality?: string | null;
 
   @IsOptional()
+  @TrimOptional()
+  @IsIn(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'], {
+    message: 'Invalid blood group',
+  })
+  bloodGroup?: string | null;
+
+  @IsOptional()
+  @TrimOptional()
   @IsString()
-  phone?: string;
+  @MaxLength(50, { message: 'Timezone must not exceed 50 characters' })
+  timeZone?: string | null;
 
   @IsOptional()
-  @IsDateString()
-  dateOfBirth?: string;
-
-  @IsOptional()
+  @TrimOptional()
   @IsString()
-  gender?: string;
+  @MaxLength(300, { message: 'Bio cannot exceed 300 characters' })
+  bio?: string | null;
 
   @IsOptional()
+  @TrimOptional()
   @IsString()
-  maritalStatus?: string;
+  @MaxLength(100, { message: 'Street address too long' })
+  streetAddress?: string | null;
 
   @IsOptional()
+  @TrimOptional()
   @IsString()
-  nationality?: string;
+  @Matches(/^[a-zA-Z\s-]+$/, {
+    message: 'City must only contain letters, spaces, or hyphens',
+  })
+  @MaxLength(50, { message: 'City must not exceed 50 characters' })
+  city?: string | null;
 
   @IsOptional()
+  @TrimOptional()
   @IsString()
-  bloodGroup?: string;
+  @Matches(/^[a-zA-Z\s-]+$/, {
+    message: 'State must only contain letters, spaces, or hyphens',
+  })
+  @MaxLength(50, { message: 'State must not exceed 50 characters' })
+  state?: string | null;
 
   @IsOptional()
+  @TrimOptional()
   @IsString()
-  timeZone?: string;
+  @Matches(/^[a-zA-Z\s-]+$/, {
+    message: 'Country must only contain letters, spaces, or hyphens',
+  })
+  @MaxLength(50, { message: 'Country must not exceed 50 characters' })
+  country?: string | null;
 
   @IsOptional()
-  @IsString()
-  bio?: string;
+  @TrimOptional()
+  @Matches(/^[a-zA-Z0-9\s-]{3,10}$/, {
+    message: 'Invalid ZIP/Postal code',
+  })
+  zipCode?: string | null;
 
   @IsOptional()
+  @TrimOptional()
   @IsString()
-  streetAddress?: string;
+  @Matches(/^[a-zA-Z\s-]+$/, {
+    message:
+      'Emergency contact name must only contain letters, spaces, or hyphens',
+  })
+  @MaxLength(50, { message: 'Emergency contact name too long' })
+  emergencyContactName?: string | null;
 
   @IsOptional()
-  @IsString()
-  city?: string;
+  @TrimOptional()
+  @Matches(/^\d{10}$/, {
+    message: 'Emergency contact phone must be exactly 10 digits',
+  })
+  emergencyContactPhone?: string | null;
 
   @IsOptional()
-  @IsString()
-  state?: string;
+  @TrimOptional()
+  @IsIn(['Spouse', 'Parent', 'Sibling', 'Friend', 'Child', 'Other'], {
+    message: 'Invalid relationship',
+  })
+  emergencyContactRelation?: string | null;
 
   @IsOptional()
+  @TrimOptional()
   @IsString()
-  country?: string;
+  linkedInUrl?: string | null;
 
   @IsOptional()
+  @TrimOptional()
   @IsString()
-  zipCode?: string;
-
-  @IsOptional()
-  @IsString()
-  emergencyContactName?: string;
-
-  @IsOptional()
-  @IsString()
-  emergencyContactPhone?: string;
-
-  @IsOptional()
-  @IsString()
-  emergencyContactRelation?: string;
-
-  @IsOptional()
-  @IsString()
-  linkedInUrl?: string;
-
-  @IsOptional()
-  @IsString()
-  personalWebsite?: string;
+  personalWebsite?: string | null;
 }

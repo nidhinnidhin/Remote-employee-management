@@ -12,9 +12,20 @@ import { ProfileHeader } from "./ProfileHeader";
 import { SkillsForm } from "./SkillsForm";
 import DocumentVault from "./DocumentsForm";
 import { formatDate } from "@/lib/date/date-format";
+import { useProfileStore } from "@/store/profile.store";
 
-export default function ProfileClient({ user }: { user: UserProfile }) {
+export default function ProfileClient({ user: initialUser }: { user: UserProfile }) {
+  const { userProfile, fetchProfile } = useProfileStore();
   const [activeTab, setActiveTab] = useState<ProfileTab>("personal-info");
+
+  // Sync prop to store on mount if store is empty
+  React.useEffect(() => {
+    if (!userProfile) {
+      useProfileStore.getState().setProfile(initialUser);
+    }
+  }, [initialUser, userProfile]);
+
+  const user = userProfile || initialUser;
 
   // ✅ IMPORTANT — Avatar state
   const [avatarUrl, setAvatarUrl] = useState(user.profileImageUrl ?? "");
@@ -44,7 +55,7 @@ export default function ProfileClient({ user }: { user: UserProfile }) {
     <DashboardLayout>
       <div className="flex flex-col gap-4 p-4 sm:p-6 max-w-5xl mx-auto w-full">
         <ProfileHeader
-          name={`${user.firstName} ${user.lastName}`.trim()}
+          name={`${user.firstName || ""} ${user.lastName || ""}`.trim()}
           title={user.title || user.role || "Employee"}
           department={user.department}
           departments={user.departments || []}
