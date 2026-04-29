@@ -1,12 +1,7 @@
-// get-project.usecase.ts
-
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import type { IProjectRepository } from '../../../domain/repositories/project.repository.interface';
-import type {
-  IGetProjectUseCase,
-  ProjectResponse,
-} from '../../interfaces/project/project-use-cases.interface';
-import { ProjectResponseMapper } from '../../mappers/project/project-response.mapper';
+import type { IGetProjectUseCase } from '../../interfaces/project/project-use-cases.interface';
+import { ProjectEntity } from '../../../domain/entities/project.entity';
 
 @Injectable()
 export class GetProjectUseCase implements IGetProjectUseCase {
@@ -15,19 +10,11 @@ export class GetProjectUseCase implements IGetProjectUseCase {
     private readonly _projectRepository: IProjectRepository,
   ) {}
 
-  async execute(id: string, companyId: string): Promise<ProjectResponse> {
-    // 1. Fetch the raw entity
-    const project = await this._projectRepository.findByIdAndCompany(
-      id,
-      companyId,
-    );
-
-    // 2. Check if it exists
+  async execute(id: string, companyId: string): Promise<ProjectEntity> {
+    const project = await this._projectRepository.findByIdAndCompany(id, companyId);
     if (!project) {
       throw new NotFoundException('Project not found');
     }
-
-    // 3. Map it to strip 'isDeleted' and return
-    return ProjectResponseMapper.toResponse(project);
+    return project;
   }
 }
