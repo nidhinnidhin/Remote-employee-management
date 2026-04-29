@@ -14,6 +14,7 @@ export class UserStoryEntity {
     public readonly description: string,
     public readonly acceptanceCriteria: string[],
     public readonly assigneeId: string,
+    public readonly storyPoints: number,
     public readonly createdAt?: Date,
     public readonly updatedAt?: Date,
     public readonly isDeleted: boolean = false,

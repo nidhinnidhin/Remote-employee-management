@@ -50,6 +50,7 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
     status: "Backlog",
     assigneeId: "",
     acceptanceCriteria: [],
+    storyPoints: 1,
   });
 
   const [newCriterion, setNewCriterion] = useState("");
@@ -58,6 +59,7 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
 
   const priorityOptions = ["Low", "Medium", "High"];
   const statusOptions = ["Backlog", "In Progress", "Done"];
+  const storyPointOptions = [1, 2, 3, 5, 8, 13];
 
   const handleChange = (e: any) => {
     const { name, value } = e.target;
@@ -132,6 +134,7 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
       status: "Backlog",
       assigneeId: "",
       acceptanceCriteria: [],
+      storyPoints: 1,
     });
     setErrors({});
     onClose();
@@ -204,7 +207,7 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
             </span>
           </div>
 
-          <div className="grid grid-cols-2 gap-5">
+          <div className="grid grid-cols-3 gap-5">
             <FormDropdown
               label="Priority"
               name="priority"
@@ -222,6 +225,15 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
               options={statusOptions}
               required
               icon={<ListChecks size={14} className="text-accent/60" />}
+            />
+            <FormDropdown
+              label="Story Points"
+              name="storyPoints"
+              value={formData.storyPoints.toString()}
+              onChange={(e) => setFormData(prev => ({ ...prev, storyPoints: parseInt(e.target.value) }))}
+              options={storyPointOptions.map(String)}
+              required
+              icon={<Target size={14} className="text-accent/60" />}
             />
           </div>
         </div>

@@ -11,6 +11,7 @@ export interface UserStory {
   priority: StoryPriority;
   assigneeId: string;
   acceptanceCriteria: string[];
+  storyPoints: number;
   order: number;
   createdBy: string;
   createdAt: string;
@@ -26,6 +27,7 @@ export interface CreateStoryPayload {
   priority: StoryPriority;
   assigneeId: string;
   acceptanceCriteria: string[];
+  storyPoints: number;
 }
 
 export interface UpdateStoryPayload extends Partial<Omit<CreateStoryPayload, 'projectId'>> {}

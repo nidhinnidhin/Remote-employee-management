@@ -1,4 +1,4 @@
-import { IsString, IsEnum, IsArray, IsNumber, IsNotEmpty, MinLength, MaxLength, IsOptional } from 'class-validator';
+import { IsString, IsEnum, IsArray, IsNumber, IsNotEmpty, MinLength, MaxLength, IsOptional, IsIn } from 'class-validator';
 import { UserStoryStatus } from 'src/shared/enums/project/user-story-status.enum';
 import { UserStoryPriority } from 'src/shared/enums/project/user-story-priority.enum';
 
@@ -37,4 +37,9 @@ export class CreateStoryDto {
   @IsNumber()
   @IsOptional()
   order?: number;
+
+  @IsNumber()
+  @IsNotEmpty({ message: 'Story points are required' })
+  @IsIn([1, 2, 3, 5, 8, 13], { message: 'Invalid story points value' })
+  storyPoints: number;
 }

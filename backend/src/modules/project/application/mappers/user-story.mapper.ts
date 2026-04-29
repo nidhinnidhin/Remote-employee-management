@@ -24,6 +24,7 @@ export class UserStoryMapper {
       userDocument.description || '',
       userDocument.acceptanceCriteria || '',
       userDocument.assigneeId?.toString(),
+      userDocument.storyPoints || 0,
       userDocument.createdAt || new Date(),
       userDocument.updatedAt || new Date(),
       !!userDocument.isDeleted,

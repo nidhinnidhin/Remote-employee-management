@@ -44,6 +44,9 @@ export class UserStoryDocument extends Document {
   @Prop({ required: true })
   createdBy!: string;
 
+  @Prop({ required: true, default: 0 })
+  storyPoints!: number;
+
   @Prop({ required: true, default: false, index: true })
   isDeleted!: boolean;
 
