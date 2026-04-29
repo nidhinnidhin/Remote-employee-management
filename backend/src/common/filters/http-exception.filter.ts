@@ -7,7 +7,7 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { ApiResponse } from '../response/api-response.util';
+import { ApiErrorModel } from '../response/response.model';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -21,36 +21,32 @@ export class HttpExceptionFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    const exceptionResponse =
-      exception instanceof HttpException
-        ? exception.getResponse()
-        : null;
-
-    // Handle common NestJS error structures
     let message = 'Internal server error';
     let errors: unknown = null;
 
-    interface ExceptionResponse {
-      message?: string | string[];
-      errors?: unknown;
+    if (exception instanceof HttpException) {
+      const exceptionResponse = exception.getResponse();
+      
+      if (typeof exceptionResponse === 'string') {
+        message = exceptionResponse;
+      } else if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
+        const res = exceptionResponse as any;
+        message = res.message || message;
+        errors = res.errors || null;
+        
+        // If message is an array (default Nest validation), set it as errors
+        if (Array.isArray(res.message)) {
+          message = 'Validation failed';
+          errors = res.message;
+        }
+      }
+    } else if (exception instanceof Error) {
+      message = exception.message;
     }
 
-    if (typeof exceptionResponse === 'string') {
-      message = exceptionResponse;
-    } else if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
-      const response = exceptionResponse as ExceptionResponse;
-      message = (Array.isArray(response.message) ? response.message[0] : response.message) || message;
-      errors = response.errors || exceptionResponse;
-    }
-
-    // Special handling for validation errors (usually an array in 'message')
-    if (status === HttpStatus.BAD_REQUEST && Array.isArray((exceptionResponse as ExceptionResponse)?.message)) {
-      message = 'Validation failed';
-      errors = (exceptionResponse as ExceptionResponse).message;
-    }
 
     response.status(status).json(
-      ApiResponse.error(message, errors, {
+      new ApiErrorModel(message, status, errors, {
         path: request.url,
         requestId: request.headers['x-request-id'] as string,
       }),

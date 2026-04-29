@@ -7,34 +7,31 @@ import {
   CallHandler,
 } from '@nestjs/common';
 import { Observable, map } from 'rxjs';
-import { ApiResponse } from './api-response.util';
+import { ApiResponseModel } from './response.model';
 
 @Injectable()
 export class ResponseInterceptor<T> implements NestInterceptor<T, any> {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    const request = context.switchToHttp().getRequest();
+    const http = context.switchToHttp();
+    const request = http.getRequest();
+    const response = http.getResponse();
     const path = request.url;
 
     return next.handle().pipe(
       map((data) => {
-        // ✅ 1. Skip if already formatted
-        if (data?.success !== undefined) {
+        // 1. If data is already in IApiResponse format, return as is
+        if (data && typeof data === 'object' && 'success' in data && 'message' in data) {
           return data;
         }
 
-        // ✅ 2. Skip wrapping for AUTH responses (CRITICAL FIX)
-        // This maintains 100% backward compatibility for auth flows
+        // 2. Skip wrapping for AUTH responses (backward compatibility)
         if (data?.accessToken || data?.refreshToken || data?.user) {
           return data;
         }
 
-        // ✅ 3. Skip if message-only response (logout etc.)
-        if (data?.message && Object.keys(data).length === 1) {
-          return data;
-        }
-
-        // ✅ DEFAULT WRAP using standardized utility
-        return ApiResponse.success(data, 'Request successful', { path });
+        // 3. Wrap success response using the explicit model
+        const statusCode = response.statusCode || 200;
+        return new ApiResponseModel(data, 'Request successful', statusCode, { path });
       }),
     );
   }
