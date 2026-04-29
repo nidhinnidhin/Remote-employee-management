@@ -32,6 +32,7 @@ export class CompanyPolicyMapper {
           p.type,
           p.title,
           p.content || { sections: [] },
+          p.leaveDistribution || [],
           p.isActive ?? true,
         ),
     );

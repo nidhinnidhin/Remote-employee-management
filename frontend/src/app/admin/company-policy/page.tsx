@@ -23,6 +23,7 @@ const CompanyPolicyPage = () => {
   const [initialWorkingHours, setInitialWorkingHours] =
     useState<any>(null);
   const [initialLeave, setInitialLeave] = useState<any>(null);
+  const [policies, setPolicies] = useState<any[]>([]);
 
   // 🔥 FETCH SAVED POLICIES
   useEffect(() => {
@@ -40,6 +41,7 @@ const CompanyPolicyPage = () => {
 
         if (working) setInitialWorkingHours(working.content);
         if (leave) setInitialLeave(leave.content);
+        setPolicies(policies);
       } catch (error) {
         console.error("Failed to fetch policies", error);
       }
@@ -64,7 +66,8 @@ const CompanyPolicyPage = () => {
         policies.push({
           type: "LEAVE_POLICY",
           title: "Leave Policy",
-          content: leaveData,
+          content: { sections: leaveData.sections },
+          leaveDistribution: leaveData.leaveDistribution,
         });
       }
 
@@ -100,6 +103,7 @@ const CompanyPolicyPage = () => {
           <LeavePolicyConfiguration
             onChange={setLeaveData}
             initialData={initialLeave}
+            leaveDistribution={policies.find((p: any) => p.type === "LEAVE_POLICY")?.leaveDistribution}
           />
         )}
 

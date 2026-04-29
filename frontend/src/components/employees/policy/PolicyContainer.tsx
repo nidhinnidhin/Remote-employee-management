@@ -59,6 +59,7 @@ export function PolicyContainer() {
         return (
           <LeavePolicy
             sections={leavePolicy?.content?.sections || []}
+            leaveDistribution={leavePolicy?.leaveDistribution}
           />
         );
 

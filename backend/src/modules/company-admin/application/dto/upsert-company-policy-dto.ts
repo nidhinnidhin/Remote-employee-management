@@ -1,4 +1,4 @@
-import { IsArray, ValidateNested, IsString } from 'class-validator';
+import { IsArray, ValidateNested, IsString, IsOptional, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
 
 class PolicySectionDto {
@@ -17,6 +17,14 @@ class PolicyContentDto {
   sections: PolicySectionDto[];
 }
 
+class LeaveDistributionDto {
+  @IsString()
+  type: string;
+
+  @IsNumber()
+  days: number;
+}
+
 export class PolicyDto {
   @IsString()
   type: string;
@@ -27,6 +35,12 @@ export class PolicyDto {
   @ValidateNested()
   @Type(() => PolicyContentDto)
   content: PolicyContentDto;
+
+  @IsArray()
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => LeaveDistributionDto)
+  leaveDistribution?: LeaveDistributionDto[];
 }
 
 export class UpsertCompanyPoliciesDto {

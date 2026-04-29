@@ -7,6 +7,7 @@ export interface Section {
 
 export interface LeavePolicyProps {
   sections: Section[];
+  leaveDistribution?: Array<{ type: string; days: number }>;
 }
 
 export interface WorkingHoursProps {
@@ -27,4 +28,5 @@ export interface CompanyPolicy {
   content: {
     sections: PolicySection[];
   };
+  leaveDistribution?: Array<{ type: string; days: number }>;
 }

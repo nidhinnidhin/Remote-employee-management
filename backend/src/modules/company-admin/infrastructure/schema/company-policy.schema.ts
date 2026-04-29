@@ -10,6 +10,7 @@ export interface PolicyItem {
       points: string[];
     }>;
   };
+  leaveDistribution: Array<{ type: string; days: number }>;
   isActive: boolean;
 }
 
@@ -31,6 +32,12 @@ export class CompanyPolicy extends Document {
             },
           ],
         },
+        leaveDistribution: [
+          {
+            type: { type: String },
+            days: { type: Number },
+          },
+        ],
         isActive: { type: Boolean, default: true },
       },
     ],
