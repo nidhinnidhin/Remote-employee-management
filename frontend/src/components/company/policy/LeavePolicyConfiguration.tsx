@@ -19,7 +19,9 @@ const LeavePolicyConfiguration: React.FC<Props> = ({
   const [leaveTypes, setLeaveTypes] = useState("");
   const [approvalRules, setApprovalRules] = useState("");
   const [emergencyRules, setEmergencyRules] = useState("");
-  const [distribution, setDistribution] = useState<Array<{ type: string; days: number }>>([]);
+  const [distribution, setDistribution] = useState<
+    Array<{ type: string; days: number }>
+  >([]);
 
   useEffect(() => {
     if (!initialData) return;
@@ -33,7 +35,7 @@ const LeavePolicyConfiguration: React.FC<Props> = ({
     setLeaveTypes(getSection("Types of Leave"));
     setApprovalRules(getSection("Approval Workflow"));
     setEmergencyRules(getSection("Emergency Leave"));
-    
+
     if (initialDistribution) {
       setDistribution(initialDistribution);
     }
@@ -80,7 +82,9 @@ const LeavePolicyConfiguration: React.FC<Props> = ({
   return (
     <div className="portal-card p-8 space-y-10">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-primary">Leave Policy Configuration</h2>
+        <h2 className="text-xl font-bold text-primary">
+          Leave Policy Configuration
+        </h2>
       </div>
 
       <div className="space-y-8">
@@ -88,12 +92,15 @@ const LeavePolicyConfiguration: React.FC<Props> = ({
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <label className="field-label !mb-0">Leave Quota Distribution</label>
-              <p className="text-[11px] text-secondary mt-1">Define specific leave types and their yearly allocations.</p>
+              <label className="field-label !mb-0">
+                Leave Quota Distribution
+              </label>
+              <p className="text-[11px] text-secondary mt-1">
+                Define specific leave types and their yearly allocations.
+              </p>
             </div>
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
               onClick={addLeaveType}
               className="h-9 px-4 text-[10px] uppercase tracking-wider font-bold"
             >
@@ -103,8 +110,8 @@ const LeavePolicyConfiguration: React.FC<Props> = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {distribution.map((item, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className="flex items-center gap-3 p-4 rounded-2xl bg-white/[0.02] border border-white/[0.05] group hover:border-accent/30 transition-all"
               >
                 <div className="flex-1 space-y-3">
@@ -113,7 +120,9 @@ const LeavePolicyConfiguration: React.FC<Props> = ({
                       type="text"
                       placeholder="Leave Type (e.g. Sick Leave)"
                       value={item.type}
-                      onChange={(e) => updateDistribution(index, "type", e.target.value)}
+                      onChange={(e) =>
+                        updateDistribution(index, "type", e.target.value)
+                      }
                       className="w-full bg-transparent border-none outline-none text-sm text-white placeholder:text-slate-700 font-semibold"
                     />
                     <div className="absolute bottom-0 left-0 w-0 h-[1px] bg-accent group-hover:w-full transition-all duration-500" />
@@ -124,10 +133,18 @@ const LeavePolicyConfiguration: React.FC<Props> = ({
                       type="number"
                       placeholder="Days"
                       value={item.days || ""}
-                      onChange={(e) => updateDistribution(index, "days", parseInt(e.target.value) || 0)}
+                      onChange={(e) =>
+                        updateDistribution(
+                          index,
+                          "days",
+                          parseInt(e.target.value) || 0,
+                        )
+                      }
                       className="w-20 bg-transparent border-none outline-none text-xs text-accent font-black"
                     />
-                    <span className="text-[10px] text-slate-600 font-bold uppercase tracking-widest">Days / Year</span>
+                    <span className="text-[10px] text-slate-600 font-bold uppercase tracking-widest">
+                      Days / Year
+                    </span>
                   </div>
                 </div>
                 <button
@@ -138,10 +155,12 @@ const LeavePolicyConfiguration: React.FC<Props> = ({
                 </button>
               </div>
             ))}
-            
+
             {distribution.length === 0 && (
               <div className="col-span-full py-12 text-center rounded-2xl border border-dashed border-white/5 bg-white/[0.01]">
-                <p className="text-sm text-slate-600 font-medium italic">No leave quotas defined yet. Click "Add Leave Type" to begin.</p>
+                <p className="text-sm text-slate-600 font-medium italic">
+                  No leave quotas defined yet. Click "Add Leave Type" to begin.
+                </p>
               </div>
             )}
           </div>
@@ -162,7 +181,9 @@ const LeavePolicyConfiguration: React.FC<Props> = ({
           </div>
 
           <div className="space-y-2">
-            <label className="field-label">Types of Leave (Textual Details)</label>
+            <label className="field-label">
+              Types of Leave (Textual Details)
+            </label>
             <textarea
               placeholder="Additional details about leave types..."
               value={leaveTypes}

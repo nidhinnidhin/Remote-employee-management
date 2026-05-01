@@ -36,10 +36,11 @@ export class CreateUserStoryUseCase implements ICreateUserStoryUseCase {
       status: storyDto.status || UserStoryStatus.BACKLOG,
       priority: storyDto.priority || UserStoryPriority.MEDIUM,
       order: storyDto.order || 0,
+      storyPoints: storyDto.type === 'Bug' ? 0 : (storyDto.storyPoints || 0),
+      attachments: storyDto.attachments || [],
+      links: storyDto.links || [],
       isDeleted: false,
     };
-
-    
 
     return this._storyRepository.create(story as Partial<UserStoryEntity>);
   }

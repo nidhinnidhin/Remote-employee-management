@@ -3,7 +3,7 @@
 import React from "react";
 import BaseModal from "@/components/ui/BaseModal";
 import { Task } from "@/shared/types/company/projects/task.type";
-import { Clock, Calendar, Hash, AlignLeft, User, CheckCircle2 } from "lucide-react";
+import { Clock, Calendar, Hash, AlignLeft, User, CheckCircle2, Layers } from "lucide-react";
 import TaskStatusBadge from "@/components/admin/tasks/TaskStatusBadge";
 import { formatDate, formatTime } from "@/lib/date/date-format";
 
@@ -68,14 +68,70 @@ export default function TaskDetailModal({ task, isOpen, onClose }: TaskDetailMod
           </div>
         </div>
 
+        {/* Resources Section */}
+        {((task.attachments && task.attachments.length > 0) || (task.links && task.links.length > 0)) && (
+          <div className="space-y-4 pt-6 border-t border-white/[0.05]">
+            <div className="flex items-center gap-2 text-slate-500">
+              <Layers size={14} />
+              <span className="text-[10px] font-black uppercase tracking-widest">Resources & Assets</span>
+            </div>
+            
+            <div className="space-y-5">
+              {/* Image Grid */}
+              {task.attachments && task.attachments.length > 0 && (
+                <div className="space-y-2">
+                  <span className="text-[9px] font-bold text-slate-600 uppercase tracking-widest ml-1">Attachments</span>
+                  <div className="flex flex-wrap gap-2">
+                    {task.attachments.map((src, idx) => (
+                      <div 
+                        key={idx} 
+                        className="relative group w-20 h-20 rounded-xl overflow-hidden border border-white/10 bg-white/5 cursor-pointer shadow-md hover:border-accent/40 transition-all"
+                        onClick={() => window.open(src, '_blank')}
+                      >
+                        <img src={src} alt={`Attachment ${idx}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <Layers size={14} className="text-white" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Links List */}
+              {task.links && task.links.length > 0 && (
+                <div className="space-y-2">
+                  <span className="text-[9px] font-bold text-slate-600 uppercase tracking-widest ml-1">Execution Links</span>
+                  <div className="grid grid-cols-1 gap-2">
+                    {task.links.map((link, idx) => (
+                      <a
+                        key={idx}
+                        href={link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.05] hover:border-accent/30 hover:bg-white/[0.04] transition-all group"
+                      >
+                        <div className="w-7 h-7 rounded-lg bg-accent/10 flex items-center justify-center text-accent/60 group-hover:text-accent transition-colors shrink-0">
+                           <Layers size={10} />
+                        </div>
+                        <span className="text-[12px] text-slate-400 group-hover:text-slate-200 truncate">{link}</span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Timestamps */}
         <div className="flex items-center justify-between py-4 border-t border-white/[0.05]">
-           <div className="text-[10px] text-slate-600">
-             Created: {formatDate(task.createdAt)}
-           </div>
-            <div className="text-[10px] text-slate-600">
-              Last Sync: {formatTime(task.updatedAt)}
-            </div>
+          <div className="text-[10px] text-slate-600">
+            Created: {formatDate(task.createdAt)}
+          </div>
+          <div className="text-[10px] text-slate-600">
+            Last Sync: {formatTime(task.updatedAt)}
+          </div>
         </div>
       </div>
     </BaseModal>

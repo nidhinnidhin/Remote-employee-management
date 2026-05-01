@@ -28,4 +28,17 @@ export const ProjectService = {
     const response = await api.delete(API_ROUTES.COMPANY.PROJECTS.BY_ID(id));
     return response.data;
   },
+
+  uploadResource: async (formData: FormData, api: AxiosInstance = clientApi) => {
+    const response = await api.post<{ url: string; publicId: string }>(
+      API_ROUTES.COMPANY.PROJECTS.UPLOAD,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response.data;
+  },
 };

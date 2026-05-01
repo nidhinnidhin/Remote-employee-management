@@ -24,6 +24,8 @@ export class TaskMapper {
       taskDoc.estimatedHours || 0,
       taskDoc.actualHours || 0,
       taskDoc.dueDate,
+      taskDoc.attachments || [],
+      taskDoc.links || [],
       taskDoc.createdAt || new Date(),
       taskDoc.updatedAt || new Date(),
       !!taskDoc.isDeleted,

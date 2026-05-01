@@ -50,10 +50,10 @@ export const createProjectAction = async (payload: CreateProjectPayload) => {
         if (Object.keys(errors).length > 0) {
           return { success: false, errors };
         }
-        
+
         return { success: false, error: messages[0] || "Validation failed" };
       }
-      
+
       // Fallback for single message strings
       return { success: false, error: messages || "Validation failed" };
     }
@@ -105,5 +105,16 @@ export const deleteProjectAction = async (id: string) => {
   } catch (error: any) {
     console.error("Error deleting project:", error?.message);
     return { success: false, error: error?.message || "Failed to delete project" };
+  }
+};
+
+export const uploadResourceAction = async (formData: FormData) => {
+  try {
+    const api = await getServerApi();
+    const data = await ProjectService.uploadResource(formData, api);
+    return { success: true, data };
+  } catch (error: any) {
+    console.error("Error uploading resource:", error?.message);
+    return { success: false, error: error?.message || "Failed to upload resource" };
   }
 };

@@ -1,5 +1,6 @@
 export type StoryStatus = 'Backlog' | 'In Progress' | 'Done';
 export type StoryPriority = 'Low' | 'Medium' | 'High';
+export type IssueType = 'Story' | 'Bug';
 
 export interface UserStory {
   id: string;
@@ -9,9 +10,12 @@ export interface UserStory {
   description: string;
   status: StoryStatus;
   priority: StoryPriority;
+  type: IssueType;
   assigneeId: string;
   acceptanceCriteria: string[];
   storyPoints: number;
+  attachments: string[];
+  links: string[];
   order: number;
   createdBy: string;
   createdAt: string;
@@ -25,9 +29,12 @@ export interface CreateStoryPayload {
   description: string;
   status: StoryStatus;
   priority: StoryPriority;
+  type: IssueType;
   assigneeId: string;
   acceptanceCriteria: string[];
-  storyPoints: number;
+  storyPoints?: number;
+  attachments?: string[];
+  links?: string[];
 }
 
 export interface UpdateStoryPayload extends Partial<Omit<CreateStoryPayload, 'projectId'>> {}

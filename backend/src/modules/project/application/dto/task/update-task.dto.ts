@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsEnum, IsNumber, IsDateString } from 'class-validator';
+import { IsString, IsOptional, IsEnum, IsNumber, IsDateString, IsArray } from 'class-validator';
 import { TaskStatus } from 'src/shared/enums/project/task-status.enum';
 
 export class UpdateTaskDto {
@@ -33,4 +33,14 @@ export class UpdateTaskDto {
   @IsDateString()
   @IsOptional()
   dueDate?: string;
+
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
+  attachments?: string[];
+
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
+  links?: string[];
 }

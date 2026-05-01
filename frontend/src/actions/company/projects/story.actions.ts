@@ -1,8 +1,20 @@
 "use server";
 
 import { StoryService } from "@/services/company/projects/story.service";
+import { ProjectService } from "@/services/company/projects/project.service";
 import { CreateStoryPayload, UpdateStoryPayload } from "@/shared/types/company/projects/user-story.type";
 import { getServerApi } from "@/lib/axios/axiosServer";
+
+export const uploadResourceAction = async (formData: FormData) => {
+  try {
+    const api = await getServerApi();
+    const data = await ProjectService.uploadResource(formData, api);
+    return { success: true, data };
+  } catch (error: any) {
+    console.error("Error uploading resource:", error?.message);
+    return { success: false, error: error?.message || "Failed to upload resource" };
+  }
+};
 
 export const getStoriesByProjectAction = async (projectId: string) => {
   try {

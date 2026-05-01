@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { UserStoryStatus } from 'src/shared/enums/project/user-story-status.enum';
 import { UserStoryPriority } from 'src/shared/enums/project/user-story-priority.enum';
+import { IssueType } from 'src/shared/enums/project/issue-type.enum';
 
 @Schema({ timestamps: true })
 export class UserStoryDocument extends Document {
@@ -38,6 +39,13 @@ export class UserStoryDocument extends Document {
   })
   priority!: string;
 
+  @Prop({
+    required: true,
+    enum: IssueType,
+    default: IssueType.STORY,
+  })
+  type!: string;
+
   @Prop({ required: true, default: 0 })
   order!: number;
 
@@ -46,6 +54,12 @@ export class UserStoryDocument extends Document {
 
   @Prop({ required: true, default: 0 })
   storyPoints!: number;
+
+  @Prop({ type: [String], default: [] })
+  attachments!: string[];
+
+  @Prop({ type: [String], default: [] })
+  links!: string[];
 
   @Prop({ required: true, default: false, index: true })
   isDeleted!: boolean;

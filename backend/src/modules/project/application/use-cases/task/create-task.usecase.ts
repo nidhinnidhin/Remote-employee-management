@@ -46,6 +46,8 @@ export class CreateTaskUseCase implements ICreateTaskUseCase {
       createdBy: adminId,
       status: taskDto.status || TaskStatus.TODO,
       order: taskDto.order || 0,
+      attachments: taskDto.attachments || [],
+      links: taskDto.links || [],
       isDeleted: false,
     };
 

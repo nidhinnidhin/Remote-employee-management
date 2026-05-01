@@ -214,6 +214,8 @@ import { MongoDepartmentRepository } from 'src/modules/department/infrastructure
     'ICookieHelperService',
     'IPasswordService',
     'IOtpService',
+    CloudinaryService,
+    'ICloudinaryService',
   ],
 })
 export class AuthModule { }

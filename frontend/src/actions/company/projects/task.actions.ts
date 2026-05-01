@@ -1,8 +1,20 @@
 "use server";
 
 import { TaskService } from "@/services/company/projects/task.service";
+import { ProjectService } from "@/services/company/projects/project.service";
 import { CreateTaskPayload, UpdateTaskPayload, MoveTaskPayload, Task, MyTasksResponse } from "@/shared/types/company/projects/task.type";
 import { getServerApi } from "@/lib/axios/axiosServer";
+
+export const uploadResourceAction = async (formData: FormData) => {
+  try {
+    const api = await getServerApi();
+    const data = await ProjectService.uploadResource(formData, api);
+    return { success: true, data };
+  } catch (error: any) {
+    console.error("Error uploading resource:", error?.message);
+    return { success: false, error: error?.message || "Failed to upload resource" };
+  }
+};
 
 export const getTasksByStoryAction = async (storyId: string) => {
   try {

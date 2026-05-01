@@ -29,7 +29,7 @@ import { cn } from "@/lib/utils";
 import { useProfileStore } from "@/store/profile.store";
 
 const navigationGroups = [
-// ... (rest of the file)
+  // ... (rest of the file)
   {
     title: "Overview",
     items: [
@@ -258,8 +258,8 @@ export function Sidebar({ className }: { className?: string }) {
               )}
             >
               <div className="w-8 h-8 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center text-[10px] font-bold text-white uppercase shrink-0">
-                {userProfile?.firstName && userProfile?.lastName 
-                  ? `${userProfile.firstName[0]}${userProfile.lastName[0]}` 
+                {userProfile?.firstName && userProfile?.lastName
+                  ? `${userProfile.firstName[0]}${userProfile.lastName[0]}`
                   : userProfile?.firstName ? userProfile.firstName[0] : "JD"}
               </div>
               {!isCollapsed && (

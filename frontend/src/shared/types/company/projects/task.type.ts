@@ -19,6 +19,8 @@ export interface Task {
   estimatedHours: number;
   actualHours?: number;
   dueDate: string;
+  attachments: string[];
+  links: string[];
   createdAt: string;
   updatedAt: string;
   isDeleted: boolean;
@@ -33,10 +35,14 @@ export interface CreateTaskPayload {
   estimatedHours: number;
   assignedTo: string;
   dueDate: string;
+  attachments?: string[];
+  links?: string[];
 }
 
 export interface UpdateTaskPayload extends Partial<Omit<CreateTaskPayload, 'projectId' | 'storyId'>> {
   actualHours?: number;
+  attachments?: string[];
+  links?: string[];
 }
 
 export interface MoveTaskPayload {

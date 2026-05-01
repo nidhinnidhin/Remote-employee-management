@@ -43,6 +43,12 @@ export class TaskDocument extends Document {
   @Prop({ required: false })
   dueDate?: Date;
 
+  @Prop({ type: [String], default: [] })
+  attachments!: string[];
+
+  @Prop({ type: [String], default: [] })
+  links!: string[];
+
   @Prop({ required: true, default: false, index: true })
   isDeleted: boolean;
 

@@ -9,7 +9,11 @@ import {
   Req,
   UseGuards,
   Inject,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import type { Request } from 'express';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import { CompanyAdminGuard } from 'src/shared/guards/company-admin.guard';
@@ -22,6 +26,8 @@ import type {
   IUpdateProjectUseCase,
   IDeleteProjectUseCase,
 } from '../../application/interfaces/project/project-use-cases.interface';
+import type { ICloudinaryService } from 'src/shared/services/cloudinary/interfaces/icloudinary.service';
+import { CLOUDINARY_PATH } from 'src/shared/constants/path/cloudinary.path';
 
 @Controller('projects')
 @UseGuards(JwtAuthGuard)
@@ -37,7 +43,27 @@ export class ProjectController {
     private readonly _updateProjectUseCase: IUpdateProjectUseCase,
     @Inject('IDeleteProjectUseCase')
     private readonly _deleteProjectUseCase: IDeleteProjectUseCase,
+    @Inject('ICloudinaryService')
+    private readonly _cloudinaryService: ICloudinaryService,
   ) {}
+
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+
+    const result = await this._cloudinaryService.uploadFile(
+      file,
+      CLOUDINARY_PATH.UPLOAD_DOCUMENT_PATH,
+    );
+
+    return {
+      url: result.secure_url,
+      publicId: result.public_id,
+    };
+  }
 
   @Post()
   @UseGuards(CompanyAdminGuard)

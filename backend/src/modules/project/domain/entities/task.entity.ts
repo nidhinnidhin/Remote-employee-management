@@ -16,6 +16,8 @@ export class TaskEntity {
     public readonly estimatedHours?: number,
     public readonly actualHours?: number,
     public readonly dueDate?: Date,
+    public readonly attachments: string[] = [],
+    public readonly links: string[] = [],
     public readonly createdAt?: Date,
     public readonly updatedAt?: Date,
     public readonly isDeleted: boolean = false,

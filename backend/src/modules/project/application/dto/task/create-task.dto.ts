@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsEnum, IsNumber, IsDateString, Min, MinLength, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsEnum, IsNumber, IsDateString, Min, MinLength, IsOptional, IsArray } from 'class-validator';
 import { TaskStatus } from 'src/shared/enums/project/task-status.enum';
 
 export class CreateTaskDto {
@@ -39,4 +39,14 @@ export class CreateTaskDto {
   @IsDateString({}, { message: 'Due date must be a valid date' })
   @IsNotEmpty({ message: 'Due date is required' })
   dueDate: string;
+
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
+  attachments?: string[];
+
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
+  links?: string[];
 }

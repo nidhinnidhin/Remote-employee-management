@@ -3,6 +3,7 @@ import { UserStoryEntity } from '../../domain/entities/user-story.entity';
 import { UserStoryDocument } from '../../infrastructure/database/mongoose/schemas/user-story.schema';
 import { UserStoryStatus } from 'src/shared/enums/project/user-story-status.enum';
 import { UserStoryPriority } from 'src/shared/enums/project/user-story-priority.enum';
+import { IssueType } from 'src/shared/enums/project/issue-type.enum';
 
 export type LeanStoryDocument = FlattenMaps<UserStoryDocument> & {
   _id: Types.ObjectId;
@@ -19,12 +20,15 @@ export class UserStoryMapper {
       userDocument.title,
       (userDocument.status as UserStoryStatus) || UserStoryStatus.TODO,
       (userDocument.priority as UserStoryPriority) || UserStoryPriority.MEDIUM,
+      (userDocument.type as IssueType) || IssueType.STORY,
       userDocument.order || 0,
       userDocument.createdBy,
       userDocument.description || '',
-      userDocument.acceptanceCriteria || '',
+      userDocument.acceptanceCriteria || [],
       userDocument.assigneeId?.toString(),
       userDocument.storyPoints || 0,
+      userDocument.attachments || [],
+      userDocument.links || [],
       userDocument.createdAt || new Date(),
       userDocument.updatedAt || new Date(),
       !!userDocument.isDeleted,
