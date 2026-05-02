@@ -61,6 +61,11 @@ export const API_ROUTES = {
             MOVE: (id: string) => `/tasks/${id}/move`,
             MY_TASKS: "/tasks/my",
         },
+        SPRINTS: {
+            BASE: "/sprints",
+            BY_PROJECT: (projectId: string) => `/sprints/project/${projectId}`,
+            BY_ID: (id: string) => `/sprints/${id}`,
+        },
     },
     SUPER_ADMIN: {
         COMPANIES: "/super-admin/companies",

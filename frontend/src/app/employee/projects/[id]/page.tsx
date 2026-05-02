@@ -11,6 +11,8 @@ import { useParams } from "next/navigation";
 import { fetchMyTasksAction } from "@/actions/company/projects/task.actions";
 import { getAllProjectsAction } from "@/actions/company/projects/project.actions";
 import { getStoriesByProjectAction } from "@/actions/company/projects/story.actions";
+import { getSprintsByProjectAction } from "@/actions/company/projects/sprint.actions";
+import { Sprint } from "@/shared/types/company/projects/sprint.type";
 import {
   Task,
   MyTasksResponse,
@@ -22,8 +24,9 @@ import EmployeeStoryCard from "@/components/employees/stories/EmployeeStoryCard"
 import ProjectStatusBadge from "@/components/company/projects/ProjectStatusBadge";
 import {
   Loader2,
-  LayoutDashboard,
   ChevronRight,
+  Timer,
+  LayoutDashboard,
   Goal,
   GitPullRequest,
 } from "lucide-react";
@@ -36,28 +39,27 @@ export default function EmployeeProjectDetailPage() {
   const params = useParams();
   const projectId = params?.id as string;
 
-  // 1. Transition hook to prevent the global loading spinner
   const [isPending, startTransition] = useTransition();
 
   const [activeTab, setActiveTab] = useState<"board" | "stories">("board");
   const [tasks, setTasks] = useState<Task[]>([]);
   const [project, setProject] = useState<Project | null>(null);
   const [stories, setStories] = useState<UserStory[]>([]);
+  const [activeSprint, setActiveSprint] = useState<Sprint | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const loadData = useCallback(
     async (isSilent = false) => {
-      // 2. Only set global loading on the very first mount
       if (!isSilent) setIsLoading(true);
 
       try {
-        const [tasksResult, projectsResult, storiesResult] = await Promise.all([
+        const [tasksResult, projectsResult, storiesResult, sprintsResult] = await Promise.all([
           fetchMyTasksAction(),
           getAllProjectsAction(),
           getStoriesByProjectAction(projectId),
+          getSprintsByProjectAction(projectId),
         ]);
 
-        // 3. Wrap updates in startTransition so React keeps the old UI visible while loading
         startTransition(() => {
           if (projectsResult.success && projectsResult.data) {
             const found = projectsResult.data.find(
@@ -66,21 +68,41 @@ export default function EmployeeProjectDetailPage() {
             if (found) setProject(found);
           }
 
+          // 1. Find Active Sprint
+          const active = sprintsResult.success && sprintsResult.data 
+            ? (sprintsResult.data as Sprint[]).find(s => s.status === 'ACTIVE') 
+            : null;
+          setActiveSprint(active || null);
+
+          if (!active) {
+            setTasks([]);
+            setStories([]);
+            return;
+          }
+
+          // 2. Filter Stories for Active Sprint
+          const activeStories = storiesResult.success && storiesResult.data
+            ? (storiesResult.data as UserStory[]).filter(s => active.issueIds.includes(s.id || (s as any)._id))
+            : [];
+          setStories(activeStories);
+
+          // 3. Filter Tasks for Active Sprint
           if (tasksResult.success && tasksResult.data) {
             const allTasks =
               (tasksResult.data as MyTasksResponse).tasks ||
               (tasksResult.data as any) ||
               [];
-            setTasks(
-              allTasks.filter(
-                (t: any) =>
-                  t.projectId === projectId || t.project === projectId,
-              ),
+            
+            const projectTasks = allTasks.filter(
+                (t: any) => t.projectId === projectId || t.project === projectId
             );
-          }
 
-          if (storiesResult.success && storiesResult.data) {
-            setStories(storiesResult.data);
+            // Only tasks that belong to stories in the active sprint
+            setTasks(
+              projectTasks.filter((t: any) => 
+                activeStories.some(s => (s.id || (s as any)._id) === t.storyId)
+              )
+            );
           }
         });
       } catch (err) {
@@ -104,6 +126,7 @@ export default function EmployeeProjectDetailPage() {
   }, [tasks, stories]);
 
   // Show spinner ONLY on initial load
+  // Show spinner ONLY on initial load
   if (isLoading && !project) {
     return (
       <DashboardLayout>
@@ -112,6 +135,30 @@ export default function EmployeeProjectDetailPage() {
           <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">
             Loading Workspace...
           </p>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (project && !activeSprint) {
+    return (
+      <DashboardLayout>
+        <div className="flex flex-col items-center justify-center py-40 gap-8 h-[calc(100vh-8rem)] animate-in fade-in duration-700">
+           <div className="w-24 h-24 rounded-[3rem] bg-orange-500/5 flex items-center justify-center text-orange-500/20 border border-orange-500/10 mb-2 border-dashed">
+             <Timer size={48} className="translate-y-0.5" />
+           </div>
+           <div className="text-center space-y-3">
+              <h3 className="text-2xl font-black text-white tracking-tight">No Active Sprint</h3>
+              <p className="text-slate-500 text-sm max-w-[320px] leading-relaxed font-medium mx-auto">
+                There are currently no active sprints for this project. Please wait for your project manager to start the next cycle.
+              </p>
+           </div>
+           <Link
+             href={FRONTEND_ROUTES.EMPLOYEE.PROJECTS}
+             className="px-10 py-4 rounded-2xl bg-white/[0.03] border border-white/10 text-[11px] font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-white/5 transition-all"
+           >
+              Back to Portfolio
+           </Link>
         </div>
       </DashboardLayout>
     );

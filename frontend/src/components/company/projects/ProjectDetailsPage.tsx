@@ -9,6 +9,8 @@ import {
   ListTodo,
   MoreHorizontal,
   Settings,
+  Timer, // <-- Added for Sprint
+  Activity, // <-- Added for Performance
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -20,14 +22,18 @@ import { getProjectByIdAction } from "@/actions/company/projects/project.actions
 import { toast } from "sonner";
 import BacklogView from "@/components/admin/stories/BacklogView";
 import BoardView from "@/components/admin/tasks/BoardView";
+import SprintListView from "@/components/admin/stories/SprintListView";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+
+// Make sure to define the exact string types for safety
+type TabType = "Backlog" | "Board" | "Sprint" | "Performance";
 
 const ProjectDetailsPage = () => {
   const { id } = useParams();
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"Backlog" | "Board">("Backlog");
+  const [activeTab, setActiveTab] = useState<TabType>("Backlog");
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -70,6 +76,35 @@ const ProjectDetailsPage = () => {
       </AdminLayoutWrapper>
     );
   }
+
+  // Helper to render the correct view based on active tab
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case "Backlog":
+        return <BacklogView projectId={id as string} />;
+      case "Board":
+        return <BoardView projectId={id as string} />;
+      case "Sprint":
+        return <SprintListView projectId={id as string} />;
+      case "Performance":
+        return (
+          // Placeholder for Performance View - Replace with your <PerformanceView /> component
+          <div className="flex flex-col items-center justify-center py-32 px-6 text-center animate-in fade-in duration-700">
+            <div className="w-20 h-20 rounded-[2.5rem] bg-accent/5 flex items-center justify-center text-accent/20 border border-accent/10 mb-8">
+              <Activity size={32} />
+            </div>
+            <h3 className="text-xl font-black text-white mb-3 tracking-tighter">
+              Performance Analytics
+            </h3>
+            <p className="text-slate-500 text-sm max-w-[300px] leading-relaxed font-medium">
+              Velocity charts, burndown data, and team metrics will be visualized here.
+            </p>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
     <AdminLayoutWrapper>
@@ -139,9 +174,9 @@ const ProjectDetailsPage = () => {
                   <span className="text-sm">
                     {project.startDate
                       ? new Date(project.startDate).toLocaleDateString(
-                          "en-US",
-                          { month: "short", day: "numeric", year: "numeric" },
-                        )
+                        "en-US",
+                        { month: "short", day: "numeric", year: "numeric" },
+                      )
                       : "TBD"}
                   </span>
                 </div>
@@ -158,10 +193,10 @@ const ProjectDetailsPage = () => {
                   <span className="text-sm">
                     {project.endDate
                       ? new Date(project.endDate).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })
                       : "N/A"}
                   </span>
                 </div>
@@ -173,14 +208,17 @@ const ProjectDetailsPage = () => {
         {/* Tabs section */}
         <div className="flex flex-col gap-8 w-full animate-in fade-in duration-700">
           {/* --- TAB NAVIGATION: SEGMENTED CONTROL --- */}
-          <div className="flex items-center gap-1 p-1 bg-white/[0.03] border border-white/[0.08] rounded-xl w-fit">
+          {/* Added flex-wrap to prevent squishing on smaller screens */}
+          <div className="flex flex-wrap sm:flex-nowrap items-center gap-1 p-1 bg-white/[0.03] border border-white/[0.08] rounded-xl w-fit">
             {[
               { id: "Backlog", icon: ListTodo, label: "Backlog" },
               { id: "Board", icon: Layout, label: "Kanban Board" },
+              { id: "Sprint", icon: Timer, label: "Sprints" },
+              { id: "Performance", icon: Activity, label: "Performance" },
             ].map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id as TabType)}
                 className={cn(
                   "relative flex items-center gap-2.5 px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 group",
                   activeTab === tab.id
@@ -214,11 +252,7 @@ const ProjectDetailsPage = () => {
             <div className="absolute inset-0 bg-gradient-to-b from-accent/[0.02] to-transparent pointer-events-none" />
 
             <div className="relative z-10">
-              {activeTab === "Backlog" ? (
-                <BacklogView projectId={id as string} />
-              ) : (
-                <BoardView projectId={id as string} />
-              )}
+              {renderTabContent()}
             </div>
           </div>
         </div>

@@ -3,9 +3,11 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ProjectDocument, ProjectSchema } from './infrastructure/database/mongoose/schemas/project.schema';
 import { UserStoryDocument, UserStorySchema } from './infrastructure/database/mongoose/schemas/user-story.schema';
 import { TaskDocument, TaskSchema } from './infrastructure/database/mongoose/schemas/task.schema';
+import { SprintDocument, SprintSchema } from './infrastructure/database/mongoose/schemas/sprint.schema';
 import { MongoProjectRepository } from './infrastructure/database/repositories/mongo-project.repository';
 import { MongoUserStoryRepository } from './infrastructure/database/repositories/mongo-user-story.repository';
 import { MongoTaskRepository } from './infrastructure/database/repositories/mongo-task.repository';
+import { MongoSprintRepository } from './infrastructure/database/repositories/mongo-sprint.repository';
 import { CreateProjectUseCase } from './application/use-cases/project/create-project.usecase';
 import { GetProjectUseCase } from './application/use-cases/project/get-project.usecase';
 import { ListProjectsUseCase } from './application/use-cases/project/list-projects.usecase';
@@ -21,9 +23,14 @@ import { GetMyTasksUseCase } from './application/use-cases/task/get-my-tasks.use
 import { UpdateTaskUseCase } from './application/use-cases/task/update-task.usecase';
 import { MoveTaskUseCase } from './application/use-cases/task/move-task.usecase';
 import { DeleteTaskUseCase } from './application/use-cases/task/delete-task.usecase';
+import { CreateSprintUseCase } from './application/use-cases/sprint/create-sprint.usecase';
+import { UpdateSprintUseCase } from './application/use-cases/sprint/update-sprint.usecase';
+import { GetSprintUseCase } from './application/use-cases/sprint/get-sprint.usecase';
+import { ListProjectSprintsUseCase } from './application/use-cases/sprint/list-project-sprints.usecase';
 import { ProjectController } from './presentation/controllers/project.controller';
 import { StoryController } from './presentation/controllers/story.controller';
 import { TaskController } from './presentation/controllers/task.controller';
+import { SprintController } from './presentation/controllers/sprint.controller';
 import { AuthModule } from '../auth/presentation/auth/auth.module';
 
 @Module({
@@ -33,9 +40,10 @@ import { AuthModule } from '../auth/presentation/auth/auth.module';
       { name: ProjectDocument.name, schema: ProjectSchema },
       { name: UserStoryDocument.name, schema: UserStorySchema },
       { name: TaskDocument.name, schema: TaskSchema },
+      { name: SprintDocument.name, schema: SprintSchema },
     ]),
   ],
-  controllers: [ProjectController, StoryController, TaskController],
+  controllers: [ProjectController, StoryController, TaskController, SprintController],
   providers: [
     // Repositories
     {
@@ -49,6 +57,10 @@ import { AuthModule } from '../auth/presentation/auth/auth.module';
     {
       provide: 'ITaskRepository',
       useClass: MongoTaskRepository,
+    },
+    {
+      provide: 'ISprintRepository',
+      useClass: MongoSprintRepository,
     },
     // Project Use Cases
     {
@@ -112,6 +124,23 @@ import { AuthModule } from '../auth/presentation/auth/auth.module';
     {
       provide: 'IDeleteTaskUseCase',
       useClass: DeleteTaskUseCase,
+    },
+    // Sprint Use Cases
+    {
+      provide: 'ICreateSprintUseCase',
+      useClass: CreateSprintUseCase,
+    },
+    {
+      provide: 'IUpdateSprintUseCase',
+      useClass: UpdateSprintUseCase,
+    },
+    {
+      provide: 'IGetSprintUseCase',
+      useClass: GetSprintUseCase,
+    },
+    {
+      provide: 'IListProjectSprintsUseCase',
+      useClass: ListProjectSprintsUseCase,
     },
   ],
 })

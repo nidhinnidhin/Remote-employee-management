@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { Layout, Loader2, Sparkles, Filter, Search, Plus } from "lucide-react";
+import { Layout, Loader2, Sparkles, Filter, Search, Plus, Timer } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Task } from "@/shared/types/company/projects/task.type";
 import { Employee } from "@/shared/types/company/employees/employee-listing.type";
@@ -9,6 +9,8 @@ import { UserStory } from "@/shared/types/company/projects/user-story.type";
 import { getStoriesByProjectAction } from "@/actions/company/projects/story.actions";
 import { getTasksByStoryAction } from "@/actions/company/projects/task.actions";
 import { getEmployees } from "@/services/company/employee-management.service";
+import { getSprintsByProjectAction } from "@/actions/company/projects/sprint.actions";
+import { Sprint } from "@/shared/types/company/projects/sprint.type";
 import { toast } from "sonner";
 import KanbanBoard from "./KanbanBoard";
 import Button from "@/components/ui/Button";
@@ -21,14 +23,16 @@ const BoardView: React.FC<BoardViewProps> = ({ projectId }) => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [stories, setStories] = useState<UserStory[]>([]);
+  const [activeSprint, setActiveSprint] = useState<Sprint | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      // 1. Fetch Stories and Employees
-      const [storiesResult, employeesData] = await Promise.all([
+      // 1. Fetch Stories, Employees, and Sprints
+      const [storiesResult, sprintsResult, employeesData] = await Promise.all([
         getStoriesByProjectAction(projectId),
+        getSprintsByProjectAction(projectId),
         getEmployees(),
       ]);
 
@@ -38,11 +42,30 @@ const BoardView: React.FC<BoardViewProps> = ({ projectId }) => {
         return;
       }
 
-      setStories(storiesResult.data);
       setEmployees(employeesData);
 
-      // 2. Fetch Tasks for each story (Parallel)
-      const tasksPromises = storiesResult.data.map((story) =>
+      // 2. Find Active Sprint
+      const active = sprintsResult.success && sprintsResult.data 
+        ? sprintsResult.data.find(s => s.status === 'ACTIVE') 
+        : null;
+      
+      setActiveSprint(active || null);
+
+      if (!active) {
+        setStories([]);
+        setTasks([]);
+        setLoading(false);
+        return;
+      }
+
+      // 3. Filter Stories for Active Sprint
+      const activeStories = storiesResult.data.filter(story => 
+        active.issueIds.includes(story.id)
+      );
+      setStories(activeStories);
+
+      // 4. Fetch Tasks for each active story (Parallel)
+      const tasksPromises = activeStories.map((story) =>
         getTasksByStoryAction(story.id),
       );
       const tasksResults = await Promise.all(tasksPromises);

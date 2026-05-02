@@ -19,4 +19,4 @@ export interface CreateProjectPayload {
   status?: 'Active' | 'Completed' | 'On Hold';
 }
 
-export interface UpdateProjectPayload extends Partial<CreateProjectPayload> {}
+export interface UpdateProjectPayload extends Partial<CreateProjectPayload> { }
