@@ -6,7 +6,6 @@ import {
   X,
   User,
   Star,
-  ListChecks,
   AlignLeft,
   CheckCircle2,
   Info,
@@ -16,6 +15,7 @@ import {
   Link2,
   FileText,
   Layers,
+  Rocket,
   Image as ImageIcon,
   Upload,
   Camera,
@@ -58,6 +58,7 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
     assigneeId: "",
     acceptanceCriteria: [],
     storyPoints: 1,
+    isInBacklog: true,
     type: "Story",
     attachments: [],
     links: [],
@@ -71,12 +72,23 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
   const [isUploading, setIsUploading] = useState(false);
 
   const priorityOptions = ["Low", "Medium", "High"];
-  const statusOptions = ["Backlog", "In Progress", "Done"];
   const storyPointOptions = [1, 2, 3, 5, 8, 13];
   const issueTypeOptions = ["Story", "Bug"];
+  const destinationOptions = ["Backlog", "Add to Active Sprint"];
 
   const handleChange = (e: any) => {
     const { name, value } = e.target;
+    
+    if (name === "destination") {
+      const isInBacklog = value === "Backlog";
+      setFormData((prev) => ({
+        ...prev,
+        isInBacklog,
+        status: isInBacklog ? "Backlog" : "Todo",
+      }));
+      return;
+    }
+
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
       setErrors((prev) => {
@@ -292,7 +304,16 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
             </span>
           </div>
 
-          <div className="grid grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <FormDropdown
+              label="Destination"
+              name="destination"
+              value={formData.isInBacklog ? "Backlog" : "Add to Active Sprint"}
+              onChange={handleChange}
+              options={destinationOptions}
+              required
+              icon={<Rocket size={14} className="text-accent/60" />}
+            />
             <FormDropdown
               label="Priority"
               name="priority"
@@ -301,15 +322,6 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
               options={priorityOptions}
               required
               icon={<Zap size={14} className="text-accent/60" />}
-            />
-            <FormDropdown
-              label="Initial Status"
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              options={statusOptions}
-              required
-              icon={<ListChecks size={14} className="text-accent/60" />}
             />
             {formData.type === "Story" && (
               <FormDropdown

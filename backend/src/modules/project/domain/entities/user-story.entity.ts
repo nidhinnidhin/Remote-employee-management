@@ -17,6 +17,7 @@ export class UserStoryEntity {
     public readonly acceptanceCriteria: string[],
     public readonly assigneeId: string,
     public readonly storyPoints: number,
+    public readonly isInBacklog: boolean = true,
     public readonly attachments: string[] = [],
     public readonly links: string[] = [],
     public readonly createdAt?: Date,

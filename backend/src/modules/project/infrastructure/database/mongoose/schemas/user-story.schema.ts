@@ -55,6 +55,9 @@ export class UserStoryDocument extends Document {
   @Prop({ required: true, default: 0 })
   storyPoints!: number;
 
+  @Prop({ required: true, default: true })
+  isInBacklog!: boolean;
+
   @Prop({ type: [String], default: [] })
   attachments!: string[];
 

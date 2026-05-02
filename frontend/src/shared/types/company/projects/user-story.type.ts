@@ -1,4 +1,4 @@
-export type StoryStatus = 'Backlog' | 'In Progress' | 'Done';
+export type StoryStatus = 'Backlog' | 'Todo' | 'In Progress' | 'Done';
 export type StoryPriority = 'Low' | 'Medium' | 'High';
 export type IssueType = 'Story' | 'Bug';
 
@@ -14,6 +14,7 @@ export interface UserStory {
   assigneeId: string;
   acceptanceCriteria: string[];
   storyPoints: number;
+  isInBacklog: boolean;
   attachments: string[];
   links: string[];
   order: number;
@@ -33,6 +34,7 @@ export interface CreateStoryPayload {
   assigneeId: string;
   acceptanceCriteria: string[];
   storyPoints?: number;
+  isInBacklog?: boolean;
   attachments?: string[];
   links?: string[];
 }

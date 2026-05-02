@@ -27,6 +27,7 @@ export class UserStoryMapper {
       userDocument.acceptanceCriteria || [],
       userDocument.assigneeId?.toString(),
       userDocument.storyPoints || 0,
+      userDocument.isInBacklog !== undefined ? !!userDocument.isInBacklog : true,
       userDocument.attachments || [],
       userDocument.links || [],
       userDocument.createdAt || new Date(),

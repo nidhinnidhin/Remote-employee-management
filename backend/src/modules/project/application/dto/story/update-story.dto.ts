@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsEnum, IsArray, IsNumber, IsIn } from 'class-validator';
+import { IsString, IsOptional, IsEnum, IsArray, IsNumber, IsIn, IsBoolean } from 'class-validator';
 import { UserStoryStatus } from 'src/shared/enums/project/user-story-status.enum';
 import { UserStoryPriority } from 'src/shared/enums/project/user-story-priority.enum';
 import { IssueType } from 'src/shared/enums/project/issue-type.enum';
@@ -41,6 +41,10 @@ export class UpdateStoryDto {
   @IsOptional()
   @IsIn([1, 2, 3, 5, 8, 13], { message: 'Invalid story points value' })
   storyPoints?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  isInBacklog?: boolean;
 
   @IsArray()
   @IsOptional()
