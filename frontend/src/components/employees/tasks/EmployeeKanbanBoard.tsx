@@ -38,6 +38,7 @@ export default function EmployeeKanbanBoard({ tasks: initialTasks, projects, onR
         toast.error("Failed to update status");
         setTasks(originalTasks);
       } else {
+        toast.success(`Task moved to ${destStatus}`);
         onRefresh();
       }
     } catch {
@@ -46,12 +47,12 @@ export default function EmployeeKanbanBoard({ tasks: initialTasks, projects, onR
     }
   };
 
-  const statuses: TaskStatus[] = [TaskStatus.TODO, TaskStatus.IN_PROGRESS, TaskStatus.DONE];
+  const statuses: TaskStatus[] = [TaskStatus.TODO, TaskStatus.IN_PROGRESS, TaskStatus.REVIEW, TaskStatus.DONE];
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className="w-full overflow-x-auto pb-6 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-        <div className="flex items-start gap-6 min-w-max lg:min-w-0">
+      <div className="w-full pb-6">
+        <div className="grid grid-cols-4 gap-4 w-full">
           {statuses.map((status) => (
             <EmployeeKanbanColumn
               key={status}

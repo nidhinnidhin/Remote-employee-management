@@ -1,4 +1,4 @@
-export type StoryStatus = 'Backlog' | 'Todo' | 'In Progress' | 'Done';
+export type StoryStatus = 'Backlog' | 'Todo' | 'In Progress' | 'Review' | 'Done';
 export type StoryPriority = 'Low' | 'Medium' | 'High';
 export type IssueType = 'Story' | 'Bug';
 

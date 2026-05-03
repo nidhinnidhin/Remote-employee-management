@@ -22,6 +22,8 @@ export default function EmployeeKanbanColumn({ status, tasks, projects, onRefres
         return { label: "To Do", color: "text-slate-400", dot: "bg-slate-500", bg: "bg-slate-500/[0.02]" };
       case TaskStatus.IN_PROGRESS: 
         return { label: "In Progress", color: "text-amber-500", dot: "bg-amber-500", bg: "bg-amber-500/[0.02]" };
+      case TaskStatus.REVIEW: 
+        return { label: "Review", color: "text-violet-500", dot: "bg-violet-500", bg: "bg-violet-500/[0.02]" };
       case TaskStatus.DONE: 
         return { label: "Done", color: "text-emerald-500", dot: "bg-emerald-500", bg: "bg-emerald-500/[0.02]" };
       default: 
@@ -42,7 +44,7 @@ export default function EmployeeKanbanColumn({ status, tasks, projects, onRefres
   return (
     <div className={cn(
       "flex flex-col rounded-2xl border border-white/[0.04] transition-all duration-500",
-      "w-[320px] lg:flex-1 lg:min-w-[300px] lg:max-w-[450px] min-h-screen",
+      "w-full min-h-[500px]",
       config.bg
     )}>
       {/* Header with Glowing Status Indicator */}

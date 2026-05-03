@@ -68,7 +68,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
-  const statusOptions = ["Todo", "In Progress", "Done"];
+  const statusOptions = ["Todo", "In Progress", "Review", "Done"];
 
   const handleChange = (e: any) => {
     const { name, value } = e.target;

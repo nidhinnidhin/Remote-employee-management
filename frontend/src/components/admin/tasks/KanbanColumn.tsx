@@ -37,6 +37,8 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
       case TaskStatus.IN_PROGRESS:
         // A soft, light gold / warm amber color
         return "rgb(251, 191, 36)";
+      case TaskStatus.REVIEW:
+        return "rgb(168, 85, 247)";
       case TaskStatus.DONE:
         return "rgb(var(--color-success))";
       default:
@@ -46,7 +48,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
 
   return (
     <div
-      className="flex flex-col w-[300px] shrink-0 min-h-screen rounded-xl transition-all duration-300"
+      className="flex flex-col w-full min-h-[500px] rounded-xl transition-all duration-300"
       style={{
         backgroundColor: `color-mix(in srgb, ${getColumnColor()} 10%, transparent)`,
       }}
