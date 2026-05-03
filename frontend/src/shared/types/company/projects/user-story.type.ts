@@ -35,6 +35,7 @@ export interface CreateStoryPayload {
   acceptanceCriteria: string[];
   storyPoints?: number;
   isInBacklog?: boolean;
+  addToActiveSprint?: boolean;
   attachments?: string[];
   links?: string[];
 }

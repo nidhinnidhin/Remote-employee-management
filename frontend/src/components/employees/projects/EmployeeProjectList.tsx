@@ -52,10 +52,8 @@ export default function EmployeeProjectList({
 
   if (filteredProjects.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 px-8 text-center border-2 border-dashed border-[rgba(var(--color-border-subtle),0.1)] rounded-[3rem] bg-surface/20 animate-in zoom-in-95 duration-700">
-         <div className="w-16 h-16 rounded-3xl bg-accent-subtle/20 flex items-center justify-center text-accent/40 mb-6 group-hover:scale-110 transition-transform">
-            <LayoutGrid size={32} strokeWidth={1} />
-         </div>
+      <div className="flex flex-col items-center justify-center py-20 px-8 text-center  border-dashed border-[rgba(var(--color-border-subtle),0.1)] rounded-[3rem] bg-surface/20 animate-in zoom-in-95 duration-700">
+         
          <h2 className="text-xl font-bold text-primary tracking-tight mb-2">No Active Projects</h2>
          <p className="text-[13px] text-muted max-w-sm leading-relaxed mb-8">
             You are not currently assigned to any active projects. Once tasks are assigned to you, they will appear here automatically.

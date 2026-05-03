@@ -27,6 +27,7 @@ import { CreateSprintUseCase } from './application/use-cases/sprint/create-sprin
 import { UpdateSprintUseCase } from './application/use-cases/sprint/update-sprint.usecase';
 import { GetSprintUseCase } from './application/use-cases/sprint/get-sprint.usecase';
 import { ListProjectSprintsUseCase } from './application/use-cases/sprint/list-project-sprints.usecase';
+import { DeleteSprintUseCase } from './application/use-cases/sprint/delete-sprint.usecase';
 import { ProjectController } from './presentation/controllers/project.controller';
 import { StoryController } from './presentation/controllers/story.controller';
 import { TaskController } from './presentation/controllers/task.controller';
@@ -141,6 +142,10 @@ import { AuthModule } from '../auth/presentation/auth/auth.module';
     {
       provide: 'IListProjectSprintsUseCase',
       useClass: ListProjectSprintsUseCase,
+    },
+    {
+      provide: 'IDeleteSprintUseCase',
+      useClass: DeleteSprintUseCase,
     },
   ],
 })

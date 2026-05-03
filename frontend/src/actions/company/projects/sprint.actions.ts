@@ -12,8 +12,9 @@ export const getSprintsByProjectAction = async (projectId: string) => {
     const normalized = data.map((s: any) => ({ ...s, id: s.id || s._id }));
     return { success: true, data: normalized };
   } catch (error: any) {
-    console.error("Error fetching sprints:", error?.message);
-    return { success: false, error: error?.message || "Failed to fetch sprints" };
+    const message = error.response?.data?.message || error.message || "Failed to fetch sprints";
+    console.error("Error fetching sprints:", message);
+    return { success: false, error: message };
   }
 };
 
@@ -25,8 +26,9 @@ export const createSprintAction = async (projectId: string, payload: CreateSprin
     const normalized = { ...data, id: (data as any).id || (data as any)._id };
     return { success: true, data: normalized };
   } catch (error: any) {
-    console.error("Error creating sprint:", error?.message);
-    return { success: false, error: error?.message || "Failed to create sprint" };
+    const message = error.response?.data?.message || error.message || "Failed to create sprint";
+    console.error("Error creating sprint:", message);
+    return { success: false, error: message };
   }
 };
 
@@ -36,7 +38,21 @@ export const updateSprintAction = async (id: string, payload: UpdateSprintPayloa
     const data = await SprintService.updateSprint(id, payload, api);
     return { success: true, data };
   } catch (error: any) {
-    console.error("Error updating sprint:", error?.message);
-    return { success: false, error: error?.message || "Failed to update sprint" };
+    const message = error.response?.data?.message || error.message || "Failed to update sprint";
+    console.error("Error updating sprint:", message);
+    return { success: false, error: message };
+  }
+};
+
+export const deleteSprintAction = async (id: string, hardDelete: boolean) => {
+  try {
+    const api = await getServerApi();
+    // Using axios.delete with data payload
+    await api.delete(`/sprints/${id}`, { data: { hardDeleteIssues: hardDelete } });
+    return { success: true };
+  } catch (error: any) {
+    const message = error.response?.data?.message || error.message || "Failed to delete sprint";
+    console.error("Error deleting sprint:", message);
+    return { success: false, error: message };
   }
 };

@@ -8,6 +8,8 @@ import {
   Target,
   Hash,
   Timer,
+  Edit3,
+  Trash2,
 } from "lucide-react";
 import {
   DragDropContext,
@@ -28,6 +30,9 @@ import CreateStoryModal from "./modals/CreateStoryModal";
 import EditStoryModal from "./modals/EditStoryModal";
 import DeleteStoryConfirmation from "./modals/DeleteStoryConfirmation";
 import CreateSprintModal from "./modals/CreateSprintModal";
+import EditSprintModal from "./modals/EditSprintModal";
+import DeleteSprintConfirmationModal from "./modals/DeleteSprintConfirmationModal";
+import DeleteSprintOptionsModal from "./modals/DeleteSprintOptionsModal";
 import { cn } from "@/lib/utils";
 
 interface BacklogViewProps {
@@ -50,6 +55,10 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId }) => {
     useState<UserStory | null>(null);
   const [selectedStoryForDelete, setSelectedStoryForDelete] =
     useState<UserStory | null>(null);
+
+  const [sprintToEdit, setSprintToEdit] = useState<Sprint | null>(null);
+  const [sprintToDelete, setSprintToDelete] = useState<Sprint | null>(null);
+  const [showDeleteOptions, setShowDeleteOptions] = useState(false);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -115,7 +124,7 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId }) => {
 
       // Optimistic Update
       setSprints(prev => prev.map(s => s.id === sprintId ? { ...s, issueIds: updatedIssueIds } : s));
-      setStories(prev => prev.filter(s => s.id !== storyId));
+      setStories(prev => prev.map(s => s.id === storyId ? { ...s, isInBacklog: false } : s));
 
       try {
         const result = await updateSprintAction(sprintId, { issueIds: updatedIssueIds });
@@ -135,8 +144,9 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId }) => {
   const filteredStories = stories
     .filter(
       (story) =>
+        story.isInBacklog && (
         story.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        story.description?.toLowerCase().includes(searchQuery.toLowerCase()),
+        story.description?.toLowerCase().includes(searchQuery.toLowerCase())),
     )
     .sort((a, b) => a.order - b.order);
 
@@ -170,7 +180,7 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId }) => {
     };
 
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div>
         {sprints.map((sprint) => (
           <Droppable key={sprint.id} droppableId={`sprint-${sprint.id}`}>
             {(provided, snapshot) => (
@@ -178,7 +188,7 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId }) => {
                 ref={provided.innerRef}
                 {...provided.droppableProps}
                 className={cn(
-                  "group relative p-5 border rounded-[1.5rem] transition-all duration-300",
+                  "group relative p-5 border transition-all duration-300",
                   snapshot.isDraggingOver
                     ? "bg-orange-500/10 border-orange-500/50 scale-[1.02] shadow-2xl shadow-orange-500/10"
                     : "bg-white/[0.02] border-white/[0.05] hover:bg-white/[0.04] hover:border-white/[0.1]"
@@ -200,31 +210,59 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId }) => {
                         </p>
                       </div>
                     </div>
-                    <span className={cn(
-                      "px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border",
-                      getStatusStyles(sprint.status)
-                    )}>
-                      {sprint.status}
-                    </span>
+                    <div className="flex items-center gap-2">
+                       <div className="flex items-center gap-1 mr-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button
+                            onClick={() => setSprintToEdit(sprint)}
+                            className="p-1.5 rounded-lg text-slate-500 hover:text-white hover:bg-white/5 transition-all"
+                            title="Edit Sprint"
+                          >
+                            <Edit3 size={13} />
+                          </button>
+                          <button
+                            onClick={() => setSprintToDelete(sprint)}
+                            className="p-1.5 rounded-lg text-slate-500 hover:text-rose-500 hover:bg-rose-500/5 transition-all"
+                            title="Delete Sprint"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                       </div>
+                       <span className={cn(
+                         "px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border",
+                         getStatusStyles(sprint.status)
+                       )}>
+                         {sprint.status}
+                       </span>
+                    </div>
                   </div>
 
                   {sprint.goal && (
-                    <p className="text-[11px] text-slate-400 leading-relaxed line-clamp-2 italic opacity-80">
+                    <p className="text-[11px] text-slate-400 leading-relaxed line-clamp-2 italic opacity-80 mb-2">
                       "{sprint.goal}"
                     </p>
                   )}
 
-                  <div className="flex items-center justify-between pt-2">
-                    <div className="flex -space-x-2">
-                      {[1, 2, 3].map(i => (
-                        <div key={i} className="w-6 h-6 rounded-full bg-slate-800 border-2 border-[#08090a] flex items-center justify-center text-[8px] font-bold text-slate-500 uppercase">
-                          ?
+                  {/* Stories List inside Sprint */}
+                  <div className="space-y-2 mt-2">
+                    {stories
+                      .filter((story) => sprint.issueIds.includes(story.id))
+                      .map((story) => (
+                        <div key={story.id} className="opacity-80 hover:opacity-100 transition-opacity">
+                          <StoryCard
+                            story={story}
+                            employees={employees}
+                            onEdit={() => {}}
+                            onDelete={() => {}}
+                          />
                         </div>
                       ))}
-                    </div>
-                    <button className="text-[10px] font-black text-accent uppercase tracking-widest hover:underline decoration-2 underline-offset-4">
-                      View Details
-                    </button>
+                    {sprint.issueIds.length === 0 && (
+                      <div className="py-4 border border-dashed border-white/5 rounded-xl flex items-center justify-center">
+                        <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">
+                          Drop stories here
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
                 {provided.placeholder}
@@ -451,6 +489,30 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId }) => {
           onClose={() => setIsSprintModalOpen(false)}
           onSuccess={fetchData}
           projectId={projectId}
+        />
+
+        <EditSprintModal
+          isOpen={!!sprintToEdit}
+          onClose={() => setSprintToEdit(null)}
+          onSuccess={fetchData}
+          sprint={sprintToEdit}
+        />
+
+        <DeleteSprintConfirmationModal
+          isOpen={!!sprintToDelete && !showDeleteOptions}
+          onClose={() => setSprintToDelete(null)}
+          onConfirm={() => setShowDeleteOptions(true)}
+          sprint={sprintToDelete}
+        />
+
+        <DeleteSprintOptionsModal
+          isOpen={showDeleteOptions}
+          onClose={() => {
+            setShowDeleteOptions(false);
+            setSprintToDelete(null);
+          }}
+          onSuccess={fetchData}
+          sprint={sprintToDelete}
         />
 
         <EditStoryModal

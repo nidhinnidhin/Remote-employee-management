@@ -52,6 +52,10 @@ export class CreateStoryDto {
   @IsOptional()
   isInBacklog?: boolean;
 
+  @IsBoolean()
+  @IsOptional()
+  addToActiveSprint?: boolean;
+
   @IsArray()
   @IsOptional()
   @IsString({ each: true })

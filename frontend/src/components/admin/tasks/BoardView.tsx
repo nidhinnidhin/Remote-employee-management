@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { Layout, Loader2, Sparkles, Filter, Search, Plus, Timer } from "lucide-react";
+import { Layout, Loader2, Sparkles, Filter, Search, Plus, Timer, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Task } from "@/shared/types/company/projects/task.type";
 import { Employee } from "@/shared/types/company/employees/employee-listing.type";
@@ -9,11 +9,12 @@ import { UserStory } from "@/shared/types/company/projects/user-story.type";
 import { getStoriesByProjectAction } from "@/actions/company/projects/story.actions";
 import { getTasksByStoryAction } from "@/actions/company/projects/task.actions";
 import { getEmployees } from "@/services/company/employee-management.service";
-import { getSprintsByProjectAction } from "@/actions/company/projects/sprint.actions";
+import { getSprintsByProjectAction, updateSprintAction } from "@/actions/company/projects/sprint.actions";
 import { Sprint } from "@/shared/types/company/projects/sprint.type";
 import { toast } from "sonner";
 import KanbanBoard from "./KanbanBoard";
 import Button from "@/components/ui/Button";
+import CompleteSprintModal from "./modals/CompleteSprintModal";
 
 interface BoardViewProps {
   projectId: string;
@@ -25,6 +26,8 @@ const BoardView: React.FC<BoardViewProps> = ({ projectId }) => {
   const [stories, setStories] = useState<UserStory[]>([]);
   const [activeSprint, setActiveSprint] = useState<Sprint | null>(null);
   const [loading, setLoading] = useState(true);
+  const [completing, setCompleting] = useState(false);
+  const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -89,6 +92,34 @@ const BoardView: React.FC<BoardViewProps> = ({ projectId }) => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  const handleCompleteSprint = () => {
+    if (!activeSprint) return;
+    setIsCompleteModalOpen(true);
+  };
+
+  const confirmCompleteSprint = async () => {
+    if (!activeSprint) return;
+
+    setCompleting(true);
+    try {
+      const result = await updateSprintAction(activeSprint.id, {
+        status: 'COMPLETED'
+      });
+
+      if (result.success) {
+        toast.success(`Sprint "${activeSprint.name}" completed successfully`);
+        setIsCompleteModalOpen(false);
+        fetchData();
+      } else {
+        toast.error(result.error || "Failed to complete sprint");
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred");
+    } finally {
+      setCompleting(false);
+    }
+  };
 
   if (loading && tasks.length === 0) {
     return (
@@ -157,6 +188,16 @@ const BoardView: React.FC<BoardViewProps> = ({ projectId }) => {
         </div>
 
         <div className="flex items-center gap-2">
+          {activeSprint && (
+            <Button
+              onClick={handleCompleteSprint}
+              isLoading={completing}
+              className="rounded-xl bg-emerald-500 text-[#08090a] gap-2 h-10 px-6 text-[10px] uppercase tracking-widest font-black shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 active:scale-95 transition-all"
+            >
+              <CheckCircle2 size={14} strokeWidth={3} />
+              Complete Sprint
+            </Button>
+          )}
           <Button
             variant="ghost"
             className="rounded-xl border border-border-subtle/20 gap-2 h-10 text-[10px] uppercase tracking-widest font-black"
@@ -180,6 +221,14 @@ const BoardView: React.FC<BoardViewProps> = ({ projectId }) => {
         stories={stories}
         projectId={projectId}
         onRefresh={fetchData}
+      />
+
+      <CompleteSprintModal
+        isOpen={isCompleteModalOpen}
+        onClose={() => setIsCompleteModalOpen(false)}
+        onConfirm={confirmCompleteSprint}
+        sprint={activeSprint}
+        loading={completing}
       />
     </div>
   );

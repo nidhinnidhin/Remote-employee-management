@@ -32,12 +32,14 @@ const StartSprintModal: React.FC<StartSprintModalProps> = ({
   });
 
   const [loading, setLoading] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
 
   if (!sprint) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setLocalError(null);
 
     try {
       const result = await updateSprintAction(sprint.id, {
@@ -51,9 +53,11 @@ const StartSprintModal: React.FC<StartSprintModalProps> = ({
         onSuccess();
         onClose();
       } else {
+        setLocalError(result.error || "Failed to start sprint");
         toast.error(result.error || "Failed to start sprint");
       }
     } catch (error) {
+      setLocalError("An unexpected error occurred");
       toast.error("An unexpected error occurred");
     } finally {
       setLoading(false);
@@ -104,6 +108,14 @@ const StartSprintModal: React.FC<StartSprintModalProps> = ({
             />
           </div>
         </div>
+
+        {localError && (
+          <div className="p-3 rounded-xl bg-red-500/5 border border-red-500/10 mb-4">
+             <p className="text-[10px] font-black text-red-400 uppercase tracking-widest text-center">
+               {localError}
+             </p>
+          </div>
+        )}
 
         <div className="flex items-center justify-end gap-4 pt-6 border-t border-white/[0.05]">
           <button

@@ -17,3 +17,7 @@ export interface IGetSprintUseCase {
 export interface IListProjectSprintsUseCase {
   execute(projectId: string, companyId: string): Promise<SprintEntity[]>;
 }
+
+export interface IDeleteSprintUseCase {
+  execute(id: string, companyId: string, hardDelete: boolean): Promise<void>;
+}

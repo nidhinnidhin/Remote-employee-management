@@ -81,9 +81,11 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
     
     if (name === "destination") {
       const isInBacklog = value === "Backlog";
+      const addToActiveSprint = value === "Add to Active Sprint";
       setFormData((prev) => ({
         ...prev,
         isInBacklog,
+        addToActiveSprint,
         status: isInBacklog ? "Backlog" : "Todo",
       }));
       return;
@@ -205,7 +207,12 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
       onSuccess();
       handleClose();
     } else {
-      toast.error(result.error || "Failed to create story");
+      const errorMessage = result.error || "Failed to create story";
+      if (errorMessage.toLowerCase().includes("sprint")) {
+        setErrors((prev) => ({ ...prev, destination: errorMessage }));
+      } else {
+        toast.error(errorMessage);
+      }
     }
   };
 
@@ -218,6 +225,8 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
       assigneeId: "",
       acceptanceCriteria: [],
       storyPoints: 1,
+      isInBacklog: true,
+      addToActiveSprint: false,
       type: "Story",
       attachments: [],
       links: [],
@@ -313,6 +322,7 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
               options={destinationOptions}
               required
               icon={<Rocket size={14} className="text-accent/60" />}
+              error={errors.destination}
             />
             <FormDropdown
               label="Priority"

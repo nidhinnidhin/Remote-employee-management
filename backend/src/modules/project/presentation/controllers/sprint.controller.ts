@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Patch,
+  Delete,
   Body,
   Param,
   Req,
@@ -14,11 +15,13 @@ import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import { CompanyAdminGuard } from 'src/shared/guards/company-admin.guard';
 import { CreateSprintDto } from '../../application/dto/sprint/create-sprint.dto';
 import { UpdateSprintDto } from '../../application/dto/sprint/update-sprint.dto';
+import { DeleteSprintDto } from '../../application/dto/sprint/delete-sprint.dto';
 import type {
   ICreateSprintUseCase,
   IUpdateSprintUseCase,
   IGetSprintUseCase,
   IListProjectSprintsUseCase,
+  IDeleteSprintUseCase,
 } from '../../application/interfaces/sprint/sprint-use-cases.interface';
 
 @Controller('sprints')
@@ -33,6 +36,8 @@ export class SprintController {
     private readonly _getSprintUseCase: IGetSprintUseCase,
     @Inject('IListProjectSprintsUseCase')
     private readonly _listProjectSprintsUseCase: IListProjectSprintsUseCase,
+    @Inject('IDeleteSprintUseCase')
+    private readonly _deleteSprintUseCase: IDeleteSprintUseCase,
   ) {}
 
   @Post(':projectId')
@@ -66,5 +71,15 @@ export class SprintController {
     @Body() dto: UpdateSprintDto,
   ) {
     return this._updateSprintUseCase.execute(id, req.user!.companyId!, dto);
+  }
+
+  @Delete(':id')
+  @UseGuards(CompanyAdminGuard)
+  async delete(
+    @Req() req: Request,
+    @Param('id') id: string,
+    @Body() dto: DeleteSprintDto,
+  ) {
+    return this._deleteSprintUseCase.execute(id, req.user!.companyId!, dto.hardDeleteIssues);
   }
 }
