@@ -15,7 +15,7 @@ export interface ISetPasswordUseCase {
 }
 
 export interface IGetEmployeesUseCase {
-    execute(companyId: string): Promise<Employee[]>;
+    execute(companyId: string, search?: string): Promise<any[]>;
 }
 
 export interface IUpdateEmployeeStatusUseCase {

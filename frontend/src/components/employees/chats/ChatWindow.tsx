@@ -8,6 +8,7 @@ import { Conversation, Message } from "@/shared/types/chat/chat.types";
 import { AvatarCircle } from "./AvatarCircle";
 import { ChatMessageBubble } from "./ChatMessageBubble";
 import { ChatInputBar } from "./ChatInputBar";
+import { GroupDetailModal } from "./GroupDetailModal";
 import { useChat } from "@/hooks/chat/useChat";
 import { useAuthStore } from "@/store/auth.store";
 
@@ -20,6 +21,7 @@ export function ChatWindow({ conversation, messages }: ChatWindowProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { userId: currentUserId } = useAuthStore();
   const { sendMessage, sendTyping, stopTyping } = useChat();
+  const [isDetailOpen, setIsDetailOpen] = React.useState(false);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -29,20 +31,34 @@ export function ChatWindow({ conversation, messages }: ChatWindowProps) {
     sendMessage(conversation.id, text);
   };
 
-  const name = conversation.name || "Direct Chat";
+  // Resolve Display Name and Avatar for Header
+  const isGroup = conversation.type === 'GROUP';
+  let displayName = conversation.name || "Direct Chat";
+  let displayAvatar = conversation.avatar;
+
+  if (!isGroup && conversation.participantDetails) {
+    const otherParticipant = conversation.participantDetails.find(p => p.id !== currentUserId);
+    if (otherParticipant) {
+      displayName = otherParticipant.name;
+      displayAvatar = otherParticipant.avatar;
+    }
+  }
 
   return (
     <div className="flex flex-col h-full bg-[rgb(var(--color-bg))]">
       {/* ── Chat Header ─────────────────────────────────────────── */}
       <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.05] bg-white/[0.01] shrink-0">
-        <div className="flex items-center gap-3">
+        <div 
+          className={cn("flex items-center gap-3", isGroup && "cursor-pointer hover:opacity-80 transition-all")}
+          onClick={() => isGroup && setIsDetailOpen(true)}
+        >
           <div className="relative">
-            <AvatarCircle name={name} size={38} isGroup={conversation.type === 'GROUP'} />
+            <AvatarCircle name={displayName} avatar={displayAvatar} size={38} isGroup={isGroup} />
           </div>
           <div>
-            <h3 className="text-[13px] font-black text-white tracking-wide">{name}</h3>
+            <h3 className="text-[13px] font-black text-white tracking-wide">{displayName}</h3>
             <p className="text-[10px] font-semibold text-slate-500">
-              {conversation.type === 'GROUP' ? `${conversation.participants.length} members` : 'Direct Chat'}
+              {isGroup ? `${conversation.participants.length} members` : 'Active now'}
             </p>
           </div>
         </div>
@@ -68,13 +84,14 @@ export function ChatWindow({ conversation, messages }: ChatWindowProps) {
           const showAvatar = !isMe && (!prevMsg || prevMsg.senderId !== msg.senderId);
 
           return (
-            <ChatMessageBubble
-              key={msg.id}
-              message={msg}
-              isMe={isMe}
-              showAvatar={showAvatar}
-              senderName={name} // In group chat this should be actual sender name
-            />
+              <ChatMessageBubble
+                key={msg.id}
+                message={msg}
+                isMe={isMe}
+                showAvatar={showAvatar}
+                senderName={isMe ? "Me" : (conversation.participantDetails?.find(p => p.id === msg.senderId)?.name || displayName)}
+                senderAvatar={conversation.participantDetails?.find(p => p.id === msg.senderId)?.avatar}
+              />
           );
         })}
         <div ref={messagesEndRef} />
@@ -86,6 +103,14 @@ export function ChatWindow({ conversation, messages }: ChatWindowProps) {
         onTyping={() => sendTyping(conversation.id)}
         onStopTyping={() => stopTyping(conversation.id)}
       />
+
+      {isGroup && (
+        <GroupDetailModal 
+          isOpen={isDetailOpen} 
+          onClose={() => setIsDetailOpen(false)} 
+          conversation={conversation}
+        />
+      )}
     </div>
   );
 }

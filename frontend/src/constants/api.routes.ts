@@ -67,6 +67,7 @@ export const API_ROUTES = {
             BY_ID: (id: string) => `/sprints/${id}`,
         },
         CHATS: {
+            BASE: "/chats",
             CONVERSATIONS: "/chats/conversations",
             MESSAGES: (id: string) => `/chats/conversations/${id}/messages`,
         },

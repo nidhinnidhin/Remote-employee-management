@@ -8,4 +8,5 @@ export interface IConversationRepository {
   findByUser(companyId: string, userId: string): Promise<ConversationEntity[]>;
   updateLastMessage(id: string, message: string, time: Date): Promise<void>;
   update(id: string, conversation: Partial<ConversationEntity>): Promise<ConversationEntity | null>;
+  delete(id: string): Promise<void>;
 }

@@ -17,7 +17,13 @@ export class Message {
   seenBy: Types.ObjectId[];
 
   @Prop({ type: Boolean, default: false })
-  isDeleted: boolean;
+  isEdited: boolean;
+
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Employee' }], default: [] })
+  deletedFor: Types.ObjectId[];
+
+  @Prop({ type: Boolean, default: false })
+  isDeletedForEveryone: boolean;
 
   createdAt: Date;
   updatedAt: Date;

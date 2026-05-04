@@ -11,6 +11,11 @@ import { SendMessageUseCase } from './application/use-cases/send-message.usecase
 import { CreateConversationUseCase } from './application/use-cases/create-conversation.usecase';
 import { GetUserConversationsUseCase } from './application/use-cases/get-user-conversations.usecase';
 import { GetConversationMessagesUseCase } from './application/use-cases/get-conversation-messages.usecase';
+import { UpdateConversationUseCase } from './application/use-cases/update-conversation.usecase';
+import { DeleteConversationUseCase } from './application/use-cases/delete-conversation.usecase';
+import { LeaveConversationUseCase } from './application/use-cases/leave-conversation.usecase';
+import { EditMessageUseCase } from './application/use-cases/edit-message.usecase';
+import { DeleteMessageUseCase } from './application/use-cases/delete-message.usecase';
 import { AuthModule } from '../auth/presentation/auth/auth.module';
 
 @Module({
@@ -47,6 +52,26 @@ import { AuthModule } from '../auth/presentation/auth/auth.module';
     {
       provide: 'IGetConversationMessagesUseCase',
       useClass: GetConversationMessagesUseCase,
+    },
+    {
+      provide: 'IUpdateConversationUseCase',
+      useClass: UpdateConversationUseCase,
+    },
+    {
+      provide: 'IDeleteConversationUseCase',
+      useClass: DeleteConversationUseCase,
+    },
+    {
+      provide: 'ILeaveConversationUseCase',
+      useClass: LeaveConversationUseCase,
+    },
+    {
+      provide: 'IEditMessageUseCase',
+      useClass: EditMessageUseCase,
+    },
+    {
+      provide: 'IDeleteMessageUseCase',
+      useClass: DeleteMessageUseCase,
     },
   ],
 })

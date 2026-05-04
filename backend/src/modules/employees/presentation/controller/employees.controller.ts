@@ -64,16 +64,18 @@ export class EmployeesController {
 
   @Get('/')
   @UseGuards(JwtAuthGuard)
-  async findAll(@Req() req: Request) {
+  async findAll(@Req() req: Request, @Query('search') search?: string) {
     console.log(
       '[EmployeesController] findAll called for company:',
       req.user?.companyId,
+      'with search:',
+      search,
     );
     const companyId = req.user?.companyId;
     if (!companyId) {
       throw new UnauthorizedException(POLICY_MESSAGES.COMPANY_ID_NOT_FOUND);
     }
-    return await this._getEmployeesUseCase.execute(companyId);
+    return await this._getEmployeesUseCase.execute(companyId, search);
   }
 
   @Get('verify-invite')

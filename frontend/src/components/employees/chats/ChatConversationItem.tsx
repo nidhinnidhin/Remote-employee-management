@@ -20,10 +20,19 @@ export function ChatConversationItem({ conversation, isSelected, onClick }: Chat
   const { userId: currentUserId } = useAuthStore();
   
   const unread = unreadCounts[conversation.id] || 0;
-
-  // For UI display
   const isGroup = conversation.type === ConversationType.GROUP;
-  const name = conversation.name || "Direct Chat"; // Fallback if name is missing
+  
+  // Resolve Name and Avatar
+  let displayName = conversation.name || "Direct Chat";
+  let displayAvatar = conversation.avatar;
+
+  if (!isGroup && conversation.participantDetails) {
+    const otherParticipant = conversation.participantDetails.find(p => p.id !== currentUserId);
+    if (otherParticipant) {
+      displayName = otherParticipant.name;
+      displayAvatar = otherParticipant.avatar;
+    }
+  }
   
   // Format time (simple version)
   const time = conversation.lastMessageAt ? new Date(conversation.lastMessageAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
@@ -40,8 +49,7 @@ export function ChatConversationItem({ conversation, isSelected, onClick }: Chat
     >
       {/* Avatar */}
       <div className="relative shrink-0">
-        <AvatarCircle name={name} size={44} isGroup={isGroup} />
-        {/* We don't have online status in backend yet, but we could add it later */}
+        <AvatarCircle name={displayName} avatar={displayAvatar} size={44} isGroup={isGroup} />
       </div>
 
       {/* Text content */}
@@ -51,7 +59,7 @@ export function ChatConversationItem({ conversation, isSelected, onClick }: Chat
             "text-[13px] font-bold truncate",
             isSelected ? "text-accent" : "text-white"
           )}>
-            {name}
+            {displayName}
           </span>
           <span className="text-[10px] text-slate-500 shrink-0 ml-2">{time}</span>
         </div>
@@ -63,7 +71,7 @@ export function ChatConversationItem({ conversation, isSelected, onClick }: Chat
           </span>
           <div className="flex items-center gap-1.5 shrink-0 ml-2">
             {unread > 0 && (
-              <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-accent text-[10px] font-black text-[#061218] flex items-center justify-center animate-in zoom-in">
+              <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-accent text-[rgb(var(--color-bg))] text-[10px] font-black flex items-center justify-center animate-in zoom-in shadow-[0_0_12px_rgb(var(--color-accent)/0.4)]">
                 {unread}
               </span>
             )}

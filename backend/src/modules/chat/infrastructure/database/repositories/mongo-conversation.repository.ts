@@ -19,7 +19,9 @@ export class MongoConversationRepository implements IConversationRepository {
       companyId: new Types.ObjectId(conversation.companyId),
       type: conversation.type,
       participants: conversation.participants.map((p) => new Types.ObjectId(p)),
+      admins: conversation.admins.map((p) => new Types.ObjectId(p)),
       name: conversation.name,
+      avatar: conversation.avatar,
       lastMessage: conversation.lastMessage,
       lastMessageAt: conversation.lastMessageAt,
     });
@@ -66,5 +68,12 @@ export class MongoConversationRepository implements IConversationRepository {
       { new: true },
     );
     return updated ? ChatMapper.toConversationEntity(updated) : null;
+  }
+
+  async delete(id: string): Promise<void> {
+    await this._conversationModel.updateOne(
+      { _id: new Types.ObjectId(id) },
+      { isDeleted: true },
+    );
   }
 }

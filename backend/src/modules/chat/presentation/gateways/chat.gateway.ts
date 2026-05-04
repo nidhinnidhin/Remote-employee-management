@@ -38,6 +38,39 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @Inject('IConversationRepository')
     private readonly _conversationRepository: IConversationRepository,
   ) {}
+  
+  // Method to be called from REST controller
+  notifyConversationUpdate(conversation: any) {
+    if (!conversation.participants) return;
+    
+    conversation.participants.forEach((participantId: string) => {
+      this.server.to(`user_${participantId}`).emit(SocketEvents.CONVERSATION_UPDATED, conversation);
+    });
+  }
+
+  notifyConversationDeletion(conversationId: string) {
+    this.server.to(conversationId).emit(SocketEvents.CONVERSATION_DELETED, conversationId);
+  }
+
+  notifyUserLeft(conversationId: string, userId: string) {
+    // Notify the user specifically
+    this.server.to(`user_${userId}`).emit(SocketEvents.CONVERSATION_DELETED, conversationId);
+    
+    // Notify the rest of the group to refresh their member list
+    this.server.to(conversationId).emit(SocketEvents.CONVERSATION_UPDATED, { id: conversationId });
+  }
+
+  notifyMessageUpdate(message: any) {
+    this.server.to(message.conversationId).emit(SocketEvents.MESSAGE_UPDATED, message);
+  }
+
+  notifyMessageDeletion(conversationId: string, messageId: string) {
+    this.server.to(conversationId).emit(SocketEvents.MESSAGE_DELETED, { conversationId, messageId, type: 'everyone' });
+  }
+
+  notifyMessageDeletedForMe(conversationId: string, messageId: string, userId: string) {
+    this.server.to(`user_${userId}`).emit(SocketEvents.MESSAGE_DELETED, { conversationId, messageId, type: 'me' });
+  }
 
   async handleConnection(client: AuthenticatedSocket) {
     try {

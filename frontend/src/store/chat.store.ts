@@ -11,9 +11,13 @@ interface ChatState {
 
   // Actions
   setConversations: (conversations: Conversation[]) => void;
+  addConversation: (conversation: Conversation) => void;
+  removeConversation: (id: string) => void;
   setActiveConversation: (id: string | null) => void;
   setMessages: (conversationId: string, messages: Message[]) => void;
   addMessage: (conversationId: string, message: Message) => void;
+  updateMessage: (conversationId: string, message: Message) => void;
+  removeMessage: (conversationId: string, messageId: string, type: 'me' | 'everyone') => void;
   incrementUnread: (conversationId: string) => void;
   clearUnread: (conversationId: string) => void;
   setConnected: (status: boolean) => void;
@@ -29,6 +33,25 @@ export const useChatStore = create<ChatState>((set) => ({
 
   setConversations: (conversations) => set({ conversations }),
   
+  addConversation: (conversation) => set((state) => {
+    const exists = state.conversations.find(c => c.id === conversation.id);
+    if (exists) {
+      return {
+        conversations: state.conversations.map(c => 
+          c.id === conversation.id ? { ...c, ...conversation } : c
+        )
+      };
+    }
+    return {
+      conversations: [conversation, ...state.conversations]
+    };
+  }),
+
+  removeConversation: (id) => set((state) => ({
+    conversations: state.conversations.filter(c => c.id !== id),
+    activeConversationId: state.activeConversationId === id ? null : state.activeConversationId
+  })),
+  
   setActiveConversation: (id) => set((state) => {
     const newState: Partial<ChatState> = { activeConversationId: id };
     if (id) {
@@ -43,19 +66,72 @@ export const useChatStore = create<ChatState>((set) => ({
       messages: { ...state.messages, [conversationId]: messages }
     })),
 
-  addMessage: (conversationId, message) => 
-    set((state) => {
-      const currentMessages = state.messages[conversationId] || [];
-      // Prevent duplicates
-      if (currentMessages.find(m => m.id === message.id)) return state;
-      
-      return {
-        messages: {
-          ...state.messages,
-          [conversationId]: [...currentMessages, message]
+  addMessage: (conversationId, message) => set((state) => {
+    const conversationMessages = state.messages[conversationId] || [];
+    // Check for duplicates
+    if (conversationMessages.some(m => m.id === message.id)) return state;
+    
+    return {
+      messages: {
+        ...state.messages,
+        [conversationId]: [...conversationMessages, message]
+      }
+    };
+  }),
+
+  updateMessage: (conversationId, message) => set((state) => {
+    const conversationMessages = state.messages[conversationId] || [];
+    const updatedMessages = conversationMessages.map(m => m.id === message.id ? message : m);
+    
+    // Update last message in conversations list if this is the last one
+    const updatedConversations = state.conversations.map(c => {
+        if (c.id === conversationId && c.lastMessageAt === message.createdAt) {
+            return { ...c, lastMessage: message.isDeletedForEveryone ? "This message was deleted" : message.content };
         }
-      };
-    }),
+        return c;
+    });
+
+    return {
+      messages: {
+        ...state.messages,
+        [conversationId]: updatedMessages
+      },
+      conversations: updatedConversations
+    };
+  }),
+
+  removeMessage: (conversationId, messageId, type) => set((state) => {
+    const conversationMessages = state.messages[conversationId] || [];
+    let updatedMessages = conversationMessages;
+    
+    if (type === 'me') {
+        updatedMessages = conversationMessages.filter(m => m.id !== messageId);
+    } else {
+        updatedMessages = conversationMessages.map(m => 
+            m.id === messageId ? { ...m, isDeletedForEveryone: true } : m
+        );
+    }
+
+    // Update last message in conversations list
+    const lastMsg = updatedMessages[updatedMessages.length - 1];
+    const updatedConversations = state.conversations.map(c => {
+        if (c.id === conversationId) {
+            return { 
+                ...c, 
+                lastMessage: lastMsg ? (lastMsg.isDeletedForEveryone ? "This message was deleted" : lastMsg.content) : "No messages yet"
+            };
+        }
+        return c;
+    });
+
+    return {
+      messages: {
+        ...state.messages,
+        [conversationId]: updatedMessages
+      },
+      conversations: updatedConversations
+    };
+  }),
 
   incrementUnread: (conversationId) => 
     set((state) => {

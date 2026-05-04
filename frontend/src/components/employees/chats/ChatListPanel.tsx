@@ -8,6 +8,8 @@ import { Conversation, ConversationType } from "@/shared/types/chat/chat.types";
 import { ChatConversationItem } from "./ChatConversationItem";
 import { CreateGroupModal } from "./CreateGroupModal";
 import { chatService } from "@/services/employee/chat/chat.service";
+import { useChatStore } from "@/store/chat.store";
+import { useAuthStore } from "@/store/auth.store";
 import { AvatarCircle } from "./AvatarCircle";
 
 interface ChatListPanelProps {
@@ -17,15 +19,19 @@ interface ChatListPanelProps {
 }
 
 export function ChatListPanel({ conversations, selectedId, onSelect }: ChatListPanelProps) {
+  const { addConversation } = useChatStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'ALL' | 'DIRECT' | 'GROUP'>('ALL');
 
   // Filter existing conversations
   const filteredConversations = conversations.filter((c) => {
     const name = c.name || "Direct Chat";
-    return name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesTab = activeTab === 'ALL' || c.type === activeTab;
+    return matchesSearch && matchesTab;
   });
 
   // Handle global search for employees
@@ -39,9 +45,9 @@ export function ChatListPanel({ conversations, selectedId, onSelect }: ChatListP
       setIsSearching(true);
       try {
         const employees = await chatService.searchEmployees(searchQuery);
-        // Filter out employees who already have a conversation shown? 
-        // Or just show them as "Start new chat"
-        setSearchResults(employees);
+        const { userId } = useAuthStore.getState();
+        // Filter out current user
+        setSearchResults(employees.filter(emp => emp.id !== userId));
       } catch (error) {
         console.error("Search failed", error);
       } finally {
@@ -59,6 +65,7 @@ export function ChatListPanel({ conversations, selectedId, onSelect }: ChatListP
         type: ConversationType.DIRECT,
         participants: [employeeId]
       });
+      addConversation(conv);
       onSelect(conv.id);
       setSearchQuery("");
       setSearchResults([]);
@@ -83,6 +90,26 @@ export function ChatListPanel({ conversations, selectedId, onSelect }: ChatListP
             </button>
           </div>
         </div>
+
+        {/* Tabs */}
+        {!searchQuery && (
+          <div className="flex items-center gap-1 px-4 mb-2 shrink-0">
+            {(['ALL', 'DIRECT', 'GROUP'] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={cn(
+                  "px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all",
+                  activeTab === tab 
+                    ? "bg-accent text-[rgb(var(--color-bg))] shadow-[0_0_12px_rgb(var(--color-accent)/0.3)]" 
+                    : "text-slate-500 hover:text-slate-300 hover:bg-white/5"
+                )}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Search */}
         <div className="px-4 py-3 shrink-0">

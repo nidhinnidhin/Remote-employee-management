@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 
 interface AvatarCircleProps {
   name: string;
+  avatar?: string;
   size?: number;
   isGroup?: boolean;
   className?: string;
@@ -33,7 +34,7 @@ function getAvatarColor(name: string): string {
   return colors[hash % colors.length];
 }
 
-export function AvatarCircle({ name, size = 40, isGroup = false, className }: AvatarCircleProps) {
+export function AvatarCircle({ name, avatar, size = 40, isGroup = false, className }: AvatarCircleProps) {
   const initials = isGroup ? null : getInitials(name);
   const gradient = getAvatarColor(name);
   const fontSize = size <= 32 ? "text-[10px]" : size <= 44 ? "text-xs" : "text-sm";
@@ -41,14 +42,20 @@ export function AvatarCircle({ name, size = 40, isGroup = false, className }: Av
   return (
     <div
       className={cn(
-        "rounded-full bg-gradient-to-br flex items-center justify-center font-black text-white shrink-0 select-none",
-        gradient,
+        "rounded-full bg-gradient-to-br flex items-center justify-center font-black text-white shrink-0 select-none overflow-hidden",
+        !avatar && gradient,
         fontSize,
         className
       )}
       style={{ width: size, height: size }}
     >
-      {isGroup ? <Users size={size * 0.42} strokeWidth={2} /> : initials}
+      {avatar ? (
+        <img src={avatar} alt={name} className="w-full h-full object-cover" />
+      ) : isGroup ? (
+        <Users size={size * 0.42} strokeWidth={2} />
+      ) : (
+        initials
+      )}
     </div>
   );
 }

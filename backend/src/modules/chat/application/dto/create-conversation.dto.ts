@@ -15,4 +15,8 @@ export class CreateConversationDto {
   @IsString()
   @IsOptional()
   name?: string; // Optional name for group chats
+
+  @IsString()
+  @IsOptional()
+  avatar?: string; // Optional group profile image
 }

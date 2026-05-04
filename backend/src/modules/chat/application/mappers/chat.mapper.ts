@@ -11,8 +11,10 @@ export class ChatMapper {
       doc.companyId.toString(),
       doc.type,
       doc.participants.map((p) => p.toString()),
+      doc.admins?.map((p) => p.toString()) || [],
       doc.lastMessageAt,
       doc.name,
+      doc.avatar,
       doc.lastMessage,
       doc.createdAt,
       doc.updatedAt,
@@ -27,9 +29,11 @@ export class ChatMapper {
       doc.senderId.toString(),
       doc.content,
       doc.seenBy.map((s) => s.toString()),
+      doc.isEdited,
+      doc.deletedFor?.map((d) => d.toString()) || [],
+      doc.isDeletedForEveryone,
       doc.createdAt,
       doc.updatedAt,
-      doc.isDeleted,
     );
   }
 }

@@ -34,7 +34,7 @@ export interface IEmployeeRepository extends IBaseRepository<
 
   findByEmail(email: string): Promise<Employee | null>;
   findByIds(ids: string[]): Promise<Employee[]>;
-  findAllByCompanyId(companyId: string): Promise<Employee[]>;
+  findAllByCompanyId(companyId: string, search?: string): Promise<Employee[]>;
   updateStatus(id: string, status: UserStatus): Promise<void>;
   activateEmployee(id: string): Promise<void>;
   setPassword(id: string, passwordHash: string): Promise<void>;

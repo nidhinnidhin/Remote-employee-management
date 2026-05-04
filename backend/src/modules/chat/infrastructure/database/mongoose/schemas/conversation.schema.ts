@@ -13,9 +13,15 @@ export class Conversation {
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Employee' }], required: true })
   participants: Types.ObjectId[];
+  
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Employee' }], default: [] })
+  admins: Types.ObjectId[];
 
   @Prop({ type: String })
   name?: string;
+
+  @Prop({ type: String })
+  avatar?: string;
 
   @Prop({ type: String })
   lastMessage?: string;

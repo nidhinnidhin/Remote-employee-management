@@ -9,7 +9,7 @@ export class GetEmployeesUseCase implements IGetEmployeesUseCase {
         private readonly _employeeRepo: IEmployeeRepository,
     ) { }
 
-    async execute(companyId: string) {
-        return await this._employeeRepo.findAllByCompanyId(companyId);
+    async execute(companyId: string, search?: string) {
+        return await this._employeeRepo.findAllByCompanyId(companyId, search);
     }
 }

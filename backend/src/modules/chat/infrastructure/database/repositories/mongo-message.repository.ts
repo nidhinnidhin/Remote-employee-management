@@ -24,11 +24,19 @@ export class MongoMessageRepository implements IMessageRepository {
     return ChatMapper.toMessageEntity(created);
   }
 
-  async findByConversationId(conversationId: string, limit: number = 50, before?: Date): Promise<MessageEntity[]> {
+  async findById(id: string): Promise<MessageEntity | null> {
+    const found = await this._messageModel.findById(new Types.ObjectId(id));
+    return found ? ChatMapper.toMessageEntity(found) : null;
+  }
+
+  async findByConversationId(conversationId: string, limit: number = 50, before?: Date, currentUserId?: string): Promise<MessageEntity[]> {
     const query: any = {
       conversationId: new Types.ObjectId(conversationId),
-      isDeleted: false,
     };
+
+    if (currentUserId) {
+        query.deletedFor = { $ne: new Types.ObjectId(currentUserId) };
+    }
 
     if (before) {
       query.createdAt = { $lt: before };
@@ -47,5 +55,20 @@ export class MongoMessageRepository implements IMessageRepository {
       { _id: { $in: messageIds.map((id) => new Types.ObjectId(id)) } },
       { $addToSet: { seenBy: new Types.ObjectId(userId) } },
     );
+  }
+
+  async update(id: string, message: Partial<MessageEntity>): Promise<MessageEntity | null> {
+    const updateData: any = { ...message };
+    if (message.senderId) updateData.senderId = new Types.ObjectId(message.senderId);
+    if (message.conversationId) updateData.conversationId = new Types.ObjectId(message.conversationId);
+    if (message.seenBy) updateData.seenBy = message.seenBy.map(s => new Types.ObjectId(s));
+    if (message.deletedFor) updateData.deletedFor = message.deletedFor.map(d => new Types.ObjectId(d));
+
+    const updated = await this._messageModel.findOneAndUpdate(
+      { _id: new Types.ObjectId(id) },
+      { $set: updateData },
+      { new: true },
+    );
+    return updated ? ChatMapper.toMessageEntity(updated) : null;
   }
 }

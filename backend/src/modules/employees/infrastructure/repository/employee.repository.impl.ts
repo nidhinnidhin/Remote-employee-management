@@ -69,8 +69,19 @@ export class EmployeeRepositoryImpl
     } as Partial<UserDocument>);
   }
 
-  async findAllByCompanyId(companyId: string): Promise<Employee[]> {
-    return this.findAll({ companyId, role: UserRole.EMPLOYEE });
+  async findAllByCompanyId(companyId: string, search?: string): Promise<Employee[]> {
+    const query: any = { companyId, role: UserRole.EMPLOYEE };
+
+    if (search) {
+      const searchRegex = new RegExp(search, 'i');
+      query.$or = [
+        { firstName: searchRegex },
+        { lastName: searchRegex },
+        { email: searchRegex },
+      ];
+    }
+
+    return this.findAll(query);
   }
 
   async findByIds(ids: string[]): Promise<Employee[]> {

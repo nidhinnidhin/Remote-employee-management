@@ -19,13 +19,47 @@ export const chatService = {
     return response.data;
   },
 
-  createConversation: async (dto: { type: ConversationType; participants: string[]; name?: string }) => {
+  createConversation: async (dto: { type: ConversationType; participants: string[]; name?: string; avatar?: string }) => {
     const response = await api.post<Conversation>(API_ROUTES.COMPANY.CHATS.CONVERSATIONS, dto);
     return response.data;
   },
 
   searchEmployees: async (query: string) => {
     const response = await api.get<any[]>(`${API_ROUTES.COMPANY.EMPLOYEES.BASE}?search=${query}`);
+    return response.data;
+  },
+
+  updateConversation: async (id: string, dto: { name?: string; avatar?: string; participants?: string[]; admins?: string[] }) => {
+    const response = await api.patch<Conversation>(`${API_ROUTES.COMPANY.CHATS.CONVERSATIONS}/${id}`, dto);
+    return response.data;
+  },
+
+  uploadGroupImage: async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await api.post<{ imageUrl: string }>(`${API_ROUTES.COMPANY.CHATS.CONVERSATIONS.replace('conversations', 'upload-image')}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response.data;
+  },
+
+  deleteConversation: async (id: string) => {
+    const response = await api.delete(`${API_ROUTES.COMPANY.CHATS.CONVERSATIONS}/${id}`);
+    return response.data;
+  },
+
+  leaveConversation: async (id: string) => {
+    const response = await api.post(`${API_ROUTES.COMPANY.CHATS.CONVERSATIONS}/${id}/leave`);
+    return response.data;
+  },
+
+  editMessage: async (messageId: string, content: string) => {
+    const response = await api.patch(`${API_ROUTES.COMPANY.CHATS.BASE}/messages/${messageId}`, { content });
+    return response.data;
+  },
+
+  deleteMessage: async (messageId: string, type: 'me' | 'everyone') => {
+    const response = await api.delete(`${API_ROUTES.COMPANY.CHATS.BASE}/messages/${messageId}?type=${type}`);
     return response.data;
   }
 };

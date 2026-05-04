@@ -11,7 +11,7 @@ export class GetConversationMessagesUseCase implements IGetConversationMessagesU
     private readonly _messageRepository: IMessageRepository,
   ) {}
 
-  async execute(conversationId: string, limit?: number, before?: Date): Promise<MessageEntity[]> {
-    return await this._messageRepository.findByConversationId(conversationId, limit, before);
+  async execute(conversationId: string, limit?: number, before?: Date, currentUserId?: string): Promise<MessageEntity[]> {
+    return await this._messageRepository.findByConversationId(conversationId, limit, before, currentUserId);
   }
 }

@@ -2,13 +2,14 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, Search, Check, Loader2 } from "lucide-react";
+import { X, Search, Check, Loader2, Camera } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AvatarCircle } from "./AvatarCircle";
 import { AnimatePresence, motion } from "framer-motion";
 import { chatService } from "@/services/employee/chat/chat.service";
 import { ConversationType } from "@/shared/types/chat/chat.types";
 import { useChatStore } from "@/store/chat.store";
+import { useAuthStore } from "@/store/auth.store";
 
 interface CreateGroupModalProps {
   isOpen: boolean;
@@ -17,11 +18,27 @@ interface CreateGroupModalProps {
 
 export function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
   const [groupName, setGroupName] = useState("");
+  const [avatar, setAvatar] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
   const [search, setSearch] = useState("");
   const [employees, setEmployees] = useState<any[]>([]);
   const [selected, setSelected] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { setConversations, conversations } = useChatStore();
+  const { addConversation } = useChatStore();
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploading(true);
+    try {
+      const response = await chatService.uploadGroupImage(file) as any;
+      setAvatar(response.imageUrl);
+    } catch (error) {
+      console.error("Upload failed", error);
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const toggle = (id: string) =>
     setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
@@ -32,9 +49,11 @@ export function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
 
     const fetchEmployees = async () => {
       setIsLoading(true);
+      const { userId } = useAuthStore.getState();
       try {
         const data = await chatService.searchEmployees(search);
-        setEmployees(data);
+        // Filter out the current user (creator)
+        setEmployees(data.filter(emp => emp.id !== userId));
       } catch (error) {
         console.error("Failed to fetch employees", error);
       } finally {
@@ -46,7 +65,7 @@ export function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
     return () => clearTimeout(timer);
   }, [search, isOpen]);
 
-  const canCreate = groupName.trim().length > 0 && selected.length >= 2;
+  const canCreate = groupName.trim().length > 0 && selected.length >= 1 && !isUploading;
 
   const handleCreate = async () => {
     if (!canCreate) return;
@@ -55,9 +74,10 @@ export function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
       const newConv = await chatService.createConversation({
         type: ConversationType.GROUP,
         participants: selected,
-        name: groupName
+        name: groupName,
+        avatar: avatar
       });
-      setConversations([newConv, ...conversations]);
+      addConversation(newConv); 
       handleClose();
     } catch (error) {
       console.error("Failed to create group", error);
@@ -66,6 +86,7 @@ export function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
 
   const handleClose = () => {
     setGroupName("");
+    setAvatar("");
     setSearch("");
     setSelected([]);
     onClose();
@@ -97,7 +118,7 @@ export function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
             <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.06]">
               <div>
                 <h2 className="text-base font-black text-white uppercase tracking-widest">Create Group</h2>
-                <p className="text-xs text-slate-500 mt-0.5">Add at least 2 members to start</p>
+                <p className="text-xs text-slate-500 mt-0.5">Add members to start</p>
               </div>
               <button
                 onClick={handleClose}
@@ -107,23 +128,46 @@ export function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
               </button>
             </div>
 
-            <div className="p-6 space-y-5">
-              {/* Group Name */}
-              <div>
-                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2 block">
-                  Group Name
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. Project Phoenix"
-                  value={groupName}
-                  onChange={(e) => setGroupName(e.target.value)}
-                  className={cn(
-                    "w-full px-4 py-3 rounded-xl text-sm text-white",
-                    "bg-white/[0.04] border border-white/[0.08]",
-                    "placeholder:text-slate-600 focus:outline-none focus:border-accent/40 transition-all"
-                  )}
-                />
+            <div className="p-6 space-y-6">
+              {/* Image & Name Row */}
+              <div className="flex items-center gap-5">
+                <div className="relative group/avatar">
+                  <div className="w-16 h-16 rounded-2xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center overflow-hidden">
+                    {avatar ? (
+                      <img src={avatar} className="w-full h-full object-cover" />
+                    ) : (
+                      <Camera size={20} className="text-slate-600" />
+                    )}
+                    {isUploading && (
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                        <Loader2 size={16} className="text-accent animate-spin" />
+                      </div>
+                    )}
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="absolute inset-0 opacity-0 cursor-pointer"
+                  />
+                </div>
+
+                <div className="flex-1">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2 block">
+                    Group Name
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Project Phoenix"
+                    value={groupName}
+                    onChange={(e) => setGroupName(e.target.value)}
+                    className={cn(
+                      "w-full px-4 py-2.5 rounded-xl text-sm text-white",
+                      "bg-white/[0.04] border border-white/[0.08]",
+                      "placeholder:text-slate-600 focus:outline-none focus:border-accent/40 transition-all"
+                    )}
+                  />
+                </div>
               </div>
 
               {/* Members Search */}
