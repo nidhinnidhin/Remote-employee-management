@@ -66,6 +66,10 @@ export const API_ROUTES = {
             BY_PROJECT: (projectId: string) => `/sprints/project/${projectId}`,
             BY_ID: (id: string) => `/sprints/${id}`,
         },
+        CHATS: {
+            CONVERSATIONS: "/chats/conversations",
+            MESSAGES: (id: string) => `/chats/conversations/${id}/messages`,
+        },
     },
     SUPER_ADMIN: {
         COMPANIES: "/super-admin/companies",

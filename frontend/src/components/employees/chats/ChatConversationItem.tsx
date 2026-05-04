@@ -1,18 +1,33 @@
+// src/components/employees/chats/ChatConversationItem.tsx
 "use client";
 
 import React from "react";
 import { BellOff } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ChatConversation } from "./types";
+import { Conversation, ConversationType } from "@/shared/types/chat/chat.types";
 import { AvatarCircle } from "./AvatarCircle";
+import { useChatStore } from "@/store/chat.store";
+import { useAuthStore } from "@/store/auth.store";
 
 interface ChatConversationItemProps {
-  conversation: ChatConversation;
+  conversation: Conversation;
   isSelected: boolean;
   onClick: () => void;
 }
 
 export function ChatConversationItem({ conversation, isSelected, onClick }: ChatConversationItemProps) {
+  const { unreadCounts } = useChatStore();
+  const { userId: currentUserId } = useAuthStore();
+  
+  const unread = unreadCounts[conversation.id] || 0;
+
+  // For UI display
+  const isGroup = conversation.type === ConversationType.GROUP;
+  const name = conversation.name || "Direct Chat"; // Fallback if name is missing
+  
+  // Format time (simple version)
+  const time = conversation.lastMessageAt ? new Date(conversation.lastMessageAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+
   return (
     <button
       onClick={onClick}
@@ -23,12 +38,10 @@ export function ChatConversationItem({ conversation, isSelected, onClick }: Chat
           : "border-l-2 border-transparent hover:bg-white/[0.04]"
       )}
     >
-      {/* Avatar with online dot */}
+      {/* Avatar */}
       <div className="relative shrink-0">
-        <AvatarCircle name={conversation.name} size={44} isGroup={conversation.isGroup} />
-        {conversation.isOnline && !conversation.isGroup && (
-          <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-[#0c2029] rounded-full" />
-        )}
+        <AvatarCircle name={name} size={44} isGroup={isGroup} />
+        {/* We don't have online status in backend yet, but we could add it later */}
       </div>
 
       {/* Text content */}
@@ -38,22 +51,20 @@ export function ChatConversationItem({ conversation, isSelected, onClick }: Chat
             "text-[13px] font-bold truncate",
             isSelected ? "text-accent" : "text-white"
           )}>
-            {conversation.name}
+            {name}
           </span>
-          <span className="text-[10px] text-slate-500 shrink-0 ml-2">{conversation.time}</span>
+          <span className="text-[10px] text-slate-500 shrink-0 ml-2">{time}</span>
         </div>
         <div className="flex items-center justify-between">
           <span className={cn(
-            "text-xs truncate",
-            conversation.isTyping ? "text-accent italic" : "text-slate-500"
+            "text-xs truncate text-slate-500"
           )}>
-            {conversation.isTyping ? "typing..." : conversation.lastMessage}
+            {conversation.lastMessage || "No messages yet"}
           </span>
           <div className="flex items-center gap-1.5 shrink-0 ml-2">
-            {conversation.muted && <BellOff size={10} className="text-slate-600" />}
-            {conversation.unread > 0 && (
-              <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-accent text-[10px] font-black text-[#061218] flex items-center justify-center">
-                {conversation.unread}
+            {unread > 0 && (
+              <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-accent text-[10px] font-black text-[#061218] flex items-center justify-center animate-in zoom-in">
+                {unread}
               </span>
             )}
           </div>

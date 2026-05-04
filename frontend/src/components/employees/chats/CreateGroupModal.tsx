@@ -1,19 +1,14 @@
+// src/components/employees/chats/CreateGroupModal.tsx
 "use client";
 
-import React, { useState } from "react";
-import { X, Search, Check } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { X, Search, Check, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AvatarCircle } from "./AvatarCircle";
 import { AnimatePresence, motion } from "framer-motion";
-
-const DUMMY_EMPLOYEES = [
-  { id: "e1", name: "Vedran Mušura", role: "UI Designer" },
-  { id: "e2", name: "Marko Beljan", role: "Backend Developer" },
-  { id: "e3", name: "Tea Biljak", role: "Product Manager" },
-  { id: "e4", name: "Josipa Vale", role: "QA Engineer" },
-  { id: "e5", name: "Ivor Delić", role: "DevOps Specialist" },
-  { id: "e6", name: "Neven Zulijani", role: "Frontend Developer" },
-];
+import { chatService } from "@/services/employee/chat/chat.service";
+import { ConversationType } from "@/shared/types/chat/chat.types";
+import { useChatStore } from "@/store/chat.store";
 
 interface CreateGroupModalProps {
   isOpen: boolean;
@@ -23,16 +18,51 @@ interface CreateGroupModalProps {
 export function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
   const [groupName, setGroupName] = useState("");
   const [search, setSearch] = useState("");
+  const [employees, setEmployees] = useState<any[]>([]);
   const [selected, setSelected] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const { setConversations, conversations } = useChatStore();
 
   const toggle = (id: string) =>
     setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
 
-  const filtered = DUMMY_EMPLOYEES.filter((e) =>
-    e.name.toLowerCase().includes(search.toLowerCase())
-  );
+  // Search employees
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const fetchEmployees = async () => {
+      setIsLoading(true);
+      try {
+        const data = await chatService.searchEmployees(search);
+        setEmployees(data);
+      } catch (error) {
+        console.error("Failed to fetch employees", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const timer = setTimeout(fetchEmployees, 300);
+    return () => clearTimeout(timer);
+  }, [search, isOpen]);
 
   const canCreate = groupName.trim().length > 0 && selected.length >= 2;
+
+  const handleCreate = async () => {
+    if (!canCreate) return;
+    
+    try {
+      const newConv = await chatService.createConversation({
+        type: ConversationType.GROUP,
+        participants: selected,
+        name: groupName
+      });
+      setConversations([newConv, ...conversations]);
+      handleClose();
+    } catch (error) {
+      console.error("Failed to create group", error);
+    }
+  };
 
   const handleClose = () => {
     setGroupName("");
@@ -114,11 +144,15 @@ export function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
                       "placeholder:text-slate-600 focus:outline-none focus:border-accent/40 transition-all"
                     )}
                   />
+                  {isLoading && (
+                    <Loader2 size={12} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-accent animate-spin" />
+                  )}
                 </div>
 
                 <div className="space-y-1 max-h-[220px] overflow-y-auto [scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,0.08)_transparent] pr-1">
-                  {filtered.map((emp) => {
+                  {employees.map((emp) => {
                     const isChecked = selected.includes(emp.id);
+                    const name = emp.name;
                     return (
                       <button
                         key={emp.id}
@@ -129,10 +163,10 @@ export function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
                         )}
                       >
                         <div className="flex items-center gap-3">
-                          <AvatarCircle name={emp.name} size={32} />
+                          <AvatarCircle name={name} size={32} />
                           <div className="text-left">
-                            <p className="text-xs font-bold text-white">{emp.name}</p>
-                            <p className="text-[10px] text-slate-500">{emp.role}</p>
+                            <p className="text-xs font-bold text-white">{name}</p>
+                            <p className="text-[10px] text-slate-500">{emp.email}</p>
                           </div>
                         </div>
                         <div className={cn(
@@ -144,13 +178,16 @@ export function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
                       </button>
                     );
                   })}
+                  {!isLoading && employees.length === 0 && search && (
+                    <p className="text-center py-4 text-[10px] text-slate-500 font-bold uppercase tracking-widest">No results</p>
+                  )}
                 </div>
               </div>
 
               {/* Create Button */}
               <button
                 disabled={!canCreate}
-                onClick={handleClose}
+                onClick={handleCreate}
                 className={cn(
                   "w-full py-3.5 rounded-xl text-xs font-black uppercase tracking-[0.2em] transition-all",
                   canCreate

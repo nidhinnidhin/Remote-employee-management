@@ -1,16 +1,55 @@
+// src/components/employees/chats/ChatInputBar.tsx
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Paperclip, Smile, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export function ChatInputBar() {
+interface ChatInputBarProps {
+  onSend: (text: string) => void;
+  onTyping?: () => void;
+  onStopTyping?: () => void;
+}
+
+export function ChatInputBar({ onSend, onTyping, onStopTyping }: ChatInputBarProps) {
   const [message, setMessage] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+
+  useEffect(() => {
+    if (!message.trim()) {
+      if (isTyping) {
+        setIsTyping(false);
+        onStopTyping?.();
+      }
+      return;
+    }
+
+    if (!isTyping) {
+      setIsTyping(true);
+      onTyping?.();
+    }
+
+    const timer = setTimeout(() => {
+      setIsTyping(false);
+      onStopTyping?.();
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [message, isTyping, onTyping, onStopTyping]);
+
+  const handleSend = () => {
+    if (message.trim()) {
+      onSend(message.trim());
+      setMessage("");
+      setIsTyping(false);
+      onStopTyping?.();
+    }
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      if (message.trim()) setMessage("");
+      handleSend();
     }
   };
 
@@ -49,7 +88,7 @@ export function ChatInputBar() {
 
       {/* Send */}
       <button
-        onClick={() => setMessage("")}
+        onClick={handleSend}
         disabled={!message.trim()}
         className={cn(
           "shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all active:scale-90",

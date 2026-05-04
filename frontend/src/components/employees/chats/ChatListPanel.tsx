@@ -1,25 +1,71 @@
+// src/components/employees/chats/ChatListPanel.tsx
 "use client";
 
-import React, { useState } from "react";
-import { Search, Plus, Edit3 } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Search, Plus, Edit3, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ChatConversation } from "./types";
+import { Conversation, ConversationType } from "@/shared/types/chat/chat.types";
 import { ChatConversationItem } from "./ChatConversationItem";
 import { CreateGroupModal } from "./CreateGroupModal";
+import { chatService } from "@/services/employee/chat/chat.service";
+import { AvatarCircle } from "./AvatarCircle";
 
 interface ChatListPanelProps {
-  conversations: ChatConversation[];
+  conversations: Conversation[];
   selectedId: string | null;
   onSelect: (id: string) => void;
 }
 
 export function ChatListPanel({ conversations, selectedId, onSelect }: ChatListPanelProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
   const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
 
-  const filtered = conversations.filter((c) =>
-    c.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Filter existing conversations
+  const filteredConversations = conversations.filter((c) => {
+    const name = c.name || "Direct Chat";
+    return name.toLowerCase().includes(searchQuery.toLowerCase());
+  });
+
+  // Handle global search for employees
+  useEffect(() => {
+    const search = async () => {
+      if (searchQuery.trim().length < 2) {
+        setSearchResults([]);
+        return;
+      }
+
+      setIsSearching(true);
+      try {
+        const employees = await chatService.searchEmployees(searchQuery);
+        // Filter out employees who already have a conversation shown? 
+        // Or just show them as "Start new chat"
+        setSearchResults(employees);
+      } catch (error) {
+        console.error("Search failed", error);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+
+    const timer = setTimeout(search, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const handleStartChat = async (employeeId: string) => {
+    try {
+      const conv = await chatService.createConversation({
+        type: ConversationType.DIRECT,
+        participants: [employeeId]
+      });
+      onSelect(conv.id);
+      setSearchQuery("");
+      setSearchResults([]);
+    } catch (error) {
+      console.error("Failed to start chat", error);
+    }
+  };
 
   return (
     <>
@@ -35,12 +81,6 @@ export function ChatListPanel({ conversations, selectedId, onSelect }: ChatListP
             >
               <Plus size={16} />
             </button>
-            <button
-              title="New Conversation"
-              className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/[0.08] transition-all active:scale-90"
-            >
-              <Edit3 size={15} />
-            </button>
           </div>
         </div>
 
@@ -53,7 +93,7 @@ export function ChatListPanel({ conversations, selectedId, onSelect }: ChatListP
             />
             <input
               type="text"
-              placeholder="New Conversation"
+              placeholder="Search people or groups..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className={cn(
@@ -63,25 +103,54 @@ export function ChatListPanel({ conversations, selectedId, onSelect }: ChatListP
                 "transition-all"
               )}
             />
+            {isSearching && (
+              <Loader2 size={12} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-accent animate-spin" />
+            )}
           </div>
         </div>
 
-        {/* Conversation List */}
+        {/* List */}
         <div className="flex-1 overflow-y-auto [scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,0.08)_transparent]">
-          {filtered.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-40 text-slate-600 text-xs font-bold uppercase tracking-widest">
-              No conversations found
+          {/* Search Results (Colleagues) */}
+          {searchResults.length > 0 && (
+            <div className="mb-4">
+              <p className="px-5 py-2 text-[10px] font-black uppercase tracking-widest text-slate-500">Global Search</p>
+                  {searchResults.map((emp) => (
+                    <button
+                      key={emp.id}
+                      onClick={() => handleStartChat(emp.id)}
+                      className="w-full flex items-center gap-3 px-5 py-3 hover:bg-white/[0.04] transition-all text-left"
+                    >
+                      <AvatarCircle name={emp.name} size={32} />
+                      <div>
+                        <p className="text-xs font-bold text-white">{emp.name}</p>
+                        <p className="text-[10px] text-slate-500">{emp.email}</p>
+                      </div>
+                    </button>
+                  ))}
             </div>
-          ) : (
-            filtered.map((conv) => (
-              <ChatConversationItem
-                key={conv.id}
-                conversation={conv}
-                isSelected={selectedId === conv.id}
-                onClick={() => onSelect(conv.id)}
-              />
-            ))
           )}
+
+          {/* Conversations */}
+          <div>
+            {searchQuery && filteredConversations.length > 0 && (
+               <p className="px-5 py-2 text-[10px] font-black uppercase tracking-widest text-slate-500">Your Conversations</p>
+            )}
+            {filteredConversations.length === 0 && searchResults.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-40 text-slate-600 text-xs font-bold uppercase tracking-widest">
+                {searchQuery ? "No results found" : "No conversations yet"}
+              </div>
+            ) : (
+              filteredConversations.map((conv) => (
+                <ChatConversationItem
+                  key={conv.id}
+                  conversation={conv}
+                  isSelected={selectedId === conv.id}
+                  onClick={() => onSelect(conv.id)}
+                />
+              ))
+            )}
+          </div>
         </div>
       </div>
 

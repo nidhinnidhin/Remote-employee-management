@@ -1,21 +1,24 @@
+// src/components/employees/chats/ChatMessageBubble.tsx
 "use client";
 
 import React from "react";
 import { cn } from "@/lib/utils";
-import { ChatMessage } from "./types";
+import { Message } from "@/shared/types/chat/chat.types";
 import { AvatarCircle } from "./AvatarCircle";
 
 interface ChatMessageBubbleProps {
-  message: ChatMessage;
+  message: Message;
   isMe: boolean;
   showAvatar: boolean;
   senderName: string;
 }
 
 export function ChatMessageBubble({ message, isMe, showAvatar, senderName }: ChatMessageBubbleProps) {
+  const time = new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
   return (
     <div className={cn("flex items-end gap-2.5 mt-1", isMe ? "flex-row-reverse" : "flex-row")}>
-      {/* Avatar — only shown for the first message in a group from same sender */}
+      {/* Avatar */}
       <div className="shrink-0 w-[30px]">
         {!isMe && showAvatar && <AvatarCircle name={senderName} size={30} />}
       </div>
@@ -30,14 +33,12 @@ export function ChatMessageBubble({ message, isMe, showAvatar, senderName }: Cha
               : "bg-white/[0.06] border border-white/[0.08] text-slate-200 rounded-bl-sm"
           )}
         >
-          {message.text}
+          {message.content}
         </div>
-        {message.time && (
-          <span className="text-[9px] text-slate-600 font-medium mt-1 px-1">
-            {message.time}
-            {isMe && <span className="ml-1 text-accent/40">✓✓</span>}
-          </span>
-        )}
+        <span className="text-[9px] text-slate-600 font-medium mt-1 px-1">
+          {time}
+          {isMe && <span className="ml-1 text-accent/40">✓✓</span>}
+        </span>
       </div>
     </div>
   );
