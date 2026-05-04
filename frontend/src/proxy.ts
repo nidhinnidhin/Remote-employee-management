@@ -31,13 +31,19 @@ export async function proxy(req: NextRequest) {
     const isEmployeeAuthRoute = pathname.startsWith(FRONTEND_ROUTES.ADMIN.INVITE.BASE);
 
     // Protected routes — require authentication
+    const EMPLOYEE_ROOT_ROUTES = [
+        "/chats", "/discussions", "/announcements", "/attendance",
+        "/leaves", "/directory", "/mood", "/performance", "/reports",
+        "/settings", "/calendar",
+    ];
     const isProtectedRoute =
         !isEmployeeAuthRoute &&
         (pathname.startsWith("/employee") ||
             pathname.startsWith("/super-admin") ||
             pathname.startsWith("/admin") ||
             pathname.startsWith(FRONTEND_ROUTES.AUTH.DASHBOARD) ||
-            pathname.startsWith(FRONTEND_ROUTES.EMPLOYEE.DASHBOARD));
+            pathname.startsWith(FRONTEND_ROUTES.EMPLOYEE.DASHBOARD) ||
+            EMPLOYEE_ROOT_ROUTES.some((r) => pathname.startsWith(r)));
 
     // 1. Handle Unauthenticated Users
     if (!isAuthenticated) {
