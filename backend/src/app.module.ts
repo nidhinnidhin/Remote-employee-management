@@ -12,6 +12,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { DepartmentModule } from './modules/department/presentation/department.module';
 import { ProjectModule } from './modules/project/project.module';
 import { ChatModule } from './modules/chat/chat.module';
+import { SubscriptionModule } from './modules/subscription/subscription.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { ChatModule } from './modules/chat/chat.module';
     DepartmentModule,
     ProjectModule,
     ChatModule,
+    SubscriptionModule,
   ],
   providers: [
     {

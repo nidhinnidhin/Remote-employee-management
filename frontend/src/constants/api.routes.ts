@@ -74,5 +74,9 @@ export const API_ROUTES = {
     },
     SUPER_ADMIN: {
         COMPANIES: "/super-admin/companies",
+        SUBSCRIPTIONS: {
+            BASE: "/subscription-plans",
+            BY_ID: (id: string) => `/subscription-plans/${id}`,
+        },
     },
 } as const;
