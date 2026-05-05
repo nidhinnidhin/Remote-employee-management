@@ -107,8 +107,6 @@ const OnboardingStepper: React.FC = () => {
                     localStorage.removeItem("registration_user_id");
                     router.replace("/admin/dashboard");
                 } else {
-                    // If the error is about company email already taken, surface it
-                    // as an inline field error on step 1
                     const errMsg = result.error || "";
                     const isEmailConflict =
                         errMsg.toLowerCase().includes("company") ||
@@ -119,7 +117,7 @@ const OnboardingStepper: React.FC = () => {
 
                     if (isEmailConflict) {
                         setErrors({ email: "This company email is already registered. Please use a different email." });
-                        setCurrentStep(1); // Navigate back to company info step
+                        setCurrentStep(1);
                     } else {
                         setErrors({ form: errMsg });
                     }
@@ -136,55 +134,44 @@ const OnboardingStepper: React.FC = () => {
         if (currentStep > 1) setCurrentStep(prev => prev - 1);
     };
 
+    // ADJUSTED: Width expands to 6xl (1152px) for Subscription Step, stays 2xl (672px) for others
+    const containerMaxWidth = currentStep === 2 ? "max-w-6xl" : "max-w-2xl";
+
     return (
-        <div className="w-full max-w-2xl mx-auto py-6 px-4 flex flex-col">
+        <div className={`w-full ${containerMaxWidth} mx-auto py-10 px-4 flex flex-col transition-all duration-500 ease-in-out`}>
 
             {/* ── Step Indicator ────────────────────────────────── */}
-            <div className="flex items-center w-full mb-8 px-2">
+            <div className="flex items-center w-full mb-12 px-2 max-w-2xl mx-auto">
                 {steps.map((step, i) => {
                     const isCompleted = currentStep > step.number;
                     const isActive = currentStep === step.number;
 
                     return (
                         <React.Fragment key={step.number}>
-                            {/* Circle + label */}
                             <div className="flex flex-col items-center gap-2">
                                 <div
-                                    className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 text-sm font-semibold
-                                        ${isCompleted
-                                            ? "bg-accent border-accent text-white"
-                                            : isActive
-                                                ? "border-accent text-accent bg-transparent"
-                                                : "border-border text-muted bg-transparent"
-                                        }`}
+                                    className="w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 text-sm font-bold"
                                     style={{
                                         borderColor: isCompleted || isActive ? "rgb(var(--color-accent))" : "rgb(var(--color-border-subtle))",
+                                        backgroundColor: isCompleted ? "rgb(var(--color-accent))" : "transparent",
                                         color: isCompleted ? "#fff" : isActive ? "rgb(var(--color-accent))" : "rgb(var(--color-text-muted))",
                                     }}
                                 >
-                                    {isCompleted ? (
-                                        <Check className="w-4 h-4" />
-                                    ) : (
-                                        step.number
-                                    )}
+                                    {isCompleted ? <Check className="w-5 h-5" /> : step.number}
                                 </div>
                                 <span
-                                    className="text-xs font-semibold"
+                                    className="text-xs font-bold uppercase tracking-wider"
                                     style={{
-                                        color: isActive
-                                            ? "rgb(var(--color-text-primary))"
-                                            : "rgb(var(--color-text-muted))",
+                                        color: isActive ? "rgb(var(--color-text-primary))" : "rgb(var(--color-text-muted))",
                                     }}
                                 >
-                                    <span className="text-muted mr-1">{step.number}</span>
                                     {step.title}
                                 </span>
                             </div>
 
-                            {/* Connector */}
                             {i < steps.length - 1 && (
                                 <div
-                                    className="flex-1 h-px mx-3 mb-5 transition-colors duration-500"
+                                    className="flex-1 h-0.5 mx-4 mb-6 transition-colors duration-500"
                                     style={{
                                         backgroundColor: currentStep > step.number
                                             ? "rgb(var(--color-accent))"
@@ -197,22 +184,28 @@ const OnboardingStepper: React.FC = () => {
                 })}
             </div>
 
-            {/* ── Card ──────────────────────────────────────────── */}
+            {/* ── Card Content ──────────────────────────────────── */}
             <div className="relative">
                 <AnimatePresence mode="wait" initial={false}>
                     <motion.div
                         key={currentStep}
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -8 }}
-                        transition={{ duration: 0.3, ease: "easeOut" }}
-                        className="rounded-2xl border overflow-hidden"
-                        style={{
-                            backgroundColor: "rgb(var(--color-surface))",
-                            borderColor: "rgb(var(--color-border-subtle))",
-                        }}
+                        initial={{ opacity: 0, x: 10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        transition={{ duration: 0.3 }}
                     >
-                        <div className="px-10 py-8">
+                        {/* 
+                           Note: The 'rounded-2xl border' is removed from here for Step 2 
+                           if your SubscriptionStep already has its own card styling.
+                           If not, keep the styling below.
+                        */}
+                        <div 
+                            className={currentStep === 2 ? "" : "rounded-[32px] border px-10 py-10 shadow-sm"}
+                            style={currentStep === 2 ? {} : {
+                                backgroundColor: "rgb(var(--color-surface-raised))",
+                                borderColor: "rgb(var(--color-border-subtle))",
+                            }}
+                        >
                             {currentStep === 1 && (
                                 <CompanyOnboardingStep
                                     formData={onboardingData.company}
@@ -220,39 +213,38 @@ const OnboardingStepper: React.FC = () => {
                                     errors={errors}
                                 />
                             )}
+                            
                             {currentStep === 2 && (
                                 <SubscriptionStep
                                     selectedPlan={onboardingData.subscription.plan}
                                     onSelect={handleSubscriptionChange}
                                 />
                             )}
+
                             {currentStep === 3 && (
                                 <ConfirmationStep />
                             )}
 
                             {errors.form && (
-                                <motion.p
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    className="text-sm text-center mt-4 py-2 px-4 rounded-lg font-medium"
+                                <p className="text-sm text-center mt-6 py-3 px-4 rounded-xl font-medium"
                                     style={{
                                         color: "rgb(var(--color-danger))",
-                                        backgroundColor: "rgb(var(--color-danger-subtle))",
+                                        backgroundColor: "rgba(var(--color-danger), 0.1)",
                                     }}
                                 >
                                     {errors.form}
-                                </motion.p>
+                                </p>
                             )}
 
-                            {/* ── Actions ───────────────────────────────────── */}
-                            <div className="flex flex-col gap-3 mt-6">
+                            {/* ── Navigation Actions ────────────────────────────── */}
+                            <div className={`flex flex-col gap-4 mt-10 ${currentStep === 2 ? "max-w-2xl mx-auto" : ""}`}>
                                 <button
                                     onClick={handleNext}
                                     disabled={isLoading}
-                                    className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold text-sm transition-all active:scale-[0.98] disabled:opacity-60"
+                                    className="w-full flex items-center justify-center gap-2 py-4 rounded-xl font-bold text-sm transition-all active:scale-[0.98] disabled:opacity-60"
                                     style={{
                                         backgroundColor: "rgb(var(--color-accent))",
-                                        color: "rgb(var(--color-text-inverse, 255 255 255))",
+                                        color: "rgb(var(--color-bg))",
                                     }}
                                 >
                                     {isLoading ? (
@@ -268,25 +260,18 @@ const OnboardingStepper: React.FC = () => {
                                     <button
                                         onClick={handleBack}
                                         disabled={isLoading}
-                                        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-medium text-sm transition-all hover:opacity-80 disabled:opacity-50"
-                                        style={{
-                                            color: "rgb(var(--color-text-secondary))",
-                                            backgroundColor: "transparent",
-                                        }}
+                                        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm transition-all hover:opacity-70"
+                                        style={{ color: "rgb(var(--color-text-secondary))" }}
                                     >
                                         <ArrowLeft className="w-4 h-4" />
                                         Back
                                     </button>
                                 )}
 
-                                {/* Security footer */}
-                                <div className="flex items-center justify-center gap-2 pt-1">
+                                <div className="flex items-center justify-center gap-2 pt-2">
                                     <SecurityLockIcon />
-                                    <span
-                                        className="text-xs"
-                                        style={{ color: "rgb(var(--color-text-muted))" }}
-                                    >
-                                        Enterprise-grade security included
+                                    <span className="text-[11px] font-medium" style={{ color: "rgb(var(--color-text-muted))" }}>
+                                        Enterprise-grade encryption and security included
                                     </span>
                                 </div>
                             </div>
@@ -299,18 +284,7 @@ const OnboardingStepper: React.FC = () => {
 };
 
 const SecurityLockIcon = () => (
-    <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="13"
-        height="13"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        style={{ color: "rgb(var(--color-text-muted))" }}
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: "rgb(var(--color-text-muted))" }}>
         <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
         <path d="M7 11V7a5 5 0 0 1 10 0v4" />
     </svg>
