@@ -25,6 +25,7 @@ export async function onboardAction(payload: any): Promise<AuthActionResult> {
 
         // Update session with tokens and onboarding status
         session.accessToken = accessToken;
+        session.refreshToken = refreshToken;
         session.userId = user.id;
         session.role = user.role;
         session.email = user.email;

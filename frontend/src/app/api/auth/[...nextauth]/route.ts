@@ -67,6 +67,7 @@ const handler = NextAuth({
       // Sync with Iron Session
       const session = await getSession();
       session.accessToken = data.accessToken;
+      session.refreshToken = data.refreshToken;
       session.userId = data.user.id;
       session.role = data.user.role;
       session.email = data.user.email;

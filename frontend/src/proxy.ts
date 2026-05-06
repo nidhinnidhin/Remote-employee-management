@@ -4,6 +4,41 @@ import { getRedirectForRole } from "@/lib/auth/auth-constants";
 import { API_ROUTES } from "@/constants/api.routes";
 import { FRONTEND_ROUTES } from "@/constants/frontend.routes";
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL!;
+
+/**
+ * Attempt to silently refresh the access token using the refresh_token cookie
+ * OR the refresh token stored in the iron-session (whichever is available).
+ * Returns the new access token string, or null if the refresh failed.
+ */
+async function tryRefreshToken(req: NextRequest, sessionRefreshToken?: string): Promise<string | null> {
+    // Prefer the raw httpOnly cookie from the browser (set by the backend directly)
+    const refreshTokenCookie = req.cookies.get("refresh_token")?.value ?? sessionRefreshToken;
+    if (!refreshTokenCookie) return null;
+
+    try {
+        const refreshResponse = await fetch(
+            `${BACKEND_URL}${API_ROUTES.AUTH.REFRESH}`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Cookie: `refresh_token=${refreshTokenCookie}`,
+                },
+            }
+        );
+
+        if (!refreshResponse.ok) return null;
+
+        const body = await refreshResponse.json();
+        // The backend returns { success: true, data: { accessToken } }
+        const newAccessToken = body?.data?.accessToken ?? body?.accessToken;
+        return newAccessToken ?? null;
+    } catch {
+        return null;
+    }
+}
+
 export async function proxy(req: NextRequest) {
     const session = await getSession();
     const { pathname } = req.nextUrl;
@@ -84,14 +119,31 @@ export async function proxy(req: NextRequest) {
     // 4. Verify session with backend for protected routes
     if (isAuthenticated && isProtectedRoute) {
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${API_ROUTES.AUTH.PROFILE.ME}`, {
+            const response = await fetch(`${BACKEND_URL}${API_ROUTES.AUTH.PROFILE.ME}`, {
                 headers: {
                     Authorization: `Bearer ${session.accessToken}`,
                 },
             });
 
             if (response.status === 401) {
-                const loginPath = pathname.startsWith("/super-admin") ? FRONTEND_ROUTES.SUPER_ADMIN.LOGIN : FRONTEND_ROUTES.AUTH.LOGIN;
+                // --- ACCESS TOKEN EXPIRED: TRY TO REFRESH ---
+                console.log("PROXY: Access token expired, attempting refresh...");
+                const newAccessToken = await tryRefreshToken(req, session.refreshToken);
+
+                if (newAccessToken) {
+                    // Refresh succeeded — update the session with the new token
+                    console.log("PROXY: Refresh successful, continuing request.");
+                    session.accessToken = newAccessToken;
+                    await session.save();
+                    // Let the request proceed; client-side axios will use the new cookie on next call
+                    return NextResponse.next();
+                }
+
+                // Refresh also failed — the user must log in again
+                console.log("PROXY: Refresh failed, redirecting to login.");
+                const loginPath = pathname.startsWith("/super-admin")
+                    ? FRONTEND_ROUTES.SUPER_ADMIN.LOGIN
+                    : FRONTEND_ROUTES.AUTH.LOGIN;
                 const redirResponse = NextResponse.redirect(new URL(loginPath, req.url));
                 redirResponse.cookies.delete("app_session");
                 return redirResponse;

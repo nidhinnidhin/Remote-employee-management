@@ -24,6 +24,7 @@ export async function verifyOtpAction(payload: { email: string; otp: string }) {
       session.userId = user.id;
       session.role = user.role;
       session.accessToken = accessToken;
+      session.refreshToken = refreshToken;
       session.isOnboarded = user.isOnboarded;
       await session.save();
     }

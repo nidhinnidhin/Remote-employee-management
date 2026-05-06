@@ -28,17 +28,20 @@ export async function setEmployeePasswordAction(password: string) {
 
     const { accessToken, user } = response.data;
 
-    // Forward HTTP-only cookies set by the backend (access_token, refresh_token)
-    const setCookieHeader = response.headers["set-cookie"];
-    if (setCookieHeader) {
-        for (const cookieStr of setCookieHeader) {
+    // Parse set-cookie headers in a single pass — forward cookies AND extract for session
+    let parsedRefreshToken: string | undefined;
+    const setCookieHeaders = response.headers["set-cookie"];
+    if (setCookieHeaders) {
+        for (const cookieStr of setCookieHeaders) {
             const [nameValue] = cookieStr.split(";");
-            const [name, value] = nameValue.split("=");
-            const trimmedName = name.trim();
+            const eqIdx = nameValue.indexOf("=");
+            const name = nameValue.substring(0, eqIdx).trim();
+            const value = nameValue.substring(eqIdx + 1).trim();
 
-            if (trimmedName === "refresh_token") {
+            if (name === "refresh_token") {
+                parsedRefreshToken = value;
                 await setRefreshTokenCookie(value);
-            } else if (trimmedName === "access_token") {
+            } else if (name === "access_token") {
                 await setAccessTokenCookie(value);
             }
         }
@@ -48,6 +51,7 @@ export async function setEmployeePasswordAction(password: string) {
     if (accessToken && user) {
         const session = await getSession();
         session.accessToken = accessToken;
+        session.refreshToken = parsedRefreshToken;
         session.userId = user.id;
         session.role = user.role;
         session.email = user.email;
