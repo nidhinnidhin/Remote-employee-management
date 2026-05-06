@@ -6,6 +6,9 @@ import { UpdateSprintDto } from '../../dto/sprint/update-sprint.dto';
 import { SprintEntity } from '../../../domain/entities/sprint.entity';
 import { SprintStatus } from 'src/shared/enums/project/sprint-status.enum';
 import { UserStoryStatus } from 'src/shared/enums/project/user-story-status.enum';
+import { TaskStatus } from 'src/shared/enums/project/task-status.enum';
+import type { ITaskRepository } from '../../../domain/repositories/task.repository.interface';
+
 
 @Injectable()
 export class UpdateSprintUseCase implements IUpdateSprintUseCase {
@@ -14,6 +17,8 @@ export class UpdateSprintUseCase implements IUpdateSprintUseCase {
     private readonly _sprintRepository: ISprintRepository,
     @Inject('IUserStoryRepository')
     private readonly _storyRepository: IUserStoryRepository,
+    @Inject('ITaskRepository')
+    private readonly _taskRepository: ITaskRepository,
   ) {}
 
   async execute(id: string, companyId: string, dto: UpdateSprintDto): Promise<SprintEntity> {
@@ -42,19 +47,73 @@ export class UpdateSprintUseCase implements IUpdateSprintUseCase {
       }
     }
 
-    // Handle Manual Completion: Move incomplete stories to backlog
+    // Handle Manual Completion: Granular migration
     if (dto.status === SprintStatus.COMPLETED) {
       const projectStories = await this._storyRepository.findByProjectId(existingSprint.projectId, companyId);
       const sprintStories = projectStories.filter(s => existingSprint.issueIds.includes(s.id));
       
-      const incompleteStories = sprintStories.filter(s => s.status !== UserStoryStatus.DONE);
-      const incompleteIds = incompleteStories.map(s => s.id);
+      for (const story of sprintStories) {
+        // Skip already deleted stories
+        if (story.isDeleted) continue;
 
-      if (incompleteIds.length > 0) {
-        await this._storyRepository.updateMany(
-          { _id: { $in: incompleteIds }, companyId },
-          { $set: { isInBacklog: true, status: UserStoryStatus.BACKLOG } }
-        );
+        const storyTasks = await this._taskRepository.findByStoryId(story.id, companyId);
+        
+        const completedTasks = storyTasks.filter(t => t.status === TaskStatus.DONE);
+        const incompleteTasks = storyTasks.filter(t => t.status !== TaskStatus.DONE);
+
+        if (storyTasks.length > 0) {
+          if (incompleteTasks.length === 0) {
+            // Case 1: ALL tasks are DONE
+            await this._storyRepository.updateStory(story.id, companyId, { 
+              status: UserStoryStatus.DONE, 
+              isInBacklog: false 
+            });
+          } else if (completedTasks.length === 0) {
+            // Case 2: NO tasks are DONE
+            await this._storyRepository.updateStory(story.id, companyId, { 
+              status: UserStoryStatus.BACKLOG, 
+              isInBacklog: true 
+            });
+          } else {
+            // Case 3: MIXED (Partial Completion) - SPLIT
+            // 1. Create a new story for the incomplete work
+            await this._storyRepository.create({
+              companyId: story.companyId,
+              projectId: story.projectId,
+              title: `${story.title} (Cont.)`,
+              description: story.description,
+              acceptanceCriteria: story.acceptanceCriteria,
+              priority: story.priority as any,
+              type: story.type as any,
+              assigneeId: story.assigneeId,
+              storyPoints: story.storyPoints,
+              createdBy: story.createdBy,
+              status: UserStoryStatus.BACKLOG,
+              isInBacklog: true,
+            }).then(async (newStory) => {
+              // 2. Reassign incomplete tasks to the new story
+              const incompleteTaskIds = incompleteTasks.map(t => t.id);
+              await this._taskRepository.updateMany(
+                { _id: { $in: incompleteTaskIds }, companyId },
+                { $set: { storyId: newStory.id } }
+              );
+            });
+
+            // 3. Mark original story as DONE for sprint history (it now only effectively has completed tasks)
+            await this._storyRepository.updateStory(story.id, companyId, { 
+              status: UserStoryStatus.DONE, 
+              isInBacklog: false 
+            });
+          }
+        } else {
+          // No tasks? If story itself isn't DONE, move it back to backlog
+          if (story.status !== UserStoryStatus.DONE) {
+            await this._storyRepository.updateStory(story.id, companyId, { 
+              status: UserStoryStatus.BACKLOG, 
+              isInBacklog: true 
+            });
+          }
+        }
       }
     }
 
