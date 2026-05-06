@@ -37,9 +37,10 @@ import { cn } from "@/lib/utils";
 
 interface BacklogViewProps {
   projectId: string;
+  projectMembers?: string[];
 }
 
-const BacklogView: React.FC<BacklogViewProps> = ({ projectId }) => {
+const BacklogView: React.FC<BacklogViewProps> = ({ projectId, projectMembers = [] }) => {
   const [stories, setStories] = useState<UserStory[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
 
@@ -81,7 +82,16 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId }) => {
         toast.error(sprintsResult.error || "Failed to load sprints");
       }
 
-      setEmployees(employeesData);
+      if (employeesData) {
+        // Filter employees to only show those assigned to the project AND active
+        const filteredEmployees = (employeesData as Employee[]).filter(emp => {
+          const isMember = projectMembers.length > 0 
+            ? projectMembers.includes(emp.id) || projectMembers.includes((emp as any)._id)
+            : true;
+          return isMember && emp.isActive;
+        });
+        setEmployees(filteredEmployees);
+      }
     } catch (error) {
       toast.error("An unexpected error occurred while loading data");
     } finally {

@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsEnum, IsDateString } from 'class-validator';
+import { IsString, IsOptional, IsEnum, IsDateString, IsArray } from 'class-validator';
 import { ProjectStatus } from 'src/shared/enums/project/project-status.enum';
 
 export class UpdateProjectDto {
@@ -21,4 +21,9 @@ export class UpdateProjectDto {
   @IsEnum(ProjectStatus)
   @IsOptional()
   status?: ProjectStatus;
+
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
+  members?: string[];
 }

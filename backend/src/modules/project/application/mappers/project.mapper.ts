@@ -23,6 +23,7 @@ export class ProjectMapper {
       projectDoc.createdAt || new Date(),
       projectDoc.updatedAt || new Date(),
       !!projectDoc.isDeleted,
+      projectDoc.members || [],
     );
   }
 

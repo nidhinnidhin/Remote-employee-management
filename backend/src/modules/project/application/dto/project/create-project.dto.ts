@@ -1,4 +1,4 @@
-import { IsString, IsEnum, IsDateString, IsNotEmpty, MinLength, MaxLength } from 'class-validator';
+import { IsString, IsEnum, IsDateString, IsNotEmpty, MinLength, MaxLength, IsArray, IsOptional, IsUUID } from 'class-validator';
 import { ProjectStatus } from 'src/shared/enums/project/project-status.enum';
 
 export class CreateProjectDto {
@@ -23,4 +23,9 @@ export class CreateProjectDto {
   @IsEnum(ProjectStatus, { message: 'Invalid project status' })
   @IsNotEmpty({ message: 'Project status is required' })
   status!: ProjectStatus;
+
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
+  members?: string[];
 }

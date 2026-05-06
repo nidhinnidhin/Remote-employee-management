@@ -81,9 +81,9 @@ const ProjectDetailsPage = () => {
   const renderTabContent = () => {
     switch (activeTab) {
       case "Backlog":
-        return <BacklogView projectId={id as string} />;
+        return <BacklogView projectId={id as string} projectMembers={project.members} />;
       case "Board":
-        return <BoardView projectId={id as string} />;
+        return <BoardView projectId={id as string} projectMembers={project.members} />;
       case "Sprint":
         return <SprintListView projectId={id as string} />;
       case "Performance":

@@ -1,13 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  X,
-  Target,
-  Rocket,
-  Timer,
-  FileText,
-} from "lucide-react";
+import { Target, Timer } from "lucide-react";
 import BaseModal from "@/components/ui/BaseModal";
 import FormInput from "@/components/ui/FormInput";
 import Button from "@/components/ui/Button";
@@ -28,11 +22,7 @@ const CreateSprintModal: React.FC<CreateSprintModalProps> = ({
   onSuccess,
   projectId,
 }) => {
-  const [formData, setFormData] = useState({
-    name: "",
-    goal: "",
-  });
-
+  const [formData, setFormData] = useState({ name: "", goal: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
@@ -51,8 +41,6 @@ const CreateSprintModal: React.FC<CreateSprintModalProps> = ({
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     if (!formData.name.trim()) newErrors.name = "Sprint name is required";
-    if (formData.name.length < 3) newErrors.name = "Sprint name must be at least 3 characters";
-    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -63,20 +51,16 @@ const CreateSprintModal: React.FC<CreateSprintModalProps> = ({
 
     setLoading(true);
     try {
-      const result = await createSprintAction(projectId, {
-        ...formData,
-        projectId,
-      });
-
+      const result = await createSprintAction(projectId, { ...formData, projectId });
       if (result.success) {
-        toast.success("Sprint initialized successfully");
+        toast.success("Sprint initialized");
         onSuccess();
         handleClose();
       } else {
-        toast.error(result.error || "Failed to initialize sprint");
+        toast.error(result.error || "Failed to initialize");
       }
     } catch (error) {
-      toast.error("An unexpected error occurred");
+      toast.error("Unexpected error");
     } finally {
       setLoading(false);
     }
@@ -89,96 +73,76 @@ const CreateSprintModal: React.FC<CreateSprintModalProps> = ({
   };
 
   return (
-    <BaseModal isOpen={isOpen} onClose={handleClose} title="Initialize New Sprint">
-      <div className="relative overflow-hidden">
-        {/* --- Header Decoration --- */}
-        <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-orange-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-64 h-64 bg-accent/5 rounded-full blur-3xl" />
+    <BaseModal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title="" 
+      theme="theme-company"
+      maxWidth="max-w-lg"
+    >
+      <div className="flex flex-col">
+        {/* --- Header --- */}
+        <h1 className="text-xl font-black text-white text-center uppercase tracking-tighter mb-6">
+          Initialize Sprint
+        </h1>
 
-        <form onSubmit={handleSubmit} className="relative space-y-8 py-4">
-          {/* --- Sprint Name Section --- */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="p-1.5 rounded-lg bg-orange-500/10 border border-orange-500/20">
-                <Timer size={14} className="text-orange-500" />
-              </div>
-              <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
-                Designation
-              </h3>
-            </div>
-            
+        {/* --- Icon --- */}
+        <div className="flex justify-center mb-6">
+          <div className="p-5 rounded-full border border-white/10 bg-white/5">
+            <Timer size={28} className="text-white" strokeWidth={2.5} />
+          </div>
+        </div>
+
+        <h2 className="text-lg font-black text-white text-center uppercase tracking-tight mb-8">
+          Ready to Start?
+        </h2>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
             <FormInput
-              label="Sprint Name"
+              label="Sprint Name" // Added required prop to fix TS(2741)
               name="name"
-              placeholder="e.g., Sprint 1: Foundation Phase"
+              placeholder="e.g., SPRINT 01"
               value={formData.name}
               onChange={handleChange}
               error={errors.name}
-              required
-              className="bg-white/[0.02] border-white/[0.08] focus:border-orange-500/40 focus:bg-orange-500/[0.02] transition-all"
+              className="bg-white/[0.03] border-white/10 h-12 rounded-xl text-white placeholder:text-slate-600 focus:border-indigo-500/50 transition-all"
             />
           </div>
 
-          {/* --- Sprint Goal Section --- */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="p-1.5 rounded-lg bg-accent/10 border border-accent/20">
-                <Target size={14} className="text-accent" />
-              </div>
-              <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
-                Strategic Objective
-              </h3>
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider pl-1">
-                Sprint Goal
-              </label>
-              <textarea
-                name="goal"
-                placeholder="What is the primary mission for this cycle?"
-                value={formData.goal}
-                onChange={handleChange}
-                rows={4}
-                className={cn(
-                  "w-full bg-white/[0.02] border border-white/[0.08] rounded-xl px-4 py-3 text-[13px] text-white placeholder:text-slate-600 outline-none focus:border-accent/40 focus:bg-accent/[0.02] transition-all resize-none min-h-[120px]",
-                  errors.goal && "border-rose-500/50 focus:border-rose-500/50"
-                )}
-              />
-              {errors.goal && (
-                <p className="text-[10px] font-medium text-rose-500 pl-1">{errors.goal}</p>
-              )}
-            </div>
-          </div>
-
-          {/* --- Info Card --- */}
-          <div className="p-4 bg-orange-500/[0.03] border border-orange-500/10 rounded-2xl flex gap-4 items-start">
-             <div className="p-2 rounded-xl bg-orange-500/10 text-orange-500">
-                <Rocket size={18} />
-             </div>
-             <div>
-                <h4 className="text-[13px] font-bold text-white mb-1 tracking-tight">Initialization Ready</h4>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  This sprint will be created in <span className="text-orange-500/80 font-bold uppercase tracking-tighter italic">Planned</span> state. You can then move items from the backlog into this sprint.
-                </p>
-             </div>
+          {/* --- Sprint Goal --- */}
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
+              Sprint Goal
+            </label>
+            <textarea
+              name="goal"
+              placeholder="What is the primary mission?"
+              value={formData.goal}
+              onChange={handleChange}
+              className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white placeholder:text-slate-600 focus:border-indigo-500/50 outline-none transition-all resize-none min-h-[100px]"
+            />
           </div>
 
           {/* --- Actions --- */}
-          <div className="flex items-center justify-end gap-4 pt-6 border-t border-white/[0.05]">
+          <div className="flex items-center justify-between pt-4">
             <button
               type="button"
               onClick={handleClose}
-              className="px-6 py-2.5 rounded-xl text-[11px] font-black text-slate-500 uppercase tracking-widest hover:text-white hover:bg-white/[0.05] transition-all"
+              className="text-[11px] font-black text-slate-500 uppercase tracking-widest hover:text-white transition-colors"
             >
-              Abort
+              Cancel
             </button>
+
             <Button
               type="submit"
               isLoading={loading}
-              className="h-12 px-10 rounded-xl bg-orange-500 text-[#08090a] font-black text-[11px] uppercase tracking-widest shadow-xl shadow-orange-500/10 hover:shadow-orange-500/20 active:scale-95 transition-all"
+              className="h-14 px-8 rounded-2xl bg-gradient-to-br from-[#7c7fff] to-[#4e84ff] text-white font-black text-[11px] uppercase tracking-widest shadow-lg shadow-indigo-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
             >
-              Initialize Sprint
+              <div className="flex items-center gap-2">
+                <Target size={16} strokeWidth={3} />
+                Initialize Sprint
+              </div>
             </Button>
           </div>
         </form>

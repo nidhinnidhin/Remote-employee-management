@@ -81,6 +81,7 @@ export const AdminProfileDetails: React.FC = () => {
             value={userProfile.email}
             disabled
             readOnly
+            onChange={() => {}}
             placeholder="john.doe@company.com"
             icon={<Mail size={18} />}
           />

@@ -18,9 +18,10 @@ import CompleteSprintModal from "./modals/CompleteSprintModal";
 
 interface BoardViewProps {
   projectId: string;
+  projectMembers?: string[];
 }
 
-const BoardView: React.FC<BoardViewProps> = ({ projectId }) => {
+const BoardView: React.FC<BoardViewProps> = ({ projectId, projectMembers = [] }) => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [stories, setStories] = useState<UserStory[]>([]);
@@ -45,7 +46,16 @@ const BoardView: React.FC<BoardViewProps> = ({ projectId }) => {
         return;
       }
 
-      setEmployees(employeesData);
+      if (employeesData) {
+        // Filter employees to only show those assigned to the project AND active
+        const filteredEmployees = (employeesData as Employee[]).filter(emp => {
+          const isMember = projectMembers.length > 0 
+            ? projectMembers.includes(emp.id) || projectMembers.includes((emp as any)._id)
+            : true;
+          return isMember && emp.isActive;
+        });
+        setEmployees(filteredEmployees);
+      }
 
       // 2. Find Active Sprint
       const active = sprintsResult.success && sprintsResult.data 

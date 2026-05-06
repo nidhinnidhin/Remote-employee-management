@@ -6,6 +6,7 @@ export interface Project {
   startDate?: string;
   endDate?: string;
   status: 'Active' | 'Completed' | 'On Hold';
+  members: string[];
   createdBy: string;
   createdAt: string;
   updatedAt: string;
@@ -17,6 +18,7 @@ export interface CreateProjectPayload {
   startDate?: string;
   endDate?: string;
   status?: 'Active' | 'Completed' | 'On Hold';
+  members?: string[];
 }
 
 export interface UpdateProjectPayload extends Partial<CreateProjectPayload> { }
