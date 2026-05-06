@@ -4,10 +4,10 @@ import { IsString, IsNotEmpty, MinLength } from 'class-validator';
 export class SendMessageDto {
   @IsString()
   @IsNotEmpty({ message: 'Conversation ID is required' })
-  conversationId: string;
+  conversationId!: string;
 
   @IsString()
   @IsNotEmpty({ message: 'Content is required' })
   @MinLength(1, { message: 'Content cannot be empty' })
-  content: string;
+  content!: string;
 }

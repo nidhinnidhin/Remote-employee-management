@@ -74,20 +74,24 @@ const CompanyOnboardingStep: React.FC<CompanyOnboardingStepProps> = ({
                     <FormDropdown
                         label="Team Size"
                         name="size"
+                        variant="company" // Set to company theme
                         value={formData.size}
                         onChange={onChange}
                         options={employeeSizeOptionsData}
                         error={errors.size}
                         required
+                        icon={<Users className="w-4 h-4" style={{ color: "rgb(var(--color-text-muted))" }} />}
                     />
                     <FormDropdown
                         label="Industry"
                         name="industry"
+                        variant="company" // Set to company theme
                         value={formData.industry}
                         onChange={onChange}
                         options={industryOptionsData}
                         error={errors.industry}
                         required
+                        icon={<Building2 className="w-4 h-4" style={{ color: "rgb(var(--color-text-muted))" }} />}
                     />
                 </div>
 

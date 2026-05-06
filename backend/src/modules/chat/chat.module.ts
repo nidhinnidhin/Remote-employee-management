@@ -74,5 +74,6 @@ import { AuthModule } from '../auth/presentation/auth/auth.module';
       useClass: DeleteMessageUseCase,
     },
   ],
+  exports: ['ICreateConversationUseCase', ChatGateway],
 })
 export class ChatModule {}
