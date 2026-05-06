@@ -24,7 +24,9 @@ export class CreateSubscriptionPlanUseCase implements ICreateSubscriptionPlanUse
       dto.price,
       dto.description,
       dto.features,
-      dto.isActive,
+      dto.maxProjects ?? -1,
+      dto.maxMembers ?? -1,
+      dto.isActive ?? true,
     );
 
     return this._subscriptionPlanRepository.create(plan);

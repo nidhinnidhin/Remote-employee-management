@@ -8,6 +8,8 @@ export class SubscriptionPlanEntity {
     public readonly price: number,
     public readonly description: string,
     public readonly features: string[],
+    public readonly maxProjects: number = -1,
+    public readonly maxMembers: number = -1,
     public readonly isActive: boolean = true,
     public readonly createdAt?: Date,
     public readonly updatedAt?: Date,

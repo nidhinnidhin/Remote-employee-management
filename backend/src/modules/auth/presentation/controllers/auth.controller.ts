@@ -59,6 +59,7 @@ export class AuthController {
     @Body() onboardingDto: OnboardingDto,
     @Res({ passthrough: true }) res: Response,
   ) {
+    console.log('[AuthController] onboard body:', JSON.stringify(onboardingDto));
     if (!onboardingDto.userId) {
       throw new BadRequestException('User ID is required for onboarding');
     }
@@ -71,6 +72,27 @@ export class AuthController {
     );
 
     return result;
+  }
+
+  @Post('onboarding/status')
+  async getOnboardingStatus(@Body('userId') userId: string) {
+    if (!userId) {
+      throw new BadRequestException('User ID is required');
+    }
+    return this._onboardCompanyUseCase.getStatus(userId);
+  }
+
+  @Post('onboarding/finalize')
+  async finalizeOnboarding(@Body('userId') userId: string) {
+    if (!userId) {
+      throw new BadRequestException('User ID is required');
+    }
+    // This is a simple update to COMPLETED
+    const result = await this._onboardCompanyUseCase.getStatus(userId);
+    if (result.company?.id) {
+       await this._onboardCompanyUseCase.finalize(userId, result.company.id);
+    }
+    return { success: true };
   }
 
   @Post('login')

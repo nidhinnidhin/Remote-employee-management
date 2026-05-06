@@ -1,4 +1,5 @@
 import { CompanyStatus } from "src/shared/enums/company/company-status.enum";
+import { OnboardingStep } from "src/shared/enums/company/onboarding-step.enum";
 
 export class CompanyEntity {
   constructor(
@@ -12,5 +13,6 @@ export class CompanyEntity {
     public readonly updatedAt?: Date,
     public readonly employeeCount?: number,
     public readonly status: CompanyStatus = CompanyStatus.ACTIVE,
+    public readonly onboardingStep: OnboardingStep = OnboardingStep.ORGANIZATION,
   ) { }
 }

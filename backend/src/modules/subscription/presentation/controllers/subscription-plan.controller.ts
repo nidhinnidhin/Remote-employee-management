@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Inject,
+  Query,
 } from '@nestjs/common';
 import { CreateSubscriptionPlanDto } from '../../application/dtos/create-subscription-plan.dto';
 import { UpdateSubscriptionPlanDto } from '../../application/dtos/update-subscription-plan.dto';
@@ -36,8 +37,8 @@ export class SubscriptionPlanController {
   }
 
   @Get()
-  findAll() {
-    return this._getAllUseCase.execute();
+  findAll(@Query('activeOnly') activeOnly?: string) {
+    return this._getAllUseCase.execute(activeOnly === 'true');
   }
 
   @Patch(':id')

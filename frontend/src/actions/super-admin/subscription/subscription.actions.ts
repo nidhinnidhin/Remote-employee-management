@@ -12,9 +12,9 @@ import {
   UpdateSubscriptionPlanDto 
 } from "@/shared/types/superadmin/subscription/subscription.type";
 
-export async function getSubscriptionPlansAction() {
+export async function getSubscriptionPlansAction(activeOnly = false) {
   try {
-    const data = await fetchSubscriptionPlans();
+    const data = await fetchSubscriptionPlans(activeOnly);
     return { success: true, data };
   } catch (error: any) {
     return { success: false, error: error.message || "Failed to fetch subscription plans" };

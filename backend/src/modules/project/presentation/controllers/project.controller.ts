@@ -17,6 +17,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import type { Request } from 'express';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import { CompanyAdminGuard } from 'src/shared/guards/company-admin.guard';
+import { SubscriptionLimitGuard } from 'src/shared/guards/subscription-limit.guard';
+import { CheckSubscriptionLimit } from 'src/shared/decorators/subscription-limit.decorator';
 import { CreateProjectDto } from '../../application/dto/project/create-project.dto';
 import { UpdateProjectDto } from '../../application/dto/project/update-project.dto';
 import type {
@@ -66,7 +68,8 @@ export class ProjectController {
   }
 
   @Post()
-  @UseGuards(CompanyAdminGuard)
+  @UseGuards(CompanyAdminGuard, SubscriptionLimitGuard)
+  @CheckSubscriptionLimit('projects')
   async create(@Req() req: Request, @Body() projectDto: CreateProjectDto) {
     return this._createProjectUseCase.execute(req.user!.companyId!, req.user!.userId, projectDto);
   }

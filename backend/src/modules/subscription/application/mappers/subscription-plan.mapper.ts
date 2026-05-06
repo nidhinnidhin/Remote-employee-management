@@ -10,6 +10,8 @@ export class SubscriptionPlanMapper {
       raw.price,
       raw.description,
       raw.features,
+      raw.maxProjects,
+      raw.maxMembers,
       raw.isActive,
       raw.createdAt,
       raw.updatedAt,
@@ -23,6 +25,8 @@ export class SubscriptionPlanMapper {
       price: entity.price,
       description: entity.description,
       features: entity.features,
+      maxProjects: entity.maxProjects,
+      maxMembers: entity.maxMembers,
       isActive: entity.isActive,
     };
   }

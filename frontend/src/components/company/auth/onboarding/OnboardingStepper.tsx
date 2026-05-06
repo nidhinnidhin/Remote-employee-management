@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import CompanyOnboardingStep from "./CompanyOnboardingStep";
 import SubscriptionStep from "./SubscriptionStep";
 import ConfirmationStep from "./ConfirmationStep";
-import { onboardAction } from "@/actions/auth/onboard.action";
+import { onboardAction, getOnboardingStatusAction, finalizeOnboardingAction } from "@/actions/auth/onboard.action";
 import { ArrowRight, ArrowLeft, Check, Loader2, Rocket } from "lucide-react";
 
 const steps = [
@@ -17,25 +17,14 @@ const steps = [
 
 const OnboardingStepper: React.FC = () => {
     const [currentStep, setCurrentStep] = useState(1);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true); // Start with loading
     const router = useRouter();
     const searchParams = useSearchParams();
     const [onboardingUserId, setOnboardingUserId] = useState<string | null>(null);
 
-    React.useEffect(() => {
-        const userIdFromUrl = searchParams.get("userId");
-        const userIdFromStorage = localStorage.getItem("registration_user_id");
-
-        if (userIdFromUrl) {
-            localStorage.setItem("registration_user_id", userIdFromUrl);
-            setOnboardingUserId(userIdFromUrl);
-        } else if (userIdFromStorage) {
-            setOnboardingUserId(userIdFromStorage);
-        }
-    }, [searchParams]);
-
     const [onboardingData, setOnboardingData] = useState({
         company: {
+            id: "",
             name: "",
             email: "",
             size: "",
@@ -43,9 +32,66 @@ const OnboardingStepper: React.FC = () => {
             website: "",
         },
         subscription: {
-            plan: "Professional",
+            planId: "",
+            planName: "Professional",
         }
     });
+
+    React.useEffect(() => {
+        const userIdFromUrl = searchParams.get("userId");
+        const userIdFromStorage = localStorage.getItem("registration_user_id");
+        const userId = userIdFromUrl || userIdFromStorage;
+
+        if (userId) {
+            if (userIdFromUrl) localStorage.setItem("registration_user_id", userIdFromUrl);
+            setOnboardingUserId(userId);
+            fetchStatus(userId);
+        } else {
+            setIsLoading(false);
+        }
+    }, [searchParams]);
+
+    const fetchStatus = async (userId: string) => {
+        try {
+            const result = await getOnboardingStatusAction(userId);
+            if (result.success && result.data) {
+                const { step, company, user } = result.data;
+                
+                // If user is already fully onboarded, redirect
+                if (user?.isOnboarded) {
+                    router.replace("/admin/dashboard");
+                    return;
+                }
+
+                if (company) {
+                    setOnboardingData(prev => ({
+                        ...prev,
+                        company: {
+                            id: company.id,
+                            name: company.name,
+                            email: company.email,
+                            size: company.size,
+                            industry: company.industry,
+                            website: company.website || "",
+                        }
+                    }));
+                }
+
+                // Map backend step to stepper number
+                const stepMap: Record<string, number> = {
+                    'ORGANIZATION': 1,
+                    'SUBSCRIPTION': 2,
+                    'CONFIRMATION': 3,
+                    'COMPLETED': 3
+                };
+                setCurrentStep(stepMap[step] || 1);
+            }
+        } catch (err) {
+            console.error("Failed to fetch onboarding status", err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const [errors, setErrors] = useState<any>({});
 
@@ -60,10 +106,10 @@ const OnboardingStepper: React.FC = () => {
         }
     };
 
-    const handleSubscriptionChange = (plan: string) => {
+    const handleSubscriptionChange = (planId: string, planName: string) => {
         setOnboardingData(prev => ({
             ...prev,
-            subscription: { ...prev.subscription, plan }
+            subscription: { planId, planName }
         }));
     };
 
@@ -86,44 +132,48 @@ const OnboardingStepper: React.FC = () => {
     const handleNext = async () => {
         if (!validateStep(currentStep)) return;
 
-        if (currentStep < 3) {
-            setCurrentStep(prev => prev + 1);
-        } else {
-            const userId = onboardingUserId || localStorage.getItem("registration_user_id");
+        const userId = onboardingUserId || localStorage.getItem("registration_user_id");
+        if (!userId) {
+            setErrors({ form: "Registration session expired. Please sign up again." });
+            return;
+        }
 
-            if (!userId) {
-                setErrors({ form: "Registration session expired. Please sign up again." });
-                return;
-            }
-
+        if (currentStep === 1) {
             setIsLoading(true);
             try {
+                const { id, ...companyData } = onboardingData.company;
                 const result = await onboardAction({
-                    ...onboardingData,
+                    company: companyData,
                     userId
                 });
 
                 if (result.success) {
+                    setCurrentStep(2);
+                } else {
+                    setErrors({ form: result.error || "Failed to save company details" });
+                }
+            } catch (err) {
+                setErrors({ form: "Something went wrong" });
+            } finally {
+                setIsLoading(false);
+            }
+        } else if (currentStep === 2) {
+            // Subscription is handled inside SubscriptionStep with Razorpay
+            // This button might be disabled until payment is verified
+            setCurrentStep(3);
+        } else {
+            // Step 3 Confirmation
+            setIsLoading(true);
+            try {
+                const result = await finalizeOnboardingAction(userId);
+                if (result.success) {
                     localStorage.removeItem("registration_user_id");
                     router.replace("/admin/dashboard");
                 } else {
-                    const errMsg = result.error || "";
-                    const isEmailConflict =
-                        errMsg.toLowerCase().includes("company") ||
-                        errMsg.toLowerCase().includes("email") ||
-                        errMsg.toLowerCase().includes("exist") ||
-                        errMsg.toLowerCase().includes("taken") ||
-                        errMsg.toLowerCase().includes("already");
-
-                    if (isEmailConflict) {
-                        setErrors({ email: "This company email is already registered. Please use a different email." });
-                        setCurrentStep(1);
-                    } else {
-                        setErrors({ form: errMsg });
-                    }
+                    setErrors({ form: result.error || "Failed to finalize account" });
                 }
             } catch (err) {
-                setErrors({ form: "Something went wrong during setup" });
+                setErrors({ form: "Something went wrong" });
             } finally {
                 setIsLoading(false);
             }
@@ -216,8 +266,11 @@ const OnboardingStepper: React.FC = () => {
                             
                             {currentStep === 2 && (
                                 <SubscriptionStep
-                                    selectedPlan={onboardingData.subscription.plan}
+                                    selectedPlan={onboardingData.subscription.planId}
                                     onSelect={handleSubscriptionChange}
+                                    companyId={onboardingData.company.id}
+                                    userId={onboardingUserId!}
+                                    onPaymentSuccess={() => setCurrentStep(3)}
                                 />
                             )}
 
@@ -238,25 +291,27 @@ const OnboardingStepper: React.FC = () => {
 
                             {/* ── Navigation Actions ────────────────────────────── */}
                             <div className={`flex flex-col gap-4 mt-10 ${currentStep === 2 ? "max-w-2xl mx-auto" : ""}`}>
-                                <button
-                                    onClick={handleNext}
-                                    disabled={isLoading}
-                                    className="w-full flex items-center justify-center gap-2 py-4 rounded-xl font-bold text-sm transition-all active:scale-[0.98] disabled:opacity-60"
-                                    style={{
-                                        backgroundColor: "rgb(var(--color-accent))",
-                                        color: "rgb(var(--color-bg))",
-                                    }}
-                                >
-                                    {isLoading ? (
-                                        <Loader2 className="w-5 h-5 animate-spin" />
-                                    ) : currentStep === 3 ? (
-                                        <>Activate Account <Rocket className="w-4 h-4" /></>
-                                    ) : (
-                                        <>Continue <ArrowRight className="w-4 h-4" /></>
-                                    )}
-                                </button>
+                                {currentStep !== 2 && (
+                                    <button
+                                        onClick={handleNext}
+                                        disabled={isLoading}
+                                        className="w-full flex items-center justify-center gap-2 py-4 rounded-xl font-bold text-sm transition-all active:scale-[0.98] disabled:opacity-60"
+                                        style={{
+                                            backgroundColor: "rgb(var(--color-accent))",
+                                            color: "rgb(var(--color-bg))",
+                                        }}
+                                    >
+                                        {isLoading ? (
+                                            <Loader2 className="w-5 h-5 animate-spin" />
+                                        ) : currentStep === 3 ? (
+                                            <>Activate Account <Rocket className="w-4 h-4" /></>
+                                        ) : (
+                                            <>Continue <ArrowRight className="w-4 h-4" /></>
+                                        )}
+                                    </button>
+                                )}
 
-                                {currentStep > 1 && (
+                                {currentStep === 2 && (
                                     <button
                                         onClick={handleBack}
                                         disabled={isLoading}

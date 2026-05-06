@@ -2,6 +2,10 @@ import { IsEmail, IsNotEmpty, IsString, IsOptional, ValidateNested, IsObject, Is
 import { Type } from 'class-transformer';
 
 export class OnboardingCompanyDto {
+    @IsOptional()
+    @IsString()
+    id?: string;
+
     @IsString()
     @IsNotEmpty()
     name: string;
@@ -33,15 +37,15 @@ export class OnboardingDto {
     @IsString()
     userId?: string;
 
-    @IsDefined()
+    @IsOptional()
     @IsObject()
     @ValidateNested()
     @Type(() => OnboardingCompanyDto)
-    company: OnboardingCompanyDto;
+    company?: OnboardingCompanyDto;
 
-    @IsDefined()
+    @IsOptional()
     @IsObject()
     @ValidateNested()
     @Type(() => OnboardingSubscriptionDto)
-    subscription: OnboardingSubscriptionDto;
+    subscription?: OnboardingSubscriptionDto;
 }

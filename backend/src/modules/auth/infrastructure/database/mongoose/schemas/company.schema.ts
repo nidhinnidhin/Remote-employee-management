@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { OnboardingStep } from 'src/shared/enums/company/onboarding-step.enum';
 import { CompanyStatus } from 'src/shared/enums/company/company-status.enum';
 
 @Schema({ timestamps: true })
@@ -22,6 +23,13 @@ export class CompanyDocument extends Document {
     default: CompanyStatus.ACTIVE,
   })
   status: CompanyStatus;
+
+  @Prop({
+    type: String,
+    enum: Object.values(OnboardingStep),
+    default: OnboardingStep.ORGANIZATION,
+  })
+  onboardingStep: OnboardingStep;
 
   @Prop()
   website?: string;

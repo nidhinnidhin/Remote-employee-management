@@ -7,7 +7,7 @@ export interface ICreateSubscriptionPlanUseCase {
 }
 
 export interface IGetAllSubscriptionPlansUseCase {
-  execute(): Promise<SubscriptionPlanEntity[]>;
+  execute(activeOnly?: boolean): Promise<SubscriptionPlanEntity[]>;
 }
 
 export interface IUpdateSubscriptionPlanUseCase {

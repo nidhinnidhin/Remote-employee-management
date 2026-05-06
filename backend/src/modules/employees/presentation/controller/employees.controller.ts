@@ -12,6 +12,8 @@ import {
   Inject,
   UseGuards,
 } from '@nestjs/common';
+import { SubscriptionLimitGuard } from 'src/shared/guards/subscription-limit.guard';
+import { CheckSubscriptionLimit } from 'src/shared/decorators/subscription-limit.decorator';
 import type {
   IInviteEmployeeUseCase,
   IVerifyInviteUseCase,
@@ -196,7 +198,8 @@ export class EmployeesController {
   }
 
   @Post('invite')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, SubscriptionLimitGuard)
+  @CheckSubscriptionLimit('members')
   async invite(@Req() req: Request, @Body() InviteEmployeeDto: InviteEmployeeDto) {
     const companyId = req.user?.companyId;
     if (!companyId) {

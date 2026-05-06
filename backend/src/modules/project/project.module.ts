@@ -33,10 +33,12 @@ import { StoryController } from './presentation/controllers/story.controller';
 import { TaskController } from './presentation/controllers/task.controller';
 import { SprintController } from './presentation/controllers/sprint.controller';
 import { AuthModule } from '../auth/presentation/auth/auth.module';
+import { SubscriptionModule } from '../subscription/subscription.module';
 
 @Module({
   imports: [
     AuthModule,
+    SubscriptionModule,
     MongooseModule.forFeature([
       { name: ProjectDocument.name, schema: ProjectSchema },
       { name: UserStoryDocument.name, schema: UserStorySchema },
@@ -148,5 +150,6 @@ import { AuthModule } from '../auth/presentation/auth/auth.module';
       useClass: DeleteSprintUseCase,
     },
   ],
+  exports: ['IProjectRepository'],
 })
 export class ProjectModule {}

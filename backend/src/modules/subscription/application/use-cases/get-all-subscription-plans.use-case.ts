@@ -10,7 +10,8 @@ export class GetAllSubscriptionPlansUseCase implements IGetAllSubscriptionPlansU
     private readonly _subscriptionPlanRepository: ISubscriptionPlanRepository,
   ) {}
 
-  async execute(): Promise<SubscriptionPlanEntity[]> {
-    return this._subscriptionPlanRepository.findAll();
+  async execute(activeOnly = false): Promise<SubscriptionPlanEntity[]> {
+    const filter = activeOnly ? { isActive: true } : {};
+    return this._subscriptionPlanRepository.findAll(filter);
   }
 }

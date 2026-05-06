@@ -24,4 +24,10 @@ export class CreateSubscriptionPlanDto {
 
   @IsBoolean()
   isActive?: boolean;
+
+  @IsNumber()
+  maxProjects?: number;
+
+  @IsNumber()
+  maxMembers?: number;
 }

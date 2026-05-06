@@ -6,9 +6,12 @@ import {
 } from "@/shared/types/superadmin/subscription/subscription.type";
 import { API_ROUTES } from "@/constants/api.routes";
 
-export async function fetchSubscriptionPlans(): Promise<SubscriptionPlan[]> {
+export async function fetchSubscriptionPlans(activeOnly = false): Promise<SubscriptionPlan[]> {
   const api = await getServerApi();
-  const res = await api.get(API_ROUTES.SUPER_ADMIN.SUBSCRIPTIONS.BASE);
+  const url = activeOnly
+    ? `${API_ROUTES.SUPER_ADMIN.SUBSCRIPTIONS.BASE}?activeOnly=true`
+    : API_ROUTES.SUPER_ADMIN.SUBSCRIPTIONS.BASE;
+  const res = await api.get(url);
   return res.data;
 }
 

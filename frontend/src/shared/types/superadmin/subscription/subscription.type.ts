@@ -11,6 +11,8 @@ export interface SubscriptionPlan {
   price: number;
   description: string;
   features: string[];
+  maxProjects: number;
+  maxMembers: number;
   isActive: boolean;
   createdAt?: string;
   updatedAt?: string;
@@ -22,6 +24,8 @@ export interface CreateSubscriptionPlanDto {
   price: number;
   description: string;
   features: string[];
+  maxProjects: number;
+  maxMembers: number;
   isActive?: boolean;
 }
 

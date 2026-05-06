@@ -25,6 +25,8 @@ export class SubscriptionSeedService implements OnModuleInit {
         price: 0,
         description: 'For small team',
         features: ['Upto 5 Projects', 'Upto 5 Members', 'Basic supports'],
+        maxProjects: 5,
+        maxMembers: 5,
       },
       {
         name: 'PRO',
@@ -32,6 +34,8 @@ export class SubscriptionSeedService implements OnModuleInit {
         price: 399,
         description: 'For Growing Team',
         features: ['Upto 10 Projects', 'Upto 10 Members', 'Advance Supports'],
+        maxProjects: 10,
+        maxMembers: 10,
       },
       {
         name: 'ENTERPRISE',
@@ -39,6 +43,8 @@ export class SubscriptionSeedService implements OnModuleInit {
         price: 999,
         description: 'For Large Team',
         features: ['Unlimited Projects', 'Unlimited Members', 'Dedicated Supports'],
+        maxProjects: -1,
+        maxMembers: -1,
       },
     ];
 
@@ -46,7 +52,13 @@ export class SubscriptionSeedService implements OnModuleInit {
       try {
         const existingPlan = await this._subscriptionPlanRepository.findByType(planData.type);
         if (existingPlan) {
-          this.logger.log(`Plan ${planData.name} already exists. Skipping.`);
+          this.logger.log(`Plan ${planData.name} exists. Updating limits...`);
+          await this._subscriptionPlanRepository.updateById(existingPlan.id, {
+            price: planData.price,
+            maxProjects: planData.maxProjects,
+            maxMembers: planData.maxMembers,
+            features: planData.features,
+          });
           continue;
         }
 
@@ -58,6 +70,8 @@ export class SubscriptionSeedService implements OnModuleInit {
           planData.price,
           planData.description,
           planData.features,
+          planData.maxProjects,
+          planData.maxMembers,
           true,
         );
 

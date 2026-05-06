@@ -21,6 +21,12 @@ export class SubscriptionPlan {
   @Prop({ type: [String], default: [] })
   features: string[];
 
+  @Prop({ default: -1 })
+  maxProjects: number;
+
+  @Prop({ default: -1 })
+  maxMembers: number;
+
   @Prop({ default: true })
   isActive: boolean;
 }

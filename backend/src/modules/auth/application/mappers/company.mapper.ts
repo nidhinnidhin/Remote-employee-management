@@ -15,7 +15,8 @@ export class CompanyMapper {
       companyDoc.createdAt || new Date(),
       companyDoc.updatedAt || new Date(),
       companyDoc.employeeCount,
-      companyDoc.status || UserStatus.ACTIVE,
+      companyDoc.status,
+      companyDoc.onboardingStep,
     );
   }
 
@@ -27,6 +28,7 @@ export class CompanyMapper {
       industry: company.industry,
       website: company.website,
       status: company.status,
+      onboardingStep: company.onboardingStep,
     } as Partial<CompanyDocument>;
   }
 }

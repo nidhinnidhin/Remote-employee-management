@@ -17,8 +17,7 @@ import {
 @Injectable()
 export class MongoUserRepository
   extends BaseRepository<UserDocument, UserEntity>
-  implements IUserRepository
-{
+  implements IUserRepository {
   constructor(
     @InjectModel(UserDocument.name)
     private readonly _userModel: Model<UserDocument>,

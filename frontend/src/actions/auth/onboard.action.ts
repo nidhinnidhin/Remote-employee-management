@@ -28,7 +28,7 @@ export async function onboardAction(payload: any): Promise<AuthActionResult> {
         session.userId = user.id;
         session.role = user.role;
         session.email = user.email;
-        session.isOnboarded = true;
+        session.isOnboarded = false;
         session.companyId = response.data.company?.id;
         await session.save();
 
@@ -42,5 +42,35 @@ export async function onboardAction(payload: any): Promise<AuthActionResult> {
             success: false,
             error: error.response?.data?.message || error.message || "Onboarding failed",
         };
+    }
+}
+
+export async function getOnboardingStatusAction(userId: string): Promise<AuthActionResult> {
+    try {
+        const response = await api.post(API_ROUTES.AUTH.ONBOARDING_STATUS, { userId });
+        return {
+            success: true,
+            data: response.data,
+        };
+    } catch (error: any) {
+        return {
+            success: false,
+            error: error.response?.data?.message || "Failed to fetch status",
+        };
+    }
+}
+export async function finalizeOnboardingAction(userId: string): Promise<AuthActionResult> {
+    try {
+        const session = await getSession();
+        const response = await api.post('/auth/onboarding/finalize', { userId });
+        
+        if (response.data.success) {
+            session.isOnboarded = true;
+            await session.save();
+            return { success: true, data: response.data };
+        }
+        return { success: false, error: "Failed to finalize onboarding" };
+    } catch (error: any) {
+        return { success: false, error: error.response?.data?.message || "Finalization failed" };
     }
 }
