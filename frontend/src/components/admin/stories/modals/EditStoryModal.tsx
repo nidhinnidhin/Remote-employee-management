@@ -295,6 +295,7 @@ const EditStoryModal: React.FC<EditStoryModalProps> = ({
               options={priorityOptions}
               required
               icon={<Zap size={14} className="text-accent/60" />}
+              variant="accent"
             />
             <FormDropdown
               label="Status"
@@ -304,6 +305,7 @@ const EditStoryModal: React.FC<EditStoryModalProps> = ({
               options={statusOptions}
               required
               icon={<ListChecks size={14} className="text-accent/60" />}
+              variant="accent"
             />
             {formData.type === "Story" && (
               <FormDropdown
@@ -314,6 +316,7 @@ const EditStoryModal: React.FC<EditStoryModalProps> = ({
                 options={["1", "2", "3", "5", "8", "13"]}
                 required
                 icon={<Target size={14} className="text-accent/60" />}
+                variant="accent"
               />
             )}
           </div>
@@ -504,6 +507,7 @@ const EditStoryModal: React.FC<EditStoryModalProps> = ({
             placeholder="Select a new owner..."
             icon={<User size={14} strokeWidth={2} className="text-accent/60" />}
             error={errors.assigneeId}
+            variant="accent"
           />
         </div>
 

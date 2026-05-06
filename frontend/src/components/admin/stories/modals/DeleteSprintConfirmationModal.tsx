@@ -4,7 +4,6 @@ import React from "react";
 import {
   AlertTriangle,
   Trash2,
-  X,
 } from "lucide-react";
 import BaseModal from "@/components/ui/BaseModal";
 import Button from "@/components/ui/Button";
@@ -26,44 +25,61 @@ const DeleteSprintConfirmationModal: React.FC<DeleteSprintConfirmationModalProps
   if (!sprint) return null;
 
   return (
-    <BaseModal isOpen={isOpen} onClose={onClose} title="Confirm Sprint Deletion">
-      <div className="space-y-8 py-4">
-        <div className="flex flex-col items-center text-center gap-6">
-          <div className="w-20 h-20 rounded-[2.5rem] bg-red-500/10 flex items-center justify-center text-red-500 border border-red-500/20 animate-pulse">
-            <Trash2 size={32} />
+    <BaseModal 
+      isOpen={isOpen} 
+      onClose={onClose} 
+      title="" 
+      theme="theme-company"
+      maxWidth="max-w-md"
+    >
+      <div className="flex flex-col pt-2">
+        {/* --- Header --- */}
+        <h1 className="text-xl font-black text-white text-center uppercase tracking-tighter mb-8">
+          Confirm Deletion
+        </h1>
+
+        {/* --- Central Warning Icon --- */}
+        <div className="flex flex-col items-center text-center gap-6 mb-8">
+          <div className="w-20 h-20 rounded-[2rem] bg-rose-500/10 flex items-center justify-center text-rose-500 border border-rose-500/20 shadow-[0_0_30px_rgba(244,63,94,0.1)]">
+            <Trash2 size={32} strokeWidth={2.5} />
           </div>
           
-          <div className="space-y-3">
-            <h3 className="text-xl font-black text-white tracking-tight">Delete Sprint "{sprint.name}"?</h3>
-            <p className="text-sm text-slate-500 max-w-[320px] leading-relaxed mx-auto font-medium">
-              You are about to remove this sprint from the project cycle. This is the first step of a secure deletion process.
+          <div className="space-y-3 px-4">
+            <h3 className="text-lg font-black text-white uppercase tracking-tight leading-tight">
+              Delete Sprint <br/>
+              <span className="text-rose-400">"{sprint.name}"</span>?
+            </h3>
+            <p className="text-[12px] text-slate-500 max-w-[280px] leading-relaxed mx-auto font-medium">
+              You are about to remove this sprint from the project cycle. This action initiates the secure deletion sequence.
             </p>
           </div>
         </div>
 
-        <div className="p-4 bg-orange-500/[0.03] border border-orange-500/10 rounded-2xl flex gap-4 items-start">
-           <div className="p-2 rounded-xl bg-orange-500/10 text-orange-500">
+        {/* --- Warning Context Box --- */}
+        <div className="p-5 bg-indigo-500/[0.03] border border-white/10 rounded-2xl flex gap-4 items-start mb-8">
+           <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-400 shrink-0">
               <AlertTriangle size={18} />
            </div>
-           <p className="text-[11px] text-slate-400 leading-relaxed font-medium">
-             After confirming, you will be asked how to handle the tasks and stories currently assigned to this sprint.
+           <p className="text-[11px] text-slate-400 leading-relaxed font-bold uppercase tracking-wider">
+             Post-confirmation, you must define the migration path for all tasks currently assigned to this cycle.
            </p>
         </div>
 
-        <div className="flex items-center gap-4 pt-4">
-          <Button
-            variant="ghost"
+        {/* --- Action Buttons --- */}
+        <div className="flex items-center gap-4 pt-2">
+          <button
+            type="button"
             onClick={onClose}
-            className="flex-1 h-12 rounded-xl text-[11px] font-black uppercase tracking-widest text-slate-500 hover:text-white hover:bg-white/5"
+            className="flex-1 h-14 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-white transition-all"
           >
-            Cancel
-          </Button>
+            Abort
+          </button>
+          
           <Button
-            variant="primary"
             onClick={onConfirm}
-            className="flex-1 h-12 rounded-xl bg-red-500 text-white font-black text-[11px] uppercase tracking-widest shadow-xl shadow-red-500/20 hover:bg-red-600 transition-all"
+            className="flex-1 h-14 rounded-2xl bg-gradient-to-br from-rose-500 to-rose-600 text-white font-black text-[11px] uppercase tracking-[0.2em] shadow-lg shadow-rose-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
           >
-            Proceed to Options
+            Confirm & Proceed
           </Button>
         </div>
       </div>

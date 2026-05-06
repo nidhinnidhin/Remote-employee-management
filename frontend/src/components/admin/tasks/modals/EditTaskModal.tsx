@@ -264,6 +264,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
               options={statusOptions}
               required
               icon={<Info size={14} className="text-accent/60" />}
+              variant="accent"
             />
             <div className="grid grid-cols-2 gap-3">
               <FormInput
@@ -337,6 +338,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
               placeholder="Select owner..."
               icon={<User size={14} strokeWidth={2} className="text-accent/60" />}
               error={errors.assignedTo}
+              variant="accent"
             />
           </div>
         </div>

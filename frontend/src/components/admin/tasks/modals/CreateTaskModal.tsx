@@ -279,6 +279,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
               options={statusOptions}
               required
               icon={<Info size={14} className="text-accent/60" />}
+              variant="accent"
             />
             <FormInput
               label="Estimated Hours"
@@ -345,6 +346,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
               placeholder="Select owner..."
               icon={<User size={14} strokeWidth={2} className="text-accent/60" />}
               error={errors.assignedTo}
+              variant="accent"
             />
           </div>
         </div>

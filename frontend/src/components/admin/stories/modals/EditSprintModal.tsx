@@ -2,12 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import {
-  X,
-  Target,
-  Rocket,
   Timer,
   Calendar,
-  Clock,
+  Save,
 } from "lucide-react";
 import BaseModal from "@/components/ui/BaseModal";
 import FormInput from "@/components/ui/FormInput";
@@ -51,7 +48,7 @@ const EditSprintModal: React.FC<EditSprintModalProps> = ({
     }
   }, [sprint]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: { target: { name: string; value: string } }) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
@@ -87,7 +84,7 @@ const EditSprintModal: React.FC<EditSprintModalProps> = ({
       const result = await updateSprintAction(sprint.id, formData);
 
       if (result.success) {
-        toast.success("Sprint updated successfully");
+        toast.success("Sprint configuration updated");
         onSuccess();
         onClose();
       } else {
@@ -103,117 +100,123 @@ const EditSprintModal: React.FC<EditSprintModalProps> = ({
   if (!sprint) return null;
 
   return (
-    <BaseModal isOpen={isOpen} onClose={onClose} title={`Edit Sprint: ${sprint.name}`}>
-      <div className="relative overflow-hidden">
-        {/* --- Header Decoration --- */}
-        <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-orange-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-64 h-64 bg-accent/5 rounded-full blur-3xl" />
+    <BaseModal 
+      isOpen={isOpen} 
+      onClose={onClose} 
+      title="" 
+      theme="theme-company"
+      maxWidth="max-w-xl"
+    >
+      <div className="flex flex-col">
+        {/* --- Header --- */}
+        <h1 className="text-xl font-black text-white text-center uppercase tracking-tighter mb-6">
+          Edit Sprint Configuration
+        </h1>
 
-        <form onSubmit={handleSubmit} className="relative space-y-8 py-4 px-2">
-          {/* --- Sprint Name Section --- */}
+        {/* --- Icon Header --- */}
+        <div className="flex justify-center mb-8">
+          <div className="p-5 rounded-full border border-white/10 bg-white/5">
+            <Timer size={28} className="text-indigo-400" strokeWidth={2.5} />
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* --- General Section --- */}
           <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="p-1.5 rounded-lg bg-orange-500/10 border border-orange-500/20">
-                <Timer size={14} className="text-orange-500" />
-              </div>
-              <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
-                General Information
-              </h3>
+            <div className="flex items-center gap-2 px-1 border-l-2 border-indigo-500/50 pl-3 mb-2">
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
+                Designation & Goal
+              </span>
             </div>
             
             <FormInput
               label="Sprint Name"
               name="name"
-              placeholder="e.g., Sprint 1: Foundation Phase"
+              placeholder="e.g., Sprint 01"
               value={formData.name}
               onChange={handleChange}
               error={errors.name}
               required
-              className="bg-white/[0.02] border-white/[0.08] focus:border-orange-500/40 focus:bg-orange-500/[0.02] transition-all"
+              className="bg-white/[0.03] border-white/10"
             />
 
             <div className="space-y-2">
-              <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider pl-1">
-                Sprint Goal
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
+                Strategic Objective
               </label>
               <textarea
                 name="goal"
-                placeholder="What is the primary mission for this cycle?"
+                placeholder="What is the primary mission?"
                 value={formData.goal}
-                onChange={handleChange}
-                rows={3}
+                onChange={(e) => handleChange({ target: { name: 'goal', value: e.target.value } })}
                 className={cn(
-                  "w-full bg-white/[0.02] border border-white/[0.08] rounded-xl px-4 py-3 text-[13px] text-white placeholder:text-slate-600 outline-none focus:border-accent/40 focus:bg-accent/[0.02] transition-all resize-none min-h-[80px]",
-                  errors.goal && "border-rose-500/50 focus:border-rose-500/50"
+                  "w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-[13px] text-white placeholder:text-slate-600 outline-none focus:border-indigo-500/50 transition-all resize-none min-h-[100px]",
+                  errors.goal && "border-rose-500/50"
                 )}
               />
-              {errors.goal && (
-                <p className="text-[10px] font-medium text-rose-500 pl-1">{errors.goal}</p>
-              )}
             </div>
           </div>
 
           {/* --- Timeline Section --- */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-                <Calendar size={14} className="text-emerald-500" />
-              </div>
-              <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
-                Duration & Schedule
-              </h3>
+          <div className="space-y-4 pt-2 border-t border-white/[0.04]">
+            <div className="flex items-center gap-2 px-1 border-l-2 border-indigo-500/50 pl-3 mb-2">
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
+                Lifecycle State
+              </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-5">
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider pl-1">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
+                  <Calendar size={12} className="text-indigo-400" />
                   Start Date
                 </label>
                 <input
                   type="date"
                   name="startDate"
                   value={formData.startDate}
-                  onChange={handleChange}
-                  className="w-full bg-white/[0.02] border border-white/[0.08] rounded-xl px-4 h-12 text-[13px] text-white outline-none focus:border-emerald-500/40 focus:bg-emerald-500/[0.02] transition-all"
+                  onChange={(e) => handleChange({ target: { name: 'startDate', value: e.target.value } })}
+                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 h-12 text-[13px] text-white outline-none focus:border-indigo-500/50 transition-all"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider pl-1">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
+                  <Calendar size={12} className="text-blue-400" />
                   End Date
                 </label>
                 <input
                   type="date"
                   name="endDate"
                   value={formData.endDate}
-                  onChange={handleChange}
+                  onChange={(e) => handleChange({ target: { name: 'endDate', value: e.target.value } })}
                   className={cn(
-                    "w-full bg-white/[0.02] border border-white/[0.08] rounded-xl px-4 h-12 text-[13px] text-white outline-none focus:border-orange-500/40 focus:bg-orange-500/[0.02] transition-all",
+                    "w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 h-12 text-[13px] text-white outline-none focus:border-indigo-500/50 transition-all",
                     errors.endDate && "border-rose-500/50"
                   )}
                 />
-                {errors.endDate && (
-                   <p className="text-[10px] font-medium text-rose-500 pl-1">{errors.endDate}</p>
-                )}
               </div>
             </div>
           </div>
 
           {/* --- Actions --- */}
-          <div className="flex items-center justify-end gap-4 pt-6 border-t border-white/[0.05]">
+          <div className="flex items-center justify-between pt-6 border-t border-white/[0.06]">
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2.5 rounded-xl text-[11px] font-black text-slate-500 uppercase tracking-widest hover:text-white hover:bg-white/[0.05] transition-all"
+              className="text-[11px] font-black text-slate-500 uppercase tracking-widest hover:text-white transition-colors"
             >
-              Cancel
+              Abort
             </button>
             <Button
               type="submit"
               isLoading={loading}
-              className="h-12 px-10 rounded-xl bg-orange-500 text-[#08090a] font-black text-[11px] uppercase tracking-widest shadow-xl shadow-orange-500/10 hover:shadow-orange-500/20 active:scale-95 transition-all"
+              className="h-14 px-10 rounded-2xl bg-gradient-to-br from-[#7c7fff] to-[#4e84ff] text-white font-black text-[11px] uppercase tracking-widest shadow-lg shadow-indigo-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
             >
-              Update Sprint
+              <div className="flex items-center gap-2">
+                <Save size={16} strokeWidth={3} />
+                Save Changes
+              </div>
             </Button>
           </div>
         </form>

@@ -113,6 +113,7 @@ const InviteEmployeeModal = ({
               options={ROLE_OPTIONS}
               placeholder="Select role"
               required
+              variant="accent"
             />
           </div>
 

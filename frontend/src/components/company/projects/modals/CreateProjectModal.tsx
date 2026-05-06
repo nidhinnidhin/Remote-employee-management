@@ -282,6 +282,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
                 error={errors.status}
                 options={["Active", "On Hold", "Completed"]}
                 required
+                variant="accent"
               />
             </div>
           </div>

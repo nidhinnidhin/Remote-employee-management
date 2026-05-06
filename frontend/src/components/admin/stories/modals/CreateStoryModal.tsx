@@ -272,6 +272,7 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
               options={issueTypeOptions}
               required
               icon={<Layers size={14} className="text-accent/60" />}
+              variant="accent"
             />
           </div>
 
@@ -323,6 +324,7 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
               required
               icon={<Rocket size={14} className="text-accent/60" />}
               error={errors.destination}
+              variant="accent"
             />
             <FormDropdown
               label="Priority"
@@ -332,6 +334,7 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
               options={priorityOptions}
               required
               icon={<Zap size={14} className="text-accent/60" />}
+              variant="accent"
             />
             {formData.type === "Story" && (
               <FormDropdown
@@ -342,6 +345,7 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
                 options={storyPointOptions.map(String)}
                 required
                 icon={<Target size={14} className="text-accent/60" />}
+                variant="accent"
               />
             )}
           </div>
@@ -548,6 +552,7 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
             placeholder="Select a project contributor..."
             icon={<User size={14} strokeWidth={2} className="text-accent/60" />}
             error={errors.assigneeId}
+            variant="accent"
           />
         </div>
 
