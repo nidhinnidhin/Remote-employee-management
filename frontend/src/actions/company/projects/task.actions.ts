@@ -29,6 +29,19 @@ export const getTasksByStoryAction = async (storyId: string) => {
   }
 };
 
+export const getTasksByProjectAction = async (projectId: string) => {
+  try {
+    const api = await getServerApi();
+    const data = await TaskService.getTasksByProject(projectId, api);
+    return { success: true, data };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to fetch tasks",
+    };
+  }
+};
+
 export const getTaskByIdAction = async (id: string) => {
   try {
     const api = await getServerApi();

@@ -62,7 +62,11 @@ export default function EmployeeStoryCard({
         </div>
 
         <div className="flex items-center gap-3 shrink-0">
-          <div className="hidden md:flex items-center gap-2 scale-90">
+          <div className="hidden md:flex items-center gap-3 scale-90">
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-accent/10 border border-accent/20 text-accent">
+               <span className="text-[9px] font-black uppercase tracking-tighter">Points</span>
+               <span className="text-[12px] font-black leading-none">{story.storyPoints || 0}</span>
+            </div>
             <StoryPriorityBadge priority={story.priority} />
             <StoryStatusBadge status={story.status} />
           </div>

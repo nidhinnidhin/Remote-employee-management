@@ -7,6 +7,7 @@ import { moveTaskAction } from "@/actions/company/projects/task.actions";
 import { Task, TaskStatus } from "@/shared/types/company/projects/task.type";
 import { Project } from "@/shared/types/company/projects/project.type";
 import EmployeeKanbanColumn from "./EmployeeKanbanColumn";
+import TaskDetailModal from "./TaskDetailModal";
 
 interface EmployeeKanbanBoardProps {
   tasks: Task[];
@@ -16,6 +17,8 @@ interface EmployeeKanbanBoardProps {
 
 export default function EmployeeKanbanBoard({ tasks: initialTasks, projects, onRefresh }: EmployeeKanbanBoardProps) {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
 
   useEffect(() => {
     setTasks(initialTasks);
@@ -47,6 +50,11 @@ export default function EmployeeKanbanBoard({ tasks: initialTasks, projects, onR
     }
   };
 
+  const handleTaskClick = (task: Task) => {
+    setSelectedTask(task);
+    setIsDetailOpen(true);
+  };
+
   const statuses: TaskStatus[] = [TaskStatus.TODO, TaskStatus.IN_PROGRESS, TaskStatus.REVIEW, TaskStatus.DONE];
 
   return (
@@ -60,10 +68,16 @@ export default function EmployeeKanbanBoard({ tasks: initialTasks, projects, onR
               tasks={tasks.filter(t => t.status === status).sort((a, b) => a.order - b.order)}
               projects={projects}
               onRefresh={onRefresh}
+              onTaskClick={handleTaskClick}
             />
           ))}
         </div>
       </div>
+      <TaskDetailModal 
+        task={selectedTask}
+        isOpen={isDetailOpen}
+        onClose={() => setIsDetailOpen(false)}
+      />
     </DragDropContext>
   );
 }

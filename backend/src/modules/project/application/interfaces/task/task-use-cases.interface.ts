@@ -11,6 +11,10 @@ export interface IGetTasksByStoryUseCase {
   execute(storyId: string, companyId: string): Promise<TaskEntity[]>;
 }
 
+export interface IGetTasksByProjectUseCase {
+  execute(projectId: string, companyId: string): Promise<TaskEntity[]>;
+}
+
 export interface IGetMyTasksUseCase {
   execute(userId: string, companyId: string): Promise<TaskEntity[]>;
 }

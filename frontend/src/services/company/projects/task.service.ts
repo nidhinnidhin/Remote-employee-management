@@ -8,6 +8,11 @@ export const TaskService = {
     const response = await api.get(API_ROUTES.COMPANY.TASKS.BY_STORY(storyId));
     return response.data;
   },
+  
+  async getTasksByProject(projectId: string, api: AxiosInstance = clientApi): Promise<Task[]> {
+    const response = await api.get(API_ROUTES.COMPANY.TASKS.BY_PROJECT(projectId));
+    return response.data;
+  },
 
   async getTaskById(id: string, api: AxiosInstance = clientApi): Promise<Task> {
     const response = await api.get(API_ROUTES.COMPANY.TASKS.BY_ID(id));

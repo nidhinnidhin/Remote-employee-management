@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import BacklogView from "@/components/admin/stories/BacklogView";
 import BoardView from "@/components/admin/tasks/BoardView";
 import SprintListView from "@/components/admin/stories/SprintListView";
+import PerformanceView from "./PerformanceView";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -87,20 +88,7 @@ const ProjectDetailsPage = () => {
       case "Sprint":
         return <SprintListView projectId={id as string} />;
       case "Performance":
-        return (
-          // Placeholder for Performance View - Replace with your <PerformanceView /> component
-          <div className="flex flex-col items-center justify-center py-32 px-6 text-center animate-in fade-in duration-700">
-            <div className="w-20 h-20 rounded-[2.5rem] bg-accent/5 flex items-center justify-center text-accent/20 border border-accent/10 mb-8">
-              <Activity size={32} />
-            </div>
-            <h3 className="text-xl font-black text-white mb-3 tracking-tighter">
-              Performance Analytics
-            </h3>
-            <p className="text-slate-500 text-sm max-w-[300px] leading-relaxed font-medium">
-              Velocity charts, burndown data, and team metrics will be visualized here.
-            </p>
-          </div>
-        );
+        return <PerformanceView projectId={id as string} />;
       default:
         return null;
     }

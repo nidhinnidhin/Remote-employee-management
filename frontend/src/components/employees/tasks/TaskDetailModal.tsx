@@ -27,9 +27,9 @@ export default function TaskDetailModal({ task, isOpen, onClose }: TaskDetailMod
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
-      title="Node Configuration"
-      description="Detailed technical breakdown of the selected task."
-      maxWidth="max-w-lg"
+      title="Task Intelligence"
+      description="Comprehensive technical overview and execution metrics."
+      maxWidth="max-w-xl"
     >
       <div className="space-y-6 pt-4">
         {/* Title & Status */}

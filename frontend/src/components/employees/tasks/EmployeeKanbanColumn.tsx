@@ -12,9 +12,10 @@ interface EmployeeKanbanColumnProps {
   tasks: Task[];
   projects: Project[];
   onRefresh?: () => void;
+  onTaskClick?: (task: Task) => void;
 }
 
-export default function EmployeeKanbanColumn({ status, tasks, projects, onRefresh }: EmployeeKanbanColumnProps) {
+export default function EmployeeKanbanColumn({ status, tasks, projects, onRefresh, onTaskClick }: EmployeeKanbanColumnProps) {
   
   const getStatusConfig = () => {
     switch (status) {
@@ -91,6 +92,7 @@ export default function EmployeeKanbanColumn({ status, tasks, projects, onRefres
                         projectName={project.name}
                         projectColor={project.color}
                         onRefresh={onRefresh}
+                        onClick={() => onTaskClick?.(task)}
                         showProjectBadge
                       />
                     </div>

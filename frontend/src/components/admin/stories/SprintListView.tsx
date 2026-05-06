@@ -23,6 +23,9 @@ import { getStoriesByProjectAction } from "@/actions/company/projects/story.acti
 import { getEmployees } from "@/services/company/employee-management.service";
 import { toast } from "sonner";
 import StoryCard from "./StoryCard";
+import SprintBurndown from "./SprintBurndown";
+import { getTasksByProjectAction } from "@/actions/company/projects/task.actions";
+import { Task } from "@/shared/types/company/projects/task.type";
 import StartSprintModal from "./modals/StartSprintModal";
 import EditSprintModal from "./modals/EditSprintModal";
 import DeleteSprintConfirmationModal from "./modals/DeleteSprintConfirmationModal";
@@ -37,6 +40,7 @@ interface SprintListViewProps {
 const SprintListView: React.FC<SprintListViewProps> = ({ projectId }) => {
   const [sprints, setSprints] = useState<Sprint[]>([]);
   const [stories, setStories] = useState<UserStory[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [sprintToStart, setSprintToStart] = useState<Sprint | null>(null);
@@ -49,9 +53,10 @@ const SprintListView: React.FC<SprintListViewProps> = ({ projectId }) => {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [sprintsResult, storiesResult, employeesData] = await Promise.all([
+      const [sprintsResult, storiesResult, tasksResult, employeesData] = await Promise.all([
         getSprintsByProjectAction(projectId),
         getStoriesByProjectAction(projectId),
+        getTasksByProjectAction(projectId),
         getEmployees(),
       ]);
 
@@ -65,6 +70,10 @@ const SprintListView: React.FC<SprintListViewProps> = ({ projectId }) => {
         setStories(storiesResult.data);
       } else {
         toast.error(storiesResult.error || "Failed to load stories");
+      }
+
+      if (tasksResult.success && tasksResult.data) {
+        setTasks(tasksResult.data);
       }
 
       setEmployees(employeesData);
@@ -149,8 +158,15 @@ const SprintListView: React.FC<SprintListViewProps> = ({ projectId }) => {
       </div>
 
       <div className="flex flex-col gap-5">
-        {sprints.map((sprint) => {
-          const sprintAddedStories = stories.filter((s) => sprint.issueIds.includes(s.id));
+        {sprints
+          .sort((a, b) => {
+            const statusOrder = { ACTIVE: 0, PLANNED: 1, COMPLETED: 2 };
+            return statusOrder[a.status as keyof typeof statusOrder] - statusOrder[b.status as keyof typeof statusOrder];
+          })
+          .map((sprint) => {
+            const sprintAddedStories = stories.filter((s) => 
+              sprint.issueIds.some(id => id.toString() === s.id.toString())
+            );
 
           return (
             <div
@@ -192,7 +208,12 @@ const SprintListView: React.FC<SprintListViewProps> = ({ projectId }) => {
                     <div className="flex items-center gap-4 text-[10px] text-slate-500 font-bold uppercase tracking-widest">
                       <span className="flex items-center gap-1.5">
                         <Hash size={12} className="text-orange-500/40" />
-                        {sprint.issueIds.length} Objectives
+                        {sprintAddedStories.length} Objectives
+                      </span>
+                      {/* Total Story Points */}
+                      <span className="flex items-center gap-1.5 border-l border-white/10 pl-4">
+                        <Target size={12} className="text-accent/40" />
+                        {sprintAddedStories.reduce((sum, s) => sum + (s.storyPoints || 0), 0)} Points
                       </span>
                       {sprint.startDate && (
                         <span className="flex items-center gap-1.5 border-l border-white/10 pl-4">
@@ -240,6 +261,19 @@ const SprintListView: React.FC<SprintListViewProps> = ({ projectId }) => {
                    )}
                 </div>
               </div>
+
+              {/* Burndown Chart for Active Sprint */}
+              {sprint.status === 'ACTIVE' && (
+                <div className="px-6 pb-2">
+                  <SprintBurndown 
+                    sprint={sprint} 
+                    tasks={tasks.filter(t => {
+                      const tStoryId = t.storyId?.toString();
+                      return sprintAddedStories.some(s => s.id.toString() === tStoryId);
+                    })} 
+                  />
+                </div>
+              )}
 
               {/* Sprint Goal - Compact Bar */}
               {sprint.goal && (

@@ -19,6 +19,7 @@ import { UpdateUserStoryUseCase } from './application/use-cases/story/update-sto
 import { DeleteUserStoryUseCase } from './application/use-cases/story/delete-story.usecase';
 import { CreateTaskUseCase } from './application/use-cases/task/create-task.usecase';
 import { GetTasksByStoryUseCase } from './application/use-cases/task/get-tasks-by-story.usecase';
+import { GetTasksByProjectUseCase } from './application/use-cases/task/get-tasks-by-project.usecase';
 import { GetMyTasksUseCase } from './application/use-cases/task/get-my-tasks.usecase';
 import { UpdateTaskUseCase } from './application/use-cases/task/update-task.usecase';
 import { MoveTaskUseCase } from './application/use-cases/task/move-task.usecase';
@@ -111,6 +112,10 @@ import { SubscriptionModule } from '../subscription/subscription.module';
     {
       provide: 'IGetTasksByStoryUseCase',
       useClass: GetTasksByStoryUseCase,
+    },
+    {
+      provide: 'IGetTasksByProjectUseCase',
+      useClass: GetTasksByProjectUseCase,
     },
     {
       provide: 'IGetMyTasksUseCase',

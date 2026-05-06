@@ -58,6 +58,7 @@ export const API_ROUTES = {
         TASKS: {
             BASE: "/tasks",
             BY_STORY: (storyId: string) => `/tasks?storyId=${storyId}`,
+            BY_PROJECT: (projectId: string) => `/tasks?projectId=${projectId}`,
             BY_ID: (id: string) => `/tasks/${id}`,
             MOVE: (id: string) => `/tasks/${id}/move`,
             MY_TASKS: "/tasks/my",

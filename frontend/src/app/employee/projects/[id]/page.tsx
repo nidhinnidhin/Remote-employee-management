@@ -82,7 +82,10 @@ export default function EmployeeProjectDetailPage() {
 
           // 2. Filter Stories for Active Sprint
           const activeStories = storiesResult.success && storiesResult.data
-            ? (storiesResult.data as UserStory[]).filter(s => active.issueIds.includes(s.id || (s as any)._id))
+            ? (storiesResult.data as UserStory[]).filter(s => {
+                const sId = (s.id || (s as any)._id)?.toString();
+                return active.issueIds.some(id => id.toString() === sId);
+              })
             : [];
           setStories(activeStories);
 
@@ -99,9 +102,10 @@ export default function EmployeeProjectDetailPage() {
 
             // Only tasks that belong to stories in the active sprint
             setTasks(
-              projectTasks.filter((t: any) => 
-                activeStories.some(s => (s.id || (s as any)._id) === t.storyId)
-              )
+              projectTasks.filter((t: any) => {
+                const tStoryId = t.storyId?.toString();
+                return activeStories.some(s => (s.id || (s as any)._id)?.toString() === tStoryId);
+              })
             );
           }
         });
@@ -219,6 +223,9 @@ export default function EmployeeProjectDetailPage() {
               )}
             >
               Objectives ({relevantStories.length})
+              <span className="ml-2 text-accent/50 text-[9px] font-bold">
+                {relevantStories.reduce((sum, s) => sum + (s.storyPoints || 0), 0)} pts
+              </span>
             </button>
           </div>
         </div>
@@ -233,16 +240,18 @@ export default function EmployeeProjectDetailPage() {
             />
           ) : (
             <div className="h-full overflow-y-auto space-y-4 pb-12 custom-scrollbar">
-              {relevantStories.map((story) => (
+              <div className="space-y-4">
+                {relevantStories.map((story) => (
                 <EmployeeStoryCard
                   key={story.id || (story as any)._id}
                   story={story}
                   tasks={tasks.filter(
-                    (t) => t.storyId === (story.id || (story as any)._id),
+                    (t) => t.storyId?.toString() === (story.id?.toString() || (story as any)._id?.toString()),
                   )}
                   onRefresh={() => loadData(true)}
                 />
-              ))}
+                ))}
+              </div>
             </div>
           )}
         </div>

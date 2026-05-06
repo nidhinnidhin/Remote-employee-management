@@ -26,6 +26,9 @@ import { getSprintsByProjectAction, updateSprintAction } from "@/actions/company
 import { getEmployees } from "@/services/company/employee-management.service";
 import { toast } from "sonner";
 import StoryCard from "./StoryCard";
+import SprintBurndown from "./SprintBurndown";
+import { getTasksByProjectAction } from "@/actions/company/projects/task.actions";
+import { Task } from "@/shared/types/company/projects/task.type";
 import CreateStoryModal from "./modals/CreateStoryModal";
 import EditStoryModal from "./modals/EditStoryModal";
 import DeleteStoryConfirmation from "./modals/DeleteStoryConfirmation";
@@ -46,7 +49,7 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId, projectMembers = [
 
   // New state for Sprints
   const [sprints, setSprints] = useState<Sprint[]>([]);
-
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -64,9 +67,10 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId, projectMembers = [
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [storiesResult, sprintsResult, employeesData] = await Promise.all([
+      const [storiesResult, sprintsResult, tasksResult, employeesData] = await Promise.all([
         getStoriesByProjectAction(projectId),
         getSprintsByProjectAction(projectId),
+        getTasksByProjectAction(projectId),
         getEmployees(),
       ]);
 
@@ -80,6 +84,10 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId, projectMembers = [
         setSprints(sprintsResult.data);
       } else {
         toast.error(sprintsResult.error || "Failed to load sprints");
+      }
+
+      if (tasksResult.success && tasksResult.data) {
+        setTasks(tasksResult.data);
       }
 
       if (employeesData) {
@@ -191,7 +199,7 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId, projectMembers = [
 
     return (
       <div>
-        {sprints.map((sprint) => (
+        {sprints.filter(s => s.status !== 'ACTIVE' && s.status !== 'COMPLETED').map((sprint) => (
           <Droppable key={sprint.id} droppableId={`sprint-${sprint.id}`}>
             {(provided, snapshot) => (
               <div
@@ -215,9 +223,15 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId, projectMembers = [
                       </div>
                       <div>
                         <h3 className="text-sm font-bold text-white tracking-tight">{sprint.name}</h3>
-                        <p className="text-[10px] text-slate-500 font-medium uppercase tracking-tighter">
-                          {sprint.issueIds.length} Objectives
-                        </p>
+                        <div className="flex items-center gap-3">
+                           <p className="text-[10px] text-slate-500 font-medium uppercase tracking-tighter">
+                             {sprint.issueIds.length} Objectives
+                           </p>
+                           <div className="w-1 h-1 rounded-full bg-slate-700" />
+                           <p className="text-[10px] text-accent/60 font-bold uppercase tracking-tighter">
+                             {stories.filter(s => sprint.issueIds.includes(s.id)).reduce((sum, s) => sum + (s.storyPoints || 0), 0)} Points
+                           </p>
+                        </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -251,6 +265,7 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId, projectMembers = [
                       "{sprint.goal}"
                     </p>
                   )}
+
 
                   {/* Stories List inside Sprint */}
                   <div className="space-y-2 mt-2">
@@ -449,7 +464,7 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId, projectMembers = [
               <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/[0.03] border border-white/[0.08]">
                 <Hash size={10} className="text-slate-500" />
                 <span className="text-[10px] font-bold text-orange-400 tracking-tighter">
-                  {sprints.length}
+                  {sprints.filter(s => s.status !== 'ACTIVE' && s.status !== 'COMPLETED').length}
                 </span>
               </div>
             </div>
@@ -478,7 +493,14 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId, projectMembers = [
             <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/[0.03] border border-white/[0.08]">
               <Hash size={10} className="text-slate-500" />
               <span className="text-[10px] font-bold text-accent tracking-tighter">
-                {stories.length}
+                {stories.filter(s => s.isInBacklog).length}
+              </span>
+            </div>
+            <div className="w-1 h-1 rounded-full bg-slate-700" />
+            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/[0.03] border border-white/[0.08]">
+              <Target size={10} className="text-slate-500" />
+              <span className="text-[10px] font-bold text-orange-400 tracking-tighter">
+                {stories.filter(s => s.isInBacklog).reduce((sum, s) => sum + (s.storyPoints || 0), 0)} Points
               </span>
             </div>
           </div>

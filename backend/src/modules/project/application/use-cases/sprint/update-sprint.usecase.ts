@@ -32,7 +32,6 @@ export class UpdateSprintUseCase implements IUpdateSprintUseCase {
     if (dto.startDate) updateData.startDate = new Date(dto.startDate);
     if (dto.endDate) updateData.endDate = new Date(dto.endDate);
 
-    // If status is being changed to ACTIVE, ensure we have dates or handle logic
     if (dto.status === SprintStatus.ACTIVE) {
       if (!existingSprint.startDate && !dto.startDate) {
         throw new BadRequestException('Start date is required to start a sprint');
@@ -45,6 +44,12 @@ export class UpdateSprintUseCase implements IUpdateSprintUseCase {
       if (otherActiveSprint) {
         throw new BadRequestException(`Cannot start sprint. Sprint "${otherActiveSprint.name}" is already active.`);
       }
+
+      // Calculate plannedPoints when starting the sprint
+      const projectStories = await this._storyRepository.findByProjectId(existingSprint.projectId, companyId);
+      const sprintStories = projectStories.filter(s => existingSprint.issueIds.includes(s.id));
+      const plannedPoints = sprintStories.reduce((sum, s) => sum + (s.storyPoints || 0), 0);
+      updateData.plannedPoints = plannedPoints;
     }
 
     // Handle Manual Completion: Granular migration
@@ -52,6 +57,8 @@ export class UpdateSprintUseCase implements IUpdateSprintUseCase {
       const projectStories = await this._storyRepository.findByProjectId(existingSprint.projectId, companyId);
       const sprintStories = projectStories.filter(s => existingSprint.issueIds.includes(s.id));
       
+      let completedPoints = 0;
+
       for (const story of sprintStories) {
         // Skip already deleted stories
         if (story.isDeleted) continue;
@@ -68,12 +75,14 @@ export class UpdateSprintUseCase implements IUpdateSprintUseCase {
               status: UserStoryStatus.DONE, 
               isInBacklog: false 
             });
+            completedPoints += story.storyPoints || 0;
           } else if (completedTasks.length === 0) {
             // Case 2: NO tasks are DONE
             await this._storyRepository.updateStory(story.id, companyId, { 
               status: UserStoryStatus.BACKLOG, 
               isInBacklog: true 
             });
+            // Story points remain on this story as it moves back to backlog
           } else {
             // Case 3: MIXED (Partial Completion) - SPLIT
             // 1. Create a new story for the incomplete work
@@ -86,7 +95,7 @@ export class UpdateSprintUseCase implements IUpdateSprintUseCase {
               priority: story.priority as any,
               type: story.type as any,
               assigneeId: story.assigneeId,
-              storyPoints: story.storyPoints,
+              storyPoints: story.storyPoints, // Reallocate ALL points to the new story
               createdBy: story.createdBy,
               status: UserStoryStatus.BACKLOG,
               isInBacklog: true,
@@ -99,11 +108,14 @@ export class UpdateSprintUseCase implements IUpdateSprintUseCase {
               );
             });
 
-            // 3. Mark original story as DONE for sprint history (it now only effectively has completed tasks)
+            // 3. Mark original story as DONE for sprint history
+            // Set storyPoints to 0 as they moved to the "Cont." story
             await this._storyRepository.updateStory(story.id, companyId, { 
               status: UserStoryStatus.DONE, 
-              isInBacklog: false 
+              isInBacklog: false,
+              storyPoints: 0
             });
+            // 0 points added to completedPoints for this story because it's technically incomplete and split
           }
         } else {
           // No tasks? If story itself isn't DONE, move it back to backlog
@@ -112,9 +124,13 @@ export class UpdateSprintUseCase implements IUpdateSprintUseCase {
               status: UserStoryStatus.BACKLOG, 
               isInBacklog: true 
             });
+          } else {
+            // Story was already marked DONE and has no tasks
+            completedPoints += story.storyPoints || 0;
           }
         }
       }
+      updateData.completedPoints = completedPoints;
     }
 
     // Handle Issue updating logic if needed

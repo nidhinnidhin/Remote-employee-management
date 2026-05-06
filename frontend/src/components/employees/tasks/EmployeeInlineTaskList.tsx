@@ -8,7 +8,7 @@ import { moveTaskAction } from "@/actions/company/projects/task.actions";
 import { toast } from "sonner";
 import { PROJECT_MESSAGES } from "@/shared/constants/messages/project.messages";
 import TaskStatusBadge from "@/components/admin/tasks/TaskStatusBadge";
-import TaskDetailModal from "./TaskDetailModel";
+import TaskDetailModal from "./TaskDetailModal";
 
 interface EmployeeInlineTaskListProps {
   tasks: Task[];

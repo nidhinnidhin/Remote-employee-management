@@ -21,6 +21,7 @@ import { MoveTaskDto } from '../../application/dto/task/move-task.dto';
 import type {
   ICreateTaskUseCase,
   IGetTasksByStoryUseCase,
+  IGetTasksByProjectUseCase,
   IGetMyTasksUseCase,
   IUpdateTaskUseCase,
   IMoveTaskUseCase,
@@ -35,6 +36,8 @@ export class TaskController {
     private readonly _createTaskUseCase: ICreateTaskUseCase,
     @Inject('IGetTasksByStoryUseCase')
     private readonly _getTasksByStoryUseCase: IGetTasksByStoryUseCase,
+    @Inject('IGetTasksByProjectUseCase')
+    private readonly _getTasksByProjectUseCase: IGetTasksByProjectUseCase,
     @Inject('IGetMyTasksUseCase')
     private readonly _getMyTasksUseCase: IGetMyTasksUseCase,
     @Inject('IUpdateTaskUseCase')
@@ -56,8 +59,18 @@ export class TaskController {
   }
 
   @Get()
-  async findByStory(@Req() req: Request, @Query('storyId') storyId: string) {
-    return this._getTasksByStoryUseCase.execute(storyId, req.user!.companyId!);
+  async findTasks(
+    @Req() req: Request, 
+    @Query('storyId') storyId?: string,
+    @Query('projectId') projectId?: string
+  ) {
+    if (storyId) {
+      return this._getTasksByStoryUseCase.execute(storyId, req.user!.companyId!);
+    }
+    if (projectId) {
+      return this._getTasksByProjectUseCase.execute(projectId, req.user!.companyId!);
+    }
+    return [];
   }
 
   @Get('my')

@@ -48,7 +48,6 @@ export class ChatController {
     const { companyId, userId } = req.user as any;
     const conversation = await this._createConversationUseCase.execute(companyId, userId, dto);
     
-    // Notify all participants via socket
     this._chatGateway.notifyConversationUpdate(conversation);
     
     return ApiResponse.success(conversation, 'Conversation created successfully');
@@ -87,7 +86,6 @@ export class ChatController {
     const { userId } = req.user as any;
     const conversation = await this._updateConversationUseCase.execute(id, userId, dto);
     
-    // Notify participants of the update
     this._chatGateway.notifyConversationUpdate(conversation);
     
     return ApiResponse.success(conversation, 'Conversation updated successfully');
@@ -97,8 +95,6 @@ export class ChatController {
   async deleteConversation(@Req() req: Request, @Param('id') id: string) {
     const { userId } = req.user as any;
     
-    // Get participants before deleting to notify them
-    // Actually, I can just emit a "deleted" event to the room
     await this._deleteConversationUseCase.execute(id, userId);
     
     this._chatGateway.notifyConversationDeletion(id);
@@ -112,12 +108,6 @@ export class ChatController {
     const { userId } = req.user as any;
     await this._leaveConversationUseCase.execute(id, userId);
     
-    // We should notify other members that someone left
-    // For now, just send a general update if the conversation still exists
-    // But since the person who left won't be in participants anymore, 
-    // the notifyConversationUpdate might not reach them if I use participants list.
-    
-    // Actually, I should emit a "left" event to the user specifically too?
     this._chatGateway.notifyUserLeft(id, userId);
     
     return ApiResponse.success(null, 'Left conversation successfully');

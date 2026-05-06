@@ -18,6 +18,7 @@ interface EmployeeTaskCardProps {
   draggableProps?: any;
   dragHandleProps?: any;
   onRefresh?: () => void;
+  onClick?: () => void;
   showProjectBadge?: boolean;
 }
 
@@ -31,6 +32,7 @@ export default function EmployeeTaskCard({
   draggableProps,
   dragHandleProps,
   onRefresh,
+  onClick,
   showProjectBadge = true,
 }: EmployeeTaskCardProps) {
   const [isLogModalOpen, setIsLogModalOpen] = useState(false);
@@ -61,6 +63,7 @@ export default function EmployeeTaskCard({
           isDraggable && "cursor-grab active:cursor-grabbing",
           "flex flex-col gap-5"
         )}
+        onClick={onClick}
       >
         <div className="space-y-3">
           {/* Top Row: Badge & Status */}
@@ -93,7 +96,13 @@ export default function EmployeeTaskCard({
 
         {/* Metrics Section: Clean Grid with Thin Divider */}
         <div className="grid grid-cols-2 gap-4 py-3 border-y border-white/[0.05]">
-          <div className="space-y-1">
+          <div 
+            className="space-y-1 cursor-pointer hover:bg-white/[0.03] p-1 -m-1 rounded-lg transition-colors" 
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsLogModalOpen(true);
+            }}
+          >
             <p className="text-[9px] font-black uppercase tracking-[0.15em] text-slate-600">Hours</p>
             <div className="flex items-center gap-1.5 text-slate-300">
               <Timer size={13} className="text-accent/60" strokeWidth={1.5} />
@@ -121,7 +130,10 @@ export default function EmployeeTaskCard({
         {/* Action Row */}
         <div className="flex items-center justify-between">
           <button
-            onClick={() => setIsLogModalOpen(true)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsLogModalOpen(true);
+            }}
             className="text-[10px] font-black uppercase tracking-[0.15em] text-accent hover:text-accent/80 transition-colors flex items-center gap-2 group/btn"
           >
             <Clock size={12} className="group-hover/btn:rotate-12 transition-transform" />
