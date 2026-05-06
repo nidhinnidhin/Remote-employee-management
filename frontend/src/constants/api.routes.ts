@@ -80,4 +80,10 @@ export const API_ROUTES = {
             BY_ID: (id: string) => `/subscription-plans/${id}`,
         },
     },
+    SUBSCRIPTIONS: {
+        CURRENT: (companyId: string) => `/subscriptions/current/${companyId}`,
+        PLANS: "/subscription-plans?activeOnly=true",
+        CREATE_ORDER: "/subscriptions/create-order",
+        VERIFY_PAYMENT: "/subscriptions/verify-payment",
+    },
 } as const;

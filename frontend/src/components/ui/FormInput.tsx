@@ -9,6 +9,8 @@ interface ExtendedFormInputProps extends FormInputProps {
   icon?: React.ReactNode;
   step?: string;
   min?: string;
+  disabled?: boolean;
+  readOnly?: boolean;
 }
 
 const FormInput: React.FC<ExtendedFormInputProps> = ({
@@ -23,6 +25,8 @@ const FormInput: React.FC<ExtendedFormInputProps> = ({
   icon,
   step,
   min,
+  disabled,
+  readOnly,
 }) => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const inputType = type === "password" && showPassword ? "text" : type;
@@ -50,6 +54,8 @@ const FormInput: React.FC<ExtendedFormInputProps> = ({
           placeholder={placeholder}
           step={step}
           min={min}
+          disabled={disabled}
+          readOnly={readOnly}
           className={cn(
             "field-input w-full px-4 py-2.5 text-sm transition-all duration-300",
             "bg-white/[0.02] border border-white/10 rounded-xl outline-none text-white",
@@ -57,6 +63,7 @@ const FormInput: React.FC<ExtendedFormInputProps> = ({
             icon ? "pl-11" : "pl-4",
             type === "password" ? "pr-11" : "pr-4",
             error ? "border-red-500/50 focus:border-red-500" : "",
+            disabled ? "opacity-50 cursor-not-allowed bg-white/[0.05]" : "",
           )}
         />
 

@@ -1,4 +1,4 @@
-import { Controller, Post, Body, BadRequestException, Inject } from '@nestjs/common';
+import { Controller, Post, Body, BadRequestException, Inject, Get, Param } from '@nestjs/common';
 import { RazorpayService } from 'src/shared/services/payment/razorpay.service';
 import type { ISubscriptionRepository } from '../../domain/repositories/isubscription.repository';
 import type { ISubscriptionPlanRepository } from '../../domain/repositories/isubscription-plan.repository';
@@ -19,6 +19,15 @@ export class SubscriptionController {
     @Inject('IUserRepository')
     private readonly _userRepository: IUserRepository,
   ) { }
+
+  @Get('current/:companyId')
+  async getCurrentSubscription(@Param('companyId') companyId: string) {
+    const subscription = await this._subscriptionRepository.findByCompanyId(companyId);
+    if (!subscription) return null;
+
+    const plan = await this._subscriptionPlanRepository.findById(subscription.planId);
+    return { ...subscription, plan };
+  }
 
   @Post('create-order')
   async createOrder(@Body() body: { planId: string; companyId: string }) {
@@ -60,6 +69,21 @@ export class SubscriptionController {
       if (!isValid) throw new BadRequestException('Invalid payment signature');
     }
 
+    // Mark existing active subscriptions as CANCELLED
+    const existingSubscription = await this._subscriptionRepository.findByCompanyId(body.companyId);
+    if (existingSubscription) {
+      const currentPlan = await this._subscriptionPlanRepository.findById(existingSubscription.planId);
+      if (currentPlan && plan.price < currentPlan.price) {
+        throw new BadRequestException('Degrading plan is not allowed');
+      }
+
+      if ((existingSubscription as any)._id) {
+        await this._subscriptionRepository.updateById((existingSubscription as any)._id.toString(), {
+          status: 'CANCELLED',
+        });
+      }
+    }
+
     // Create Subscription record
     const startDate = new Date();
     const endDate = new Date();
@@ -74,10 +98,13 @@ export class SubscriptionController {
       endDate,
     });
 
-    // Update Company Onboarding Step
-    await this._companyRepository.updateById(body.companyId, {
-      onboardingStep: OnboardingStep.CONFIRMATION,
-    });
+    // Update Company Onboarding Step (if it was in a previous step)
+    const company = await this._companyRepository.findById(body.companyId);
+    if (company && company.onboardingStep !== OnboardingStep.CONFIRMATION) {
+      await this._companyRepository.updateById(body.companyId, {
+        onboardingStep: OnboardingStep.CONFIRMATION,
+      });
+    }
 
     return { success: true, message: 'Subscription activated successfully' };
   }

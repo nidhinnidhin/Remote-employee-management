@@ -30,3 +30,23 @@ export async function verifyPaymentAction(payload: {
         return { success: false, error: error.response?.data?.message || "Payment verification failed" };
     }
 }
+
+export async function getSubscriptionPlansAction(activeOnly: boolean = true) {
+    try {
+        const api = await getServerApi();
+        const response = await api.get(`/subscription-plans?activeOnly=${activeOnly}`);
+        return { success: true, data: response.data };
+    } catch (error: any) {
+        return { success: false, error: error.response?.data?.message || "Failed to load subscription plans" };
+    }
+}
+
+export async function getCurrentSubscriptionAction(companyId: string) {
+    try {
+        const api = await getServerApi();
+        const response = await api.get(`/subscriptions/current/${companyId}`);
+        return { success: true, data: response.data };
+    } catch (error: any) {
+        return { success: false, error: error.response?.data?.message || "Failed to load current subscription" };
+    }
+}
