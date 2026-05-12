@@ -5,7 +5,7 @@ export async function getMe() {
   const cookieStore = cookies();
 
   const res = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_URL}/users/me`,
+    `${process.env.API_URL_INTERNAL || process.env.NEXT_PUBLIC_API_URL}/users/me`,
     {
       headers: {
         Cookie: cookieStore.toString(),

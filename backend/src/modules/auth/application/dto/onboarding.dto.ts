@@ -8,18 +8,18 @@ export class OnboardingCompanyDto {
 
     @IsString()
     @IsNotEmpty()
-    name: string;
+    name!: string;
 
     @IsEmail()
-    email: string;
+    email!: string;
 
     @IsString()
     @IsNotEmpty()
-    size: string;
+    size!: string;
 
     @IsString()
     @IsNotEmpty()
-    industry: string;
+    industry!: string;
 
     @IsOptional()
     @IsString()
@@ -29,7 +29,7 @@ export class OnboardingCompanyDto {
 export class OnboardingSubscriptionDto {
     @IsString()
     @IsNotEmpty()
-    plan: string;
+    plan!: string;
 }
 
 export class OnboardingDto {

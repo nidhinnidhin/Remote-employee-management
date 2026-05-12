@@ -4,3 +4,8 @@ docker exec -it redis-server redis-cli
 ping
 
 Expected - PONG
+
+Dockewr compose run command [Project]:-
+
+docker compose down
+docker compose up --build

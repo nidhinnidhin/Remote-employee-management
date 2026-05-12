@@ -26,15 +26,17 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     if (exception instanceof HttpException) {
       const exceptionResponse = exception.getResponse();
-      
+
       if (typeof exceptionResponse === 'string') {
         message = exceptionResponse;
-      } else if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
+      } else if (
+        typeof exceptionResponse === 'object' &&
+        exceptionResponse !== null
+      ) {
         const res = exceptionResponse as any;
         message = res.message || message;
         errors = res.errors || null;
-        
-        // If message is an array (default Nest validation), set it as errors
+
         if (Array.isArray(res.message)) {
           message = 'Validation failed';
           errors = res.message;
@@ -43,7 +45,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
     } else if (exception instanceof Error) {
       message = exception.message;
     }
-
 
     response.status(status).json(
       new ApiErrorModel(message, status, errors, {

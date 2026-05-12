@@ -2,7 +2,9 @@ import axios from "axios";
 import { API_ROUTES } from "@/constants/api.routes";
 
 export const clientApi = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: (typeof window === "undefined" && process.env.API_URL_INTERNAL)
+    ? process.env.API_URL_INTERNAL
+    : process.env.NEXT_PUBLIC_API_URL,
   withCredentials: true,
 });
 

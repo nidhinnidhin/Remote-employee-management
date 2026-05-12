@@ -6,28 +6,28 @@ import { IsNotEmpty, IsString, IsEmail, MinLength } from 'class-validator';
 class AdminDto {
   @IsString()
   @IsNotEmpty()
-  firstName: string;
+  firstName!: string;
 
   @IsString()
   @IsNotEmpty()
-  lastName: string;
+  lastName!: string;
 
   @IsEmail()
-  email: string;
+  email!: string;
 
   @IsString()
-  phone: string;
+  phone!: string;
 
   @MinLength(8)
-  password: string;
+  password!: string;
 }
 
 export class RegisterCompanyAdminDto {
   @ValidateNested()
   @Type(() => CompanyRegistrationDto)
-  company: CompanyRegistrationDto;
+  company!: CompanyRegistrationDto;
 
   @ValidateNested()
   @Type(() => AdminDto)
-  admin: AdminDto;
+  admin!: AdminDto;
 }
