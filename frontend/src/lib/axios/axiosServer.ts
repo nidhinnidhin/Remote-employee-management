@@ -5,12 +5,6 @@ import { COOKIE_KEYS } from "@/shared/constants/temp/cookie-keys";
 
 const BASE_URL = process.env.API_URL_INTERNAL || process.env.NEXT_PUBLIC_API_URL!;
 
-/**
- * Returns a configured axios instance with:
- * - Authorization header using the current session access token
- * - Automatic 401 retry with token refresh (read-only for session)
- * - 403 suspension detection
- */
 export async function getServerApi() {
   const session = await getSession();
 
@@ -27,8 +21,6 @@ export async function getServerApi() {
 
   api.interceptors.response.use(
     (res) => {
-      // Standard response handling: Automatically unwrap 'data' ONLY if it's a standardized wrapper
-      // This provides 100% backward compatibility with zero code changes needed in components.
       if (
         res.data &&
         typeof res.data === 'object' &&
@@ -41,14 +33,11 @@ export async function getServerApi() {
       return res;
     },
     async (error) => {
-      // Handle company suspension (403)
       if (error.response?.status === 403) {
         error.isSuspended = true;
         return Promise.reject(error);
       }
 
-      // Handle 401: Just reject and let the middleware or page handle it.
-      // We cannot modify cookies (session.destroy/save) here during render.
       if (error.response?.status === 401) {
         return Promise.reject(error);
       }

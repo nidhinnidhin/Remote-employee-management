@@ -12,6 +12,8 @@ services:
     environment:
       - NODE_ENV=development
       - WATCHPACK_POLLING=true
+      - API_URL_INTERNAL=http://backend:4000/api
+      - BACKEND_URL_INTERNAL=http://backend:4000
     env_file:
       - ./frontend/.env
     command: pnpm dev
@@ -31,6 +33,7 @@ services:
       - NODE_ENV=development
       - PORT=4000
       - CHOKIDAR_USEPOLLING=true
+      - REDIS_URL=redis://redis:6379
     env_file:
       - ./backend/.env
     command: sh -c "corepack enable && corepack prepare pnpm@10.12.4 --activate && pnpm install && pnpm exec nest start --watch"
