@@ -16,7 +16,6 @@ import {
   REFRESH_TOKEN_COOKIE_OPTIONS,
 } from 'src/shared/config/cookies.config';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
-
 import type {
   IRegisterAdminUseCase,
   ILoginUseCase,
@@ -59,11 +58,17 @@ export class AuthController {
     @Body() onboardingDto: OnboardingDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    console.log('[AuthController] onboard body:', JSON.stringify(onboardingDto));
+    console.log(
+      '[AuthController] onboard body:',
+      JSON.stringify(onboardingDto),
+    );
     if (!onboardingDto.userId) {
       throw new BadRequestException('User ID is required for onboarding');
     }
-    const result = await this._onboardCompanyUseCase.execute(onboardingDto.userId, onboardingDto);
+    const result = await this._onboardCompanyUseCase.execute(
+      onboardingDto.userId,
+      onboardingDto,
+    );
 
     this._cookieHelperService.setAuthCookies(
       res,
@@ -90,7 +95,7 @@ export class AuthController {
     // This is a simple update to COMPLETED
     const result = await this._onboardCompanyUseCase.getStatus(userId);
     if (result.company?.id) {
-       await this._onboardCompanyUseCase.finalize(userId, result.company.id);
+      await this._onboardCompanyUseCase.finalize(userId, result.company.id);
     }
     return { success: true };
   }
