@@ -15,7 +15,7 @@ import {
 import Image from "next/image";
 import { Employee } from "@/shared/types/company/employees/employee-listing.type";
 import {
-  getEmployees,
+  getEmployeesPaginated,
   updateEmployeeStatus,
 } from "@/services/company/employee-management.service";
 import { toast } from "sonner";
@@ -27,12 +27,14 @@ import { cn } from "@/lib/utils";
 
 interface EmployeesTableProps {
   refreshKey?: number;
+  searchQuery?: string;
 }
 
-const EmployeesTable: React.FC<EmployeesTableProps> = ({ refreshKey }) => {
+const EmployeesTable: React.FC<EmployeesTableProps> = ({ refreshKey, searchQuery }) => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalEmployees, setTotalEmployees] = useState(0);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [menuAnchor, setMenuAnchor] = useState<{ x: number; y: number } | null>(
     null,
@@ -52,9 +54,13 @@ const EmployeesTable: React.FC<EmployeesTableProps> = ({ refreshKey }) => {
   const fetchEmployees = async () => {
     try {
       setLoading(true);
-      const data = await getEmployees();
-      console.log(data)
+      const { data, total } = await getEmployeesPaginated({
+        page: currentPage,
+        limit: itemsPerPage,
+        search: searchQuery,
+      });
       setEmployees(data);
+      setTotalEmployees(total);
     } catch (error) {
       toast.error("Failed to load employees");
     } finally {
@@ -67,7 +73,12 @@ const EmployeesTable: React.FC<EmployeesTableProps> = ({ refreshKey }) => {
     const handleScroll = () => setOpenMenuId(null);
     window.addEventListener("scroll", handleScroll, true);
     return () => window.removeEventListener("scroll", handleScroll, true);
-  }, [refreshKey]);
+  }, [refreshKey, currentPage, searchQuery]);
+
+  // Reset to first page on search
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   const handleStatusToggle = (employee: Employee) => {
     const newStatus = employee.isActive ? "SUSPENDED" : "ACTIVE";
@@ -127,11 +138,7 @@ const EmployeesTable: React.FC<EmployeesTableProps> = ({ refreshKey }) => {
     }
   };
 
-  const totalPages = Math.ceil(employees.length / itemsPerPage);
-  const paginatedData = employees.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
-  );
+  const totalPages = Math.ceil(totalEmployees / itemsPerPage);
 
   const columns: Column<Employee>[] = [
     {
@@ -304,7 +311,7 @@ const EmployeesTable: React.FC<EmployeesTableProps> = ({ refreshKey }) => {
       {employees.length > 0 ? (
         <div className="space-y-4">
           <Table
-            data={paginatedData}
+            data={employees}
             columns={columns}
             keyExtractor={(item) => item.id}
             theme="light"

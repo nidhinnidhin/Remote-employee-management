@@ -1,4 +1,5 @@
 import { InviteEmployeeDto } from '../dto/invite-employee.dto';
+import { SearchEmployeesDto } from '../dto/search-employees.dto';
 import { Employee } from '../../domain/entities/employee.entity';
 import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 
@@ -20,4 +21,8 @@ export interface IGetEmployeesUseCase {
 
 export interface IUpdateEmployeeStatusUseCase {
     execute(id: string, status: UserStatus, reason?: string): Promise<void>;
+}
+
+export interface ISearchEmployeesUseCase {
+    execute(companyId: string, dto: SearchEmployeesDto): Promise<{ data: Employee[]; total: number }>;
 }

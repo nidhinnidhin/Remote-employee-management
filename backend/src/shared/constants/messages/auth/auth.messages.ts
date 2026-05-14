@@ -25,5 +25,6 @@ export const AUTH_MESSAGES = {
   USER_BLOCKED: 'Your account has been blocked. Please contact your company administrator.',
   LOGIN_SUCCESS: 'Login successful',
   EMAIL_UPDATED: 'Email updated successfully',
-  LOGOUT_SUCCESS: 'Logout successful'
+  LOGOUT_SUCCESS: 'Logout successful',
+  INVALID_TOKEN: 'Invalid token'
 };

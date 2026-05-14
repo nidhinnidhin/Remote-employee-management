@@ -31,6 +31,7 @@ export const API_ROUTES = {
     COMPANY: {
         EMPLOYEES: {
             BASE: "/company/employees",
+            SEARCH: "/company/employees/search",
             STATUS: (id: string) => `/company/employees/${id}/status`,
             RESEND_INVITE: (id: string) => `/company/employees/${id}/resend-invite`,
             VERIFY_INVITE: "/company/employees/verify-invite",

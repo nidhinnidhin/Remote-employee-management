@@ -7,6 +7,7 @@ import { ResponseInterceptor } from './common/response/response.interceptor';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
+  console.log('Starting NestJS bootstrap...');
   const app = await NestFactory.create(AppModule);
 
   app.use(cookieParser());
@@ -56,7 +57,9 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ResponseInterceptor());
   app.useGlobalFilters(new HttpExceptionFilter());
 
-  await app.listen(process.env.PORT || 3000);
+  const port = process.env.PORT || 3000;
+  await app.listen(port, '0.0.0.0');
+  console.log(`Backend is running on: http://0.0.0.0:${port}`);
 }
 
 void bootstrap();

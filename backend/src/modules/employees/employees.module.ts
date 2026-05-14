@@ -18,6 +18,7 @@ import { RedisService } from 'src/shared/services/redis/redis.service';
 import { JwtService } from 'src/shared/services/auth/jwt.service';
 import { InviteLinkCleanupService } from './application/services/invite-link-cleanup.service';
 import { SubscriptionLimitGuard } from 'src/shared/guards/subscription-limit.guard';
+import { SearchEmployeesUseCase } from './application/use-cases/search-employees.usecase';
 
 import { AuthModule } from '../auth/presentation/auth/auth.module';
 import { SubscriptionModule } from '../subscription/subscription.module';
@@ -78,6 +79,10 @@ import { ProjectModule } from '../project/project.module';
     {
       provide: 'IInviteLinkRepository',
       useClass: InviteLinkRepositoryImpl,
+    },
+    {
+      provide: 'ISearchEmployeesUseCase',
+      useClass: SearchEmployeesUseCase,
     },
     SubscriptionLimitGuard,
   ],

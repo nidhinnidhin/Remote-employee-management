@@ -16,3 +16,10 @@ export const resendEmployeeInvite = async (employeeId: string) => {
     const response = await clientApi.post(API_ROUTES.COMPANY.EMPLOYEES.RESEND_INVITE(employeeId));
     return response.data;
 };
+
+export const getEmployeesPaginated = async (params: { page: number; limit: number; search?: string }) => {
+    const response = await clientApi.get<{ data: Employee[]; total: number }>(API_ROUTES.COMPANY.EMPLOYEES.SEARCH, {
+        params
+    });
+    return response.data;
+};
