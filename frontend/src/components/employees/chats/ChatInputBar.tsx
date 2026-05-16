@@ -11,7 +11,11 @@ interface ChatInputBarProps {
   onStopTyping?: () => void;
 }
 
-export function ChatInputBar({ onSend, onTyping, onStopTyping }: ChatInputBarProps) {
+export function ChatInputBar({
+  onSend,
+  onTyping,
+  onStopTyping,
+}: ChatInputBarProps) {
   const [message, setMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
 
@@ -76,7 +80,7 @@ export function ChatInputBar({ onSend, onTyping, onStopTyping }: ChatInputBarPro
           "flex-1 resize-none bg-transparent text-sm text-white",
           "placeholder:text-slate-500 focus:outline-none",
           "py-2 leading-relaxed min-h-[36px] max-h-[120px] overflow-y-auto",
-          "[scrollbar-width:none]"
+          "[scrollbar-width:none]",
         )}
         style={{ height: "36px" }}
         onInput={(e) => {
@@ -91,10 +95,10 @@ export function ChatInputBar({ onSend, onTyping, onStopTyping }: ChatInputBarPro
         onClick={handleSend}
         disabled={!message.trim()}
         className={cn(
-          "shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all active:scale-90",
+          "shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all active:scale-90 bg-transparent text-white",
           message.trim()
-            ? "bg-accent text-[#061218] shadow-[0_0_20px_rgba(45,212,191,0.3)] hover:shadow-[0_0_28px_rgba(45,212,191,0.5)]"
-            : "bg-white/[0.04] border border-white/[0.06] text-slate-600 cursor-not-allowed"
+            ? "shadow-[0_0_20px_rgba(45,212,191,0.3)] hover:shadow-[0_0_28px_rgba(45,212,191,0.5)]"
+            : "border border-white/[0.06] cursor-not-allowed",
         )}
       >
         <Send size={17} />

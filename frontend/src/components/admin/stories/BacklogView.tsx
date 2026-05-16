@@ -18,12 +18,22 @@ import {
   DropResult,
 } from "@hello-pangea/dnd";
 import Button from "@/components/ui/Button";
-import { UserStory, UserStoryPriority, UserStoryStatus } from "@/shared/types/company/projects/user-story.type";
+import {
+  UserStory,
+  UserStoryPriority,
+  UserStoryStatus,
+} from "@/shared/types/company/projects/user-story.type";
 import Pagination from "@/components/ui/Pagination";
 import { Employee } from "@/shared/types/company/employees/employee-listing.type";
 import { Sprint } from "@/shared/types/company/projects/sprint.type";
-import { getStoriesByProjectAction, searchStoriesAction } from "@/actions/company/projects/story.actions";
-import { getSprintsByProjectAction, updateSprintAction } from "@/actions/company/projects/sprint.actions";
+import {
+  getStoriesByProjectAction,
+  searchStoriesAction,
+} from "@/actions/company/projects/story.actions";
+import {
+  getSprintsByProjectAction,
+  updateSprintAction,
+} from "@/actions/company/projects/sprint.actions";
 import { getEmployees } from "@/services/company/employee-management.service";
 import { toast } from "sonner";
 import StoryCard from "./StoryCard";
@@ -44,7 +54,10 @@ interface BacklogViewProps {
   projectMembers?: string[];
 }
 
-const BacklogView: React.FC<BacklogViewProps> = ({ projectId, projectMembers = [] }) => {
+const BacklogView: React.FC<BacklogViewProps> = ({
+  projectId,
+  projectMembers = [],
+}) => {
   const [stories, setStories] = useState<UserStory[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
 
@@ -71,58 +84,66 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId, projectMembers = [
   const [sprintToDelete, setSprintToDelete] = useState<Sprint | null>(null);
   const [showDeleteOptions, setShowDeleteOptions] = useState(false);
 
-  const fetchData = useCallback(async (isSilent = false) => {
-    if (!isSilent) setLoading(true);
-    try {
-      const [storiesResult, sprintsResult, tasksResult, employeesData] = await Promise.all([
-        searchStoriesAction({
-          projectId,
-          search: searchQuery || undefined,
-          status: (statusFilter as any) || undefined,
-          priority: (priorityFilter as any) || undefined,
-          isInBacklog: true,
-          page: currentPage,
-          limit: limit,
-        }),
-        getSprintsByProjectAction(projectId),
-        getTasksByProjectAction(projectId),
-        getEmployees(),
-      ]);
+  const fetchData = useCallback(
+    async (isSilent = false) => {
+      if (!isSilent) setLoading(true);
+      try {
+        const [storiesResult, sprintsResult, tasksResult, employeesData] =
+          await Promise.all([
+            searchStoriesAction({
+              projectId,
+              search: searchQuery || undefined,
+              status: (statusFilter as any) || undefined,
+              priority: (priorityFilter as any) || undefined,
+              isInBacklog: true,
+              page: currentPage,
+              limit: limit,
+            }),
+            getSprintsByProjectAction(projectId),
+            getTasksByProjectAction(projectId),
+            getEmployees(),
+          ]);
 
-      if (storiesResult.success && storiesResult.data) {
-        setStories(storiesResult.data.data);
-        setTotalStories(storiesResult.data.total);
-        setTotalPages(Math.ceil(storiesResult.data.total / limit));
-      } else {
-        toast.error(storiesResult.error || "Failed to load stories");
-      }
+        if (storiesResult.success && storiesResult.data) {
+          setStories(storiesResult.data.data);
+          setTotalStories(storiesResult.data.total);
+          setTotalPages(Math.ceil(storiesResult.data.total / limit));
+        } else {
+          toast.error(storiesResult.error || "Failed to load stories");
+        }
 
-      if (sprintsResult.success && sprintsResult.data) {
-        setSprints(sprintsResult.data);
-      } else {
-        toast.error(sprintsResult.error || "Failed to load sprints");
-      }
+        if (sprintsResult.success && sprintsResult.data) {
+          setSprints(sprintsResult.data);
+        } else {
+          toast.error(sprintsResult.error || "Failed to load sprints");
+        }
 
-      if (tasksResult.success && tasksResult.data) {
-        setTasks(tasksResult.data);
-      }
+        if (tasksResult.success && tasksResult.data) {
+          setTasks(tasksResult.data);
+        }
 
-      if (employeesData) {
-        // Filter employees to only show those assigned to the project AND active
-        const filteredEmployees = (employeesData as Employee[]).filter(emp => {
-          const isMember = projectMembers.length > 0 
-            ? projectMembers.includes(emp.id) || projectMembers.includes((emp as any)._id)
-            : true;
-          return isMember && emp.isActive;
-        });
-        setEmployees(filteredEmployees);
+        if (employeesData) {
+          // Filter employees to only show those assigned to the project AND active
+          const filteredEmployees = (employeesData as Employee[]).filter(
+            (emp) => {
+              const isMember =
+                projectMembers.length > 0
+                  ? projectMembers.includes(emp.id) ||
+                    projectMembers.includes((emp as any)._id)
+                  : true;
+              return isMember && emp.isActive;
+            },
+          );
+          setEmployees(filteredEmployees);
+        }
+      } catch (error) {
+        toast.error("An unexpected error occurred while loading data");
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      toast.error("An unexpected error occurred while loading data");
-    } finally {
-      setLoading(false);
-    }
-  }, [projectId, searchQuery, statusFilter, priorityFilter, currentPage]);
+    },
+    [projectId, searchQuery, statusFilter, priorityFilter, currentPage],
+  );
 
   useEffect(() => {
     fetchData();
@@ -150,11 +171,14 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId, projectMembers = [
     }
 
     // Handle Moving from Backlog to Sprint
-    if (source.droppableId === "backlog" && destination.droppableId.startsWith("sprint-")) {
+    if (
+      source.droppableId === "backlog" &&
+      destination.droppableId.startsWith("sprint-")
+    ) {
       const sprintId = destination.droppableId.replace("sprint-", "");
       const storyId = draggableId;
 
-      const targetSprint = sprints.find(s => s.id === sprintId);
+      const targetSprint = sprints.find((s) => s.id === sprintId);
       if (!targetSprint) return;
 
       // Prevent duplicates
@@ -166,11 +190,19 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId, projectMembers = [
       const updatedIssueIds = [...targetSprint.issueIds, storyId];
 
       // Optimistic Update
-      setSprints(prev => prev.map(s => s.id === sprintId ? { ...s, issueIds: updatedIssueIds } : s));
-      setStories(prev => prev.map(s => s.id === storyId ? { ...s, isInBacklog: false } : s));
+      setSprints((prev) =>
+        prev.map((s) =>
+          s.id === sprintId ? { ...s, issueIds: updatedIssueIds } : s,
+        ),
+      );
+      setStories((prev) =>
+        prev.map((s) => (s.id === storyId ? { ...s, isInBacklog: false } : s)),
+      );
 
       try {
-        const result = await updateSprintAction(sprintId, { issueIds: updatedIssueIds });
+        const result = await updateSprintAction(sprintId, {
+          issueIds: updatedIssueIds,
+        });
         if (result.success) {
           toast.success(`Story assigned to ${targetSprint.name}`);
         } else {
@@ -185,7 +217,7 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId, projectMembers = [
   };
 
   const filteredStories = stories
-    .map(s => ({ ...s, id: s.id || (s as any)._id }))
+    .map((s) => ({ ...s, id: s.id || (s as any)._id }))
     .sort((a, b) => a.order - b.order);
 
   // --- RENDER SPRINTS SECTION ---
@@ -193,7 +225,9 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId, projectMembers = [
     if (loading && sprints.length === 0) {
       return (
         <div className="flex items-center justify-center py-12 animate-pulse bg-white/[0.01] rounded-2xl border border-white/[0.03]">
-          <p className="text-slate-500 font-black tracking-[0.2em] text-[10px] uppercase">Loading Sprints...</p>
+          <p className="text-slate-500 font-black tracking-[0.2em] text-[10px] uppercase">
+            Loading Sprints...
+          </p>
         </div>
       );
     }
@@ -201,61 +235,77 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId, projectMembers = [
     if (sprints.length === 0) {
       return (
         <div className="flex flex-col items-center justify-center py-12 px-6 text-center bg-white/[0.01] rounded-2xl border border-dashed border-white/[0.05]">
-          <p className="text-slate-400 text-xs font-medium mb-4">No active or planned sprints.</p>
+          <p className="text-slate-400 text-xs font-medium mb-4">
+            No active or planned sprints.
+          </p>
         </div>
       );
     }
 
     const getStatusStyles = (status: string) => {
       switch (status) {
-        case 'ACTIVE':
-          return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
-        case 'COMPLETED':
-          return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
+        case "ACTIVE":
+          return "bg-emerald-500/10 text-emerald-500 border-emerald-500/20";
+        case "COMPLETED":
+          return "bg-blue-500/10 text-blue-500 border-blue-500/20";
         default:
-          return 'bg-orange-500/10 text-orange-500 border-orange-500/20';
+          return "bg-orange-500/10 text-orange-500 border-orange-500/20";
       }
     };
 
     return (
       <div>
-        {sprints.filter(s => s.status !== 'ACTIVE' && s.status !== 'COMPLETED').map((sprint) => (
-          <Droppable key={sprint.id} droppableId={`sprint-${sprint.id}`}>
-            {(provided, snapshot) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                className={cn(
-                  "group relative p-5 border transition-all duration-300",
-                  snapshot.isDraggingOver
-                    ? "bg-orange-500/10 border-orange-500/50 scale-[1.02] shadow-2xl shadow-orange-500/10"
-                    : "bg-white/[0.02] border-white/[0.05] hover:bg-white/[0.04] hover:border-white/[0.1]"
-                )}
-              >
-                <div className="flex flex-col gap-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={cn(
-                        "p-2.5 rounded-xl border transition-all duration-500",
-                        snapshot.isDraggingOver ? "bg-orange-500 text-[#08090a] border-orange-500" : "bg-orange-500/10 border-orange-500/20 text-orange-500"
-                      )}>
-                        <Timer size={18} />
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-bold text-white tracking-tight">{sprint.name}</h3>
-                        <div className="flex items-center gap-3">
-                           <p className="text-[10px] text-slate-500 font-medium uppercase tracking-tighter">
-                             {sprint.issueIds.length} Objectives
-                           </p>
-                           <div className="w-1 h-1 rounded-full bg-slate-700" />
-                           <p className="text-[10px] text-accent/60 font-bold uppercase tracking-tighter">
-                             {stories.filter(s => sprint.issueIds.includes(s.id)).reduce((sum, s) => sum + (s.storyPoints || 0), 0)} Points
-                           </p>
+        {sprints
+          .filter((s) => s.status !== "ACTIVE" && s.status !== "COMPLETED")
+          .map((sprint) => (
+            <Droppable key={sprint.id} droppableId={`sprint-${sprint.id}`}>
+              {(provided, snapshot) => (
+                <div
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  className={cn(
+                    "group relative p-5 border transition-all duration-300",
+                    snapshot.isDraggingOver
+                      ? "bg-orange-500/10 border-orange-500/50 scale-[1.02] shadow-2xl shadow-orange-500/10"
+                      : "bg-white/[0.02] border-white/[0.05] hover:bg-white/[0.04] hover:border-white/[0.1]",
+                  )}
+                >
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={cn(
+                            "p-2.5 rounded-xl border transition-all duration-500",
+                            snapshot.isDraggingOver
+                              ? "bg-orange-500 text-[#08090a] border-orange-500"
+                              : "bg-orange-500/10 border-orange-500/20 text-orange-500",
+                          )}
+                        >
+                          <Timer size={18} />
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-bold text-white tracking-tight">
+                            {sprint.name}
+                          </h3>
+                          <div className="flex items-center gap-3">
+                            <p className="text-[10px] text-slate-500 font-medium uppercase tracking-tighter">
+                              {sprint.issueIds.length} Objectives
+                            </p>
+                            <div className="w-1 h-1 rounded-full bg-slate-700" />
+                            <p className="text-[10px] text-accent/60 font-bold uppercase tracking-tighter">
+                              {stories
+                                .filter((s) => sprint.issueIds.includes(s.id))
+                                .reduce(
+                                  (sum, s) => sum + (s.storyPoints || 0),
+                                  0,
+                                )}{" "}
+                              Points
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                       <div className="flex items-center gap-1 mr-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1 mr-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={() => setSprintToEdit(sprint)}
                             className="p-1.5 rounded-lg text-slate-500 hover:text-white hover:bg-white/5 transition-all"
@@ -270,51 +320,55 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId, projectMembers = [
                           >
                             <Trash2 size={13} />
                           </button>
-                       </div>
-                       <span className={cn(
-                         "px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border",
-                         getStatusStyles(sprint.status)
-                       )}>
-                         {sprint.status}
-                       </span>
+                        </div>
+                        <span
+                          className={cn(
+                            "px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border",
+                            getStatusStyles(sprint.status),
+                          )}
+                        >
+                          {sprint.status}
+                        </span>
+                      </div>
+                    </div>
+
+                    {sprint.goal && (
+                      <p className="text-[11px] text-slate-400 leading-relaxed line-clamp-2 italic opacity-80 mb-2">
+                        "{sprint.goal}"
+                      </p>
+                    )}
+
+                    {/* Stories List inside Sprint */}
+                    <div className="space-y-2 mt-2">
+                      {stories
+                        .filter((story) => sprint.issueIds.includes(story.id))
+                        .map((story) => (
+                          <div
+                            key={story.id}
+                            className="opacity-80 hover:opacity-100 transition-opacity"
+                          >
+                            <StoryCard
+                              story={story}
+                              employees={employees}
+                              onEdit={() => {}}
+                              onDelete={() => {}}
+                            />
+                          </div>
+                        ))}
+                      {sprint.issueIds.length === 0 && (
+                        <div className="py-4 border border-dashed border-white/5 rounded-xl flex items-center justify-center">
+                          <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">
+                            Drop stories here
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
-
-                  {sprint.goal && (
-                    <p className="text-[11px] text-slate-400 leading-relaxed line-clamp-2 italic opacity-80 mb-2">
-                      "{sprint.goal}"
-                    </p>
-                  )}
-
-
-                  {/* Stories List inside Sprint */}
-                  <div className="space-y-2 mt-2">
-                    {stories
-                      .filter((story) => sprint.issueIds.includes(story.id))
-                      .map((story) => (
-                        <div key={story.id} className="opacity-80 hover:opacity-100 transition-opacity">
-                          <StoryCard
-                            story={story}
-                            employees={employees}
-                            onEdit={() => {}}
-                            onDelete={() => {}}
-                          />
-                        </div>
-                      ))}
-                    {sprint.issueIds.length === 0 && (
-                      <div className="py-4 border border-dashed border-white/5 rounded-xl flex items-center justify-center">
-                        <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">
-                          Drop stories here
-                        </p>
-                      </div>
-                    )}
-                  </div>
+                  {provided.placeholder}
                 </div>
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        ))}
+              )}
+            </Droppable>
+          ))}
       </div>
     );
   };
@@ -325,7 +379,11 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId, projectMembers = [
       return (
         <div className="flex flex-col items-center justify-center py-32 gap-6 animate-in fade-in duration-1000">
           <div className="relative">
-            <Loader2 className="animate-spin text-accent/40" size={40} strokeWidth={1} />
+            <Loader2
+              className="animate-spin text-accent/40"
+              size={40}
+              strokeWidth={1}
+            />
             <div className="absolute inset-0 blur-2xl bg-accent/10 animate-pulse" />
           </div>
           <p className="text-slate-500 font-black tracking-[0.3em] text-[9px] uppercase">
@@ -339,13 +397,17 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId, projectMembers = [
       return (
         <div className="flex flex-col items-center justify-center py-24 px-6 text-center animate-in fade-in slide-in-from-bottom-4 duration-700 bg-white/[0.01] rounded-[3rem] border border-dashed border-white/[0.05]">
           <div className="w-20 h-20 rounded-[2.5rem] bg-accent/5 flex items-center justify-center text-accent/20 border border-accent/10 mb-8 group transition-all">
-            <Target size={32} className="group-hover:scale-110 group-hover:rotate-12 transition-all duration-500" />
+            <Target
+              size={32}
+              className="group-hover:scale-110 group-hover:rotate-12 transition-all duration-500"
+            />
           </div>
           <h3 className="text-xl font-black text-white mb-3 tracking-tighter">
             No Operational Objectives
           </h3>
           <p className="text-slate-500 text-sm max-w-[300px] leading-relaxed mb-10 font-medium">
-            This project node is currently empty. Initialize your first user story to begin.
+            This project node is currently empty. Initialize your first user
+            story to begin.
           </p>
           <Button
             variant="primary"
@@ -367,7 +429,7 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId, projectMembers = [
             {...provided.droppableProps}
             className={cn(
               "flex flex-col gap-4 animate-in fade-in duration-500 min-h-[200px] rounded-3xl transition-colors",
-              snapshot.isDraggingOver ? "bg-accent/[0.02]" : ""
+              snapshot.isDraggingOver ? "bg-accent/[0.02]" : "",
             )}
           >
             <div className="grid grid-cols-1 gap-3">
@@ -384,7 +446,9 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId, projectMembers = [
                       }}
                       className={cn(
                         "transition-shadow",
-                        snapshot.isDragging ? "shadow-2xl shadow-accent/20 z-50" : ""
+                        snapshot.isDragging
+                          ? "shadow-2xl shadow-accent/20 z-50"
+                          : "",
                       )}
                     >
                       <StoryCard
@@ -404,18 +468,22 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId, projectMembers = [
                 <p className="text-slate-500 text-[11px] font-black uppercase tracking-widest">
                   No Matches for your criteria
                 </p>
-                <button 
-                  onClick={() => { setSearchQuery(""); setStatusFilter(""); setPriorityFilter(""); }}
+                <button
+                  onClick={() => {
+                    setSearchQuery("");
+                    setStatusFilter("");
+                    setPriorityFilter("");
+                  }}
                   className="mt-4 text-accent text-[10px] font-black uppercase tracking-widest hover:underline"
                 >
                   Reset Filters
                 </button>
               </div>
             )}
-            
+
             {totalPages > 0 && (
               <div className="mt-8 flex w-full justify-end pb-12 pr-4">
-                <Pagination 
+                <Pagination
                   currentPage={currentPage}
                   totalPages={totalPages}
                   onPageChange={setCurrentPage}
@@ -458,25 +526,29 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId, projectMembers = [
               />
             </div>
 
-            <select 
+            <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
               className="bg-white/[0.02] border border-white/10 rounded-xl px-4 h-11 text-[11px] font-black uppercase tracking-widest text-slate-400 focus:outline-none focus:border-accent/40 transition-all cursor-pointer hover:bg-white/5"
             >
               <option value="">All Statuses</option>
-              {Object.values(UserStoryStatus).map(status => (
-                <option key={status} value={status}>{status}</option>
+              {Object.values(UserStoryStatus).map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
               ))}
             </select>
 
-            <select 
+            <select
               value={priorityFilter}
               onChange={(e) => setPriorityFilter(e.target.value)}
               className="bg-white/[0.02] border border-white/10 rounded-xl px-4 h-11 text-[11px] font-black uppercase tracking-widest text-slate-400 focus:outline-none focus:border-accent/40 transition-all cursor-pointer hover:bg-white/5"
             >
               <option value="">All Priorities</option>
-              {Object.values(UserStoryPriority).map(p => (
-                <option key={p} value={p}>{p}</option>
+              {Object.values(UserStoryPriority).map((p) => (
+                <option key={p} value={p}>
+                  {p}
+                </option>
               ))}
             </select>
 
@@ -522,7 +594,11 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId, projectMembers = [
               <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/[0.03] border border-white/[0.08]">
                 <Hash size={10} className="text-slate-500" />
                 <span className="text-[10px] font-bold text-orange-400 tracking-tighter">
-                  {sprints.filter(s => s.status !== 'ACTIVE' && s.status !== 'COMPLETED').length}
+                  {
+                    sprints.filter(
+                      (s) => s.status !== "ACTIVE" && s.status !== "COMPLETED",
+                    ).length
+                  }
                 </span>
               </div>
             </div>
@@ -551,14 +627,17 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId, projectMembers = [
             <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/[0.03] border border-white/[0.08]">
               <Hash size={10} className="text-slate-500" />
               <span className="text-[10px] font-bold text-accent tracking-tighter">
-                {stories.filter(s => s.isInBacklog).length}
+                {stories.filter((s) => s.isInBacklog).length}
               </span>
             </div>
             <div className="w-1 h-1 rounded-full bg-slate-700" />
             <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/[0.03] border border-white/[0.08]">
               <Target size={10} className="text-slate-500" />
               <span className="text-[10px] font-bold text-orange-400 tracking-tighter">
-                {stories.filter(s => s.isInBacklog).reduce((sum, s) => sum + (s.storyPoints || 0), 0)} Points
+                {stories
+                  .filter((s) => s.isInBacklog)
+                  .reduce((sum, s) => sum + (s.storyPoints || 0), 0)}{" "}
+                Points
               </span>
             </div>
           </div>

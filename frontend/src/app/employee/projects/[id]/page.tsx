@@ -52,6 +52,7 @@ export default function EmployeeProjectDetailPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [project, setProject] = useState<Project | null>(null);
   const [stories, setStories] = useState<UserStory[]>([]);
+  const [allSprints, setAllSprints] = useState<Sprint[]>([]);
   const [activeSprint, setActiveSprint] = useState<Sprint | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -92,14 +93,13 @@ export default function EmployeeProjectDetailPage() {
             if (found) setProject(found);
           }
 
-          // 1. Find Active Sprint
-          const active =
-            sprintsResult.success && sprintsResult.data
-              ? (sprintsResult.data as Sprint[]).find(
-                  (s) => s.status === "ACTIVE",
-                )
-              : null;
-          setActiveSprint(active || null);
+          // 1. Find Active Sprint and store all sprints
+          if (sprintsResult.success && sprintsResult.data) {
+            const sprintList = sprintsResult.data as Sprint[];
+            setAllSprints(sprintList);
+            const active = sprintList.find((s) => s.status === "ACTIVE");
+            setActiveSprint(active || null);
+          }
 
           // 2. Set Stories
           if (storiesResult.success && storiesResult.data) {
@@ -134,8 +134,41 @@ export default function EmployeeProjectDetailPage() {
     return () => clearTimeout(handler);
   }, [searchQuery]);
 
+  // Map storyId to its Sprint Status
+  const storySprintMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    allSprints.forEach(sprint => {
+      sprint.issueIds.forEach(id => {
+        map[id.toString()] = sprint.status;
+      });
+    });
+    return map;
+  }, [allSprints]);
+
+  // Filter tasks: ONLY show tasks from the ACTIVE sprint
+  const displayTasks = useMemo(() => {
+    if (!activeSprint) return []; // If no active sprint, show nothing? Or show backlog?
+    
+    return tasks.filter(task => {
+      const storyId = task.storyId?.toString();
+      if (!storyId) return false;
+      
+      // Check if this story is in the active sprint
+      return activeSprint.issueIds.some(id => id.toString() === storyId);
+    });
+  }, [tasks, activeSprint]);
+
+  // Filter stories: ONLY show stories from the ACTIVE sprint
   const relevantStories = useMemo(() => {
+    if (!activeSprint) return [];
+
     return stories.filter((s: any) => {
+      const sId = s.id?.toString() || s._id?.toString();
+      
+      // Check if this story belongs to the active sprint
+      const isInActiveSprint = activeSprint.issueIds.some(id => id.toString() === sId);
+      if (!isInActiveSprint) return false;
+
       const matchesSearch = !searchQuery || 
         s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         s.description.toLowerCase().includes(searchQuery.toLowerCase());
@@ -145,7 +178,7 @@ export default function EmployeeProjectDetailPage() {
 
       return matchesSearch && matchesStatus && matchesPriority;
     });
-  }, [stories, searchQuery, statusFilter, priorityFilter]);
+  }, [stories, activeSprint, searchQuery, statusFilter, priorityFilter]);
 
   if (isLoading && !project) {
     return (
@@ -287,9 +320,9 @@ export default function EmployeeProjectDetailPage() {
         {/* Content */}
         <div className="flex-1 relative">
           {activeTab === "board" ? (
-            tasks.length > 0 ? (
+            displayTasks.length > 0 ? (
               <EmployeeKanbanBoard
-                tasks={tasks}
+                tasks={displayTasks}
                 projects={project ? [project] : []}
                 onRefresh={() => loadData(true)}
               />
@@ -312,7 +345,7 @@ export default function EmployeeProjectDetailPage() {
                     <EmployeeStoryCard
                       key={story.id || (story as any)._id}
                       story={story}
-                      tasks={tasks.filter(
+                      tasks={displayTasks.filter(
                         (t) =>
                           t.storyId?.toString() ===
                           (story.id?.toString() ||
