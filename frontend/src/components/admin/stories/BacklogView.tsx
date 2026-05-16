@@ -29,6 +29,7 @@ import { Sprint } from "@/shared/types/company/projects/sprint.type";
 import {
   getStoriesByProjectAction,
   searchStoriesAction,
+  updateStoryAction,
 } from "@/actions/company/projects/story.actions";
 import {
   getSprintsByProjectAction,
@@ -95,7 +96,7 @@ const BacklogView: React.FC<BacklogViewProps> = ({
               search: searchQuery || undefined,
               status: (statusFilter as any) || undefined,
               priority: (priorityFilter as any) || undefined,
-              isInBacklog: true,
+              // Remove isInBacklog filter to fetch all stories for both backlog and sprints
               page: currentPage,
               limit: limit,
             }),
@@ -113,7 +114,12 @@ const BacklogView: React.FC<BacklogViewProps> = ({
         }
 
         if (sprintsResult.success && sprintsResult.data) {
-          setSprints(sprintsResult.data);
+          const normalizedSprints = (sprintsResult.data as Sprint[]).map(s => ({
+            ...s,
+            id: (s.id || (s as any)._id)?.toString(),
+            issueIds: (s.issueIds || []).map(id => id.toString())
+          }));
+          setSprints(normalizedSprints);
         } else {
           toast.error(sprintsResult.error || "Failed to load sprints");
         }
@@ -200,24 +206,82 @@ const BacklogView: React.FC<BacklogViewProps> = ({
       );
 
       try {
-        const result = await updateSprintAction(sprintId, {
-          issueIds: updatedIssueIds,
-        });
-        if (result.success) {
+        const [sprintResult, storyResult] = await Promise.all([
+          updateSprintAction(sprintId, {
+            issueIds: updatedIssueIds,
+          }),
+          updateStoryAction(storyId, {
+            isInBacklog: false,
+          })
+        ]);
+
+        if (sprintResult.success && storyResult.success) {
           toast.success(`Story assigned to ${targetSprint.name}`);
         } else {
-          toast.error(result.error || "Failed to assign story to sprint");
+          console.error("Assignment failure:", { sprintResult, storyResult });
+          toast.error("Failed to fully update story assignment");
           fetchData(); // Rollback
         }
       } catch (error) {
-        toast.error("An error occurred while updating sprint");
+        console.error("Drag end error (Backlog -> Sprint):", error);
+        toast.error("An error occurred while updating story assignment");
         fetchData(); // Rollback
       }
+      return;
+    }
+
+    // Handle Moving from Sprint to Backlog (UNDO)
+    if (
+      source.droppableId.startsWith("sprint-") &&
+      destination.droppableId === "backlog"
+    ) {
+      const sprintId = source.droppableId.replace("sprint-", "");
+      const storyId = draggableId;
+
+      const sourceSprint = sprints.find((s) => s.id === sprintId);
+      if (!sourceSprint) return;
+
+      const updatedIssueIds = sourceSprint.issueIds.filter(id => id.toString() !== storyId.toString());
+
+      // Optimistic Update
+      setSprints((prev) =>
+        prev.map((s) =>
+          s.id === sprintId ? { ...s, issueIds: updatedIssueIds } : s,
+        ),
+      );
+      setStories((prev) =>
+        prev.map((s) => (s.id === storyId ? { ...s, isInBacklog: true } : s)),
+      );
+
+      try {
+        const [sprintResult, storyResult] = await Promise.all([
+          updateSprintAction(sprintId, {
+            issueIds: updatedIssueIds,
+          }),
+          updateStoryAction(storyId, {
+            isInBacklog: true,
+          })
+        ]);
+
+        if (sprintResult.success && storyResult.success) {
+          toast.success("Story moved back to backlog");
+        } else {
+          console.error("Undo failure:", { sprintResult, storyResult });
+          toast.error("Failed to move story back to backlog");
+          fetchData(); // Rollback
+        }
+      } catch (error) {
+        console.error("Drag end error (Sprint -> Backlog):", error);
+        toast.error("An error occurred while moving story back to backlog");
+        fetchData(); // Rollback
+      }
+      return;
     }
   };
 
   const filteredStories = stories
-    .map((s) => ({ ...s, id: s.id || (s as any)._id }))
+    .map((s) => ({ ...s, id: (s.id || (s as any)._id)?.toString() }))
+    .filter((s) => s.isInBacklog)
     .sort((a, b) => a.order - b.order);
 
   // --- RENDER SPRINTS SECTION ---
@@ -342,18 +406,31 @@ const BacklogView: React.FC<BacklogViewProps> = ({
                     <div className="space-y-2 mt-2">
                       {stories
                         .filter((story) => sprint.issueIds.includes(story.id))
-                        .map((story) => (
-                          <div
+                        .map((story, index) => (
+                          <Draggable
                             key={story.id}
-                            className="opacity-80 hover:opacity-100 transition-opacity"
+                            draggableId={story.id}
+                            index={index}
                           >
-                            <StoryCard
-                              story={story}
-                              employees={employees}
-                              onEdit={() => {}}
-                              onDelete={() => {}}
-                            />
-                          </div>
+                            {(provided, snapshot) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                className={cn(
+                                  "transition-all duration-200",
+                                  snapshot.isDragging ? "z-50 opacity-90 scale-105" : "opacity-80 hover:opacity-100"
+                                )}
+                              >
+                                <StoryCard
+                                  story={story}
+                                  employees={employees}
+                                  onEdit={() => {}}
+                                  onDelete={() => {}}
+                                />
+                              </div>
+                            )}
+                          </Draggable>
                         ))}
                       {sprint.issueIds.length === 0 && (
                         <div className="py-4 border border-dashed border-white/5 rounded-xl flex items-center justify-center">
