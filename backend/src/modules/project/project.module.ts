@@ -13,10 +13,12 @@ import { GetProjectUseCase } from './application/use-cases/project/get-project.u
 import { ListProjectsUseCase } from './application/use-cases/project/list-projects.usecase';
 import { UpdateProjectUseCase } from './application/use-cases/project/update-project.usecase';
 import { DeleteProjectUseCase } from './application/use-cases/project/delete-project.usecase';
+import { SearchProjectsUseCase } from './application/use-cases/project/search-projects.usecase';
 import { CreateUserStoryUseCase } from './application/use-cases/story/create-story.usecase';
 import { GetUserStoriesByProjectUseCase } from './application/use-cases/story/get-stories-by-project.usecase';
 import { UpdateUserStoryUseCase } from './application/use-cases/story/update-story.usecase';
 import { DeleteUserStoryUseCase } from './application/use-cases/story/delete-story.usecase';
+import { SearchStoriesUseCase } from './application/use-cases/story/search-stories.usecase';
 import { CreateTaskUseCase } from './application/use-cases/task/create-task.usecase';
 import { GetTasksByStoryUseCase } from './application/use-cases/task/get-tasks-by-story.usecase';
 import { GetTasksByProjectUseCase } from './application/use-cases/task/get-tasks-by-project.usecase';
@@ -24,6 +26,7 @@ import { GetMyTasksUseCase } from './application/use-cases/task/get-my-tasks.use
 import { UpdateTaskUseCase } from './application/use-cases/task/update-task.usecase';
 import { MoveTaskUseCase } from './application/use-cases/task/move-task.usecase';
 import { DeleteTaskUseCase } from './application/use-cases/task/delete-task.usecase';
+import { SearchTasksUseCase } from './application/use-cases/task/search-tasks.usecase';
 import { CreateSprintUseCase } from './application/use-cases/sprint/create-sprint.usecase';
 import { UpdateSprintUseCase } from './application/use-cases/sprint/update-sprint.usecase';
 import { GetSprintUseCase } from './application/use-cases/sprint/get-sprint.usecase';
@@ -89,6 +92,10 @@ import { ChatModule } from '../chat/chat.module';
       provide: 'IDeleteProjectUseCase',
       useClass: DeleteProjectUseCase,
     },
+    {
+      provide: 'ISearchProjectsUseCase',
+      useClass: SearchProjectsUseCase,
+    },
     // User Story Use Cases
     {
       provide: 'ICreateUserStoryUseCase',
@@ -105,6 +112,10 @@ import { ChatModule } from '../chat/chat.module';
     {
       provide: 'IDeleteUserStoryUseCase',
       useClass: DeleteUserStoryUseCase,
+    },
+    {
+      provide: 'ISearchUserStoriesUseCase',
+      useClass: SearchStoriesUseCase,
     },
     // Task Use Cases
     {
@@ -134,6 +145,10 @@ import { ChatModule } from '../chat/chat.module';
     {
       provide: 'IDeleteTaskUseCase',
       useClass: DeleteTaskUseCase,
+    },
+    {
+      provide: 'ISearchTasksUseCase',
+      useClass: SearchTasksUseCase,
     },
     // Sprint Use Cases
     {

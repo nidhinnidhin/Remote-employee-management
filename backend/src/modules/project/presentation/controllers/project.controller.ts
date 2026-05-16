@@ -12,6 +12,7 @@ import {
   UseInterceptors,
   UploadedFile,
   BadRequestException,
+  Query,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Request } from 'express';
@@ -21,10 +22,12 @@ import { SubscriptionLimitGuard } from 'src/shared/guards/subscription-limit.gua
 import { CheckSubscriptionLimit } from 'src/shared/decorators/subscription-limit.decorator';
 import { CreateProjectDto } from '../../application/dto/project/create-project.dto';
 import { UpdateProjectDto } from '../../application/dto/project/update-project.dto';
+import { SearchProjectsDto } from '../../application/dto/project/search-projects.dto';
 import type {
   ICreateProjectUseCase,
   IGetProjectUseCase,
   IListProjectsUseCase,
+  ISearchProjectsUseCase,
   IUpdateProjectUseCase,
   IDeleteProjectUseCase,
 } from '../../application/interfaces/project/project-use-cases.interface';
@@ -45,6 +48,8 @@ export class ProjectController {
     private readonly _updateProjectUseCase: IUpdateProjectUseCase,
     @Inject('IDeleteProjectUseCase')
     private readonly _deleteProjectUseCase: IDeleteProjectUseCase,
+    @Inject('ISearchProjectsUseCase')
+    private readonly _searchProjectsUseCase: ISearchProjectsUseCase,
     @Inject('ICloudinaryService')
     private readonly _cloudinaryService: ICloudinaryService,
   ) {}
@@ -77,6 +82,12 @@ export class ProjectController {
   @Get()
   async findAll(@Req() req: Request) {
     return this._listProjectsUseCase.execute(req.user!.companyId!);
+  }
+
+  @Get('search')
+  async search(@Req() req: Request, @Query() dto: SearchProjectsDto) {
+    console.log('Project search endpoint hit:', { companyId: req.user?.companyId, dto });
+    return this._searchProjectsUseCase.execute(req.user!.companyId!, dto);
   }
 
   @Get(':id')

@@ -16,9 +16,11 @@ import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import { CompanyAdminGuard } from 'src/shared/guards/company-admin.guard';
 import { CreateStoryDto } from '../../application/dto/story/create-story.dto';
 import { UpdateStoryDto } from '../../application/dto/story/update-story.dto';
+import { SearchStoriesDto } from '../../application/dto/story/search-stories.dto';
 import type {
   ICreateUserStoryUseCase,
   IGetUserStoriesByProjectUseCase,
+  ISearchUserStoriesUseCase,
   IUpdateUserStoryUseCase,
   IDeleteUserStoryUseCase,
 } from '../../application/interfaces/story/story-use-cases.interface';
@@ -31,6 +33,8 @@ export class StoryController {
     private readonly _createStoryUseCase: ICreateUserStoryUseCase,
     @Inject('IGetUserStoriesByProjectUseCase')
     private readonly _getStoriesByProjectUseCase: IGetUserStoriesByProjectUseCase,
+    @Inject('ISearchUserStoriesUseCase')
+    private readonly _searchStoriesUseCase: ISearchUserStoriesUseCase,
     @Inject('IUpdateUserStoryUseCase')
     private readonly _updateStoryUseCase: IUpdateUserStoryUseCase,
     @Inject('IDeleteUserStoryUseCase')
@@ -49,6 +53,11 @@ export class StoryController {
     @Query('projectId') projectId: string,
   ) {
     return this._getStoriesByProjectUseCase.execute(projectId, req.user!.companyId!);
+  }
+
+  @Get('search')
+  async search(@Req() req: Request, @Query() dto: SearchStoriesDto) {
+    return this._searchStoriesUseCase.execute(req.user!.companyId!, dto);
   }
 
   @Patch(':id')

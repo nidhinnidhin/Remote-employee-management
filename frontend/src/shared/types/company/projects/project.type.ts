@@ -5,7 +5,7 @@ export interface Project {
   description?: string;
   startDate?: string;
   endDate?: string;
-  status: 'Active' | 'Completed' | 'On Hold';
+  status: 'Active' | 'Completed' | 'On Hold' | 'Planning';
   members: string[];
   createdBy: string;
   createdAt: string;

@@ -26,6 +26,8 @@ import FormDropdown from "@/components/ui/FormDropdown";
 import Button from "@/components/ui/Button";
 import {
   CreateStoryPayload,
+  UserStoryPriority,
+  UserStoryStatus,
 } from "@/shared/types/company/projects/user-story.type";
 import { Employee } from "@/shared/types/company/employees/employee-listing.type";
 import { createStoryAction, uploadResourceAction } from "@/actions/company/projects/story.actions";
@@ -53,8 +55,8 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
   >({
     title: "",
     description: "",
-    priority: "Medium",
-    status: "Backlog",
+    priority: UserStoryPriority.MEDIUM,
+    status: UserStoryStatus.BACKLOG,
     assigneeId: "",
     acceptanceCriteria: [],
     storyPoints: 1,
@@ -71,7 +73,7 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
-  const priorityOptions = ["Low", "Medium", "High"];
+  const priorityOptions = Object.values(UserStoryPriority);
   const storyPointOptions = [1, 2, 3, 5, 8, 13];
   const issueTypeOptions = ["Story", "Bug"];
   const destinationOptions = ["Backlog", "Add to Active Sprint"];
@@ -86,7 +88,7 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
         ...prev,
         isInBacklog,
         addToActiveSprint,
-        status: isInBacklog ? "Backlog" : "Todo",
+        status: isInBacklog ? UserStoryStatus.BACKLOG : UserStoryStatus.TODO,
       }));
       return;
     }
@@ -220,8 +222,8 @@ const CreateStoryModal: React.FC<CreateStoryModalProps> = ({
     setFormData({
       title: "",
       description: "",
-      priority: "Medium",
-      status: "Backlog",
+      priority: UserStoryPriority.MEDIUM,
+      status: UserStoryStatus.BACKLOG,
       assigneeId: "",
       acceptanceCriteria: [],
       storyPoints: 1,

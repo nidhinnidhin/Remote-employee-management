@@ -99,26 +99,12 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
                     </button>
                   )}
                 </Menu.Item>
-                <Menu.Item>
-                  {({ active }) => (
-                    <button
-                      className={cn(
-                        "group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-[10px] font-black uppercase tracking-widest transition-all duration-200",
-                        active ? "bg-white/[0.08] text-white" : "text-slate-500 hover:text-slate-300"
-                      )}
-                    >
-                      <MousePointer2 size={14} />
-                      Bulk Select
-                    </button>
-                  )}
-                </Menu.Item>
               </div>
             </Menu.Items>
           </Transition>
         </Menu>
       </div>
 
-      {/* Droppable Area */}
       <Droppable droppableId={status}>
         {(provided, snapshot) => (
           <div

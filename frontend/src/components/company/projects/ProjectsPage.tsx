@@ -11,12 +11,13 @@ import {
 } from "lucide-react";
 import AdminLayoutWrapper from "../layout/AdminLayoutWrapper";
 import ProjectsTable from "./ProjectsTable";
+import ProjectsHeader from "./ProjectsHeader";
 import CreateProjectModal from "./modals/CreateProjectModal";
 import EditProjectModal from "./modals/EditProjectModal";
 import DeleteProjectConfirmation from "./modals/DeleteProjectConfirmation";
 import { Project } from "@/shared/types/company/projects/project.type";
 import {
-  getAllProjectsAction,
+  searchProjectsAction,
   deleteProjectAction,
 } from "@/actions/company/projects/project.actions";
 import { toast } from "sonner";
@@ -26,18 +27,31 @@ import { cn } from "@/lib/utils";
 const ProjectsPage = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalProjects, setTotalProjects] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
+  const itemsPerPage = 10;
+
   const fetchProjects = async () => {
     setLoading(true);
     try {
-      const result = await getAllProjectsAction();
+      const result = await searchProjectsAction({
+        page: currentPage,
+        limit: itemsPerPage,
+        search: searchQuery,
+      });
+
       if (result.success && result.data) {
-        setProjects(result.data);
+        setProjects(result.data.data || []);
+        setTotalProjects(result.data.total || 0);
       } else {
+        setProjects([]);
+        setTotalProjects(0);
         toast.error(result.error || PROJECT_MESSAGES.PROJECT_FETCH_FAILED);
       }
     } catch (err) {
@@ -49,7 +63,12 @@ const ProjectsPage = () => {
 
   useEffect(() => {
     fetchProjects();
-  }, []);
+  }, [currentPage, searchQuery]);
+
+  // Reset to first page on search
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   const handleEdit = (project: Project) => {
     setSelectedProject(project);
@@ -79,69 +98,29 @@ const ProjectsPage = () => {
     <AdminLayoutWrapper>
       <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-12">
         {/* ── HEADER HERO SECTION ── */}
-        <div className="portal-card p-8 bg-gradient-to-br from-white/[0.02] to-transparent border border-white/[0.06] relative overflow-hidden transition-none">
-          {/* Subtle Accent Glow */}
-          <div className="absolute -top-24 -right-24 w-64 h-64 bg-accent/5 rounded-full blur-[100px] pointer-events-none" />
-
-          <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="flex items-start gap-5">
-              <div className="w-14 h-14 rounded-2xl bg-accent/[0.08] border border-accent/20 flex items-center justify-center text-accent shrink-0 shadow-[0_0_20px_rgba(var(--color-accent),0.1)]">
-                <Briefcase size={28} strokeWidth={1.5} />
-              </div>
-              <div className="space-y-1">
-                <h1 className="text-2xl font-black text-white uppercase tracking-tighter">
-                  Project Portfolio
-                </h1>
-                <p className="text-slate-500 text-sm font-medium">
-                  Centralized command for company initiatives and resource
-                  tracking.
-                </p>
-              </div>
-            </div>
-
-            {/* --- THE STYLED BUTTON --- */}
-            <button
-              onClick={() => setIsCreateModalOpen(true)}
-              className={cn(
-                "group relative flex items-center gap-2.5 px-7 py-3 rounded-xl overflow-hidden shrink-0 transition-all duration-300",
-                "bg-accent text-white border border-white/20", // Force White Text
-                "text-[10px] font-black uppercase tracking-[0.25em] antialiased",
-                "hover:brightness-110",
-                "hover:shadow-[0_0_25px_rgba(var(--color-accent),0.4),inset_0_0_10px_rgba(255,255,255,0.2)]",
-                "active:scale-95 shadow-xl shadow-accent/10",
-              )}
-            >
-              {/* Internal Shimmer Animation */}
-              <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] pointer-events-none" />
-
-              <Plus
-                size={14}
-                strokeWidth={4}
-                className="relative z-10 transition-transform duration-500 group-hover:rotate-90 text-white"
-              />
-              <span className="relative z-10 text-white">Create Project</span>
-            </button>
-          </div>
-        </div>
+        <ProjectsHeader 
+          onAdd={() => setIsCreateModalOpen(true)} 
+          onSearch={setSearchQuery} 
+        />
 
         {/* ── BENTO STATS ── */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
             {
               label: "Total Scope",
-              value: projects.length,
+              value: totalProjects,
               icon: Activity,
               color: "text-blue-400",
             },
             {
               label: "Active Nodes",
-              value: projects.filter((p) => p.status === "Active").length,
+              value: (projects || []).filter((p) => p.status === "Active").length,
               icon: Clock,
               color: "text-accent",
             },
             {
               label: "Completed",
-              value: projects.filter((p) => p.status === "Completed").length,
+              value: (projects || []).filter((p) => p.status === "Completed").length,
               icon: CheckCircle2,
               color: "text-emerald-500",
             },
@@ -191,6 +170,10 @@ const ProjectsPage = () => {
               isLoading={loading}
               onEdit={handleEdit}
               onDelete={handleDeleteClick}
+              totalItems={totalProjects}
+              itemsPerPage={itemsPerPage}
+              currentPage={currentPage}
+              onPageChange={setCurrentPage}
             />
           </div>
         </div>

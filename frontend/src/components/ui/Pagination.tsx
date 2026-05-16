@@ -3,6 +3,7 @@
 import React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { PaginationProps } from "@/shared/types/ui/pagination-props.type";
+import { cn } from "@/lib/utils";
 
 const Pagination: React.FC<PaginationProps & { theme?: "dark" | "light" }> = ({
     currentPage,
@@ -43,17 +44,11 @@ const Pagination: React.FC<PaginationProps & { theme?: "dark" | "light" }> = ({
         return pages;
     };
 
-    if (totalPages <= 1) return null;
+    if (totalPages < 1) return null;
 
     return (
-        <div className={`flex items-center justify-between border-t px-4 py-3 sm:px-6 ${styles.container} ${className}`}>
-            <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-                <div>
-                    <p className={`text-sm ${styles.text}`}>
-                        Showing page <span className={`font-medium ${styles.activeText}`}>{currentPage}</span> of{" "}
-                        <span className={`font-medium ${styles.activeText}`}>{totalPages}</span>
-                    </p>
-                </div>
+        <div className={cn("inline-flex items-center", className)}>
+            <div className="flex items-center">
                 <div>
                     <nav
                         className="isolate inline-flex -space-x-px rounded-md shadow-sm"

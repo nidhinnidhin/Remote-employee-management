@@ -9,12 +9,17 @@ import { Project } from "@/shared/types/company/projects/project.type";
 import ProjectStatusBadge from "./ProjectStatusBadge";
 import Button from "@/components/ui/Button";
 import { formatDate } from "@/lib/date/date-format";
+import Pagination from "@/components/ui/Pagination";
 
 interface ProjectsTableProps {
   projects: Project[];
   isLoading: boolean;
   onEdit: (project: Project) => void;
   onDelete: (project: Project) => void;
+  totalItems: number;
+  itemsPerPage: number;
+  currentPage: number;
+  onPageChange: (page: number) => void;
 }
 
 const ProjectsTable: React.FC<ProjectsTableProps> = ({
@@ -22,6 +27,10 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
   isLoading,
   onEdit,
   onDelete,
+  totalItems,
+  itemsPerPage,
+  currentPage,
+  onPageChange,
 }) => {
   const columns: Column<Project>[] = [
     {
@@ -89,13 +98,25 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
   ];
 
   return (
-    <Table
-      data={projects}
-      columns={columns}
-      keyExtractor={(project) => project._id || project.id || ""}
-      isLoading={isLoading}
-      emptyMessage="No projects found. Create your first project to get started!"
-    />
+    <div className="space-y-4">
+      <Table
+        data={projects}
+        columns={columns}
+        keyExtractor={(project) => project._id || project.id || ""}
+        isLoading={isLoading}
+        emptyMessage="No projects found. Create your first project to get started!"
+      />
+
+      {!isLoading && totalItems > 0 && (
+        <div className="flex justify-end px-6 py-4 border-t border-white/[0.06] bg-white/[0.01]">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={Math.ceil(totalItems / itemsPerPage)}
+            onPageChange={onPageChange}
+          />
+        </div>
+      )}
+    </div>
   );
 };
 

@@ -3,9 +3,9 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Layout, Loader2, Sparkles, Filter, Search, Plus, Timer, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Task } from "@/shared/types/company/projects/task.type";
+import { Task, TaskStatus } from "@/shared/types/company/projects/task.type";
 import { Employee } from "@/shared/types/company/employees/employee-listing.type";
-import { UserStory } from "@/shared/types/company/projects/user-story.type";
+import { UserStory, UserStoryPriority } from "@/shared/types/company/projects/user-story.type";
 import { getStoriesByProjectAction } from "@/actions/company/projects/story.actions";
 import { getTasksByStoryAction } from "@/actions/company/projects/task.actions";
 import { getEmployees } from "@/services/company/employee-management.service";
@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import KanbanBoard from "./KanbanBoard";
 import Button from "@/components/ui/Button";
 import CompleteSprintModal from "./modals/CompleteSprintModal";
+import { useMemo } from "react";
 
 interface BoardViewProps {
   projectId: string;
@@ -29,6 +30,11 @@ const BoardView: React.FC<BoardViewProps> = ({ projectId, projectMembers = [] })
   const [loading, setLoading] = useState(true);
   const [completing, setCompleting] = useState(false);
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
+
+  // Search & Filter State
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("");
+  const [priorityFilter, setPriorityFilter] = useState<string>("");
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -131,6 +137,19 @@ const BoardView: React.FC<BoardViewProps> = ({ projectId, projectMembers = [] })
     }
   };
 
+  const filteredTasks = useMemo(() => {
+    return tasks.filter((task) => {
+      const matchesSearch = !searchQuery || 
+        task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        task.description.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      const matchesStatus = !statusFilter || task.status === statusFilter;
+      const matchesPriority = !priorityFilter || task.priority === priorityFilter;
+
+      return matchesSearch && matchesStatus && matchesPriority;
+    });
+  }, [tasks, searchQuery, statusFilter, priorityFilter]);
+
   if (loading && tasks.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-32 gap-6 animate-in fade-in duration-700">
@@ -181,52 +200,75 @@ const BoardView: React.FC<BoardViewProps> = ({ projectId, projectMembers = [] })
   return (
     <div className="space-y-6">
       {/* Board Header Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 py-2">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 py-2">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-accent/10  flex items-center justify-center text-accent shadow-inner">
-            <Sparkles size={24} />
-          </div>
           <div>
-            <h2 className="text-xl font-black text-primary tracking-tighter">
+            <h2 className="text-xl p-2 font-black text-primary tracking-tighter">
               Project Kanban
             </h2>
-            <p className="text-[10px] font-black text-muted uppercase tracking-widest">
-              Visualizing {tasks.length}{" "}
-              {tasks.length === 1 ? "active task" : "active tasks"}
+            <p className="text-[10px] p-2 font-black text-muted uppercase tracking-widest">
+              Visualizing {filteredTasks.length}{" "}
+              {filteredTasks.length === 1 ? "task" : "tasks"}
+              {searchQuery || statusFilter || priorityFilter ? " (filtered)" : ""}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col md:flex-row items-center gap-3">
+          {/* Search Input */}
+          <div className="relative group w-full md:w-64">
+            <Search 
+              size={14} 
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted group-focus-within:text-accent transition-colors" 
+            />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Find tasks..."
+              className="w-full pl-10 pr-4 py-2 bg-white/[0.02] border border-white/10 rounded-xl text-[11px] font-bold text-white placeholder:text-zinc-600 focus:outline-none focus:border-accent/40 focus:bg-white/[0.04] transition-all"
+            />
+          </div>
+
+          {/* Status Filter */}
+          <select 
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="w-full md:w-auto bg-white/[0.02] border border-white/10 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-400 focus:outline-none focus:border-accent/40 transition-all cursor-pointer hover:bg-white/5"
+          >
+            <option value="">Status</option>
+            {Object.values(TaskStatus).map(status => (
+              <option key={status} value={status}>{status}</option>
+            ))}
+          </select>
+
+          {/* Priority Filter */}
+          <select 
+            value={priorityFilter}
+            onChange={(e) => setPriorityFilter(e.target.value)}
+            className="w-full md:w-auto bg-white/[0.02] border border-white/10 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-400 focus:outline-none focus:border-accent/40 transition-all cursor-pointer hover:bg-white/5"
+          >
+            <option value="">Priority</option>
+            {Object.values(UserStoryPriority).map(p => (
+              <option key={p} value={p}>{p}</option>
+            ))}
+          </select>
+
           {activeSprint && (
             <Button
               onClick={handleCompleteSprint}
               isLoading={completing}
-              className="rounded-xl bg-emerald-500 text-[#08090a] gap-2 h-10 px-6 text-[10px] uppercase tracking-widest font-black shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 active:scale-95 transition-all"
+              className="w-full md:w-auto rounded-xl bg-emerald-500 text-[#08090a] gap-2 h-10 px-6 text-[10px] uppercase tracking-widest font-black shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 active:scale-95 transition-all"
             >
               <CheckCircle2 size={14} strokeWidth={3} />
               Complete Sprint
             </Button>
           )}
-          <Button
-            variant="ghost"
-            className="rounded-xl border border-border-subtle/20 gap-2 h-10 text-[10px] uppercase tracking-widest font-black"
-          >
-            <Filter size={14} />
-            Filters
-          </Button>
-          <Button
-            variant="ghost"
-            className="rounded-xl border border-border-subtle/20 gap-2 h-10 text-[10px] uppercase tracking-widest font-black"
-          >
-            <Search size={14} />
-            Find
-          </Button>
         </div>
       </div>
 
       <KanbanBoard
-        tasks={tasks}
+        tasks={filteredTasks}
         employees={employees}
         stories={stories}
         projectId={projectId}

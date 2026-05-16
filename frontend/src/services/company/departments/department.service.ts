@@ -10,6 +10,15 @@ export const DepartmentService = {
     return res.data;
   },
 
+  async searchDepartments(params: { page: number; limit: number; search?: string; employeeId?: string }): Promise<{ data: Department[]; total: number }> {
+    console.log("Searching departments with params:", params);
+    const res = await clientApi.get(
+      API_ROUTES.COMPANY.DEPARTMENTS.SEARCH,
+      { params }
+    );
+    return res.data;
+  },
+
   async createDepartment(name: string) {
     const res = await clientApi.post(
       API_ROUTES.COMPANY.DEPARTMENTS.CREATE,

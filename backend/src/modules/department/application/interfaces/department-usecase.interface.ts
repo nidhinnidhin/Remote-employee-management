@@ -1,4 +1,5 @@
 import { DepartmentEntity } from '../../domain/entities/department.entity';
+import { SearchDepartmentsDto } from '../dto/search-departments.dto';
 
 export interface ICreateDepartmentUseCase {
   execute(name: string, companyId: string): Promise<DepartmentEntity>;
@@ -27,3 +28,12 @@ export interface IGetEmployeeDepartmentsUseCase {
 export interface IDeleteDepartmentUseCase {
   execute(id: string): Promise<void>;
 }
+
+export interface ISearchDepartmentsUseCase {
+  execute(companyId: string, dto: SearchDepartmentsDto): Promise<{
+    data: any[];
+    total: number;
+    page: number;
+    limit: number;
+  }>;
+}

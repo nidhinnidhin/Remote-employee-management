@@ -118,3 +118,14 @@ export const uploadResourceAction = async (formData: FormData) => {
     return { success: false, error: error?.message || "Failed to upload resource" };
   }
 };
+
+export const searchProjectsAction = async (params: { page: number; limit: number; search?: string; memberId?: string }) => {
+  try {
+    const api = await getServerApi();
+    const data = await ProjectService.searchProjects(params, api);
+    return { success: true, data };
+  } catch (error: any) {
+    console.error("Error searching projects:", error?.message);
+    return { success: false, error: error?.message || "Failed to search projects" };
+  }
+};

@@ -1,95 +1,182 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { Task } from "@/shared/types/company/projects/task.type";
 import { Project } from "@/shared/types/company/projects/project.type";
-import { LayoutGrid, AlertCircle, Info } from "lucide-react";
+import { LayoutGrid, AlertCircle, Info, Search, Loader2 } from "lucide-react";
 import EmployeeProjectCard from "./EmployeeProjectCard";
+import { searchProjectsAction } from "@/actions/company/projects/project.actions";
+import Pagination from "@/components/ui/Pagination";
+import { toast } from "sonner";
 
 interface EmployeeProjectListProps {
   tasks: Task[];
-  projects: Project[];
+  userId: string;
 }
 
 export default function EmployeeProjectList({
   tasks,
-  projects,
+  userId,
 }: EmployeeProjectListProps) {
-  
-  // Filter projects where user has assigned work
-  const filteredProjects = useMemo(() => {
-    const assignedProjectIds = new Set(tasks.map(t => t.projectId));
-    return projects.filter(p => assignedProjectIds.has(p.id || p._id));
-  }, [tasks, projects]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalProjects, setTotalProjects] = useState(0);
+  const itemsPerPage = 6; // Grid looks better with multiples of 2 or 3
 
-  // Derive counts per project
+  const fetchProjects = useCallback(async () => {
+    setLoading(true);
+    try {
+      const result = await searchProjectsAction({
+        page: currentPage,
+        limit: itemsPerPage,
+        search: searchQuery,
+        memberId: userId,
+      });
+
+      if (result.success && result.data) {
+        setProjects(result.data.data || []);
+        setTotalProjects(result.data.total || 0);
+      } else {
+        toast.error(result.error || "Failed to load projects");
+      }
+    } catch (err) {
+      toast.error("An unexpected error occurred");
+    } finally {
+      setLoading(false);
+    }
+  }, [userId, currentPage, searchQuery]);
+
+  useEffect(() => {
+    fetchProjects();
+  }, [fetchProjects]);
+
+  // Debounce search
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setCurrentPage(1);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
+
+  // Derive counts per project (from tasks passed as props)
   const projectStats = useMemo(() => {
-     const stats: Record<string, { tasks: number, stories: number }> = {};
-     tasks.forEach(task => {
-        if (!stats[task.projectId]) {
-            stats[task.projectId] = { tasks: 0, stories: 0 };
-        }
-        stats[task.projectId].tasks += 1;
-     });
-     
-     // Story counts (approximate based on unique stories in those tasks)
-     const storiesPerProject: Record<string, Set<string>> = {};
-     tasks.forEach(task => {
-        if (!storiesPerProject[task.projectId]) {
-            storiesPerProject[task.projectId] = new Set();
-        }
-        storiesPerProject[task.projectId].add(task.storyId);
-     });
-     
-     Object.keys(storiesPerProject).forEach(pId => {
-        if (stats[pId]) {
-            stats[pId].stories = storiesPerProject[pId].size;
-        }
-     });
+    const stats: Record<string, { tasks: number; stories: number }> = {};
+    tasks.forEach((task) => {
+      if (!stats[task.projectId]) {
+        stats[task.projectId] = { tasks: 0, stories: 0 };
+      }
+      stats[task.projectId].tasks += 1;
+    });
 
-     return stats;
+    const storiesPerProject: Record<string, Set<string>> = {};
+    tasks.forEach((task) => {
+      if (!storiesPerProject[task.projectId]) {
+        storiesPerProject[task.projectId] = new Set();
+      }
+      storiesPerProject[task.projectId].add(task.storyId);
+    });
+
+    Object.keys(storiesPerProject).forEach((pId) => {
+      if (stats[pId]) {
+        stats[pId].stories = storiesPerProject[pId].size;
+      }
+    });
+
+    return stats;
   }, [tasks]);
 
-  if (filteredProjects.length === 0) {
+  if (!loading && projects.length === 0 && !searchQuery) {
     return (
       <div className="flex flex-col items-center justify-center py-20 px-8 text-center  border-dashed border-[rgba(var(--color-border-subtle),0.1)] rounded-[3rem] bg-surface/20 animate-in zoom-in-95 duration-700">
-         
-         <h2 className="text-xl font-bold text-primary tracking-tight mb-2">No Active Projects</h2>
-         <p className="text-[13px] text-muted max-w-sm leading-relaxed mb-8">
-            You are not currently assigned to any active projects. Once tasks are assigned to you, they will appear here automatically.
-         </p>
-         <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-accent/5 border border-accent/10 text-accent/60">
-            <AlertCircle size={14} />
-            <span className="text-[10px] font-black uppercase tracking-widest">Awaiting Assignment</span>
-         </div>
+        <h2 className="text-xl font-bold text-primary tracking-tight mb-2">
+          No Active Projects
+        </h2>
+        <p className="text-[13px] text-muted max-w-sm leading-relaxed mb-8">
+          You are not currently assigned to any active projects. Once tasks are
+          assigned to you, they will appear here automatically.
+        </p>
+        <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-accent/5 border border-accent/10 text-accent/60">
+          <AlertCircle size={14} />
+          <span className="text-[10px] font-black uppercase tracking-widest">
+            Awaiting Assignment
+          </span>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      {/* Header Area */}
-      <div className="flex flex-col gap-2">
-         <div className="flex items-center gap-3">
-            <h2 className="text-2xl font-black text-primary tracking-tight font-heading">My Active Projects</h2>
-            <div className="h-[1px] flex-1 bg-gradient-to-r from-accent/20 to-transparent" />
-         </div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h2 className="text-2xl font-black text-primary tracking-tight font-heading whitespace-nowrap uppercase tracking-tighter">
+          My Portfolio
+        </h2>
+
+        <div className="relative w-full sm:w-72 md:w-80 group">
+          <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-white/40 group-focus-within:text-accent transition-colors duration-200">
+            <Search size={14} />
+          </div>
+          <input
+            type="text"
+            placeholder="Search your projects..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-9 pr-4 py-2 bg-white/[0.03] border border-white/[0.06] focus:border-accent/30 rounded-xl text-[13px] text-white placeholder:text-white/30 focus:outline-none transition-all duration-300"
+          />
+          {loading && (
+            <div className="absolute inset-y-0 right-3 flex items-center">
+              <Loader2 size={14} className="animate-spin text-accent" />
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 lg:gap-8">
-        {filteredProjects.map((project) => {
-          const stats = projectStats[project.id || project._id] || { tasks: 0, stories: 0 };
-          return (
-            <EmployeeProjectCard
-              key={project.id || project._id}
-              project={project}
-              taskCount={stats.tasks}
-              storyCount={stats.stories}
+      {loading && projects.length === 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 lg:gap-8 opacity-50 pointer-events-none">
+          {[1, 2, 3, 4].map((i) => (
+             <div key={i} className="h-48 rounded-3xl bg-white/[0.02] border border-white/[0.06] animate-pulse" />
+          ))}
+        </div>
+      ) : projects.length === 0 ? (
+        <div className="text-center py-20 bg-white/[0.02] rounded-[3rem] border border-dashed border-white/[0.06]">
+          <p className="text-muted text-sm">No projects match your search query.</p>
+          <button 
+            onClick={() => setSearchQuery("")}
+            className="mt-4 text-accent text-xs font-bold uppercase tracking-widest hover:underline"
+          >
+            Clear Search
+          </button>
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 lg:gap-8">
+            {projects.map((project) => {
+              const stats = projectStats[project.id || project._id] || {
+                tasks: 0,
+                stories: 0,
+              };
+              return (
+                <EmployeeProjectCard
+                  key={project.id || project._id}
+                  project={project}
+                  taskCount={stats.tasks}
+                  storyCount={stats.stories}
+                />
+              );
+            })}
+          </div>
+
+          <div className="pt-6">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={Math.ceil(totalProjects / itemsPerPage)}
+              onPageChange={setCurrentPage}
             />
-          );
-        })}
-      </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

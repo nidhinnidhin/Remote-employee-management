@@ -64,3 +64,23 @@ export const deleteStoryAction = async (id: string) => {
     return { success: false, error: message };
   }
 };
+
+export const searchStoriesAction = async (params: {
+  projectId?: string;
+  status?: string;
+  priority?: string;
+  search?: string;
+  isInBacklog?: boolean;
+  page?: number;
+  limit?: number;
+}) => {
+  try {
+    const api = await getServerApi();
+    const data = await StoryService.searchStories(params, api);
+    return { success: true, data };
+  } catch (error: any) {
+    const message = error.response?.data?.message || error.message || "Failed to search stories";
+    console.error("Error searching stories:", message);
+    return { success: false, error: message };
+  }
+};

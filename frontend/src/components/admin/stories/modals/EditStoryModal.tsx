@@ -22,7 +22,7 @@ import BaseModal from "@/components/ui/BaseModal";
 import FormInput from "@/components/ui/FormInput";
 import FormDropdown from "@/components/ui/FormDropdown";
 import Button from "@/components/ui/Button";
-import { StoryPriority, StoryStatus, UserStory, UpdateStoryPayload } from "@/shared/types/company/projects/user-story.type";
+import { UserStoryPriority, UserStoryStatus, UserStory, UpdateStoryPayload } from "@/shared/types/company/projects/user-story.type";
 import { Employee } from "@/shared/types/company/employees/employee-listing.type";
 import { updateStoryAction, uploadResourceAction } from "@/actions/company/projects/story.actions";
 import { toast } from "sonner";
@@ -47,8 +47,8 @@ const EditStoryModal: React.FC<EditStoryModalProps> = ({
   const [formData, setFormData] = useState<UpdateStoryPayload>({
     title: "",
     description: "",
-    priority: "Medium",
-    status: "Backlog",
+    priority: UserStoryPriority.MEDIUM,
+    status: UserStoryStatus.BACKLOG,
     type: "Story",
     storyPoints: 1,
     assigneeId: "",
@@ -80,8 +80,8 @@ const EditStoryModal: React.FC<EditStoryModalProps> = ({
     }
   }, [story]);
 
-  const priorityOptions = ["Low", "Medium", "High"];
-  const statusOptions = ["Backlog", "In Progress", "Done"];
+  const priorityOptions = Object.values(UserStoryPriority);
+  const statusOptions = Object.values(UserStoryStatus);
 
   const handleChange = (e: any) => {
     const { name, value } = e.target;
@@ -290,7 +290,7 @@ const EditStoryModal: React.FC<EditStoryModalProps> = ({
             <FormDropdown
               label="Priority"
               name="priority"
-              value={formData.priority || "Medium"}
+              value={formData.priority || UserStoryPriority.MEDIUM}
               onChange={handleChange}
               options={priorityOptions}
               required
@@ -300,7 +300,7 @@ const EditStoryModal: React.FC<EditStoryModalProps> = ({
             <FormDropdown
               label="Status"
               name="status"
-              value={formData.status || "Backlog"}
+              value={formData.status || UserStoryStatus.BACKLOG}
               onChange={handleChange}
               options={statusOptions}
               required

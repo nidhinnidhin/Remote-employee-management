@@ -14,17 +14,24 @@ import { DepartmentFormModal } from "./DepartmentFormModal";
 const DepartmentsPage = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleRefresh = () => setRefreshKey(Date.now());
 
   return (
     <AdminLayoutWrapper>
       <div className="flex flex-col gap-6 w-full">
-        <DepartmentsHeader onAdd={() => setIsAddModalOpen(true)} /> 
+        <DepartmentsHeader 
+          onAdd={() => setIsAddModalOpen(true)} 
+          onSearch={setSearchQuery}
+        /> 
         <DepartmentsStats />
         <div className="grid grid-cols-1 gap-6 pb-10">
           <div className="flex flex-col gap-6 min-w-0">
-             <DepartmentsTable refreshTrigger={refreshKey} />
+             <DepartmentsTable 
+                refreshTrigger={refreshKey} 
+                searchQuery={searchQuery}
+             />
           </div>
         </div>
       </div>

@@ -28,4 +28,17 @@ export const StoryService = {
     const response = await api.delete(API_ROUTES.COMPANY.STORIES.BY_ID(id));
     return response.data;
   },
+
+  searchStories: async (params: {
+    projectId?: string;
+    status?: string;
+    priority?: string;
+    search?: string;
+    isInBacklog?: boolean;
+    page?: number;
+    limit?: number;
+  }, api: AxiosInstance = clientApi): Promise<{ data: UserStory[]; total: number }> => {
+    const response = await api.get(API_ROUTES.COMPANY.STORIES.SEARCH, { params });
+    return response.data;
+  },
 };

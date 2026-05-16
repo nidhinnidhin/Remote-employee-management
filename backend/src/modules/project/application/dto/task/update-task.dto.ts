@@ -1,5 +1,6 @@
 import { IsString, IsOptional, IsEnum, IsNumber, IsDateString, IsArray } from 'class-validator';
 import { TaskStatus } from 'src/shared/enums/project/task-status.enum';
+import { UserStoryPriority } from 'src/shared/enums/project/user-story-priority.enum';
 
 export class UpdateTaskDto {
   @IsString()
@@ -25,6 +26,10 @@ export class UpdateTaskDto {
   @IsEnum(TaskStatus)
   @IsOptional()
   status?: TaskStatus;
+
+  @IsEnum(UserStoryPriority)
+  @IsOptional()
+  priority?: UserStoryPriority;
 
   @IsNumber()
   @IsOptional()

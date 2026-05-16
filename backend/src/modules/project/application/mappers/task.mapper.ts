@@ -2,6 +2,7 @@ import { Types, FlattenMaps } from 'mongoose';
 import { TaskEntity } from '../../domain/entities/task.entity';
 import { TaskDocument } from '../../infrastructure/database/mongoose/schemas/task.schema';
 import { TaskStatus } from 'src/shared/enums/project/task-status.enum';
+import { UserStoryPriority } from 'src/shared/enums/project/user-story-priority.enum';
 
 export type LeanTaskDocument = FlattenMaps<TaskDocument> & {
   _id: Types.ObjectId;
@@ -16,6 +17,7 @@ export class TaskMapper {
       taskDoc.storyId?.toString(),
       taskDoc.title,
       (taskDoc.status as TaskStatus) || TaskStatus.TODO,
+      (taskDoc.priority as UserStoryPriority) || UserStoryPriority.MEDIUM,
       taskDoc.order || 0,
       taskDoc.createdBy,
       taskDoc.description || '',

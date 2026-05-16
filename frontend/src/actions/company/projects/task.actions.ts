@@ -119,3 +119,24 @@ export const fetchMyTasksAction = async () => {
     };
   }
 };
+export const searchTasksAction = async (params: {
+  projectId?: string;
+  storyId?: string;
+  memberId?: string;
+  status?: string;
+  priority?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
+}) => {
+  try {
+    const api = await getServerApi();
+    const data = await TaskService.searchTasks(params, api);
+    return { success: true, data };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to search tasks",
+    };
+  }
+};

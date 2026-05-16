@@ -8,7 +8,7 @@ import React, {
   useTransition,
 } from "react";
 import { useParams } from "next/navigation";
-import { fetchMyTasksAction } from "@/actions/company/projects/task.actions";
+import { fetchMyTasksAction, searchTasksAction } from "@/actions/company/projects/task.actions";
 import { getAllProjectsAction } from "@/actions/company/projects/project.actions";
 import { getStoriesByProjectAction } from "@/actions/company/projects/story.actions";
 import { getSprintsByProjectAction } from "@/actions/company/projects/sprint.actions";
@@ -29,11 +29,18 @@ import {
   LayoutDashboard,
   Goal,
   GitPullRequest,
+  Search,
+  Filter,
+  ArrowDownWideNarrow,
+  Clock,
 } from "lucide-react";
 import { DashboardLayout } from "@/components/employees/dashboard/DashboardLayout";
 import Link from "next/link";
 import { FRONTEND_ROUTES } from "@/constants/frontend.routes";
 import { cn } from "@/lib/utils";
+import Pagination from "@/components/ui/Pagination";
+import { TaskStatus } from "@/shared/types/company/projects/task.type";
+import { UserStoryPriority } from "@/shared/types/company/projects/user-story.type";
 
 export default function EmployeeProjectDetailPage() {
   const params = useParams();
@@ -48,17 +55,34 @@ export default function EmployeeProjectDetailPage() {
   const [activeSprint, setActiveSprint] = useState<Sprint | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Search & Filter State
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("");
+  const [priorityFilter, setPriorityFilter] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalTasks, setTotalTasks] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 12;
+
   const loadData = useCallback(
     async (isSilent = false) => {
       if (!isSilent) setIsLoading(true);
 
       try {
-        const [tasksResult, projectsResult, storiesResult, sprintsResult] = await Promise.all([
-          fetchMyTasksAction(),
-          getAllProjectsAction(),
-          getStoriesByProjectAction(projectId),
-          getSprintsByProjectAction(projectId),
-        ]);
+        const [projectsResult, storiesResult, sprintsResult, tasksResult] =
+          await Promise.all([
+            getAllProjectsAction(),
+            getStoriesByProjectAction(projectId),
+            getSprintsByProjectAction(projectId),
+            searchTasksAction({
+              projectId,
+              search: searchQuery,
+              status: statusFilter || undefined,
+              priority: priorityFilter || undefined,
+              page: currentPage,
+              limit: limit,
+            })
+          ]);
 
         startTransition(() => {
           if (projectsResult.success && projectsResult.data) {
@@ -69,44 +93,24 @@ export default function EmployeeProjectDetailPage() {
           }
 
           // 1. Find Active Sprint
-          const active = sprintsResult.success && sprintsResult.data 
-            ? (sprintsResult.data as Sprint[]).find(s => s.status === 'ACTIVE') 
-            : null;
+          const active =
+            sprintsResult.success && sprintsResult.data
+              ? (sprintsResult.data as Sprint[]).find(
+                  (s) => s.status === "ACTIVE",
+                )
+              : null;
           setActiveSprint(active || null);
 
-          if (!active) {
-            setTasks([]);
-            setStories([]);
-            return;
+          // 2. Set Stories
+          if (storiesResult.success && storiesResult.data) {
+            setStories(storiesResult.data as UserStory[]);
           }
 
-          // 2. Filter Stories for Active Sprint
-          const activeStories = storiesResult.success && storiesResult.data
-            ? (storiesResult.data as UserStory[]).filter(s => {
-                const sId = (s.id || (s as any)._id)?.toString();
-                return active.issueIds.some(id => id.toString() === sId);
-              })
-            : [];
-          setStories(activeStories);
-
-          // 3. Filter Tasks for Active Sprint
+          // 3. Set Tasks
           if (tasksResult.success && tasksResult.data) {
-            const allTasks =
-              (tasksResult.data as MyTasksResponse).tasks ||
-              (tasksResult.data as any) ||
-              [];
-            
-            const projectTasks = allTasks.filter(
-                (t: any) => t.projectId === projectId || t.project === projectId
-            );
-
-            // Only tasks that belong to stories in the active sprint
-            setTasks(
-              projectTasks.filter((t: any) => {
-                const tStoryId = t.storyId?.toString();
-                return activeStories.some(s => (s.id || (s as any)._id)?.toString() === tStoryId);
-              })
-            );
+            setTasks(tasksResult.data.tasks || []);
+            setTotalTasks(tasksResult.data.total || 0);
+            setTotalPages(Math.ceil((tasksResult.data.total || 0) / limit));
           }
         });
       } catch (err) {
@@ -115,22 +119,34 @@ export default function EmployeeProjectDetailPage() {
         setIsLoading(false);
       }
     },
-    [projectId],
+    [projectId, searchQuery, statusFilter, priorityFilter, currentPage],
   );
 
   useEffect(() => {
     loadData();
   }, [loadData]);
 
-  const relevantStories = useMemo(() => {
-    const assignedStoryIds = new Set(tasks.map((t) => t.storyId?.toString()));
-    return stories.filter((s: any) =>
-      assignedStoryIds.has(s.id?.toString() || s._id?.toString()),
-    );
-  }, [tasks, stories]);
+  // Debounce search
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setCurrentPage(1);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
 
-  // Show spinner ONLY on initial load
-  // Show spinner ONLY on initial load
+  const relevantStories = useMemo(() => {
+    return stories.filter((s: any) => {
+      const matchesSearch = !searchQuery || 
+        s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        s.description.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      const matchesStatus = !statusFilter || s.status === statusFilter;
+      const matchesPriority = !priorityFilter || s.priority === priorityFilter;
+
+      return matchesSearch && matchesStatus && matchesPriority;
+    });
+  }, [stories, searchQuery, statusFilter, priorityFilter]);
+
   if (isLoading && !project) {
     return (
       <DashboardLayout>
@@ -139,30 +155,6 @@ export default function EmployeeProjectDetailPage() {
           <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">
             Loading Workspace...
           </p>
-        </div>
-      </DashboardLayout>
-    );
-  }
-
-  if (project && !activeSprint) {
-    return (
-      <DashboardLayout>
-        <div className="flex flex-col items-center justify-center py-40 gap-8 h-[calc(100vh-8rem)] animate-in fade-in duration-700">
-           <div className="w-24 h-24 rounded-[3rem] bg-orange-500/5 flex items-center justify-center text-orange-500/20 border border-orange-500/10 mb-2 border-dashed">
-             <Timer size={48} className="translate-y-0.5" />
-           </div>
-           <div className="text-center space-y-3">
-              <h3 className="text-2xl font-black text-white tracking-tight">No Active Sprint</h3>
-              <p className="text-slate-500 text-sm max-w-[320px] leading-relaxed font-medium mx-auto">
-                There are currently no active sprints for this project. Please wait for your project manager to start the next cycle.
-              </p>
-           </div>
-           <Link
-             href={FRONTEND_ROUTES.EMPLOYEE.PROJECTS}
-             className="px-10 py-4 rounded-2xl bg-white/[0.03] border border-white/10 text-[11px] font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-white/5 transition-all"
-           >
-              Back to Portfolio
-           </Link>
         </div>
       </DashboardLayout>
     );
@@ -178,80 +170,163 @@ export default function EmployeeProjectDetailPage() {
       >
         {/* Header */}
         <div className="flex flex-col gap-6 mb-8 shrink-0">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
-              <Link
-                href={FRONTEND_ROUTES.EMPLOYEE.PROJECTS}
-                className="hover:text-accent"
-              >
-                Portfolio
-              </Link>
-              <ChevronRight size={10} />
-              <span className="text-accent">Project Details</span>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+                <Link
+                  href={FRONTEND_ROUTES.EMPLOYEE.PROJECTS}
+                  className="hover:text-accent transition-colors"
+                >
+                  Portfolio
+                </Link>
+                <ChevronRight size={10} />
+                <span className="text-accent">Project Details</span>
+              </div>
+              <div className="flex items-center gap-4">
+                <h1 className="text-3xl font-black text-white tracking-tighter">
+                  {project?.name}
+                </h1>
+                <ProjectStatusBadge status={project?.status as any} />
+                {isPending && (
+                  <Loader2 size={16} className="animate-spin text-accent" />
+                )}
+              </div>
             </div>
+
+            {/* Pagination at top for quick access */}
             <div className="flex items-center gap-4">
-              <h1 className="text-3xl font-black text-white tracking-tighter">
-                {project?.name}
-              </h1>
-              <ProjectStatusBadge status={project?.status as any} />
-              {isPending && (
-                <Loader2 size={16} className="animate-spin text-accent" />
-              )}
+               {totalPages > 1 && (
+                  <div className="bg-white/[0.02] border border-white/10 rounded-2xl p-1 px-3">
+                    <Pagination 
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      onPageChange={setCurrentPage}
+                      className="border-none bg-transparent py-1 px-0"
+                    />
+                  </div>
+               )}
             </div>
           </div>
 
-          {/* Tab Toggle */}
-          <div className="flex items-center p-1.5 bg-white/[0.02] border border-white/10 rounded-2xl w-fit">
-            <button
-              onClick={() => setActiveTab("board")}
-              className={cn(
-                "px-6 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all",
-                activeTab === "board"
-                  ? "bg-white/5 text-white border border-white/10"
-                  : "text-slate-500",
+          {/* Controls Bar */}
+          <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 w-full bg-white/[0.01] border border-white/[0.06] p-4 rounded-[2rem]">
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Tab Toggle */}
+              <div className="flex items-center p-1 bg-white/[0.02] border border-white/10 rounded-2xl">
+                <button
+                  onClick={() => setActiveTab("board")}
+                  className={cn(
+                    "px-6 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all",
+                    activeTab === "board"
+                      ? "bg-white/5 text-white border border-white/10"
+                      : "text-slate-500 hover:text-slate-300",
+                  )}
+                >
+                  Kanban Board
+                </button>
+                <button
+                  onClick={() => setActiveTab("stories")}
+                  className={cn(
+                    "px-6 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all",
+                    activeTab === "stories"
+                      ? "bg-white/5 text-white border border-white/10"
+                      : "text-slate-500 hover:text-slate-300",
+                  )}
+                >
+                  Objectives ({relevantStories.length})
+                </button>
+              </div>
+
+              <div className="h-8 w-[1px] bg-white/10 hidden sm:block mx-1" />
+
+              {/* Status Filter */}
+              <select 
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="bg-white/[0.02] border border-white/10 rounded-xl px-4 py-2 text-[11px] font-black uppercase tracking-widest text-slate-400 focus:outline-none focus:border-accent/40 transition-all cursor-pointer hover:bg-white/5"
+              >
+                <option value="">All Statuses</option>
+                {Object.values(TaskStatus).map(status => (
+                  <option key={status} value={status}>{status}</option>
+                ))}
+              </select>
+
+              {/* Priority Filter */}
+              <select 
+                value={priorityFilter}
+                onChange={(e) => setPriorityFilter(e.target.value)}
+                className="bg-white/[0.02] border border-white/10 rounded-xl px-4 py-2 text-[11px] font-black uppercase tracking-widest text-slate-400 focus:outline-none focus:border-accent/40 transition-all cursor-pointer hover:bg-white/5"
+              >
+                <option value="">All Priorities</option>
+                {Object.values(UserStoryPriority).map(p => (
+                  <option key={p} value={p}>{p}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="relative w-full xl:w-80 group">
+              <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-white/30 group-focus-within:text-accent transition-colors duration-200">
+                <Search size={14} />
+              </div>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search tasks or objectives..."
+                className="w-full pl-11 pr-4 py-3 bg-white/[0.02] border border-white/[0.06] focus:border-accent/30 rounded-2xl text-[13px] text-white placeholder:text-white/20 focus:outline-none transition-all duration-300 shadow-inner"
+              />
+              {isPending && (
+                <div className="absolute inset-y-0 right-4 flex items-center">
+                  <Loader2 size={14} className="animate-spin text-accent" />
+                </div>
               )}
-            >
-              Kanban Board
-            </button>
-            <button
-              onClick={() => setActiveTab("stories")}
-              className={cn(
-                "px-6 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all",
-                activeTab === "stories"
-                  ? "bg-white/5 text-white border border-white/10"
-                  : "text-slate-500",
-              )}
-            >
-              Objectives ({relevantStories.length})
-              <span className="ml-2 text-accent/50 text-[9px] font-bold">
-                {relevantStories.reduce((sum, s) => sum + (s.storyPoints || 0), 0)} pts
-              </span>
-            </button>
+            </div>
           </div>
         </div>
 
         {/* Content */}
         <div className="flex-1 relative">
           {activeTab === "board" ? (
-            <EmployeeKanbanBoard
-              tasks={tasks}
-              projects={project ? [project] : []}
-              onRefresh={() => loadData(true)}
-            />
+            tasks.length > 0 ? (
+              <EmployeeKanbanBoard
+                tasks={tasks}
+                projects={project ? [project] : []}
+                onRefresh={() => loadData(true)}
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center py-20 bg-white/[0.01] border border-dashed border-white/[0.06] rounded-[2rem]">
+                <p className="text-slate-500 text-sm font-medium">No tasks found matching your criteria.</p>
+                <button 
+                  onClick={() => { setSearchQuery(""); setStatusFilter(""); setPriorityFilter(""); }}
+                  className="mt-4 text-accent text-[10px] font-black uppercase tracking-widest hover:underline"
+                >
+                  Reset Filters
+                </button>
+              </div>
+            )
           ) : (
             <div className="h-full overflow-y-auto space-y-4 pb-12 custom-scrollbar">
-              <div className="space-y-4">
-                {relevantStories.map((story) => (
-                <EmployeeStoryCard
-                  key={story.id || (story as any)._id}
-                  story={story}
-                  tasks={tasks.filter(
-                    (t) => t.storyId?.toString() === (story.id?.toString() || (story as any)._id?.toString()),
-                  )}
-                  onRefresh={() => loadData(true)}
-                />
-                ))}
-              </div>
+              {relevantStories.length > 0 ? (
+                <div className="grid grid-cols-1 gap-4">
+                  {relevantStories.map((story) => (
+                    <EmployeeStoryCard
+                      key={story.id || (story as any)._id}
+                      story={story}
+                      tasks={tasks.filter(
+                        (t) =>
+                          t.storyId?.toString() ===
+                          (story.id?.toString() ||
+                            (story as any)._id?.toString()),
+                      )}
+                      onRefresh={() => loadData(true)}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-20 bg-white/[0.01] border border-dashed border-white/[0.06] rounded-[2rem]">
+                  <p className="text-slate-500 text-sm font-medium">No objectives found matching your criteria.</p>
+                </div>
+              )}
             </div>
           )}
         </div>

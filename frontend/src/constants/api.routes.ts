@@ -48,16 +48,19 @@ export const API_ROUTES = {
         POLICIES: "/company-policies",
         PROJECTS: {
             BASE: "/projects",
+            SEARCH: "/projects/search",
             BY_ID: (id: string) => `/projects/${id}`,
             UPLOAD: "/projects/upload",
         },
         STORIES: {
             BASE: "/stories",
+            SEARCH: "/stories/search",
             BY_PROJECT: (projectId: string) => `/stories?projectId=${projectId}`,
             BY_ID: (id: string) => `/stories/${id}`,
         },
         TASKS: {
             BASE: "/tasks",
+            SEARCH: "/tasks/search",
             BY_STORY: (storyId: string) => `/tasks?storyId=${storyId}`,
             BY_PROJECT: (projectId: string) => `/tasks?projectId=${projectId}`,
             BY_ID: (id: string) => `/tasks/${id}`,

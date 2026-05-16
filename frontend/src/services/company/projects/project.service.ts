@@ -41,4 +41,9 @@ export const ProjectService = {
     );
     return response.data;
   },
+
+  searchProjects: async (params: { page: number; limit: number; search?: string; memberId?: string }, api: AxiosInstance = clientApi) => {
+    const response = await api.get<{ data: Project[]; total: number }>(API_ROUTES.COMPANY.PROJECTS.SEARCH, { params });
+    return response.data;
+  },
 };

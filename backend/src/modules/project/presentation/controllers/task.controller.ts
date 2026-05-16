@@ -18,6 +18,7 @@ import { CompanyAdminGuard } from 'src/shared/guards/company-admin.guard';
 import { CreateTaskDto } from '../../application/dto/task/create-task.dto';
 import { UpdateTaskDto } from '../../application/dto/task/update-task.dto';
 import { MoveTaskDto } from '../../application/dto/task/move-task.dto';
+import { SearchTasksDto } from '../../application/dto/task/search-tasks.dto';
 import type {
   ICreateTaskUseCase,
   IGetTasksByStoryUseCase,
@@ -26,6 +27,7 @@ import type {
   IUpdateTaskUseCase,
   IMoveTaskUseCase,
   IDeleteTaskUseCase,
+  ISearchTasksUseCase,
 } from '../../application/interfaces/task/task-use-cases.interface';
 
 @Controller('tasks')
@@ -46,6 +48,8 @@ export class TaskController {
     private readonly _moveTaskUseCase: IMoveTaskUseCase,
     @Inject('IDeleteTaskUseCase')
     private readonly _deleteTaskUseCase: IDeleteTaskUseCase,
+    @Inject('ISearchTasksUseCase')
+    private readonly _searchTasksUseCase: ISearchTasksUseCase,
   ) {}
 
   @Post()
@@ -71,6 +75,11 @@ export class TaskController {
       return this._getTasksByProjectUseCase.execute(projectId, req.user!.companyId!);
     }
     return [];
+  }
+
+  @Get('search')
+  async search(@Req() req: Request, @Query() dto: SearchTasksDto) {
+    return this._searchTasksUseCase.execute(req.user!.companyId!, dto);
   }
 
   @Get('my')

@@ -48,8 +48,19 @@ export class MongoUserStoryRepository
     projectId: string,
     companyId: string,
   ): Promise<UserStoryEntity[]> {
+    const filter: any = { companyId, isDeleted: { $ne: true } };
+    
+    if (Types.ObjectId.isValid(projectId)) {
+      filter.$or = [
+        { projectId: new Types.ObjectId(projectId) },
+        { projectId: projectId }
+      ];
+    } else {
+      filter.projectId = projectId;
+    }
+
     const docs = await this.model
-      .find({ projectId, companyId, isDeleted: false })
+      .find(filter)
       .sort({ order: 1 })
       .lean()
       .exec();

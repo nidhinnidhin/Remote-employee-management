@@ -42,4 +42,18 @@ export const TaskService = {
     const response = await api.get(API_ROUTES.COMPANY.TASKS.MY_TASKS);
     return response.data;
   },
+  
+  async searchTasks(params: {
+    projectId?: string;
+    storyId?: string;
+    memberId?: string;
+    status?: string;
+    priority?: string;
+    search?: string;
+    page?: number;
+    limit?: number;
+  }, api: AxiosInstance = clientApi): Promise<{ tasks: Task[]; total: number; page: number; limit: number }> {
+    const response = await api.get(API_ROUTES.COMPANY.TASKS.SEARCH, { params });
+    return response.data;
+  },
 };

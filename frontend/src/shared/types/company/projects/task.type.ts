@@ -1,3 +1,5 @@
+import { UserStoryPriority } from './user-story.type';
+
 export enum TaskStatus {
   TODO = 'Todo',
   IN_PROGRESS = 'In Progress',
@@ -13,6 +15,7 @@ export interface Task {
   title: string;
   description: string;
   status: TaskStatus;
+  priority: UserStoryPriority;
   order: number;
   assignedTo: string;
   assignedBy: string;
@@ -33,6 +36,7 @@ export interface CreateTaskPayload {
   title: string;
   description: string;
   status: TaskStatus;
+  priority: UserStoryPriority;
   estimatedHours: number;
   assignedTo: string;
   dueDate: string;

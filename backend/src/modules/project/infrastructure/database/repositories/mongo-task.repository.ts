@@ -46,11 +46,25 @@ export class MongoTaskRepository
     storyId: string,
     companyId: string,
   ): Promise<TaskEntity[]> {
+    const filter: any = { companyId, isDeleted: { $ne: true } };
+    
+    if (Types.ObjectId.isValid(storyId)) {
+      filter.$or = [
+        { storyId: new Types.ObjectId(storyId) },
+        { storyId: storyId }
+      ];
+    } else {
+      filter.storyId = storyId;
+    }
+
+    console.log('[MongoTaskRepository] findByStoryId filter:', JSON.stringify(filter));
     const docs = await this.model
-      .find({ storyId, companyId, isDeleted: false })
+      .find(filter)
       .sort({ order: 1 })
       .lean()
       .exec();
+
+    console.log('[MongoTaskRepository] findByStoryId result count:', docs.length);
 
     return docs.map((doc) => this.toEntity(doc as unknown as LeanTaskDocument));
   }
@@ -59,18 +73,32 @@ export class MongoTaskRepository
     projectId: string,
     companyId: string,
   ): Promise<TaskEntity[]> {
-    return this.findAll({ projectId, companyId, isDeleted: false });
+    const filter: any = { companyId, isDeleted: { $ne: true } };
+    if (Types.ObjectId.isValid(projectId)) {
+      filter.$or = [
+        { projectId: new Types.ObjectId(projectId) },
+        { projectId: projectId }
+      ];
+    } else {
+      filter.projectId = projectId;
+    }
+    return this.findAll(filter);
   }
 
   async findByAssignee(
     assigneeId: string,
     companyId: string,
   ): Promise<TaskEntity[]> {
-    return this.findAll({
-      assignedTo: assigneeId,
-      companyId,
-      isDeleted: false,
-    });
+    const filter: any = { companyId, isDeleted: { $ne: true } };
+    if (Types.ObjectId.isValid(assigneeId)) {
+      filter.$or = [
+        { assignedTo: new Types.ObjectId(assigneeId) },
+        { assignedTo: assigneeId }
+      ];
+    } else {
+      filter.assignedTo = assigneeId;
+    }
+    return this.findAll(filter);
   }
 
   async updateTask(

@@ -26,8 +26,10 @@ export class SearchEmployeesUseCase implements ISearchEmployeesUseCase {
         { firstName: searchRegex },
         { lastName: searchRegex },
         { email: searchRegex },
+        { phone: searchRegex },
       ];
     }
+
 
     if (role) {
       filter.role = role;

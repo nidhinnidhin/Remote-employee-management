@@ -3,6 +3,17 @@ import { UpdateTaskDto } from '../../dto/task/update-task.dto';
 import { MoveTaskDto } from '../../dto/task/move-task.dto';
 import { TaskEntity } from '../../../domain/entities/task.entity';
 
+import { SearchTasksDto } from '../../dto/task/search-tasks.dto';
+
+export interface ISearchTasksUseCase {
+  execute(companyId: string, dto: SearchTasksDto): Promise<{
+    tasks: TaskEntity[];
+    total: number;
+    page: number;
+    limit: number;
+  }>;
+}
+
 export interface ICreateTaskUseCase {
   execute(companyId: string, adminId: string, dto: CreateTaskDto): Promise<TaskEntity>;
 }

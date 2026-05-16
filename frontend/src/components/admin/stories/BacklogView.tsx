@@ -18,10 +18,11 @@ import {
   DropResult,
 } from "@hello-pangea/dnd";
 import Button from "@/components/ui/Button";
-import { UserStory } from "@/shared/types/company/projects/user-story.type";
+import { UserStory, UserStoryPriority, UserStoryStatus } from "@/shared/types/company/projects/user-story.type";
+import Pagination from "@/components/ui/Pagination";
 import { Employee } from "@/shared/types/company/employees/employee-listing.type";
 import { Sprint } from "@/shared/types/company/projects/sprint.type";
-import { getStoriesByProjectAction } from "@/actions/company/projects/story.actions";
+import { getStoriesByProjectAction, searchStoriesAction } from "@/actions/company/projects/story.actions";
 import { getSprintsByProjectAction, updateSprintAction } from "@/actions/company/projects/sprint.actions";
 import { getEmployees } from "@/services/company/employee-management.service";
 import { toast } from "sonner";
@@ -52,6 +53,12 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId, projectMembers = [
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("");
+  const [priorityFilter, setPriorityFilter] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalStories, setTotalStories] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 10;
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isSprintModalOpen, setIsSprintModalOpen] = useState(false);
@@ -64,18 +71,28 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId, projectMembers = [
   const [sprintToDelete, setSprintToDelete] = useState<Sprint | null>(null);
   const [showDeleteOptions, setShowDeleteOptions] = useState(false);
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
+  const fetchData = useCallback(async (isSilent = false) => {
+    if (!isSilent) setLoading(true);
     try {
       const [storiesResult, sprintsResult, tasksResult, employeesData] = await Promise.all([
-        getStoriesByProjectAction(projectId),
+        searchStoriesAction({
+          projectId,
+          search: searchQuery || undefined,
+          status: (statusFilter as any) || undefined,
+          priority: (priorityFilter as any) || undefined,
+          isInBacklog: true,
+          page: currentPage,
+          limit: limit,
+        }),
         getSprintsByProjectAction(projectId),
         getTasksByProjectAction(projectId),
         getEmployees(),
       ]);
 
       if (storiesResult.success && storiesResult.data) {
-        setStories(storiesResult.data);
+        setStories(storiesResult.data.data);
+        setTotalStories(storiesResult.data.total);
+        setTotalPages(Math.ceil(storiesResult.data.total / limit));
       } else {
         toast.error(storiesResult.error || "Failed to load stories");
       }
@@ -105,11 +122,19 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId, projectMembers = [
     } finally {
       setLoading(false);
     }
-  }, [projectId]);
+  }, [projectId, searchQuery, statusFilter, priorityFilter, currentPage]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  // Debounce search
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setCurrentPage(1);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
 
   const onDragEnd = async (result: DropResult) => {
     const { destination, source, draggableId } = result;
@@ -160,12 +185,7 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId, projectMembers = [
   };
 
   const filteredStories = stories
-    .filter(
-      (story) =>
-        story.isInBacklog && (
-        story.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        story.description?.toLowerCase().includes(searchQuery.toLowerCase())),
-    )
+    .map(s => ({ ...s, id: s.id || (s as any)._id }))
     .sort((a, b) => a.order - b.order);
 
   // --- RENDER SPRINTS SECTION ---
@@ -382,8 +402,25 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId, projectMembers = [
             {filteredStories.length === 0 && (
               <div className="flex flex-col items-center justify-center py-20 bg-white/[0.01] rounded-3xl border border-white/[0.03]">
                 <p className="text-slate-500 text-[11px] font-black uppercase tracking-widest">
-                  No Matches for "{searchQuery}"
+                  No Matches for your criteria
                 </p>
+                <button 
+                  onClick={() => { setSearchQuery(""); setStatusFilter(""); setPriorityFilter(""); }}
+                  className="mt-4 text-accent text-[10px] font-black uppercase tracking-widest hover:underline"
+                >
+                  Reset Filters
+                </button>
+              </div>
+            )}
+            
+            {totalPages > 0 && (
+              <div className="mt-8 flex w-full justify-end pb-12 pr-4">
+                <Pagination 
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                  className="bg-transparent border-none shadow-none !p-0"
+                />
               </div>
             )}
             {provided.placeholder}
@@ -407,7 +444,6 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId, projectMembers = [
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Tactical Search */}
             <div className="relative group flex-1 sm:w-72">
               <Search
                 size={14}
@@ -415,12 +451,34 @@ const BacklogView: React.FC<BacklogViewProps> = ({ projectId, projectMembers = [
               />
               <input
                 type="text"
-                placeholder="Search registry..."
+                placeholder="Search backlog..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-white/[0.02] border border-white/[0.08] rounded-xl pl-11 pr-4 h-11 text-[13px] text-white placeholder:text-slate-600 outline-none focus:border-accent/40 focus:bg-accent/[0.02] transition-all"
               />
             </div>
+
+            <select 
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="bg-white/[0.02] border border-white/10 rounded-xl px-4 h-11 text-[11px] font-black uppercase tracking-widest text-slate-400 focus:outline-none focus:border-accent/40 transition-all cursor-pointer hover:bg-white/5"
+            >
+              <option value="">All Statuses</option>
+              {Object.values(UserStoryStatus).map(status => (
+                <option key={status} value={status}>{status}</option>
+              ))}
+            </select>
+
+            <select 
+              value={priorityFilter}
+              onChange={(e) => setPriorityFilter(e.target.value)}
+              className="bg-white/[0.02] border border-white/10 rounded-xl px-4 h-11 text-[11px] font-black uppercase tracking-widest text-slate-400 focus:outline-none focus:border-accent/40 transition-all cursor-pointer hover:bg-white/5"
+            >
+              <option value="">All Priorities</option>
+              {Object.values(UserStoryPriority).map(p => (
+                <option key={p} value={p}>{p}</option>
+              ))}
+            </select>
 
             <div className="h-10 w-px bg-white/[0.06] hidden sm:block" />
 

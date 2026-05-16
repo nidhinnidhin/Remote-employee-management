@@ -8,6 +8,7 @@ import {
   Play,
   MoreVertical,
   Target,
+  Search,
   Loader2,
   ChevronRight,
   Edit3,
@@ -16,11 +17,12 @@ import {
 import { cn } from "@/lib/utils";
 import Button from "@/components/ui/Button";
 import { Sprint } from "@/shared/types/company/projects/sprint.type";
-import { UserStory } from "@/shared/types/company/projects/user-story.type";
-import { Employee } from "@/shared/types/company/employees/employee-listing.type";
+import { getStoriesByProjectAction, searchStoriesAction } from "@/actions/company/projects/story.actions";
+import { UserStory, UserStoryPriority, UserStoryStatus } from "@/shared/types/company/projects/user-story.type";
+import Pagination from "@/components/ui/Pagination";
 import { getSprintsByProjectAction } from "@/actions/company/projects/sprint.actions";
-import { getStoriesByProjectAction } from "@/actions/company/projects/story.actions";
 import { getEmployees } from "@/services/company/employee-management.service";
+import { Employee } from "@/shared/types/company/employees/employee-listing.type";
 import { toast } from "sonner";
 import StoryCard from "./StoryCard";
 import SprintBurndown from "./SprintBurndown";
@@ -43,6 +45,12 @@ const SprintListView: React.FC<SprintListViewProps> = ({ projectId }) => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("");
+  const [priorityFilter, setPriorityFilter] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 10;
   const [sprintToStart, setSprintToStart] = useState<Sprint | null>(null);
   const [sprintToEdit, setSprintToEdit] = useState<Sprint | null>(null);
   const [sprintToDelete, setSprintToDelete] = useState<Sprint | null>(null);
@@ -50,12 +58,20 @@ const SprintListView: React.FC<SprintListViewProps> = ({ projectId }) => {
   const [selectedStoryForEdit, setSelectedStoryForEdit] = useState<UserStory | null>(null);
   const [selectedStoryForDelete, setSelectedStoryForDelete] = useState<UserStory | null>(null);
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
+  const fetchData = useCallback(async (isSilent = false) => {
+    if (!isSilent) setLoading(true);
     try {
       const [sprintsResult, storiesResult, tasksResult, employeesData] = await Promise.all([
         getSprintsByProjectAction(projectId),
-        getStoriesByProjectAction(projectId),
+        searchStoriesAction({
+          projectId,
+          search: searchQuery || undefined,
+          status: (statusFilter as any) || undefined,
+          priority: (priorityFilter as any) || undefined,
+          // Remove isInBacklog filter to ensure we get all stories that might be in sprints
+          page: 1, 
+          limit: 100, // Large limit for now to ensure all sprint stories are caught
+        }),
         getTasksByProjectAction(projectId),
         getEmployees(),
       ]);
@@ -67,7 +83,7 @@ const SprintListView: React.FC<SprintListViewProps> = ({ projectId }) => {
       }
 
       if (storiesResult.success && storiesResult.data) {
-        setStories(storiesResult.data);
+        setStories(storiesResult.data.data);
       } else {
         toast.error(storiesResult.error || "Failed to load stories");
       }
@@ -82,7 +98,7 @@ const SprintListView: React.FC<SprintListViewProps> = ({ projectId }) => {
     } finally {
       setLoading(false);
     }
-  }, [projectId]);
+  }, [projectId, searchQuery, statusFilter, priorityFilter]);
 
   useEffect(() => {
     fetchData();
@@ -141,7 +157,7 @@ const SprintListView: React.FC<SprintListViewProps> = ({ projectId }) => {
     <div className="flex flex-col gap-6 p-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
       
       {/* --- REFINED COMPACT HEADER --- */}
-      <div className="flex items-center justify-between border-b border-white/[0.05] pb-5">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-white/[0.05] pb-5">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-500">
             <Timer size={18} strokeWidth={2.5} />
@@ -155,6 +171,44 @@ const SprintListView: React.FC<SprintListViewProps> = ({ projectId }) => {
             </p>
           </div>
         </div>
+
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative group flex-1 sm:w-64">
+            <Search
+              size={14}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-accent transition-colors"
+            />
+            <input
+              type="text"
+              placeholder="Search Roadmap..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-white/[0.02] border border-white/[0.08] rounded-xl pl-11 pr-4 h-10 text-[12px] text-white placeholder:text-slate-600 outline-none focus:border-accent/40 focus:bg-accent/[0.02] transition-all"
+            />
+          </div>
+
+          <select 
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="bg-white/[0.02] border border-white/10 rounded-xl px-4 h-10 text-[10px] font-black uppercase tracking-widest text-slate-400 focus:outline-none focus:border-accent/40 transition-all cursor-pointer hover:bg-white/5"
+          >
+            <option value="">All Statuses</option>
+            {Object.values(UserStoryStatus).map(status => (
+              <option key={status} value={status}>{status}</option>
+            ))}
+          </select>
+
+          <select 
+            value={priorityFilter}
+            onChange={(e) => setPriorityFilter(e.target.value)}
+            className="bg-white/[0.02] border border-white/10 rounded-xl px-4 h-10 text-[10px] font-black uppercase tracking-widest text-slate-400 focus:outline-none focus:border-accent/40 transition-all cursor-pointer hover:bg-white/5"
+          >
+            <option value="">All Priorities</option>
+            {Object.values(UserStoryPriority).map(p => (
+              <option key={p} value={p}>{p}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div className="flex flex-col gap-5">
@@ -164,9 +218,12 @@ const SprintListView: React.FC<SprintListViewProps> = ({ projectId }) => {
             return statusOrder[a.status as keyof typeof statusOrder] - statusOrder[b.status as keyof typeof statusOrder];
           })
           .map((sprint) => {
-            const sprintAddedStories = stories.filter((s) => 
-              sprint.issueIds.some(id => id.toString() === s.id.toString())
-            );
+            const sprintAddedStories = stories
+              .filter((s) => {
+                const sId = s.id || (s as any)._id;
+                return sprint.issueIds.some(id => id.toString() === sId?.toString());
+              })
+              .map(s => ({ ...s, id: s.id || (s as any)._id }));
 
           return (
             <div
@@ -269,7 +326,10 @@ const SprintListView: React.FC<SprintListViewProps> = ({ projectId }) => {
                     sprint={sprint} 
                     tasks={tasks.filter(t => {
                       const tStoryId = t.storyId?.toString();
-                      return sprintAddedStories.some(s => s.id.toString() === tStoryId);
+                      return sprintAddedStories.some(s => {
+                        const sId = s.id || (s as any)._id;
+                        return sId?.toString() === tStoryId;
+                      });
                     })} 
                   />
                 </div>

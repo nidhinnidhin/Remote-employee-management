@@ -30,7 +30,10 @@ interface EmployeesTableProps {
   searchQuery?: string;
 }
 
-const EmployeesTable: React.FC<EmployeesTableProps> = ({ refreshKey, searchQuery }) => {
+const EmployeesTable: React.FC<EmployeesTableProps> = ({
+  refreshKey,
+  searchQuery,
+}) => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -316,11 +319,13 @@ const EmployeesTable: React.FC<EmployeesTableProps> = ({ refreshKey, searchQuery
             keyExtractor={(item) => item.id}
             theme="light"
           />
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-          />
+          <div className="flex justify-end pt-4">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          </div>
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center p-24 text-center border border-dashed border-slate-200 rounded-2xl bg-[#0B1026]">
@@ -328,7 +333,6 @@ const EmployeesTable: React.FC<EmployeesTableProps> = ({ refreshKey, searchQuery
         </div>
       )}
 
-      {/* Details Modal */}
       <EmployeeDetailsModal
         isOpen={isDetailsModalOpen}
         onClose={() => setIsDetailsModalOpen(false)}

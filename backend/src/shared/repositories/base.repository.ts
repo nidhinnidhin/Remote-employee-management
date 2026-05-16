@@ -23,7 +23,9 @@ export abstract class BaseRepository<TDocument extends Document, TEntity = TDocu
   // ==================== READ ====================
 
   async findAll(filter: FilterQuery<TDocument> = {}): Promise<TEntity[]> {
+    console.log(`[BaseRepository] findAll ${this.model.modelName} filter:`, JSON.stringify(filter));
     const docs = await this.model.find(filter).lean().exec() as TDocument[];
+    console.log(`[BaseRepository] findAll ${this.model.modelName} result count:`, docs.length);
     return docs.map((doc) => this.toEntity(doc));
   }
 
@@ -33,10 +35,13 @@ export abstract class BaseRepository<TDocument extends Document, TEntity = TDocu
     limit: number,
     sort: Record<string, 1 | -1 | 'asc' | 'desc'> | string = { createdAt: -1 }
   ): Promise<{ data: TEntity[]; total: number }> {
+    console.log(`[BaseRepository] Querying ${this.model.modelName} with filter:`, JSON.stringify(filter));
     const [data, total] = await Promise.all([
       this.model.find(filter).sort(sort).skip(skip).limit(limit).lean().exec() as Promise<TDocument[]>,
       this.model.countDocuments(filter).exec(),
     ]);
+
+    console.log(`[BaseRepository] ${this.model.modelName} Result:`, { count: data.length, total });
 
     return {
       data: data.map((doc) => this.toEntity(doc)),

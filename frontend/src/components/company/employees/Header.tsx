@@ -36,15 +36,16 @@ const Header: React.FC<HeaderProps> = ({ onInviteSuccess, onSearch }) => {
 
       setIsInviteOpen(false);
       toast.success("Invitation sent successfully");
-      
+
       if (onInviteSuccess) {
         onInviteSuccess();
       }
-      
+
       console.log("Invitation sent successfully");
     } catch (error: any) {
       console.error("Invite failed", error);
-      const errorMessage = error.response?.data?.message || "Failed to send invitation";
+      const errorMessage =
+        error.response?.data?.message || "Failed to send invitation";
       toast.error(errorMessage); // ❌ optional: toast error
     } finally {
       setLoading(false);

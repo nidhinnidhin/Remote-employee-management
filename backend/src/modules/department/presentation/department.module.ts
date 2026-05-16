@@ -17,6 +17,7 @@ import { UpdateDepartmentUseCase } from '../application/use-cases/update-departm
 import { DeleteDepartmentUseCase } from '../application/use-cases/delete-department.usecase';
 import { RemoveEmployeeFromDepartmentUseCase } from '../application/use-cases/remove-employee-from-department.usecase';
 import { GetEmployeeDepartmentsUseCase } from '../application/use-cases/get-employee-departments.usecase';
+import { SearchDepartmentsUseCase } from '../application/use-cases/search-departments.usecase';
 
 
 import { AuthModule } from '../../auth/presentation/auth/auth.module';
@@ -63,6 +64,10 @@ import { EmployeesModule } from '../../employees/employees.module';
     {
       provide: 'IGetEmployeeDepartmentsUseCase',
       useClass: GetEmployeeDepartmentsUseCase,
+    },
+    {
+      provide: 'ISearchDepartmentsUseCase',
+      useClass: SearchDepartmentsUseCase,
     },
   ],
 })
