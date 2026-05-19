@@ -25,6 +25,19 @@ export class ListEmployeeLogsUseCase implements IListEmployeeLogsUseCase {
       companyId: new Types.ObjectId(companyId),
     };
 
+    if (dto.status && dto.status.trim() !== '') {
+      filter.status = dto.status.trim();
+    }
+
+    if (dto.search && dto.search.trim() !== '') {
+      const searchRegex = new RegExp(dto.search.trim(), 'i');
+      filter.$or = [
+        { date: searchRegex },
+        { status: searchRegex },
+        { 'activities.remarks': searchRegex },
+      ];
+    }
+
     const startStr = dto.startDate?.trim();
     const endStr = dto.endDate?.trim();
     if (startStr || endStr) {

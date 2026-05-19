@@ -37,6 +37,8 @@ export interface GetMyLogsParams {
   limit?: number;
   startDate?: string;
   endDate?: string;
+  status?: string;
+  search?: string;
 }
 
 export interface AttendanceLogsResponse {

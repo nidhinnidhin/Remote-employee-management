@@ -24,7 +24,7 @@ export class RazorpayService {
   async createOrder(amount: number, currency: string = 'INR', receipt: string) {
     try {
       const options = {
-        amount: amount * 100, // Razorpay expects amount in paise
+        amount: amount * 100, 
         currency,
         receipt,
       };

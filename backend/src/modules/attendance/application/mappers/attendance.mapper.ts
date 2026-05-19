@@ -23,8 +23,10 @@ export class AttendanceMapper {
         : doc.userId.toString())
       : '';
 
-    const employeeName = doc.userId && typeof doc.userId === 'object' && doc.userId !== null && 'name' in doc.userId
-      ? (doc.userId as any).name
+    const employeeName = doc.userId && typeof doc.userId === 'object' && doc.userId !== null
+      ? ('name' in doc.userId
+        ? (doc.userId as any).name
+        : `${(doc.userId as any).firstName || ''} ${(doc.userId as any).lastName || ''}`.trim())
       : undefined;
 
     const employeeEmail = doc.userId && typeof doc.userId === 'object' && doc.userId !== null && 'email' in doc.userId

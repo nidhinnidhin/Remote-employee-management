@@ -9,6 +9,8 @@ export interface GetAdminLogsParams {
   startDate?: string;
   endDate?: string;
   employeeId?: string;
+  status?: string;
+  search?: string;
 }
 
 export interface AdminAttendanceLogsResponse {

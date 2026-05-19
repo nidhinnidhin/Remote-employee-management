@@ -12,10 +12,12 @@ import { ListEmployeeLogsUseCase } from './application/use-cases/list-employee-l
 import { ListAdminLogsUseCase } from './application/use-cases/list-admin-logs.usecase';
 import { GetAttendanceDetailUseCase } from './application/use-cases/get-attendance-detail.usecase';
 import { AttendanceController } from './presentation/controllers/attendance.controller';
+import { EmployeesModule } from '../employees/employees.module';
 
 @Module({
   imports: [
     AuthModule,
+    EmployeesModule,
     MongooseModule.forFeature([
       { name: AttendanceDocument.name, schema: AttendanceSchema },
     ]),

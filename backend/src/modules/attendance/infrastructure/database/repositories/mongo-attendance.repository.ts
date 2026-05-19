@@ -44,7 +44,7 @@ export class MongoAttendanceRepository
     const [docs, total] = await Promise.all([
       this._attendanceModel
         .find(filter)
-        .populate('userId', 'name email')
+        .populate('userId', 'firstName lastName email')
         .sort({ date: -1 })
         .skip(skip)
         .limit(limit)
