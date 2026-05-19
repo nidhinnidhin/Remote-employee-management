@@ -23,5 +23,8 @@ export class AttendanceEntity {
     public readonly updatedAt?: Date,
     public readonly employeeName?: string,
     public readonly employeeEmail?: string,
+    public readonly lateReason?: string,
+    public readonly approvalStatus?: 'PENDING' | 'APPROVED' | 'REJECTED' | null,
+    public readonly adminRemarks?: string,
   ) {}
 }

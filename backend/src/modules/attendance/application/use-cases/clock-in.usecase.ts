@@ -3,12 +3,24 @@ import type { IAttendanceRepository } from '../../domain/repositories/iattendanc
 import { IClockInUseCase } from '../interfaces/attendance-use-cases.interface';
 import { AttendanceEntity, AttendanceActivityEntity } from '../../domain/entities/attendance.entity';
 import { ClockInDto } from '../dto/clock-in.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { CompanyPolicy } from 'src/modules/company-admin/infrastructure/schema/company-policy.schema';
+import { UserDocument } from 'src/modules/auth/infrastructure/database/mongoose/schemas/userSchema';
+import type { IEmailService } from 'src/shared/services/email/interfaces/iemail.service';
+import { UserRole } from 'src/shared/enums/user/user-role.enum';
 
 @Injectable()
 export class ClockInUseCase implements IClockInUseCase {
   constructor(
     @Inject('IAttendanceRepository')
     private readonly _attendanceRepository: IAttendanceRepository,
+    @InjectModel(CompanyPolicy.name)
+    private readonly _companyPolicyModel: Model<CompanyPolicy>,
+    @InjectModel(UserDocument.name)
+    private readonly _userModel: Model<UserDocument>,
+    @Inject('IEmailService')
+    private readonly _emailService: IEmailService,
   ) {}
 
   async execute(userId: string, companyId: string, dto: ClockInDto): Promise<AttendanceEntity> {
@@ -21,7 +33,39 @@ export class ClockInUseCase implements IClockInUseCase {
       if (existing.status === 'COMPLETED') {
         throw new BadRequestException('You have already clocked out for today.');
       }
+      if (existing.approvalStatus === 'PENDING') {
+        throw new BadRequestException('Your late clock-in request is pending admin approval.');
+      }
+      if (existing.approvalStatus === 'REJECTED') {
+        throw new BadRequestException('Your late clock-in request was rejected by the admin.');
+      }
       throw new BadRequestException('You are already clocked in.');
+    }
+
+    // POLICY VALIDATION
+    const policyDoc = await this._companyPolicyModel.findOne({ companyId }).exec();
+    const workingHoursPolicy = policyDoc?.policies?.find(p => p.type === 'WORKING_HOURS');
+    
+    let isLate = false;
+    let policyStartTime = '';
+
+    if (workingHoursPolicy && workingHoursPolicy.content && workingHoursPolicy.content.workStartTime) {
+      policyStartTime = workingHoursPolicy.content.workStartTime;
+      
+      const istTimeStr = now.toLocaleTimeString('en-US', {
+        timeZone: 'Asia/Kolkata',
+        hour12: false,
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+      
+      if (istTimeStr > policyStartTime) {
+        isLate = true;
+      }
+    }
+
+    if (isLate && !dto.lateReason) {
+      throw new BadRequestException('LATE_CLOCK_IN_REQUIRED');
     }
 
     const activity = new AttendanceActivityEntity(
@@ -41,9 +85,56 @@ export class ClockInUseCase implements IClockInUseCase {
       null,
       [activity],
       0,
-      0
+      0,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      dto.lateReason || undefined,
+      isLate ? 'PENDING' : null,
+      undefined
     );
 
-    return this._attendanceRepository.create(newAttendance);
+    const savedEntity = await this._attendanceRepository.create(newAttendance);
+
+    if (isLate && dto.lateReason) {
+      // Find employee details
+      const employee = await this._userModel.findById(userId).exec();
+      const employeeName = employee ? `${employee.firstName} ${employee.lastName}`.trim() : 'Employee';
+      const employeeEmail = employee?.email || '';
+
+      // Find company admin details
+      const admin = await this._userModel.findOne({ companyId, role: UserRole.COMPANY_ADMIN }).exec();
+      const adminName = admin ? `${admin.firstName} ${admin.lastName}`.trim() : 'Admin';
+      const adminEmail = admin?.email || '';
+
+      if (adminEmail) {
+        try {
+          await this._emailService.sendLateClockInRequestNotification(
+            adminEmail,
+            adminName,
+            employeeName,
+            employeeEmail,
+            dto.lateReason
+          );
+        } catch (err) {
+          console.error('Failed to send admin notification email:', err);
+        }
+      }
+
+      if (employeeEmail) {
+        try {
+          await this._emailService.sendLateClockInEmployeeConfirmation(
+            employeeEmail,
+            employeeName,
+            dto.lateReason
+          );
+        } catch (err) {
+          console.error('Failed to send employee confirmation email:', err);
+        }
+      }
+    }
+
+    return savedEntity;
   }
 }

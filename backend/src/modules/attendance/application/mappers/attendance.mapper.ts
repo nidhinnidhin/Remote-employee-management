@@ -51,6 +51,9 @@ export class AttendanceMapper {
       (doc as any).updatedAt,
       employeeName,
       employeeEmail,
+      (doc as any).lateReason,
+      (doc as any).approvalStatus || null,
+      (doc as any).adminRemarks,
     );
   }
 
@@ -70,6 +73,9 @@ export class AttendanceMapper {
       })),
       totalWorkMinutes: entity.totalWorkMinutes,
       totalBreakMinutes: entity.totalBreakMinutes,
+      lateReason: entity.lateReason || undefined,
+      approvalStatus: entity.approvalStatus || undefined,
+      adminRemarks: entity.adminRemarks || undefined,
     } as Partial<AttendanceDocument>;
   }
 }

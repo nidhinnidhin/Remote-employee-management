@@ -13,13 +13,13 @@ const Pagination: React.FC<PaginationProps & { theme?: "dark" | "light" }> = ({
     theme = "dark",
 }) => {
     const styles = {
-        container: "border-[rgb(var(--color-border-subtle))] bg-[rgb(var(--color-nav-bg))]",
-        text: "text-muted",
-        activeText: "text-primary",
+        container: "border-white/10 bg-[#08090a]",
+        text: "text-slate-400",
+        activeText: "text-accent",
         button: {
-            base: "text-muted ring-[rgb(var(--color-border-subtle))] hover:bg-[rgb(var(--color-bg-subtle))] hover:text-accent",
-            active: "z-10 bg-[rgb(var(--color-accent))] text-white focus-visible:outline-[rgb(var(--color-accent))] ring-[rgb(var(--color-accent))]",
-            disabled: "disabled:opacity-40 disabled:cursor-not-allowed",
+            base: "text-slate-400 ring-white/10 hover:bg-white/[0.05] hover:text-white bg-white/[0.01]",
+            active: "z-10 bg-accent text-slate-950 font-black ring-accent focus-visible:outline-accent",
+            disabled: "disabled:opacity-20 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-slate-500",
         },
     };
 

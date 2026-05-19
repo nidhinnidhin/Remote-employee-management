@@ -43,6 +43,7 @@ export const AttendanceFilters: React.FC<AttendanceFiltersProps> = ({
               value={startDate}
               onChange={(e) => onStartDateChange(e.target.value)}
               onClick={(e) => e.currentTarget.showPicker?.()}
+              style={{ colorScheme: "dark" }}
               className="w-full h-11 pl-10 pr-4 rounded-xl border border-white/10 bg-transparent text-xs font-semibold text-white focus:border-accent/40 focus:ring-1 focus:ring-accent/40 outline-none transition-all cursor-pointer hover:border-white/20"
             />
           </div>
@@ -60,6 +61,7 @@ export const AttendanceFilters: React.FC<AttendanceFiltersProps> = ({
               value={endDate}
               onChange={(e) => onEndDateChange(e.target.value)}
               onClick={(e) => e.currentTarget.showPicker?.()}
+              style={{ colorScheme: "dark" }}
               className="w-full h-11 pl-10 pr-4 rounded-xl border border-white/10 bg-transparent text-xs font-semibold text-white focus:border-accent/40 focus:ring-1 focus:ring-accent/40 outline-none transition-all cursor-pointer hover:border-white/20"
             />
           </div>

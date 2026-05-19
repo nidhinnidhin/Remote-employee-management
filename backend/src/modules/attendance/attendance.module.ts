@@ -11,8 +11,11 @@ import { GetTodayAttendanceUseCase } from './application/use-cases/get-today-att
 import { ListEmployeeLogsUseCase } from './application/use-cases/list-employee-logs.usecase';
 import { ListAdminLogsUseCase } from './application/use-cases/list-admin-logs.usecase';
 import { GetAttendanceDetailUseCase } from './application/use-cases/get-attendance-detail.usecase';
+import { DecideLateClockInUseCase } from './application/use-cases/decide-late-clockin.usecase';
 import { AttendanceController } from './presentation/controllers/attendance.controller';
 import { EmployeesModule } from '../employees/employees.module';
+import { CompanyPolicy, CompanyPolicySchema } from '../company-admin/infrastructure/schema/company-policy.schema';
+import { UserDocument, UserSchema } from '../auth/infrastructure/database/mongoose/schemas/userSchema';
 
 @Module({
   imports: [
@@ -20,6 +23,8 @@ import { EmployeesModule } from '../employees/employees.module';
     EmployeesModule,
     MongooseModule.forFeature([
       { name: AttendanceDocument.name, schema: AttendanceSchema },
+      { name: CompanyPolicy.name, schema: CompanyPolicySchema },
+      { name: UserDocument.name, schema: UserSchema },
     ]),
   ],
   controllers: [AttendanceController],
@@ -59,6 +64,10 @@ import { EmployeesModule } from '../employees/employees.module';
     {
       provide: 'IGetAttendanceDetailUseCase',
       useClass: GetAttendanceDetailUseCase,
+    },
+    {
+      provide: 'IDecideLateClockInUseCase',
+      useClass: DecideLateClockInUseCase,
     },
   ],
   exports: [

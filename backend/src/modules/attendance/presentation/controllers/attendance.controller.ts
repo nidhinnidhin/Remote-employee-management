@@ -25,6 +25,7 @@ import type {
   IListEmployeeLogsUseCase,
   IListAdminLogsUseCase,
   IGetAttendanceDetailUseCase,
+  IDecideLateClockInUseCase,
 } from '../../application/interfaces/attendance-use-cases.interface';
 
 @Controller('attendance')
@@ -47,6 +48,8 @@ export class AttendanceController {
     private readonly _listAdminLogsUseCase: IListAdminLogsUseCase,
     @Inject('IGetAttendanceDetailUseCase')
     private readonly _getAttendanceDetailUseCase: IGetAttendanceDetailUseCase,
+    @Inject('IDecideLateClockInUseCase')
+    private readonly _decideLateClockInUseCase: IDecideLateClockInUseCase,
   ) {}
 
   @Post('clock-in')
@@ -111,5 +114,15 @@ export class AttendanceController {
   async getLogDetail(@Req() req: Request, @Param('id') id: string) {
     const companyId = req.user!.companyId!;
     return this._getAttendanceDetailUseCase.execute(id, companyId);
+  }
+
+  @Post('admin/decide-request')
+  @UseGuards(CompanyAdminGuard)
+  async decideLateClockIn(
+    @Req() req: Request,
+    @Body() dto: { attendanceId: string; decision: 'APPROVED' | 'REJECTED'; adminRemarks?: string }
+  ) {
+    const companyId = req.user!.companyId!;
+    return this._decideLateClockInUseCase.execute(companyId, dto);
   }
 }

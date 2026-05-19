@@ -20,4 +20,7 @@ export interface AttendanceLog {
   updatedAt?: string;
   employeeName?: string; // Enhanced property for admin list
   employeeEmail?: string;
+  lateReason?: string;
+  approvalStatus?: 'PENDING' | 'APPROVED' | 'REJECTED' | null;
+  adminRemarks?: string;
 }

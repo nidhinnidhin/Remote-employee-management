@@ -5,4 +5,8 @@ export class ClockInDto {
   @IsOptional()
   @MaxLength(200)
   remarks?: string;
+
+  @IsString()
+  @IsOptional()
+  lateReason?: string;
 }

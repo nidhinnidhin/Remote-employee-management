@@ -3,9 +3,24 @@ import { API_ROUTES } from "@/constants/api.routes";
 import { AttendanceLog } from "@/shared/types/attendance/attendance.types";
 import { AxiosInstance } from "axios";
 
-export const clockIn = async (remarks?: string, api: AxiosInstance = clientApi): Promise<AttendanceLog> => {
-  const response = await api.post(API_ROUTES.ATTENDANCE.CLOCK_IN, { remarks });
-  return response.data;
+export interface ClockInResult {
+  success: boolean;
+  data?: AttendanceLog;
+  error?: string;
+}
+
+export const clockIn = async (
+  remarks?: string,
+  lateReason?: string,
+  api: AxiosInstance = clientApi
+): Promise<ClockInResult> => {
+  try {
+    const response = await api.post(API_ROUTES.ATTENDANCE.CLOCK_IN, { remarks, lateReason });
+    return { success: true, data: response.data };
+  } catch (err: any) {
+    const errMsg = err.response?.data?.message || err.message || "Failed to Clock In.";
+    return { success: false, error: errMsg };
+  }
 };
 
 export const clockOut = async (api: AxiosInstance = clientApi): Promise<AttendanceLog> => {

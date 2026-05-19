@@ -16,6 +16,13 @@ export class BreakEndUseCase implements IBreakEndUseCase {
       throw new BadRequestException('No active break found. You must start a break first.');
     }
 
+    if (activeShift.approvalStatus === 'PENDING') {
+      throw new BadRequestException('Awaiting administrator approval to start work.');
+    }
+    if (activeShift.approvalStatus === 'REJECTED') {
+      throw new BadRequestException('Your clock-in request has been rejected by the administrator.');
+    }
+
     const now = new Date();
     const activities = [...activeShift.activities];
 

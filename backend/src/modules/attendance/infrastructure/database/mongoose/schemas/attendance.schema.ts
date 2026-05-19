@@ -21,6 +21,15 @@ export class AttendanceDocument extends Document {
   @Prop()
   clockOut?: Date;
 
+  @Prop()
+  lateReason?: string;
+
+  @Prop({ type: String, enum: ['PENDING', 'APPROVED', 'REJECTED', null], default: null })
+  approvalStatus?: 'PENDING' | 'APPROVED' | 'REJECTED' | null;
+
+  @Prop()
+  adminRemarks?: string;
+
   @Prop({
     type: [
       {

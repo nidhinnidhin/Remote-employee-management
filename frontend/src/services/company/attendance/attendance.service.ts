@@ -25,3 +25,22 @@ export const getAdminLogs = async (
   const response = await api.get(API_ROUTES.ATTENDANCE.ADMIN_LOGS, { params });
   return response.data;
 };
+
+export interface DecideLateRequestDto {
+  attendanceId: string;
+  status: "APPROVED" | "REJECTED";
+  decision?: "APPROVED" | "REJECTED";
+  adminRemarks?: string;
+}
+
+export const decideLateRequest = async (
+  data: DecideLateRequestDto,
+  api: AxiosInstance = clientApi
+): Promise<AttendanceLog> => {
+  const payload = {
+    ...data,
+    decision: data.status,
+  };
+  const response = await api.post(API_ROUTES.ATTENDANCE.DECIDE_REQUEST, payload);
+  return response.data;
+};

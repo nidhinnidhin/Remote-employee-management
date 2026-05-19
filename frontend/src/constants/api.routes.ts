@@ -100,5 +100,6 @@ export const API_ROUTES = {
         MY_LOGS: "/attendance/my-logs",
         ADMIN_LOGS: "/attendance/admin/logs",
         DETAIL: (id: string) => `/attendance/logs/${id}`,
+        DECIDE_REQUEST: "/attendance/admin/decide-request",
     },
 } as const;

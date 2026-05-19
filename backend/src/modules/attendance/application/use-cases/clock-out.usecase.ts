@@ -16,6 +16,13 @@ export class ClockOutUseCase implements IClockOutUseCase {
       throw new BadRequestException('No active shift found. Please clock in first.');
     }
 
+    if (activeShift.approvalStatus === 'PENDING') {
+      throw new BadRequestException('Awaiting administrator approval to start work.');
+    }
+    if (activeShift.approvalStatus === 'REJECTED') {
+      throw new BadRequestException('Your clock-in request has been rejected by the administrator.');
+    }
+
     const now = new Date();
     const activities = [...activeShift.activities];
     let totalBreakMinutes = activeShift.totalBreakMinutes;

@@ -109,8 +109,35 @@ export const AttendanceTable: React.FC<AttendanceTableProps> = ({
             {logs.map((log) => (
               <tr key={log.id} className="hover:bg-white/[0.01] transition-colors">
                 <td className="p-4 text-xs font-bold text-white">{log.date}</td>
-                <td className="p-4 text-xs font-semibold tabular-nums text-emerald-400">
-                  {formatDateTime(log.clockIn)}
+                 <td className="p-4 text-xs font-semibold tabular-nums text-emerald-400">
+                  <div>{formatDateTime(log.clockIn)}</div>
+                  {log.approvalStatus && (
+                    <div className="mt-1 flex flex-col gap-0.5 text-[10px]">
+                      {log.approvalStatus === "PENDING" && (
+                        <span className="text-amber-400 font-black uppercase tracking-wider text-[8px] bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20 w-fit">
+                          Pending Late Request
+                        </span>
+                      )}
+                      {log.approvalStatus === "APPROVED" && (
+                        <span className="text-emerald-400 font-black uppercase tracking-wider text-[8px] bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 w-fit">
+                          Late Approved
+                        </span>
+                      )}
+                      {log.approvalStatus === "REJECTED" && (
+                        <span className="text-rose-400 font-black uppercase tracking-wider text-[8px] bg-rose-500/10 px-1.5 py-0.5 rounded border border-rose-500/20 w-fit">
+                          Late Rejected
+                        </span>
+                      )}
+                      <span className="text-slate-500 italic font-medium max-w-[180px] truncate block" title={log.lateReason}>
+                        "{log.lateReason}"
+                      </span>
+                      {log.adminRemarks && (
+                        <span className="text-slate-400 font-semibold max-w-[180px] truncate block" title={log.adminRemarks}>
+                          Remarks: {log.adminRemarks}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </td>
                 <td className="p-4 text-xs font-semibold tabular-nums text-rose-400">
                   {log.clockOut ? formatDateTime(log.clockOut) : "Active"}
@@ -174,6 +201,33 @@ export const AttendanceTable: React.FC<AttendanceTableProps> = ({
                 </p>
               </div>
             </div>
+
+            {log.approvalStatus && (
+              <div className="pt-3 border-t border-white/[0.04] space-y-1 text-[10px]">
+                <div className="flex items-center justify-between">
+                  <span className="text-[9px] font-black uppercase tracking-wider text-slate-500">Late Request</span>
+                  {log.approvalStatus === "PENDING" && (
+                    <span className="text-amber-400 font-bold bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20 text-[8px] uppercase tracking-wider">
+                      Pending
+                    </span>
+                  )}
+                  {log.approvalStatus === "APPROVED" && (
+                    <span className="text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 text-[8px] uppercase tracking-wider">
+                      Approved
+                    </span>
+                  )}
+                  {log.approvalStatus === "REJECTED" && (
+                    <span className="text-rose-400 font-bold bg-rose-500/10 px-1.5 py-0.5 rounded border border-rose-500/20 text-[8px] uppercase tracking-wider">
+                      Rejected
+                    </span>
+                  )}
+                </div>
+                <p className="text-slate-300 italic font-medium">"{log.lateReason}"</p>
+                {log.adminRemarks && (
+                  <p className="text-slate-400 font-semibold"><span className="text-[9px] font-black uppercase text-slate-500">Remarks:</span> {log.adminRemarks}</p>
+                )}
+              </div>
+            )}
 
             <button
               onClick={() => onSelectLog(log)}

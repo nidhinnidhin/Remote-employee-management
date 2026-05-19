@@ -165,6 +165,115 @@ export class EmailService implements IEmailService {
     });
   }
 
+  async sendLateClockInRequestNotification(
+    adminEmail: string,
+    adminName: string,
+    employeeName: string,
+    employeeEmail: string,
+    reason: string,
+  ): Promise<void> {
+    const html = this.getHtmlWrapper(`
+      <div>
+        <h2 style="color:#2563eb;margin-bottom:16px;font-size:24px;">Late Clock-In Permission Request</h2>
+        <p style="color:#1e293b;font-size:16px;line-height:24px;margin-bottom:16px;">
+          Hi ${adminName || 'Admin'},
+        </p>
+        <p style="color:#64748b;font-size:16px;line-height:24px;margin-bottom:24px;">
+          An employee, <strong>${employeeName}</strong> (${employeeEmail}), is late for their shift and has requested permission to start work.
+        </p>
+        <div style="background:#f8fafc;border-left:4px solid #2563eb;padding:20px;margin-bottom:24px;border-radius:4px;">
+          <strong style="color:#1e293b;display:block;margin-bottom:4px;">Reason provided:</strong>
+          <p style="color:#475569;margin:0;font-style:italic;">"${reason}"</p>
+        </div>
+        <p style="color:#64748b;font-size:16px;line-height:24px;margin-bottom:32px;">
+          Please log into the Company Admin Attendance Portal to approve or reject this request.
+        </p>
+        <div style="text-align:center;">
+          <a href="${process.env.FRONTEND_URL || '#'}/company-admin/attendance" 
+             style="display:inline-block;background:#2563eb;color:#ffffff;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;">
+            Go to Attendance Portal
+          </a>
+        </div>
+      </div>
+    `);
+
+    await this.sendMail({
+      to: adminEmail,
+      subject: `Late Clock-In Request: ${employeeName}`,
+      html,
+    });
+  }
+
+  async sendLateClockInEmployeeConfirmation(
+    employeeEmail: string,
+    employeeName: string,
+    reason: string,
+  ): Promise<void> {
+    const html = this.getHtmlWrapper(`
+      <div>
+        <h2 style="color:#2563eb;margin-bottom:16px;font-size:24px;">Late Clock-In Request Submitted</h2>
+        <p style="color:#1e293b;font-size:16px;line-height:24px;margin-bottom:16px;">
+          Hi ${employeeName},
+        </p>
+        <p style="color:#64748b;font-size:16px;line-height:24px;margin-bottom:24px;">
+          Your request for late clock-in has been submitted successfully to the administrator. You will be notified once the admin makes a decision.
+        </p>
+        <div style="background:#f8fafc;border-left:4px solid #94a3b8;padding:20px;margin-bottom:24px;border-radius:4px;">
+          <strong style="color:#1e293b;display:block;margin-bottom:4px;">Reason submitted:</strong>
+          <p style="color:#475569;margin:0;font-style:italic;">"${reason}"</p>
+        </div>
+        <p style="color:#64748b;font-size:16px;line-height:24px;">
+          Please wait for administrative approval to continue your shift.
+        </p>
+      </div>
+    `);
+
+    await this.sendMail({
+      to: employeeEmail,
+      subject: 'Late Clock-In Request Submitted',
+      html,
+    });
+  }
+
+  async sendLateClockInDecisionNotification(
+    employeeEmail: string,
+    employeeName: string,
+    decision: 'APPROVED' | 'REJECTED',
+    adminRemarks: string,
+  ): Promise<void> {
+    const isApproved = decision === 'APPROVED';
+    const html = this.getHtmlWrapper(`
+      <div>
+        <h2 style="color:${isApproved ? '#16a34a' : '#dc2626'};margin-bottom:16px;font-size:24px;">
+          Late Clock-In Request: ${isApproved ? 'Approved' : 'Rejected'}
+        </h2>
+        <p style="color:#1e293b;font-size:16px;line-height:24px;margin-bottom:16px;">
+          Hi ${employeeName},
+        </p>
+        <p style="color:#64748b;font-size:16px;line-height:24px;margin-bottom:24px;">
+          The administrator has <strong>${decision.toLowerCase()}</strong> your request to clock in late today.
+        </p>
+        <div style="background:${isApproved ? '#f0fdf4' : '#fef2f2'};border-left:4px solid ${isApproved ? '#16a34a' : '#dc2626'};padding:20px;margin-bottom:24px;border-radius:4px;">
+          <strong style="color:${isApproved ? '#166534' : '#991b1b'};display:block;margin-bottom:4px;">Admin Remarks:</strong>
+          <p style="color:${isApproved ? '#15803d' : '#b91c1c'};margin:0;">"${adminRemarks || (isApproved ? 'None' : 'No comments provided')}"</p>
+        </div>
+        <p style="color:#64748b;font-size:16px;line-height:24px;">
+          ${
+            isApproved
+              ? 'You can now refresh the portal and continue your work shift.'
+              : 'You are not permitted to start your shift. Please contact HR or your admin for details.'
+          }
+        </p>
+      </div>
+    `);
+
+    await this.sendMail({
+      to: employeeEmail,
+      subject: `Late Clock-In Request ${isApproved ? 'Approved' : 'Rejected'}`,
+      html,
+    });
+  }
+
   private getHtmlWrapper(content: string): string {
     return `
       <!DOCTYPE html>

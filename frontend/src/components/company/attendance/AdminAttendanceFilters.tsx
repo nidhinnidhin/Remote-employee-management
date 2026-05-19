@@ -133,6 +133,7 @@ export const AdminAttendanceFilters: React.FC<AdminAttendanceFiltersProps> = ({
               value={startDate}
               onChange={(e) => onStartDateChange(e.target.value)}
               onClick={(e) => e.currentTarget.showPicker?.()}
+              style={{ colorScheme: "dark" }}
               className="w-full h-11 pl-10 pr-4 rounded-xl border border-white/10 bg-transparent text-xs font-medium text-slate-200 focus:border-accent/40 focus:ring-1 focus:ring-accent/40 outline-none transition-all cursor-pointer hover:border-white/20 dynamic-date-input"
             />
           </div>
@@ -153,6 +154,7 @@ export const AdminAttendanceFilters: React.FC<AdminAttendanceFiltersProps> = ({
               value={endDate}
               onChange={(e) => onEndDateChange(e.target.value)}
               onClick={(e) => e.currentTarget.showPicker?.()}
+              style={{ colorScheme: "dark" }}
               className="w-full h-11 pl-10 pr-4 rounded-xl border border-white/10 bg-transparent text-xs font-medium text-slate-200 focus:border-accent/40 focus:ring-1 focus:ring-accent/40 outline-none transition-all cursor-pointer hover:border-white/20 dynamic-date-input"
             />
           </div>

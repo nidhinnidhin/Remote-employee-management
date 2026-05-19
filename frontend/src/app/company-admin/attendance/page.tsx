@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import AdminLayoutWrapper from "@/components/company/layout/AdminLayoutWrapper";
-import { getAdminLogs } from "@/services/company/attendance/attendance.service";
+import { getAdminLogs, decideLateRequest } from "@/services/company/attendance/attendance.service";
 import { getEmployees } from "@/services/company/employee-management.service";
 import { AttendanceLog } from "@/shared/types/attendance/attendance.types";
 import { Employee } from "@/shared/types/company/employees/employee-listing.type";
@@ -89,6 +89,26 @@ export default function AdminAttendancePage() {
     setPage(1);
   };
 
+  const handleDecideRequest = async (
+    attendanceId: string,
+    decisionStatus: "APPROVED" | "REJECTED",
+    remarks: string
+  ) => {
+    try {
+      await decideLateRequest({
+        attendanceId,
+        status: decisionStatus,
+        adminRemarks: remarks || undefined,
+      });
+      toast.success(`Successfully ${decisionStatus.toLowerCase()} late clock-in request.`);
+      fetchLogs();
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e?.response?.data?.message || "Failed to submit decision.");
+      throw e;
+    }
+  };
+
   const totalPages = Math.ceil(total / limit);
 
   return (
@@ -155,6 +175,7 @@ export default function AdminAttendancePage() {
           totalPages={totalPages}
           onPageChange={setPage}
           onSelectLog={setSelectedLog}
+          onDecideRequest={handleDecideRequest}
         />
       </div>
 

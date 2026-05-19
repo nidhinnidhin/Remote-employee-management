@@ -34,3 +34,10 @@ export interface IListAdminLogsUseCase {
 export interface IGetAttendanceDetailUseCase {
   execute(id: string, companyId: string): Promise<AttendanceEntity>;
 }
+
+export interface IDecideLateClockInUseCase {
+  execute(
+    companyId: string,
+    dto: { attendanceId: string; decision: 'APPROVED' | 'REJECTED'; adminRemarks?: string }
+  ): Promise<AttendanceEntity>;
+}
