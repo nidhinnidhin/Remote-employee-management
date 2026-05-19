@@ -115,12 +115,6 @@ export const AttendanceFilters: React.FC<AttendanceFiltersProps> = ({
             Clear Filters
           </button>
         )}
-        <button
-          onClick={onRefresh}
-          className="flex-1 xl:flex-initial h-11 px-6 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 active:scale-95 hover:opacity-95"
-        >
-          Refresh
-        </button>
       </div>
     </div>
   );

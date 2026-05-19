@@ -85,11 +85,6 @@ export const AdminProfileDetails: React.FC = () => {
             placeholder="john.doe@company.com"
             icon={<Mail size={18} />}
           />
-          <div className="flex flex-col justify-end">
-             <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest px-1">
-               Note: Email cannot be changed.
-             </p>
-          </div>
         </div>
 
         <div className="pt-6 border-t border-white/5 flex justify-end">

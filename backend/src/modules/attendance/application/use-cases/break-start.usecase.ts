@@ -20,11 +20,11 @@ function getAllowedBreakMinutes(policyDoc: any, targetType: 'TEA' | 'LUNCH' | 'E
     if (targetType === 'LUNCH') return 45;
     return 15;
   }
-  
+
   const content = workingHoursPolicy.content;
   let startStr = '';
   let endStr = '';
-  
+
   if (targetType === 'TEA') {
     startStr = content.morningBreakStart || '';
     endStr = content.morningBreakEnd || '';
@@ -35,13 +35,13 @@ function getAllowedBreakMinutes(policyDoc: any, targetType: 'TEA' | 'LUNCH' | 'E
     startStr = content.eveningBreakStart || '';
     endStr = content.eveningBreakEnd || '';
   }
-  
+
   if (!startStr || !endStr) {
     if (targetType === 'TEA') return 15;
     if (targetType === 'LUNCH') return 45;
     return 15;
   }
-  
+
   const diff = parseTimeToMinutes(endStr) - parseTimeToMinutes(startStr);
   return diff > 0 ? diff : (targetType === 'LUNCH' ? 45 : 15);
 }
@@ -53,7 +53,7 @@ function getElapsedBreakMinutesForType(activities: any[], targetType: 'TEA' | 'L
     if (act.type === 'BREAK_START' && act.breakType === targetType) {
       const start = new Date(act.timestamp).getTime();
       let end = start;
-      
+
       for (let j = i + 1; j < activities.length; j++) {
         const nextAct = activities[j];
         if (nextAct.type === 'BREAK_END' && nextAct.breakType === targetType) {
@@ -61,7 +61,7 @@ function getElapsedBreakMinutesForType(activities: any[], targetType: 'TEA' | 'L
           break;
         }
       }
-      
+
       if (end === start) {
         end = Date.now();
       }
@@ -78,7 +78,7 @@ export class BreakStartUseCase implements IBreakStartUseCase {
     private readonly _attendanceRepository: IAttendanceRepository,
     @InjectModel(CompanyPolicy.name)
     private readonly _companyPolicyModel: Model<CompanyPolicy>,
-  ) {}
+  ) { }
 
   async execute(userId: string, companyId: string, dto: BreakStartDto): Promise<AttendanceEntity> {
     const activeShift = await this._attendanceRepository.findActiveShift(userId);

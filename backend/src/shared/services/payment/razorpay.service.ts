@@ -1,9 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Razorpay from 'razorpay';
+import { IPaymentService } from './interfaces/ipayment.service';
 
 @Injectable()
-export class RazorpayService {
+export class RazorpayService implements IPaymentService {
   private razorpay: Razorpay;
   private readonly logger = new Logger(RazorpayService.name);
 

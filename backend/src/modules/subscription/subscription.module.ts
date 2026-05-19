@@ -17,6 +17,7 @@ import { GetAllSubscriptionPlansUseCase } from './application/use-cases/get-all-
 import { UpdateSubscriptionPlanUseCase } from './application/use-cases/update-subscription-plan.use-case';
 import { DeleteSubscriptionPlanUseCase } from './application/use-cases/delete-subscription-plan.use-case';
 import { RazorpayService } from 'src/shared/services/payment/razorpay.service';
+import { IPAYMENT_SERVICE } from 'src/shared/services/payment/interfaces/ipayment.service';
 import { AuthModule } from '../auth/presentation/auth/auth.module';
 import { SubscriptionService } from './application/services/subscription.service';
 
@@ -54,7 +55,10 @@ import { SubscriptionService } from './application/services/subscription.service
       provide: 'IDeleteSubscriptionPlanUseCase',
       useClass: DeleteSubscriptionPlanUseCase,
     },
-    RazorpayService,
+    {
+      provide: IPAYMENT_SERVICE,
+      useClass: RazorpayService,
+    },
     SubscriptionService,
   ],
   exports: [
@@ -64,7 +68,7 @@ import { SubscriptionService } from './application/services/subscription.service
     'IGetAllSubscriptionPlansUseCase',
     'IUpdateSubscriptionPlanUseCase',
     'IDeleteSubscriptionPlanUseCase',
-    RazorpayService,
+    IPAYMENT_SERVICE,
     SubscriptionService,
   ],
 })

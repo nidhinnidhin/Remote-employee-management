@@ -21,7 +21,7 @@ export class ClockInUseCase implements IClockInUseCase {
     private readonly _userModel: Model<UserDocument>,
     @Inject('IEmailService')
     private readonly _emailService: IEmailService,
-  ) {}
+  ) { }
 
   async execute(userId: string, companyId: string, dto: ClockInDto): Promise<AttendanceEntity> {
     const now = new Date();
@@ -45,20 +45,20 @@ export class ClockInUseCase implements IClockInUseCase {
     // POLICY VALIDATION
     const policyDoc = await this._companyPolicyModel.findOne({ companyId }).exec();
     const workingHoursPolicy = policyDoc?.policies?.find(p => p.type === 'WORKING_HOURS');
-    
+
     let isLate = false;
     let policyStartTime = '';
 
     if (workingHoursPolicy && workingHoursPolicy.content && workingHoursPolicy.content.workStartTime) {
       policyStartTime = workingHoursPolicy.content.workStartTime;
-      
+
       const istTimeStr = now.toLocaleTimeString('en-US', {
         timeZone: 'Asia/Kolkata',
         hour12: false,
         hour: '2-digit',
         minute: '2-digit',
       });
-      
+
       if (istTimeStr > policyStartTime) {
         isLate = true;
       }

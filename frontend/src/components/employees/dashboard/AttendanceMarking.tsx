@@ -74,6 +74,12 @@ export function AttendanceMarking() {
     BREAK_EVENING: 15,
   });
 
+  const [breakTimes, setBreakTimes] = useState({
+    BREAK_TEA: { start: "", end: "" },
+    BREAK_LUNCH: { start: "", end: "" },
+    BREAK_EVENING: { start: "", end: "" },
+  });
+
   // Late Clock-in Request states
   const [showLateModal, setShowLateModal] = useState(false);
   const [lateReasonInput, setLateReasonInput] = useState("");
@@ -101,9 +107,37 @@ export function AttendanceMarking() {
             eveningBreakEnd,
           } = workingHoursPolicy.content;
 
+          const format12Hour = (timeStr?: string) => {
+            if (!timeStr) return "";
+            if (timeStr.includes("AM") || timeStr.includes("PM")) return timeStr;
+            const [hStr, mStr] = timeStr.split(":");
+            let h = parseInt(hStr, 10);
+            if (isNaN(h)) return timeStr;
+            const period = h >= 12 ? "PM" : "AM";
+            if (h > 12) h -= 12;
+            if (h === 0) h = 12;
+            return `${h.toString().padStart(2, "0")}:${mStr} ${period}`;
+          };
+
+          setBreakTimes({
+            BREAK_TEA: { start: format12Hour(morningBreakStart), end: format12Hour(morningBreakEnd) },
+            BREAK_LUNCH: { start: format12Hour(lunchBreakStart), end: format12Hour(lunchBreakEnd) },
+            BREAK_EVENING: { start: format12Hour(eveningBreakStart), end: format12Hour(eveningBreakEnd) },
+          });
+
           const parseToMins = (timeStr?: string) => {
             if (!timeStr) return 0;
-            const [h, m] = timeStr.split(":").map(Number);
+            // Handle both "10:00 AM" and "10:00"
+            let timeStr24 = timeStr;
+            if (timeStr.includes('AM') || timeStr.includes('PM')) {
+              const [timePart, period] = timeStr.split(' ');
+              let [hStr, mStr] = timePart.split(':');
+              let h = parseInt(hStr, 10);
+              if (period === 'PM' && h < 12) h += 12;
+              if (period === 'AM' && h === 12) h = 0;
+              timeStr24 = `${h.toString().padStart(2, '0')}:${mStr}`;
+            }
+            const [h, m] = timeStr24.split(":").map(Number);
             return h * 60 + m;
           };
 
@@ -237,6 +271,43 @@ export function AttendanceMarking() {
     syncWithBackend();
   }, []);
 
+  // Compute cumulative elapsed break minutes per break type from chronological pairs in the timeline logs
+  const getElapsedBreakMinutes = (breakType: "BREAK_TEA" | "BREAK_LUNCH" | "BREAK_EVENING", skipActive: boolean = false) => {
+    const typeLabel = BREAK_LIMITS[breakType]?.type;
+    let totalMs = 0;
+
+    for (let i = 0; i < timeline.length; i++) {
+      const event = timeline[i];
+      if (event.type === "break_start" && event.label.includes(typeLabel)) {
+        const start = event.timestamp;
+        let end = start;
+        let isEnded = false;
+
+        // Look forward chronologically for the matching completion break_end event
+        for (let j = i + 1; j < timeline.length; j++) {
+          const nextEvent = timeline[j];
+          if (nextEvent.type === "break_end" && nextEvent.label.includes(typeLabel)) {
+            end = nextEvent.timestamp;
+            isEnded = true;
+            break;
+          }
+        }
+
+        // If it's the active unended break
+        if (!isEnded) {
+          if (skipActive) {
+            continue; // Ignore the current active session
+          }
+          if (status === breakType) {
+            end = Date.now();
+          }
+        }
+        totalMs += Math.max(0, end - start);
+      }
+    }
+    return Math.floor(totalMs / 60000);
+  };
+
   // Timers thread
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -254,8 +325,13 @@ export function AttendanceMarking() {
     ) {
       timer = setInterval(() => {
         const now = Date.now();
-        const breakElapsed = Math.max(0, Math.floor((now - currentBreakStart) / 1000));
-        setLiveBreakSeconds(breakElapsed);
+        const breakElapsedCurrentSession = Math.max(0, Math.floor((now - currentBreakStart) / 1000));
+        
+        // Add previously accumulated time for THIS specific break type
+        const previousElapsedMins = getElapsedBreakMinutes(status, true);
+        const totalBreakElapsed = breakElapsedCurrentSession + (previousElapsedMins * 60);
+
+        setLiveBreakSeconds(totalBreakElapsed);
 
         if (clockInTime) {
           const totalElapsed = Math.max(0, Math.floor((currentBreakStart - clockInTime) / 1000));
@@ -275,7 +351,7 @@ export function AttendanceMarking() {
     return () => {
       if (timer) clearInterval(timer);
     };
-  }, [status, clockInTime, clockOutTime, currentBreakStart, accumulatedBreakTime]);
+  }, [status, clockInTime, clockOutTime, currentBreakStart, accumulatedBreakTime, timeline]);
 
   // Formatter helpers
   const formatDateLong = (date: Date | null) => {
@@ -298,8 +374,10 @@ export function AttendanceMarking() {
   };
 
   const getBreakLimitText = (breakType: AttendanceState) => {
-    const limitObj = BREAK_LIMITS[breakType];
-    return limitObj ? `${limitObj.limitMinutes} min limit` : "";
+    if (breakType === "BREAK_TEA") return `${breakLimits.BREAK_TEA} min limit`;
+    if (breakType === "BREAK_LUNCH") return `${breakLimits.BREAK_LUNCH} min limit`;
+    if (breakType === "BREAK_EVENING") return `${breakLimits.BREAK_EVENING} min limit`;
+    return "";
   };
 
   // Action: Clock In
@@ -452,38 +530,6 @@ export function AttendanceMarking() {
     }
   };
 
-  // Compute cumulative elapsed break minutes per break type from chronological pairs in the timeline logs
-  const getElapsedBreakMinutes = (breakType: "BREAK_TEA" | "BREAK_LUNCH" | "BREAK_EVENING") => {
-    const typeLabel = BREAK_LIMITS[breakType]?.type;
-    let totalMs = 0;
-
-    for (let i = 0; i < timeline.length; i++) {
-      const event = timeline[i];
-      if (event.type === "break_start" && event.label.includes(typeLabel)) {
-        const start = event.timestamp;
-        let end = start;
-
-        // Look forward chronologically for the matching completion break_end event
-        for (let j = i + 1; j < timeline.length; j++) {
-          const nextEvent = timeline[j];
-          if (nextEvent.type === "break_end" && nextEvent.label.includes(typeLabel)) {
-            end = nextEvent.timestamp;
-            break;
-          }
-        }
-
-        // If it's the active unended break, use current time
-        if (end === start) {
-          if (status === breakType) {
-            end = Date.now();
-          }
-        }
-        totalMs += Math.max(0, end - start);
-      }
-    }
-    return Math.floor(totalMs / 60000);
-  };
-
   // Compute remaining allowed break minutes
   const getRemainingMinutes = (breakType: "BREAK_TEA" | "BREAK_LUNCH" | "BREAK_EVENING") => {
     const allowed = breakLimits[breakType] || 15;
@@ -608,24 +654,26 @@ export function AttendanceMarking() {
                       {formatDateLong(liveTime)}
                     </p>
                     <div className="text-4xl sm:text-5xl font-black text-white tracking-tighter tabular-nums flex items-baseline justify-center md:justify-start gap-1 mt-1 drop-shadow-sm select-none">
-                      {liveTime ? (
-                        <>
-                          <span>
-                            {liveTime.toLocaleTimeString("en-US", {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                              hour12: false,
-                            })}
-                          </span>
-                          <span className="text-xl font-bold text-accent animate-pulse">:</span>
-                          <span className="text-xl sm:text-2xl font-bold text-slate-400">
-                            {liveTime.toLocaleTimeString("en-US", { second: "2-digit" })}
-                          </span>
-                          <span className="text-xs font-black uppercase tracking-widest text-slate-500 ml-2">
-                            {liveTime.toLocaleTimeString("en-US", { hour12: true }).slice(-2)}
-                          </span>
-                        </>
-                      ) : (
+                      {liveTime ? (() => {
+                        const timeStr = liveTime.toLocaleTimeString("en-US", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hour12: true,
+                        });
+                        const [timePart, period] = timeStr.split(' ');
+                        return (
+                          <>
+                            <span>{timePart}</span>
+                            <span className="text-xl font-bold text-accent animate-pulse">:</span>
+                            <span className="text-xl sm:text-2xl font-bold text-slate-400">
+                              {liveTime.toLocaleTimeString("en-US", { second: "2-digit" })}
+                            </span>
+                            <span className="text-xs font-black uppercase tracking-widest text-slate-500 ml-2">
+                              {period}
+                            </span>
+                          </>
+                        );
+                      })() : (
                         "--:--:--"
                       )}
                     </div>
@@ -825,6 +873,11 @@ export function AttendanceMarking() {
                         )}>
                           {getRemainingMinutes("BREAK_TEA")}m remaining of {breakLimits.BREAK_TEA}m
                         </p>
+                        {breakTimes.BREAK_TEA.start && breakTimes.BREAK_TEA.end && (
+                           <p className="text-[9px] text-slate-500 font-medium mt-0.5">
+                             Scheduled: {breakTimes.BREAK_TEA.start} to {breakTimes.BREAK_TEA.end}
+                           </p>
+                        )}
                       </div>
                     </div>
                     {getRemainingMinutes("BREAK_TEA") <= 0 ? (
@@ -876,6 +929,11 @@ export function AttendanceMarking() {
                         )}>
                           {getRemainingMinutes("BREAK_LUNCH")}m remaining of {breakLimits.BREAK_LUNCH}m
                         </p>
+                        {breakTimes.BREAK_LUNCH.start && breakTimes.BREAK_LUNCH.end && (
+                           <p className="text-[9px] text-slate-500 font-medium mt-0.5">
+                             Scheduled: {breakTimes.BREAK_LUNCH.start} to {breakTimes.BREAK_LUNCH.end}
+                           </p>
+                        )}
                       </div>
                     </div>
                     {getRemainingMinutes("BREAK_LUNCH") <= 0 ? (
@@ -927,6 +985,11 @@ export function AttendanceMarking() {
                         )}>
                           {getRemainingMinutes("BREAK_EVENING")}m remaining of {breakLimits.BREAK_EVENING}m
                         </p>
+                        {breakTimes.BREAK_EVENING.start && breakTimes.BREAK_EVENING.end && (
+                           <p className="text-[9px] text-slate-500 font-medium mt-0.5">
+                             Scheduled: {breakTimes.BREAK_EVENING.start} to {breakTimes.BREAK_EVENING.end}
+                           </p>
+                        )}
                       </div>
                     </div>
                     {getRemainingMinutes("BREAK_EVENING") <= 0 ? (
@@ -1125,7 +1188,7 @@ export function AttendanceMarking() {
                     <button
                       type="submit"
                       disabled={loading || !lateReasonInput.trim()}
-                      className="flex-1 h-11 rounded-xl bg-accent text-slate-950 text-xs font-black uppercase tracking-wider transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
+                      className="flex-1 h-11 rounded-xl bg-accent text-white text-xs font-black uppercase tracking-wider transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                       {loading && <Loader2 size={12} className="animate-spin" />}
                       Submit Request

@@ -38,30 +38,6 @@ export function WorkingHours({
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-3 duration-700">
-      {/* ── HEADER HERO ── */}
-      <div className="portal-card p-8 bg-gradient-to-br from-white/[0.02] to-transparent border border-white/[0.06] overflow-hidden relative">
-        <div className="absolute -top-24 -right-24 w-64 h-64 bg-accent/5 rounded-full blur-[100px] pointer-events-none" />
-
-        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="flex items-start gap-5">
-            <div className="space-y-1.5">
-              <h2 className="text-2xl font-black text-white tracking-tighter uppercase">
-                Working Hours & Flexibility
-              </h2>
-              <p className="text-slate-500 text-sm leading-relaxed max-w-xl font-medium">
-                We prioritize output and collaboration over fixed clock-ins. Our policy is designed to respect individual biological primes while maintaining team synchronicity.
-              </p>
-            </div>
-          </div>
-
-          <div className="px-4 py-2 rounded-xl bg-white/[0.03] border border-white/[0.06] flex items-center gap-3 shrink-0">
-            <Calendar size={16} className="text-accent" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-              Core Sync: Mon — Fri
-            </span>
-          </div>
-        </div>
-      </div>
 
       {/* ── TIMING & BREAKS PANEL ── */}
       {hasTimings && (

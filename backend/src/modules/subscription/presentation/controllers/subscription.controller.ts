@@ -1,5 +1,6 @@
 import { Controller, Post, Body, BadRequestException, Inject, Get, Param } from '@nestjs/common';
-import { RazorpayService } from 'src/shared/services/payment/razorpay.service';
+import { IPAYMENT_SERVICE } from 'src/shared/services/payment/interfaces/ipayment.service';
+import type { IPaymentService } from 'src/shared/services/payment/interfaces/ipayment.service';
 import type { ISubscriptionRepository } from '../../domain/repositories/isubscription.repository';
 import type { ISubscriptionPlanRepository } from '../../domain/repositories/isubscription-plan.repository';
 import type { ICompanyRepository } from '../../../auth/domain/repositories/icompany.repository';
@@ -9,7 +10,8 @@ import { OnboardingStep } from 'src/shared/enums/company/onboarding-step.enum';
 @Controller('subscriptions')
 export class SubscriptionController {
   constructor(
-    private readonly razorpayService: RazorpayService,
+    @Inject(IPAYMENT_SERVICE)
+    private readonly paymentService: IPaymentService,
     @Inject('ISubscriptionRepository')
     private readonly _subscriptionRepository: ISubscriptionRepository,
     @Inject('ISubscriptionPlanRepository')
@@ -39,7 +41,7 @@ export class SubscriptionController {
       return { isFree: true, planId: plan.id };
     }
 
-    const order = await this.razorpayService.createOrder(
+    const order = await this.paymentService.createOrder(
       plan.price,
       'INR',
       `receipt_${Date.now()}`,
@@ -65,7 +67,7 @@ export class SubscriptionController {
       if (!body.orderId || !body.paymentId || !body.signature) {
         throw new BadRequestException('Payment details missing');
       }
-      const isValid = this.razorpayService.verifyPayment(body.orderId, body.paymentId, body.signature);
+      const isValid = this.paymentService.verifyPayment(body.orderId, body.paymentId, body.signature);
       if (!isValid) throw new BadRequestException('Invalid payment signature');
     }
 
