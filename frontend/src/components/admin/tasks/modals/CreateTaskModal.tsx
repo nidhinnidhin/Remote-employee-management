@@ -26,6 +26,7 @@ import {
   TaskStatus,
   CreateTaskPayload,
 } from "@/shared/types/company/projects/task.type";
+import { UserStoryPriority } from "@/shared/types/company/projects/user-story.type";
 import { Employee } from "@/shared/types/company/employees/employee-listing.type";
 import { createTaskAction, uploadResourceAction } from "@/actions/company/projects/task.actions";
 import { toast } from "sonner";
@@ -55,6 +56,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
     title: "",
     description: "",
     status: TaskStatus.TODO,
+    priority: UserStoryPriority.MEDIUM,
     estimatedHours: 0,
     assignedTo: "",
     dueDate: "",
@@ -111,6 +113,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
       title: formData.title.trim(),
       description: formData.description.trim(),
       status: formData.status as TaskStatus,
+      priority: formData.priority,
       estimatedHours: Number(formData.estimatedHours),
       assignedTo: formData.assignedTo,
       dueDate: formData.dueDate,
@@ -191,6 +194,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
       title: "",
       description: "",
       status: TaskStatus.TODO,
+      priority: UserStoryPriority.MEDIUM,
       estimatedHours: 0,
       assignedTo: "",
       dueDate: "",

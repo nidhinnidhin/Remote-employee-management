@@ -13,6 +13,7 @@ import { DepartmentModule } from './modules/department/presentation/department.m
 import { ProjectModule } from './modules/project/project.module';
 import { ChatModule } from './modules/chat/chat.module';
 import { SubscriptionModule } from './modules/subscription/subscription.module';
+import { AttendanceModule } from './modules/attendance/attendance.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { SubscriptionModule } from './modules/subscription/subscription.module';
     ProjectModule,
     ChatModule,
     SubscriptionModule,
+    AttendanceModule,
   ],
   providers: [
     {

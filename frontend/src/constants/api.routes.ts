@@ -91,4 +91,14 @@ export const API_ROUTES = {
         CREATE_ORDER: "/subscriptions/create-order",
         VERIFY_PAYMENT: "/subscriptions/verify-payment",
     },
+    ATTENDANCE: {
+        CLOCK_IN: "/attendance/clock-in",
+        CLOCK_OUT: "/attendance/clock-out",
+        BREAK_START: "/attendance/break/start",
+        BREAK_END: "/attendance/break/end",
+        TODAY: "/attendance/today",
+        MY_LOGS: "/attendance/my-logs",
+        ADMIN_LOGS: "/attendance/admin/logs",
+        DETAIL: (id: string) => `/attendance/logs/${id}`,
+    },
 } as const;
