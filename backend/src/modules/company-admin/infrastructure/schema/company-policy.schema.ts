@@ -9,6 +9,14 @@ export interface PolicyItem {
       title: string;
       points: string[];
     }>;
+    workStartTime?: string;
+    workEndTime?: string;
+    morningBreakStart?: string;
+    morningBreakEnd?: string;
+    lunchBreakStart?: string;
+    lunchBreakEnd?: string;
+    eveningBreakStart?: string;
+    eveningBreakEnd?: string;
   };
   leaveDistribution: Array<{ type: string; days: number }>;
   isActive: boolean;
@@ -31,6 +39,14 @@ export class CompanyPolicy extends Document {
               points: [{ type: String }],
             },
           ],
+          workStartTime: { type: String },
+          workEndTime: { type: String },
+          morningBreakStart: { type: String },
+          morningBreakEnd: { type: String },
+          lunchBreakStart: { type: String },
+          lunchBreakEnd: { type: String },
+          eveningBreakStart: { type: String },
+          eveningBreakEnd: { type: String },
         },
         leaveDistribution: [
           {

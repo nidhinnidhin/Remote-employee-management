@@ -23,16 +23,9 @@ export const AdminAttendanceDetailsModal: React.FC<AdminAttendanceDetailsModalPr
     return `${hrs}h ${mins}m`;
   };
 
-  const modalHeaderTitle = selectedLog ? (
-    <div className="space-y-1.5 text-left">
-      <span className="inline-block px-2.5 py-0.5 rounded-md text-[9px] font-black bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 uppercase tracking-widest">
-        Shift Log Inspector
-      </span>
-      <h3 className="text-xl font-black text-white mt-1">
-        {selectedLog.employeeName || "Nexus Employee"}
-      </h3>
-    </div>
-  ) : null;
+  const modalHeaderTitle = selectedLog
+    ? selectedLog.employeeName || "Nexus Employee"
+    : "";
 
   const modalHeaderDescription = selectedLog
     ? `Date: ${selectedLog.date} | ${selectedLog.employeeEmail || ""}`
@@ -66,6 +59,12 @@ export const AdminAttendanceDetailsModal: React.FC<AdminAttendanceDetailsModalPr
           >
             <X size={16} />
           </button>
+
+          <div className="flex items-center justify-between">
+            <span className="inline-block px-2.5 py-0.5 rounded-md text-[9px] font-black bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 uppercase tracking-widest">
+              Shift Log Inspector
+            </span>
+          </div>
 
           {/* Quick totals summary */}
           <div className="grid grid-cols-2 gap-4 p-4 rounded-xl bg-white/[0.01] border border-white/[0.04]">

@@ -12,6 +12,14 @@ export interface LeavePolicyProps {
 
 export interface WorkingHoursProps {
   sections: Section[];
+  workStartTime?: string;
+  workEndTime?: string;
+  morningBreakStart?: string;
+  morningBreakEnd?: string;
+  lunchBreakStart?: string;
+  lunchBreakEnd?: string;
+  eveningBreakStart?: string;
+  eveningBreakEnd?: string;
 }
 
 export interface PolicySection {
@@ -27,6 +35,14 @@ export interface CompanyPolicy {
   isActive: boolean;
   content: {
     sections: PolicySection[];
+    workStartTime?: string;
+    workEndTime?: string;
+    morningBreakStart?: string;
+    morningBreakEnd?: string;
+    lunchBreakStart?: string;
+    lunchBreakEnd?: string;
+    eveningBreakStart?: string;
+    eveningBreakEnd?: string;
   };
   leaveDistribution?: Array<{ type: string; days: number }>;
 }

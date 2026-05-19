@@ -15,6 +15,38 @@ class PolicyContentDto {
   @ValidateNested({ each: true })
   @Type(() => PolicySectionDto)
   sections: PolicySectionDto[];
+
+  @IsString()
+  @IsOptional()
+  workStartTime?: string;
+
+  @IsString()
+  @IsOptional()
+  workEndTime?: string;
+
+  @IsString()
+  @IsOptional()
+  morningBreakStart?: string;
+
+  @IsString()
+  @IsOptional()
+  morningBreakEnd?: string;
+
+  @IsString()
+  @IsOptional()
+  lunchBreakStart?: string;
+
+  @IsString()
+  @IsOptional()
+  lunchBreakEnd?: string;
+
+  @IsString()
+  @IsOptional()
+  eveningBreakStart?: string;
+
+  @IsString()
+  @IsOptional()
+  eveningBreakEnd?: string;
 }
 
 class LeaveDistributionDto {
