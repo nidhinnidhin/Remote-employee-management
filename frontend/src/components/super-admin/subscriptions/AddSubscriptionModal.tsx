@@ -8,6 +8,7 @@ import {
   CreateSubscriptionPlanDto,
 } from "@/shared/types/superadmin/subscription/subscription.type";
 import { Loader2, Plus, X, Infinity } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface AddSubscriptionModalProps {
   isOpen: boolean;
@@ -33,7 +34,8 @@ const AddSubscriptionModal: React.FC<AddSubscriptionModalProps> = ({
   onSubmit,
   isSubmitting,
 }) => {
-  const [formData, setFormData] = useState<CreateSubscriptionPlanDto>(INITIAL_STATE);
+  const [formData, setFormData] =
+    useState<CreateSubscriptionPlanDto>(INITIAL_STATE);
   const [unlimitedProjects, setUnlimitedProjects] = useState(false);
   const [unlimitedMembers, setUnlimitedMembers] = useState(false);
   const [extraFeature, setExtraFeature] = useState("");
@@ -41,15 +43,19 @@ const AddSubscriptionModal: React.FC<AddSubscriptionModalProps> = ({
   const [errors, setErrors] = useState<Partial<Record<string, string>>>({});
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]:
-        name === "price" ? parseFloat(value) || 0
-        : name === "maxProjects" || name === "maxMembers" ? parseInt(value) || 1
-        : value,
+        name === "price"
+          ? parseFloat(value) || 0
+          : name === "maxProjects" || name === "maxMembers"
+            ? parseInt(value) || 1
+            : value,
     }));
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
@@ -68,7 +74,8 @@ const AddSubscriptionModal: React.FC<AddSubscriptionModalProps> = ({
     const newErrors: Record<string, string> = {};
     if (!formData.name.trim()) newErrors.name = "Plan name is required";
     if (formData.price < 0) newErrors.price = "Price cannot be negative";
-    if (!formData.description.trim()) newErrors.description = "Description is required";
+    if (!formData.description.trim())
+      newErrors.description = "Description is required";
     if (!unlimitedProjects && (formData.maxProjects ?? 0) < 1)
       newErrors.maxProjects = "Must be at least 1";
     if (!unlimitedMembers && (formData.maxMembers ?? 0) < 1)
@@ -80,9 +87,17 @@ const AddSubscriptionModal: React.FC<AddSubscriptionModalProps> = ({
   const buildFeatures = (): string[] => {
     const features: string[] = [];
     // Auto-generate project feature
-    features.push(unlimitedProjects ? "Unlimited Projects" : `Upto ${formData.maxProjects} Projects`);
+    features.push(
+      unlimitedProjects
+        ? "Unlimited Projects"
+        : `Upto ${formData.maxProjects} Projects`,
+    );
     // Auto-generate member feature
-    features.push(unlimitedMembers ? "Unlimited Members" : `Upto ${formData.maxMembers} Members`);
+    features.push(
+      unlimitedMembers
+        ? "Unlimited Members"
+        : `Upto ${formData.maxMembers} Members`,
+    );
     // Always include Basic Support
     features.push("Basic Support");
     // Append any extras the admin added
@@ -149,16 +164,33 @@ const AddSubscriptionModal: React.FC<AddSubscriptionModalProps> = ({
               name="type"
               value={formData.type}
               onChange={handleChange}
-              className={inputClass}
+              className={cn(
+                inputClass,
+                "text-white font-semibold cursor-pointer outline-none", // Modified styles
+              )}
             >
-              <option value={SubscriptionPlanType.FREE}>FREE</option>
-              <option value={SubscriptionPlanType.PRO}>PRO</option>
-              <option value={SubscriptionPlanType.ENTERPRISE}>ENTERPRISE</option>
+              <option
+                value={SubscriptionPlanType.FREE}
+                className="bg-[#08090a] text-slate-200"
+              >
+                BASIC
+              </option>
+              <option
+                value={SubscriptionPlanType.PRO}
+                className="bg-[#08090a] text-slate-200"
+              >
+                PRO
+              </option>
+              <option
+                value={SubscriptionPlanType.ENTERPRISE}
+                className="bg-[#08090a] text-slate-200"
+              >
+                ENTERPRISE
+              </option>
             </select>
           </div>
         </div>
 
-        {/* Price */}
         <FormInput
           label="Price (₹/month)"
           name="price"
@@ -190,7 +222,7 @@ const AddSubscriptionModal: React.FC<AddSubscriptionModalProps> = ({
         </div>
 
         {/* Limits Section */}
-        <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-5 space-y-5">
+        <div className="rounded-2xl  bg-white/[0.02] p-5 space-y-5">
           <p className={`${labelClass} mb-0`}>Plan Limits</p>
 
           {/* Max Projects */}
@@ -227,8 +259,11 @@ const AddSubscriptionModal: React.FC<AddSubscriptionModalProps> = ({
               </p>
             )}
             <p className="text-[11px] text-gray-500 ml-1">
-              Will generate: <span className="text-accent font-semibold">
-                {unlimitedProjects ? "Unlimited Projects" : `Upto ${formData.maxProjects} Projects`}
+              Will generate:{" "}
+              <span className="text-accent font-semibold">
+                {unlimitedProjects
+                  ? "Unlimited Projects"
+                  : `Upto ${formData.maxProjects} Projects`}
               </span>
             </p>
           </div>
@@ -267,39 +302,30 @@ const AddSubscriptionModal: React.FC<AddSubscriptionModalProps> = ({
               </p>
             )}
             <p className="text-[11px] text-gray-500 ml-1">
-              Will generate: <span className="text-accent font-semibold">
-                {unlimitedMembers ? "Unlimited Members" : `Upto ${formData.maxMembers} Members`}
+              Will generate:{" "}
+              <span className="text-accent font-semibold">
+                {unlimitedMembers
+                  ? "Unlimited Members"
+                  : `Upto ${formData.maxMembers} Members`}
               </span>
             </p>
-          </div>
-        </div>
-
-        {/* Auto-Generated Features Preview */}
-        <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-5 space-y-3">
-          <p className={`${labelClass} mb-0`}>Auto-Generated Features (always included)</p>
-          <div className="flex flex-wrap gap-2">
-            {buildFeatures().map((f, i) => (
-              <span
-                key={i}
-                className="px-3 py-1 rounded-lg bg-accent/10 border border-accent/20 text-accent-light text-xs font-medium"
-              >
-                {f}
-              </span>
-            ))}
           </div>
         </div>
 
         {/* Extra Features */}
         <div className="space-y-3">
           <label className={labelClass}>
-            Additional Features <span className="text-gray-600">(optional)</span>
+            Additional Features{" "}
+            <span className="text-gray-600">(optional)</span>
           </label>
           <div className="flex gap-2">
             <input
               type="text"
               value={extraFeature}
               onChange={(e) => setExtraFeature(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addExtraFeature())}
+              onKeyDown={(e) =>
+                e.key === "Enter" && (e.preventDefault(), addExtraFeature())
+              }
               placeholder="e.g. Priority Email Support"
               className={inputClass}
             />
