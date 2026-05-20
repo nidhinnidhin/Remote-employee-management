@@ -1,12 +1,13 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import type { IInviteLinkRepository } from '../../domain/repositories/invite-link.repository';
+import type { ILogger } from 'src/common/logger/interface/logger.interface';
+import { LOGGER_SERVICE } from 'src/common/logger/tokens/logger.tokens';
 
 @Injectable()
 export class InviteLinkCleanupService {
-  private readonly logger = new Logger(InviteLinkCleanupService.name);
-
   constructor(
+    @Inject(LOGGER_SERVICE) private readonly logger: ILogger,
     @Inject('IInviteLinkRepository')
     private readonly _inviteLinkRepo: IInviteLinkRepository,
   ) {}

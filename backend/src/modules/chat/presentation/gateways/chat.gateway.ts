@@ -10,13 +10,15 @@ import {
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import * as jwt from 'jsonwebtoken';
-import { UseGuards, Logger, Inject } from '@nestjs/common';
+import { UseGuards, Inject } from '@nestjs/common';
 import { WsJwtGuard } from 'src/shared/guards/ws-jwt.guard';
 import { SocketEvents } from 'src/shared/types/socket/socket.types';
 import type { AuthenticatedSocket } from 'src/shared/types/socket/socket.types';
 import type { ISendMessageUseCase } from '../../application/interfaces/chat-use-cases.interface';
 import type { IConversationRepository } from '../../domain/repositories/iconversation.repository';
 import { SendMessageDto } from '../../application/dto/send-message.dto';
+import type { ILogger } from 'src/common/logger/interface/logger.interface';
+import { LOGGER_SERVICE } from 'src/common/logger/tokens/logger.tokens';
 
 @WebSocketGateway({
   cors: {
@@ -27,12 +29,11 @@ import { SendMessageDto } from '../../application/dto/send-message.dto';
 })
 @UseGuards(WsJwtGuard)
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  private readonly logger = new Logger(ChatGateway.name);
-
   @WebSocketServer()
   server: Server;
 
   constructor(
+    @Inject(LOGGER_SERVICE) private readonly logger: ILogger,
     @Inject('ISendMessageUseCase')
     private readonly _sendMessageUseCase: ISendMessageUseCase,
     @Inject('IConversationRepository')

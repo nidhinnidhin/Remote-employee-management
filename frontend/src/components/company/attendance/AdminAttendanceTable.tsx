@@ -55,25 +55,25 @@ export const AdminAttendanceTable: React.FC<AdminAttendanceTableProps> = ({
     switch (status) {
       case "WORKING":
         return (
-          <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase tracking-wider animate-pulse">
+          <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase tracking-wider animate-pulse whitespace-nowrap">
             Active
           </span>
         );
       case "BREAK":
         return (
-          <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20 uppercase tracking-wider">
+          <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20 uppercase tracking-wider whitespace-nowrap">
             Break
           </span>
         );
       case "COMPLETED":
         return (
-          <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 uppercase tracking-wider">
+          <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 uppercase tracking-wider whitespace-nowrap">
             Finished
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold bg-slate-500/10 text-slate-400 border border-slate-500/20 uppercase tracking-wider">
+          <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold bg-slate-500/10 text-slate-400 border border-slate-500/20 uppercase tracking-wider whitespace-nowrap">
             Off Shift
           </span>
         );
@@ -113,20 +113,20 @@ export const AdminAttendanceTable: React.FC<AdminAttendanceTableProps> = ({
   }
 
   return (
-    <div className="space-y-4">
-      {/* Desktop view */}
-      <div className="hidden lg:block overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.01] backdrop-blur-xl shadow-xl shadow-black/20">
-        <table className="w-full border-collapse border-none text-left text-slate-300 table-fixed">
+    <div className="space-y-4 w-full overflow-hidden">
+      {/* Desktop view with scrolling safe gates */}
+      <div className="hidden lg:block overflow-x-auto w-full rounded-2xl border border-white/[0.06] bg-white/[0.01] backdrop-blur-xl shadow-xl shadow-black/20 custom-scrollbar">
+        <table className="w-full border-collapse border-none text-left text-slate-300 table-auto min-w-[1000px]">
           <thead>
             <tr className="border-b border-white/[0.06] bg-white/[0.03]">
-              <th className="w-[22%] px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 text-left align-middle">Employee</th>
-              <th className="w-[12%] px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 text-left align-middle">Shift Date</th>
-              <th className="w-[14%] px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 text-left align-middle">Clock In</th>
-              <th className="w-[12%] px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 text-left align-middle">Clock Out</th>
-              <th className="w-[12%] px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 text-left align-middle">Shift Hours</th>
-              <th className="w-[12%] px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 text-left align-middle">Break duration</th>
-              <th className="w-[10%] px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 text-left align-middle">Status</th>
-              <th className="w-[18%] px-6 py-4 text-right text-[10px] font-bold uppercase tracking-widest text-slate-400 align-middle">Action</th>
+              <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 text-left align-middle">Employee</th>
+              <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 text-left align-middle">Shift Date</th>
+              <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 text-left align-middle">Clock In</th>
+              <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 text-left align-middle">Clock Out</th>
+              <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 text-left align-middle">Shift Hours</th>
+              <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 text-left align-middle">Break duration</th>
+              <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 text-left align-middle">Status</th>
+              <th className="px-6 py-4 text-right text-[10px] font-bold uppercase tracking-widest text-slate-400 align-middle">Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/[0.04]">
@@ -135,7 +135,7 @@ export const AdminAttendanceTable: React.FC<AdminAttendanceTableProps> = ({
               return (
                 <React.Fragment key={log.id}>
                   <tr className="hover:bg-white/[0.02] transition-colors group align-middle">
-                    <td className="px-6 py-4 text-left">
+                    <td className="px-6 py-3.5 text-left max-w-[200px]">
                       <div className="flex flex-col min-w-0">
                         <span className="text-sm font-semibold text-white group-hover:text-accent transition-colors truncate">
                           {log.employeeName || "Nexus Employee"}
@@ -145,38 +145,38 @@ export const AdminAttendanceTable: React.FC<AdminAttendanceTableProps> = ({
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-left text-xs font-medium text-slate-300">
+                    <td className="px-6 py-3.5 text-left text-xs font-medium text-slate-300 whitespace-nowrap">
                       {log.date}
                     </td>
-                    <td className="px-6 py-4 text-left">
-                      <div className="flex flex-col space-y-1">
-                        <span className="text-sm font-semibold tabular-nums text-emerald-400">
+                    <td className="px-6 py-3.5 text-left min-w-[160px] max-w-[220px]">
+                      <div className="flex flex-col space-y-1.5 justify-center">
+                        <span className="text-sm font-semibold tabular-nums text-emerald-400 whitespace-nowrap">
                           {formatDateTime(log.clockIn)}
                         </span>
                         {log.approvalStatus && (
                           <div className="flex flex-col gap-1 text-[10px]">
                             {log.approvalStatus === "PENDING" && (
-                              <span className="text-amber-400 font-bold uppercase tracking-wider text-[8px] bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20 w-fit">
+                              <span className="text-amber-400 font-bold uppercase tracking-wider text-[8px] bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20 w-fit whitespace-nowrap">
                                 Pending Decision
                               </span>
                             )}
                             {log.approvalStatus === "APPROVED" && (
-                              <span className="text-emerald-400 font-bold uppercase tracking-wider text-[8px] bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 w-fit">
+                              <span className="text-emerald-400 font-bold uppercase tracking-wider text-[8px] bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 w-fit whitespace-nowrap">
                                 Late Approved
                               </span>
                             )}
                             {log.approvalStatus === "REJECTED" && (
-                              <span className="text-rose-400 font-bold uppercase tracking-wider text-[8px] bg-rose-500/10 px-1.5 py-0.5 rounded border border-rose-500/20 w-fit">
+                              <span className="text-rose-400 font-bold uppercase tracking-wider text-[8px] bg-rose-500/10 px-1.5 py-0.5 rounded border border-rose-500/20 w-fit whitespace-nowrap">
                                 Late Rejected
                               </span>
                             )}
                             {log.lateReason && (
-                              <span className="text-slate-500 italic font-medium max-w-[140px] truncate block" title={log.lateReason}>
+                              <span className="text-slate-500 italic font-medium max-w-[180px] truncate block mt-0.5" title={log.lateReason}>
                                 "{log.lateReason}"
                               </span>
                             )}
                             {log.adminRemarks && (
-                              <span className="text-slate-400 font-semibold max-w-[140px] truncate block" title={log.adminRemarks}>
+                              <span className="text-slate-400 font-semibold max-w-[180px] truncate block" title={log.adminRemarks}>
                                 Remarks: {log.adminRemarks}
                               </span>
                             )}
@@ -184,20 +184,20 @@ export const AdminAttendanceTable: React.FC<AdminAttendanceTableProps> = ({
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-left text-sm font-semibold tabular-nums text-rose-400">
+                    <td className="px-6 py-3.5 text-left text-sm font-semibold tabular-nums text-rose-400 whitespace-nowrap">
                       {log.clockOut ? formatDateTime(log.clockOut) : "Active"}
                     </td>
-                    <td className="px-6 py-4 text-left text-sm font-semibold text-slate-200 tabular-nums">
+                    <td className="px-6 py-3.5 text-left text-sm font-semibold text-slate-200 tabular-nums whitespace-nowrap">
                       {formatMinutesToHours(log.totalWorkMinutes)}
                     </td>
-                    <td className="px-6 py-4 text-left text-sm font-medium text-slate-400 tabular-nums">
+                    <td className="px-6 py-3.5 text-left text-sm font-medium text-slate-400 tabular-nums whitespace-nowrap">
                       {log.totalBreakMinutes}m
                     </td>
-                    <td className="px-6 py-4 text-left">
+                    <td className="px-6 py-3.5 text-left whitespace-nowrap">
                       {getStatusBadge(log.status)}
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
+                    <td className="px-6 py-3.5 text-right">
+                      <div className="flex items-center justify-end gap-2 whitespace-nowrap">
                         {log.approvalStatus === "PENDING" && (
                           <button
                             onClick={() => {
@@ -232,8 +232,8 @@ export const AdminAttendanceTable: React.FC<AdminAttendanceTableProps> = ({
                   {isExpanded && (
                     <tr className="bg-amber-500/[0.02] border-b border-white/[0.06]">
                       <td colSpan={8} className="px-8 py-6">
-                        <div className="flex flex-col md:flex-row gap-8 items-start justify-between">
-                          <div className="space-y-4 max-w-md text-left">
+                        <div className="flex flex-col md:flex-row gap-8 items-start justify-between max-w-[1200px] mx-auto">
+                          <div className="space-y-4 max-w-md text-left w-full">
                             <div>
                               <span className="inline-block px-2 py-0.5 rounded text-[9px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20 uppercase tracking-widest">
                                 Late Clock-In Appeal
@@ -247,7 +247,7 @@ export const AdminAttendanceTable: React.FC<AdminAttendanceTableProps> = ({
                               <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500 block">
                                 Employee's Stated Reason
                               </span>
-                              <p className="text-xs text-amber-300 italic font-medium leading-relaxed">
+                              <p className="text-xs text-amber-300 italic font-medium leading-relaxed break-words">
                                 "{log.lateReason}"
                               </p>
                             </div>

@@ -1,14 +1,18 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Razorpay from 'razorpay';
 import { IPaymentService } from './interfaces/ipayment.service';
+import type { ILogger } from 'src/common/logger/interface/logger.interface';
+import { LOGGER_SERVICE } from 'src/common/logger/tokens/logger.tokens';
 
 @Injectable()
 export class RazorpayService implements IPaymentService {
   private razorpay: Razorpay;
-  private readonly logger = new Logger(RazorpayService.name);
 
-  constructor(private configService: ConfigService) {
+  constructor(
+    @Inject(LOGGER_SERVICE) private readonly logger: ILogger,
+    private configService: ConfigService,
+  ) {
     const keyId = this.configService.get<string>('RAZORPAY_KEY_ID');
     const keySecret = this.configService.get<string>('RAZORPAY_KEY_SECRET');
 

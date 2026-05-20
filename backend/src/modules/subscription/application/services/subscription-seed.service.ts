@@ -1,13 +1,14 @@
-import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { SubscriptionPlanType } from 'src/shared/enums/subscription/subscription-plan-type.enum';
 import type { ISubscriptionPlanRepository } from '../../domain/repositories/isubscription-plan.repository';
 import { SubscriptionPlanEntity } from '../../domain/entities/subscription-plan.entity';
+import type { ILogger } from 'src/common/logger/interface/logger.interface';
+import { LOGGER_SERVICE } from 'src/common/logger/tokens/logger.tokens';
 
 @Injectable()
 export class SubscriptionSeedService implements OnModuleInit {
-  private readonly logger = new Logger(SubscriptionSeedService.name);
-
   constructor(
+    @Inject(LOGGER_SERVICE) private readonly logger: ILogger,
     @Inject('ISubscriptionPlanRepository')
     private readonly _subscriptionPlanRepository: ISubscriptionPlanRepository,
   ) {}

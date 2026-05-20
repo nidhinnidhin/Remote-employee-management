@@ -14,6 +14,7 @@ import { ProjectModule } from './modules/project/project.module';
 import { ChatModule } from './modules/chat/chat.module';
 import { SubscriptionModule } from './modules/subscription/subscription.module';
 import { AttendanceModule } from './modules/attendance/attendance.module';
+import { LoggerModule } from './common/logger/logger.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { AttendanceModule } from './modules/attendance/attendance.module';
     ChatModule,
     SubscriptionModule,
     AttendanceModule,
+    LoggerModule,
   ],
   providers: [
     {
@@ -41,4 +43,4 @@ import { AttendanceModule } from './modules/attendance/attendance.module';
     },
   ],
 })
-export class AppModule { }
+export class AppModule {}

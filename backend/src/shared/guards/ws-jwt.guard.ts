@@ -1,16 +1,17 @@
 // src/shared/guards/ws-jwt.guard.ts
-import { CanActivate, ExecutionContext, Injectable, Inject, Logger } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, Inject } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
 import { WsException } from '@nestjs/websockets';
 import { AuthenticatedSocket } from '../types/socket/socket.types';
 import type { ICompanyRepository } from 'src/modules/auth/domain/repositories/icompany.repository';
 import { CompanyStatus } from 'src/shared/enums/company/company-status.enum';
+import type { ILogger } from 'src/common/logger/interface/logger.interface';
+import { LOGGER_SERVICE } from 'src/common/logger/tokens/logger.tokens';
 
 @Injectable()
 export class WsJwtGuard implements CanActivate {
-  private readonly logger = new Logger(WsJwtGuard.name);
-
   constructor(
+    @Inject(LOGGER_SERVICE) private readonly logger: ILogger,
     @Inject('ICompanyRepository')
     private readonly _companyRepository: ICompanyRepository,
   ) {}
