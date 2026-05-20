@@ -6,96 +6,114 @@ import { PaginationProps } from "@/shared/types/ui/pagination-props.type";
 import { cn } from "@/lib/utils";
 
 const Pagination: React.FC<PaginationProps & { theme?: "dark" | "light" }> = ({
-    currentPage,
-    totalPages,
-    onPageChange,
-    className = "",
-    theme = "dark",
+  currentPage,
+  totalPages,
+  onPageChange,
+  className = "",
+  theme = "dark",
 }) => {
-    const styles = {
-        container: "border-white/10 bg-[#08090a]",
-        text: "text-slate-400",
-        activeText: "text-accent",
-        button: {
-            base: "text-slate-400 ring-white/10 hover:bg-white/[0.05] hover:text-white bg-white/[0.01]",
-            active: "z-10 bg-accent text-slate-950 font-black ring-accent focus-visible:outline-accent",
-            disabled: "disabled:opacity-20 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-slate-500",
-        },
-    };
+  const styles = {
+    container: "border-white/10 bg-[#08090a]",
+    text: "text-slate-400",
+    activeText: "text-accent",
+    button: {
+      base: "text-slate-400 ring-white/10 hover:bg-white/[0.05] hover:text-white bg-white/[0.01]",
+      active:
+        "z-10 bg-accent text-slate-950 font-black ring-accent focus-visible:outline-accent",
+      disabled:
+        "disabled:opacity-20 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-slate-500",
+    },
+  };
 
-    const getPageNumbers = () => {
-        const pages = [];
-        const maxVisiblePages = 5;
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
 
-        if (totalPages <= maxVisiblePages) {
-            for (let i = 1; i <= totalPages; i++) {
-                pages.push(i);
-            }
-        } else {
-            // Always show first, last, and current page with surrounding
-            if (currentPage <= 3) {
-                pages.push(1, 2, 3, 4, "...", totalPages);
-            } else if (currentPage >= totalPages - 2) {
-                pages.push(1, "...", totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
-            } else {
-                pages.push(1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages);
-            }
-        }
-        return pages;
-    };
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Always show first, last, and current page with surrounding
+      if (currentPage <= 3) {
+        pages.push(1, 2, 3, 4, "...", totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(
+          1,
+          "...",
+          totalPages - 3,
+          totalPages - 2,
+          totalPages - 1,
+          totalPages,
+        );
+      } else {
+        pages.push(
+          1,
+          "...",
+          currentPage - 1,
+          currentPage,
+          currentPage + 1,
+          "...",
+          totalPages,
+        );
+      }
+    }
+    return pages;
+  };
 
-    if (totalPages < 1) return null;
+  if (totalPages <= 1) return null;
 
-    return (
-        <div className={cn("inline-flex items-center", className)}>
-            <div className="flex items-center">
-                <div>
-                    <nav
-                        className="isolate inline-flex -space-x-px rounded-md shadow-sm"
-                        aria-label="Pagination"
-                    >
-                        <button
-                            onClick={() => onPageChange(currentPage - 1)}
-                            disabled={currentPage === 1}
-                            className={`relative inline-flex items-center rounded-l-md px-2 py-2 ring-1 ring-inset focus:z-20 focus:outline-offset-0 transition-colors ${styles.button.base} ${styles.button.disabled}`}
-                        >
-                            <span className="sr-only">Previous</span>
-                            <ChevronLeft className="h-4 w-4" aria-hidden="true" />
-                        </button>
-                        {getPageNumbers().map((page, index) =>
-                            typeof page === "number" ? (
-                                <button
-                                    key={index}
-                                    onClick={() => onPageChange(page)}
-                                    className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold focus:z-20 focus:outline-offset-0 ring-1 ring-inset transition-colors ${currentPage === page
-                                        ? styles.button.active
-                                        : styles.button.base
-                                        }`}
-                                >
-                                    {page}
-                                </button>
-                            ) : (
-                                <span
-                                    key={index}
-                                    className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ring-1 ring-inset focus:outline-offset-0 ${styles.button.base} ring-opacity-50`}
-                                >
-                                    ...
-                                </span>
-                            )
-                        )}
-                        <button
-                            onClick={() => onPageChange(currentPage + 1)}
-                            disabled={currentPage === totalPages}
-                            className={`relative inline-flex items-center rounded-r-md px-2 py-2 ring-1 ring-inset focus:z-20 focus:outline-offset-0 transition-colors ${styles.button.base} ${styles.button.disabled}`}
-                        >
-                            <span className="sr-only">Next</span>
-                            <ChevronRight className="h-4 w-4" aria-hidden="true" />
-                        </button>
-                    </nav>
-                </div>
-            </div>
+  return (
+    <div className={cn("inline-flex items-center", className)}>
+      <div className="flex items-center">
+        <div>
+          <nav
+            className="isolate inline-flex -space-x-px rounded-md shadow-sm"
+            aria-label="Pagination"
+          >
+            <button
+              onClick={() => onPageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className={`relative inline-flex items-center rounded-l-md px-2 py-2 ring-1 ring-inset focus:z-20 focus:outline-offset-0 transition-colors ${styles.button.base} ${styles.button.disabled}`}
+            >
+              <span className="sr-only">Previous</span>
+              <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+            </button>
+            {getPageNumbers().map((page, index) =>
+              typeof page === "number" ? (
+                <button
+                  key={index}
+                  onClick={() => onPageChange(page)}
+                  className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold focus:z-20 focus:outline-offset-0 ring-1 ring-inset transition-colors ${
+                    currentPage === page
+                      ? styles.button.active
+                      : styles.button.base
+                  }`}
+                >
+                  {page}
+                </button>
+              ) : (
+                <span
+                  key={index}
+                  className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ring-1 ring-inset focus:outline-offset-0 ${styles.button.base} ring-opacity-50`}
+                >
+                  ...
+                </span>
+              ),
+            )}
+            <button
+              onClick={() => onPageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className={`relative inline-flex items-center rounded-r-md px-2 py-2 ring-1 ring-inset focus:z-20 focus:outline-offset-0 transition-colors ${styles.button.base} ${styles.button.disabled}`}
+            >
+              <span className="sr-only">Next</span>
+              <ChevronRight className="h-4 w-4" aria-hidden="true" />
+            </button>
+          </nav>
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 export default Pagination;
