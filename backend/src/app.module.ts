@@ -1,16 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-<<<<<<< HEAD
-<<<<<<< HEAD
-import { MongoDatabaseModule } from './infrastructure/database/mongoose/mongoose.module';
-
-@Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), MongoDatabaseModule],
-=======
-=======
 import { ScheduleModule } from '@nestjs/schedule';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
->>>>>>> develop
+
 import { AuthModule } from './modules/auth/presentation/auth/auth.module';
 import { MongoDatabaseModule } from './shared/config/mongoose.module';
 import { SuperAdminModule } from './modules/super-admin/super-admin.module';
@@ -51,6 +43,5 @@ import { LoggerModule } from './common/logger/logger.module';
       useClass: HttpExceptionFilter,
     },
   ],
->>>>>>> develop
 })
 export class AppModule {}

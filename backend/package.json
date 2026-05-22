@@ -33,9 +33,6 @@
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.3",
-<<<<<<< HEAD
-    "mongoose": "^9.1.3",
-=======
     "cloudinary": "^2.9.0",
     "cookie": "^1.1.1",
     "cookie-parser": "^1.4.7",
@@ -46,11 +43,7 @@
     "mongoose": "^8.23.0",
     "multer": "^2.0.2",
     "nodemailer": "^7.0.12",
-<<<<<<< HEAD
->>>>>>> develop
-=======
     "razorpay": "^2.9.6",
->>>>>>> 6ab66f19bb01e7f32aa738247fe53e06139ceb54
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
     "socket.io": "^4.8.3",
