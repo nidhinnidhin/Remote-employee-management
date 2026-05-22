@@ -18,7 +18,7 @@ export class SearchEmployeesDto {
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  limit: number = 10;
+  limit: number = 5;
 
   @IsOptional()
   @IsEnum(UserRole)

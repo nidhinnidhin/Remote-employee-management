@@ -52,7 +52,7 @@ const EmployeesTable: React.FC<EmployeesTableProps> = ({
     status: string;
   } | null>(null);
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 5;
 
   const fetchEmployees = async () => {
     try {

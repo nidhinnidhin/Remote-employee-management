@@ -61,7 +61,7 @@ const Pagination: React.FC<PaginationProps & { theme?: "dark" | "light" }> = ({
     return pages;
   };
 
-  if (totalPages <= 1) return null;
+  if (totalPages < 1) return null;
 
   return (
     <div className={cn("inline-flex items-center", className)}>

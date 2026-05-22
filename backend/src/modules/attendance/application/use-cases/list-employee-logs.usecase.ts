@@ -18,7 +18,7 @@ export class ListEmployeeLogsUseCase implements IListEmployeeLogsUseCase {
     dto: ListLogsDto,
   ): Promise<{ data: AttendanceEntity[]; total: number }> {
     const page = dto.page || 1;
-    const limit = dto.limit || 10;
+    const limit = dto.limit || 5;
 
     const filter: any = {
       userId: new Types.ObjectId(userId),

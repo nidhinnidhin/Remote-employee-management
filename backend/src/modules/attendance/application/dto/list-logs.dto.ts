@@ -10,7 +10,7 @@ export class ListLogsDto {
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
-  limit?: number = 10;
+  limit?: number = 5;
 
   @IsOptional()
   @IsString()

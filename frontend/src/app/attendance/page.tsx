@@ -13,7 +13,7 @@ export default function EmployeeAttendancePage() {
   const [logs, setLogs] = useState<AttendanceLog[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
-  const [limit] = useState(10);
+  const [limit] = useState(5);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [status, setStatus] = useState("");

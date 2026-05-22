@@ -11,7 +11,7 @@ export class SearchDepartmentsDto {
 
   @IsOptional()
   @Type(() => Number)
-  limit: number = 10;
+  limit: number = 5;
 
   @IsOptional()
   employeeId?: string;
