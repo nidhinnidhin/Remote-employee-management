@@ -4,13 +4,14 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Calendar, MessageSquareText } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { UserStoryPriority } from "@/shared/types/company/projects/user-story.type";
 
 const tasks = [
     {
         id: 1,
         title: "Implement user authentication API",
         status: "in-progress",
-        priority: "High",
+        priority: UserStoryPriority.HIGH,
         date: "2024-01-20",
         comments: 3,
     },
@@ -18,7 +19,7 @@ const tasks = [
         id: 2,
         title: "Fix memory leak in WebSocket server",
         status: "todo",
-        priority: "High",
+        priority: UserStoryPriority.HIGH,
         date: "2024-01-18",
         comments: 5,
     },
@@ -26,7 +27,7 @@ const tasks = [
         id: 3,
         title: "Update API documentation",
         status: "todo",
-        priority: "Medium",
+        priority: UserStoryPriority.MEDIUM,
         date: "2024-01-15",
         comments: 1,
     },
@@ -34,7 +35,7 @@ const tasks = [
         id: 4,
         title: "Code review for payment module",
         status: "in-progress",
-        priority: "Medium",
+        priority: UserStoryPriority.MEDIUM,
         date: "2024-01-19",
         comments: 8,
     },
@@ -42,7 +43,7 @@ const tasks = [
         id: 5,
         title: "Database migration for new schema",
         status: "done",
-        priority: "High",
+        priority: UserStoryPriority.HIGH,
         date: "2024-01-15",
         comments: 12,
     },

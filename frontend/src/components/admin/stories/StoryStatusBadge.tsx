@@ -1,39 +1,44 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { StoryStatus } from '@/shared/types/company/projects/user-story.type';
+import { UserStoryStatus } from '@/shared/types/company/projects/user-story.type';
 import { 
   CheckCircle2, 
   CircleDashed, 
   CircleDot, 
-  Clock 
+  Clock,
+  Eye
 } from 'lucide-react';
 
 interface StoryStatusBadgeProps {
-  status: StoryStatus;
+  status: UserStoryStatus;
   className?: string;
 }
 
 const StoryStatusBadge: React.FC<StoryStatusBadgeProps> = ({ status, className }) => {
   const config = {
-    'Done': {
+    [UserStoryStatus.DONE]: {
       icon: CheckCircle2,
       styles: 'text-emerald-600 border-emerald-500/20 bg-emerald-500/5 dark:text-emerald-400 dark:border-emerald-500/20',
     },
-    'In Progress': {
+    [UserStoryStatus.IN_PROGRESS]: {
       icon: CircleDot,
       styles: 'text-blue-600 border-blue-500/20 bg-blue-500/5 dark:text-blue-400 dark:border-blue-500/20',
     },
-    'Backlog': {
+    [UserStoryStatus.BACKLOG]: {
       icon: CircleDashed,
       styles: 'text-zinc-500 border-zinc-500/20 bg-zinc-500/5 dark:text-zinc-400 dark:border-zinc-500/20',
     },
-    'Todo': {
+    [UserStoryStatus.TODO]: {
       icon: Clock,
       styles: 'text-zinc-600 border-zinc-500/20 bg-zinc-500/5 dark:text-zinc-400 dark:border-zinc-500/20',
+    },
+    [UserStoryStatus.REVIEW]: {
+      icon: Eye,
+      styles: 'text-purple-600 border-purple-500/20 bg-purple-500/5 dark:text-purple-400 dark:border-purple-500/20',
     }
   };
 
-  const { icon: Icon, styles } = config[status as keyof typeof config] || config['Todo'];
+  const { icon: Icon, styles } = config[status] || config[UserStoryStatus.TODO];
 
   return (
     <div

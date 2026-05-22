@@ -1,7 +1,7 @@
 "use client";
 
-import { Filter, UserPlus, Users } from "lucide-react";
-import React, { useState } from "react";
+import { Filter, UserPlus, Users, Search } from "lucide-react";
+import React, { useEffect, useState } from "react";
 import EmployeeStats from "./EmployeeStats";
 import Button from "../../ui/Button";
 import InviteEmployeeModal from "../modals/InviteEmployeeModal";
@@ -11,11 +11,22 @@ import { clientApi } from "@/lib/axios/axiosClient";
 
 interface HeaderProps {
   onInviteSuccess?: () => void;
+  onSearch: (query: string) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onInviteSuccess }) => {
+const Header: React.FC<HeaderProps> = ({ onInviteSuccess, onSearch }) => {
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+
+  // Debounce search
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      onSearch(searchValue);
+    }, 500);
+
+    return () => clearTimeout(handler);
+  }, [searchValue, onSearch]);
 
   const handleInvite = async (data: InviteEmployeePayload) => {
     try {
@@ -25,15 +36,16 @@ const Header: React.FC<HeaderProps> = ({ onInviteSuccess }) => {
 
       setIsInviteOpen(false);
       toast.success("Invitation sent successfully");
-      
+
       if (onInviteSuccess) {
         onInviteSuccess();
       }
-      
+
       console.log("Invitation sent successfully");
     } catch (error: any) {
       console.error("Invite failed", error);
-      const errorMessage = error.response?.data?.message || "Failed to send invitation";
+      const errorMessage =
+        error.response?.data?.message || "Failed to send invitation";
       toast.error(errorMessage); // ❌ optional: toast error
     } finally {
       setLoading(false);
@@ -49,10 +61,20 @@ const Header: React.FC<HeaderProps> = ({ onInviteSuccess }) => {
         </div>
 
         <div className="flex items-center gap-3">
+          <div className="relative group w-full sm:w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted group-focus-within:text-accent transition-colors" />
+            <input
+              type="text"
+              placeholder="Search employees..."
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              className="w-full bg-[rgb(var(--color-nav-bg))] border border-[rgb(var(--color-border-subtle))] rounded-lg py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-1 focus:ring-[rgb(var(--color-accent))] transition-all placeholder:text-muted/50"
+            />
+          </div>
 
           <Button
             variant="primary"
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 whitespace-nowrap"
             onClick={() => setIsInviteOpen(true)}
             disabled={loading}
           >

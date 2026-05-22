@@ -20,6 +20,7 @@ export class PolicyItemEntity {
         points: string[];
       }>;
     },
+    public readonly leaveDistribution: Array<{ type: string; days: number }> = [],
     public readonly isActive: boolean = true,
   ) {}
 }

@@ -1,9 +1,12 @@
 import { ProjectEntity } from '../entities/project.entity';
+import { IBaseRepository } from 'src/shared/repositories/interfaces/base.repository.interface';
+import { ProjectDocument } from '../../infrastructure/database/mongoose/schemas/project.schema'; 
 
-export interface IProjectRepository {
+export interface IProjectRepository extends IBaseRepository<ProjectDocument, ProjectEntity> {
+  findByIdAndCompany(id: string, companyId: string): Promise<ProjectEntity | null>;
+  findAllByCompanyId(companyId: string): Promise<ProjectEntity[]>;
   create(project: Partial<ProjectEntity>): Promise<ProjectEntity>;
-  findById(id: string, companyId: string): Promise<ProjectEntity | null>;
-  findAll(companyId: string): Promise<ProjectEntity[]>;
-  update(id: string, companyId: string, project: Partial<ProjectEntity>): Promise<ProjectEntity | null>;
-  softDelete(id: string, companyId: string): Promise<boolean>;
+  updateProject(id: string, companyId: string, project: Partial<ProjectEntity>): Promise<ProjectEntity | null>;
+  
+  softDeleteProject(id: string, companyId: string): Promise<boolean>;
 }

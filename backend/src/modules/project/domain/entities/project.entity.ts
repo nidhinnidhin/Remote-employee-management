@@ -13,5 +13,6 @@ export class ProjectEntity {
     public readonly createdAt?: Date,
     public readonly updatedAt?: Date,
     public readonly isDeleted: boolean = false,
+    public readonly members: string[] = [],
   ) {}
 }

@@ -1,5 +1,6 @@
 import { CreateStoryDto } from '../../dto/story/create-story.dto';
 import { UpdateStoryDto } from '../../dto/story/update-story.dto';
+import { SearchStoriesDto } from '../../dto/story/search-stories.dto';
 import { UserStoryEntity } from '../../../domain/entities/user-story.entity';
 
 export interface ICreateUserStoryUseCase {
@@ -8,6 +9,13 @@ export interface ICreateUserStoryUseCase {
 
 export interface IGetUserStoriesByProjectUseCase {
   execute(projectId: string, companyId: string): Promise<UserStoryEntity[]>;
+}
+
+export interface ISearchUserStoriesUseCase {
+  execute(
+    companyId: string,
+    dto: SearchStoriesDto,
+  ): Promise<{ data: UserStoryEntity[]; total: number }>;
 }
 
 export interface IUpdateUserStoryUseCase {

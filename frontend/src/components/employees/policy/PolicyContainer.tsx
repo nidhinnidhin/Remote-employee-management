@@ -52,6 +52,14 @@ export function PolicyContainer() {
         return (
           <WorkingHours
             sections={workingHoursPolicy?.content?.sections || []}
+            workStartTime={workingHoursPolicy?.content?.workStartTime}
+            workEndTime={workingHoursPolicy?.content?.workEndTime}
+            morningBreakStart={workingHoursPolicy?.content?.morningBreakStart}
+            morningBreakEnd={workingHoursPolicy?.content?.morningBreakEnd}
+            lunchBreakStart={workingHoursPolicy?.content?.lunchBreakStart}
+            lunchBreakEnd={workingHoursPolicy?.content?.lunchBreakEnd}
+            eveningBreakStart={workingHoursPolicy?.content?.eveningBreakStart}
+            eveningBreakEnd={workingHoursPolicy?.content?.eveningBreakEnd}
           />
         );
 
@@ -59,6 +67,7 @@ export function PolicyContainer() {
         return (
           <LeavePolicy
             sections={leavePolicy?.content?.sections || []}
+            leaveDistribution={leavePolicy?.leaveDistribution}
           />
         );
 

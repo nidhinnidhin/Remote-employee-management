@@ -20,6 +20,10 @@ import { ResponseInterceptor } from './common/response/response.interceptor';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { DepartmentModule } from './modules/department/presentation/department.module';
 import { ProjectModule } from './modules/project/project.module';
+import { ChatModule } from './modules/chat/chat.module';
+import { SubscriptionModule } from './modules/subscription/subscription.module';
+import { AttendanceModule } from './modules/attendance/attendance.module';
+import { LoggerModule } from './common/logger/logger.module';
 
 @Module({
   imports: [
@@ -32,6 +36,10 @@ import { ProjectModule } from './modules/project/project.module';
     CompanyPolicyModule,
     DepartmentModule,
     ProjectModule,
+    ChatModule,
+    SubscriptionModule,
+    AttendanceModule,
+    LoggerModule,
   ],
   providers: [
     {
@@ -45,4 +53,4 @@ import { ProjectModule } from './modules/project/project.module';
   ],
 >>>>>>> develop
 })
-export class AppModule { }
+export class AppModule {}

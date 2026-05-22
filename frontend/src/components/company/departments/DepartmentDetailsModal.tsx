@@ -7,6 +7,7 @@ import { Department } from "@/shared/types/company/departments/department.type";
 import { Users, Info, Calendar, Building2, X } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { formatDate } from "@/lib/date/date-format";
 
 interface DepartmentDetailsModalProps {
   isOpen: boolean;
@@ -69,7 +70,7 @@ export const DepartmentDetailsModal = ({
           <div className="p-5 rounded-xl bg-white/[0.02] border border-white/10 flex flex-col items-center text-center group hover:bg-white/[0.04] transition-colors">
             <Calendar className="text-accent mb-3 group-hover:scale-110 transition-transform duration-300" size={24} strokeWidth={1.5} />
             <span className="text-lg font-bold text-white leading-none mb-1.5 mt-2">
-              {new Date(department.createdAt).toLocaleDateString()}
+              {formatDate(department.createdAt)}
             </span>
             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
               Created On

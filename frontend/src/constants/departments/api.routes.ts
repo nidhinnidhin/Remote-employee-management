@@ -10,6 +10,7 @@ export const API_ROUTES = {
 
     DEPARTMENTS: {
       GET_ALL: "/departments",
+      SEARCH: "/departments/search",
       CREATE: "/departments",
       UPDATE: (id: string) => `/departments/${id}`,
       DELETE: (id: string) => `/departments/${id}`,

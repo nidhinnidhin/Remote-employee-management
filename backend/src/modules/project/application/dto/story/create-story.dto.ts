@@ -1,6 +1,7 @@
-import { IsString, IsEnum, IsArray, IsNumber, IsNotEmpty, MinLength, MaxLength, IsOptional } from 'class-validator';
+import { IsString, IsEnum, IsArray, IsNumber, IsNotEmpty, MinLength, MaxLength, IsOptional, IsIn, IsUrl, IsBoolean } from 'class-validator';
 import { UserStoryStatus } from 'src/shared/enums/project/user-story-status.enum';
 import { UserStoryPriority } from 'src/shared/enums/project/user-story-priority.enum';
+import { IssueType } from 'src/shared/enums/project/issue-type.enum';
 
 export class CreateStoryDto {
   @IsString()
@@ -34,7 +35,34 @@ export class CreateStoryDto {
   @IsNotEmpty({ message: 'Story priority is required' })
   priority: UserStoryPriority;
 
+  @IsEnum(IssueType, { message: 'Invalid issue type' })
+  @IsNotEmpty({ message: 'Issue type is required' })
+  type: IssueType;
+
   @IsNumber()
   @IsOptional()
   order?: number;
+
+  @IsNumber()
+  @IsOptional()
+  @IsIn([1, 2, 3, 5, 8, 13], { message: 'Invalid story points value' })
+  storyPoints?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  isInBacklog?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  addToActiveSprint?: boolean;
+
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
+  attachments?: string[];
+
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
+  links?: string[];
 }

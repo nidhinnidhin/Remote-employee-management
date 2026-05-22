@@ -1,7 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 
-export type ProjectStatus = 'Active' | 'Completed' | 'On Hold';
+export type ProjectStatus = 'Active' | 'Completed' | 'On Hold' | 'Planning';
 
 interface ProjectStatusBadgeProps {
   status: ProjectStatus;
@@ -17,6 +17,8 @@ const ProjectStatusBadge: React.FC<ProjectStatusBadgeProps> = ({ status, classNa
         return 'bg-[rgb(255,159,67,0.15)] text-[#fb923c] border-[rgba(255,159,67,0.3)] shadow-[0_0_12px_rgba(255,159,67,0.2)]';
       case 'Completed':
         return 'bg-[rgb(169,179,214,0.15)] text-[#a9b3d6] border-[rgba(169,179,214,0.3)]';
+      case 'Planning':
+        return 'bg-[rgb(99,102,241,0.15)] text-[#818cf8] border-[rgba(99,102,241,0.3)] shadow-[0_0_12px_rgba(99,102,241,0.2)]';
       default:
         return 'bg-[rgb(var(--color-badge-bg))] text-[rgb(var(--color-badge-text))]';
     }

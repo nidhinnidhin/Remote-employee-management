@@ -1,154 +1,234 @@
-"use client";
-
-import React from "react";
-import { Check, CreditCard, Sparkles, Zap, Shield } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Check, Layout, Database, Terminal, Loader2, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
+import { getSubscriptionPlansAction } from "@/actions/super-admin/subscription/subscription.actions";
+import { createPaymentOrderAction, verifyPaymentAction } from "@/actions/company/subscription/payment.actions";
+import { SubscriptionPlan } from "@/shared/types/superadmin/subscription/subscription.type";
+import { toast } from "sonner";
 
 interface SubscriptionStepProps {
-    selectedPlan: string;
-    onSelect: (plan: string) => void;
+  selectedPlan: string;
+  onSelect: (planId: string, planName: string) => void;
+  companyId: string;
+  userId: string;
+  onPaymentSuccess: () => void;
 }
 
-const plans = [
-    {
-        id: "Starter",
-        name: "Starter",
-        price: "Free",
-        description: "Perfect for exploring",
-        icon: Sparkles,
-        features: ["Up to 10 Employees", "Basic Analytics", "Standard Support"],
-    },
-    {
-        id: "Professional",
-        name: "Professional",
-        price: "$49/mo",
-        description: "Best for growing teams",
-        icon: Zap,
-        features: ["Unlimited Employees", "Advanced Analytics", "Priority Support"],
-        popular: true,
-    },
-    {
-        id: "Enterprise",
-        name: "Enterprise",
-        price: "Custom",
-        description: "Scale with confidence",
-        icon: Shield,
-        features: ["SSO & Security", "Dedicated Manager", "Custom Integration"],
-    },
-];
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
 
-const SubscriptionStep: React.FC<SubscriptionStepProps> = ({ selectedPlan, onSelect }) => {
+const SubscriptionStep: React.FC<SubscriptionStepProps> = ({ 
+  selectedPlan, 
+  onSelect, 
+  companyId, 
+  userId,
+  onPaymentSuccess 
+}) => {
+  const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  useEffect(() => {
+    loadPlans();
+    loadRazorpayScript();
+  }, []);
+
+  const loadPlans = async () => {
+    try {
+      const result = await getSubscriptionPlansAction(true); // only active plans
+      if (result.success) {
+        setPlans(result.data || []);
+      }
+    } catch (error) {
+      toast.error("Failed to load subscription plans");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const loadRazorpayScript = () => {
+    if (window.Razorpay) return; // Already loaded
+
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onerror = () => {
+      toast.error("Failed to load payment gateway. Please check your internet or disable ad-blockers.");
+    };
+    document.body.appendChild(script);
+  };
+
+  const handleSubscribe = async (plan: SubscriptionPlan) => {
+    onSelect(plan.id, plan.name);
+    setIsProcessing(true);
+
+    try {
+      const orderResult = await createPaymentOrderAction(plan.id, companyId);
+      
+      if (!orderResult.success) {
+        toast.error(orderResult.error || "Failed to initiate payment");
+        setIsProcessing(false);
+        return;
+      }
+
+      if (orderResult.data.isFree) {
+        // Handle Free Plan Activation
+        const verifyResult = await verifyPaymentAction({
+          planId: plan.id,
+          companyId,
+          userId,
+          isFree: true
+        });
+        
+        if (verifyResult.success) {
+          toast.success("Free plan activated!");
+          onPaymentSuccess();
+        } else {
+          toast.error(verifyResult.error || "Failed to activate free plan");
+        }
+        setIsProcessing(false);
+        return;
+      }
+
+      // Handle Razorpay Payment
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: orderResult.data.order.amount,
+        currency: orderResult.data.order.currency,
+        name: "Employee Management",
+        description: `Subscription: ${plan.name}`,
+        order_id: orderResult.data.order.id,
+        handler: async (response: any) => {
+          const verifyResult = await verifyPaymentAction({
+            orderId: response.razorpay_order_id,
+            paymentId: response.razorpay_payment_id,
+            signature: response.razorpay_signature,
+            planId: plan.id,
+            companyId,
+            userId
+          });
+
+          if (verifyResult.success) {
+            toast.success("Payment successful!");
+            onPaymentSuccess();
+          } else {
+            toast.error("Payment verification failed");
+          }
+        },
+        prefill: {
+          name: "",
+          email: "",
+        },
+        theme: {
+          color: "#8B5CF6", // Violet/Accent color
+        },
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
+    } catch (error) {
+      toast.error("Something went wrong during payment");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  if (isLoading) {
     return (
-        <div>
-            {/* Header */}
-            <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold mb-1.5" style={{ color: "rgb(var(--color-text-primary))" }}>
-                    Select a Plan
-                </h2>
-                <p className="text-sm" style={{ color: "rgb(var(--color-text-secondary))" }}>
-                    Choose the perfect scale for your organization
-                </p>
-            </div>
-
-            {/* Plan cards — single column stack */}
-            <div className="space-y-3">
-                {plans.map((plan) => {
-                    const isSelected = selectedPlan === plan.id;
-                    const Icon = plan.icon;
-
-                    return (
-                        <motion.div
-                            key={plan.id}
-                            whileTap={{ scale: 0.99 }}
-                            onClick={() => onSelect(plan.id)}
-                            className="relative flex items-start gap-4 p-4 rounded-xl border cursor-pointer transition-all duration-200"
-                            style={{
-                                borderColor: isSelected
-                                    ? "rgb(var(--color-accent))"
-                                    : "rgb(var(--color-border-subtle))",
-                                backgroundColor: isSelected
-                                    ? "rgba(var(--color-accent), 0.06)"
-                                    : "rgb(var(--color-surface-raised))",
-                            }}
-                        >
-                            {/* Popular badge */}
-                            {plan.popular && (
-                                <span
-                                    className="absolute -top-2.5 right-3 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wide"
-                                    style={{
-                                        backgroundColor: "rgb(var(--color-accent))",
-                                        color: "rgb(var(--color-bg))",
-                                    }}
-                                >
-                                    Most Popular
-                                </span>
-                            )}
-
-                            {/* Icon */}
-                            <div
-                                className="flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center mt-0.5"
-                                style={{ backgroundColor: "rgb(var(--color-accent-subtle))" }}
-                            >
-                                <Icon className="w-4 h-4" style={{ color: "rgb(var(--color-accent))" }} />
-                            </div>
-
-                            {/* Info */}
-                            <div className="flex-1 min-w-0">
-                                <div className="flex items-center justify-between mb-1">
-                                    <span className="font-semibold text-sm" style={{ color: "rgb(var(--color-text-primary))" }}>
-                                        {plan.name}
-                                    </span>
-                                    <span className="font-bold text-sm" style={{ color: "rgb(var(--color-accent))" }}>
-                                        {plan.price}
-                                    </span>
-                                </div>
-                                <p className="text-xs mb-2" style={{ color: "rgb(var(--color-text-muted))" }}>
-                                    {plan.description}
-                                </p>
-                                <ul className="flex flex-wrap gap-x-4 gap-y-1">
-                                    {plan.features.map((f) => (
-                                        <li key={f} className="flex items-center gap-1 text-xs" style={{ color: "rgb(var(--color-text-secondary))" }}>
-                                            <Check className="w-3 h-3 flex-shrink-0" style={{ color: "rgb(var(--color-accent))" }} />
-                                            {f}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-
-                            {/* Radio indicator */}
-                            <div
-                                className="flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center mt-0.5"
-                                style={{
-                                    borderColor: isSelected ? "rgb(var(--color-accent))" : "rgb(var(--color-border-subtle))",
-                                }}
-                            >
-                                {isSelected && (
-                                    <div
-                                        className="w-2.5 h-2.5 rounded-full"
-                                        style={{ backgroundColor: "rgb(var(--color-accent))" }}
-                                    />
-                                )}
-                            </div>
-                        </motion.div>
-                    );
-                })}
-            </div>
-
-            {/* Footer note */}
-            <div
-                className="mt-5 flex items-center justify-center gap-2 py-3 px-4 rounded-xl"
-                style={{
-                    backgroundColor: "rgb(var(--color-surface-raised))",
-                    border: "1px solid rgb(var(--color-border-subtle))",
-                }}
-            >
-                <CreditCard className="w-4 h-4 flex-shrink-0" style={{ color: "rgb(var(--color-accent))" }} />
-                <span className="text-xs" style={{ color: "rgb(var(--color-text-secondary))" }}>
-                    No credit card required for your 14-day free trial
-                </span>
-            </div>
-        </div>
+      <div className="w-full py-20 flex flex-col items-center justify-center gap-4">
+        <Loader2 className="w-10 h-10 text-[rgb(var(--color-accent))] animate-spin" />
+        <p className="text-gray-400 font-medium">Loading premium plans...</p>
+      </div>
     );
+  }
+
+  return (
+    <div className="w-full py-6 px-4 flex flex-col items-center">
+      <div className="text-center mb-12 space-y-3">
+        <h2 className="text-3xl font-black text-white">Choose Your Power</h2>
+        <p className="text-gray-400">Scale your organization with our premium tools.</p>
+      </div>
+
+      <div className="w-full max-w-[1200px] flex flex-wrap justify-center gap-6 items-stretch">
+        {plans.map((plan) => {
+          const isSelected = selectedPlan === plan.id;
+          const isPro = plan.type === 'PRO';
+          
+          return (
+            <motion.div
+              key={plan.id}
+              className="flex flex-col p-8 rounded-[32px] border transition-all duration-500 relative overflow-hidden"
+              style={{
+                width: "min(100%, 31%)", 
+                flex: "1 1 320px",
+                maxWidth: "360px",
+                borderColor: isSelected ? "rgb(var(--color-accent))" : "rgb(var(--color-border-subtle))",
+                backgroundColor: "rgb(var(--color-surface-raised))",
+                boxShadow: isSelected ? "0 25px 50px -12px rgba(var(--color-accent), 0.25)" : "none",
+              }}
+            >
+              {isPro && (
+                <div className="absolute top-0 right-0 p-4">
+                  <div className="bg-[rgb(var(--color-accent))] text-white text-[10px] font-black px-3 py-1 rounded-full uppercase flex items-center gap-1">
+                    <Sparkles size={10} />
+                    Popular
+                  </div>
+                </div>
+              )}
+
+              <h3 className="text-xl font-black mb-1 uppercase tracking-wider" style={{ color: isPro ? "rgb(var(--color-accent))" : "white" }}>
+                {plan.name}
+              </h3>
+              <p className="text-xs font-medium text-gray-500 mb-6 uppercase tracking-tight">
+                {plan.type} Edition
+              </p>
+
+              <div className="mb-8 flex items-baseline gap-1">
+                <span className="text-4xl font-black text-white">₹{plan.price}</span>
+                <span className="text-sm text-gray-400">/mo</span>
+              </div>
+
+              <p className="text-sm text-gray-400 mb-8 min-h-[40px]">
+                {plan.description}
+              </p>
+
+              <button
+                disabled={isProcessing}
+                onClick={() => handleSubscribe(plan)}
+                className="w-full py-4 rounded-2xl font-black text-sm mb-10 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 group"
+                style={{
+                  backgroundColor: isPro ? "rgb(var(--color-accent))" : "white",
+                  color: isPro ? "white" : "black",
+                }}
+              >
+                {isProcessing && isSelected ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <>
+                    <span>{plan.price === 0 ? "Select Plan" : "Subscribe Now"}</span>
+                  </>
+                )}
+              </button>
+
+              <div className="space-y-4 pt-8 border-t border-white/5">
+                {plan.features.map((feature, i) => (
+                  <div key={i} className="flex items-center gap-3 text-sm text-gray-300">
+                    <div className="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-3 h-3 text-[rgb(var(--color-accent))]" strokeWidth={3} />
+                    </div>
+                    <span>{feature}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          );
+        })}
+      </div>
+    </div>
+  );
 };
 
 export default SubscriptionStep;

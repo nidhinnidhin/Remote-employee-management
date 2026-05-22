@@ -5,6 +5,7 @@ export const API_ROUTES = {
         REFRESH: "/auth/refresh",
         LOGOUT: "/auth/logout",
         ONBOARD: "/auth/onboard",
+        ONBOARDING_STATUS: "/auth/onboarding/status",
         PASSWORD: {
             FORGOT: "/auth/password/forgot",
             VERIFY_RESET: "/auth/password/verify-reset",
@@ -30,6 +31,7 @@ export const API_ROUTES = {
     COMPANY: {
         EMPLOYEES: {
             BASE: "/company/employees",
+            SEARCH: "/company/employees/search",
             STATUS: (id: string) => `/company/employees/${id}/status`,
             RESEND_INVITE: (id: string) => `/company/employees/${id}/resend-invite`,
             VERIFY_INVITE: "/company/employees/verify-invite",
@@ -46,22 +48,58 @@ export const API_ROUTES = {
         POLICIES: "/company-policies",
         PROJECTS: {
             BASE: "/projects",
+            SEARCH: "/projects/search",
             BY_ID: (id: string) => `/projects/${id}`,
+            UPLOAD: "/projects/upload",
         },
         STORIES: {
             BASE: "/stories",
+            SEARCH: "/stories/search",
             BY_PROJECT: (projectId: string) => `/stories?projectId=${projectId}`,
             BY_ID: (id: string) => `/stories/${id}`,
         },
         TASKS: {
             BASE: "/tasks",
+            SEARCH: "/tasks/search",
             BY_STORY: (storyId: string) => `/tasks?storyId=${storyId}`,
+            BY_PROJECT: (projectId: string) => `/tasks?projectId=${projectId}`,
             BY_ID: (id: string) => `/tasks/${id}`,
             MOVE: (id: string) => `/tasks/${id}/move`,
             MY_TASKS: "/tasks/my",
         },
+        SPRINTS: {
+            BASE: "/sprints",
+            BY_PROJECT: (projectId: string) => `/sprints/project/${projectId}`,
+            BY_ID: (id: string) => `/sprints/${id}`,
+        },
+        CHATS: {
+            BASE: "/chats",
+            CONVERSATIONS: "/chats/conversations",
+            MESSAGES: (id: string) => `/chats/conversations/${id}/messages`,
+        },
     },
     SUPER_ADMIN: {
         COMPANIES: "/super-admin/companies",
+        SUBSCRIPTIONS: {
+            BASE: "/subscription-plans",
+            BY_ID: (id: string) => `/subscription-plans/${id}`,
+        },
+    },
+    SUBSCRIPTIONS: {
+        CURRENT: (companyId: string) => `/subscriptions/current/${companyId}`,
+        PLANS: "/subscription-plans?activeOnly=true",
+        CREATE_ORDER: "/subscriptions/create-order",
+        VERIFY_PAYMENT: "/subscriptions/verify-payment",
+    },
+    ATTENDANCE: {
+        CLOCK_IN: "/attendance/clock-in",
+        CLOCK_OUT: "/attendance/clock-out",
+        BREAK_START: "/attendance/break/start",
+        BREAK_END: "/attendance/break/end",
+        TODAY: "/attendance/today",
+        MY_LOGS: "/attendance/my-logs",
+        ADMIN_LOGS: "/attendance/admin/logs",
+        DETAIL: (id: string) => `/attendance/logs/${id}`,
+        DECIDE_REQUEST: "/attendance/admin/decide-request",
     },
 } as const;

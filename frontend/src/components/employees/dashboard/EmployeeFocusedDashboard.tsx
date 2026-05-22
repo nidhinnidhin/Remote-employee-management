@@ -20,8 +20,10 @@ import EmployeeTaskCard from "@/components/employees/tasks/EmployeeTaskCard";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { FRONTEND_ROUTES } from "@/constants/frontend.routes";
+import { useProfileStore } from "@/store/profile.store";
 
 export default function EmployeeFocusedDashboard() {
+  const { userProfile } = useProfileStore();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -242,7 +244,7 @@ export default function EmployeeFocusedDashboard() {
       )}
 
       {/* ── 5. My Projects ── */}
-      <EmployeeProjectList tasks={tasks} projects={projects} />
+      <EmployeeProjectList tasks={tasks} userId={userProfile?.id || ""} />
 
       {/* ── 6. Empty State ── */}
       {tasks.length === 0 && !isLoading && (

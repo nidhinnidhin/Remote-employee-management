@@ -22,6 +22,8 @@ import Button from "@/components/ui/Button";
 import OtpInput from "@/components/ui/OtpInput";
 import { useOtpTimer } from "@/hooks/otp/use-otp-timer";
 import { API_ROUTES } from "@/constants/api.routes";
+import { formatDate } from "@/lib/date/date-format";
+import { useProfileStore } from "@/store/profile.store";
 
 interface PersonalInfoFormData {
   firstName: string;
@@ -108,6 +110,7 @@ const InputField = ({
   placeholder,
   icon: Icon,
   required,
+  error,
 }: {
   label: string;
   name: string;
@@ -117,26 +120,33 @@ const InputField = ({
   placeholder?: string;
   icon?: React.ElementType;
   required?: boolean;
+  error?: string;
 }) => (
   <div className="flex flex-col gap-1.5">
     <label className="text-xs font-medium text-secondary uppercase tracking-wide">
       {label} {required && <span className="text-danger">*</span>}
     </label>
+
     <div className="relative">
       {Icon && (
         <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted" />
       )}
+
       <input
         type={type}
         name={name}
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className={`field-input transition placeholder:text-slate-700 ${
-          Icon ? "pl-9" : ""
-        }`}
+        className={`field-input transition placeholder:text-slate-700
+          ${Icon ? "pl-9" : ""}
+          ${error ? "border-red-500 focus:ring-red-500" : ""}
+        `}
       />
     </div>
+
+    {/* ✅ Error message */}
+    {error && <p className="text-xs text-red-500 mt-1 font-medium">{error}</p>}
   </div>
 );
 
@@ -147,6 +157,7 @@ const SelectField = ({
   onChange,
   options,
   placeholder,
+  error,
 }: {
   label: string;
   name: string;
@@ -154,33 +165,42 @@ const SelectField = ({
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   options: string[];
   placeholder?: string;
+  error?: string;
 }) => (
   <div className="flex flex-col gap-1.5">
     <label className="text-xs font-medium text-secondary uppercase tracking-wide">
       {label}
     </label>
+
     <div className="relative">
       <select
         name={name}
         value={value}
         onChange={onChange}
-        className={`field-input transition pr-9 cursor-pointer appearance-none ${
-          !value ? "text-slate-700" : "text-primary"
-        }`}
+        className={`field-input pr-9 appearance-none
+          ${error ? "border-red-500 focus:ring-red-500" : ""}
+        `}
       >
         {placeholder && (
-          <option value="" disabled className="bg-[#08090a] text-slate-500">
+          <option value="" className="bg-white text-slate-900 dark:bg-slate-800 dark:text-white">
             {placeholder}
           </option>
         )}
         {options.map((opt) => (
-          <option key={opt} value={opt} className="bg-[#08090a] text-primary">
+          <option 
+            key={opt} 
+            value={opt} 
+            className="bg-white text-slate-900 dark:bg-slate-800 dark:text-white"
+          >
             {opt}
           </option>
         ))}
       </select>
+
       <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted pointer-events-none" />
     </div>
+
+    {error && <p className="text-xs text-red-500 mt-1 font-medium">{error}</p>}
   </div>
 );
 
@@ -224,6 +244,8 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
   const [verifyingOtp, setVerifyingOtp] = useState(false);
   const [otpError, setOtpError] = useState("");
   const [resendingOtp, setResendingOtp] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+  const getError = (field: string) => fieldErrors[field]?.[0];
 
   const { remaining, expired, startTimer } = useOtpTimer();
 
@@ -233,18 +255,23 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
     }
   }, [otpModalOpen]);
 
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >,
-  ) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleChange = (e: any) => {
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    setFieldErrors((prev) => ({
+      ...prev,
+      [name]: [],
+    }));
   };
 
   const handleSubmit = async () => {
     setSaving(true);
     setError("");
     setSuccessMsg("");
+    setFieldErrors({});
+
     try {
       await clientApi.patch(API_ROUTES.AUTH.PROFILE.UPDATE, {
         firstName: formData.firstName,
@@ -256,27 +283,32 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
         bloodGroup: formData.bloodGroup,
         timeZone: formData.timeZone,
         bio: formData.bio,
-
         city: formData.city,
         state: formData.state,
         country: formData.country,
         zipCode: formData.zipCode,
-
         streetAddress: formData.street,
         linkedInUrl: formData.linkedIn,
         personalWebsite: formData.personalWebsite,
-
         emergencyContactName: formData.emergencyContactName,
         emergencyContactPhone: formData.emergencyContactPhone,
         emergencyContactRelation: formData.emergencyContactRelation,
-
         ...(formData.dateOfBirth && {
           dateOfBirth: formData.dateOfBirth,
         }),
       });
+
       setSuccessMsg("Profile updated successfully.");
-    } catch {
-      setError("Failed to save changes. Please try again.");
+      // ✅ Refresh global profile store to update Header/Sidebar immediately
+      useProfileStore.getState().fetchProfile(true);
+    } catch (err: any) {
+      const backendErrors = err.response?.data?.errors;
+
+      if (backendErrors) {
+        setFieldErrors(backendErrors); 
+      } else {
+        setError("Failed to save changes. Please try again.");
+      }
     } finally {
       setSaving(false);
     }
@@ -389,7 +421,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
               Joined On
             </span>
             <span className="text-sm text-secondary">
-              {new Date(user.createdAt).toLocaleDateString()}
+              {formatDate(user.createdAt)}
             </span>
           </div>
           <div className="flex flex-col gap-1">
@@ -430,6 +462,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
             onChange={handleChange}
             placeholder="Enter first name"
             required
+            error={getError("firstName")}
           />
           <InputField
             label="Last Name"
@@ -437,6 +470,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
             value={formData.lastName}
             onChange={handleChange}
             placeholder="Enter last name"
+            error={getError("lastName")}
           />
           <InputField
             label="Phone"
@@ -446,6 +480,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
             type="tel"
             icon={Phone}
             placeholder="+1 (555) 000-0000"
+            error={getError("phone")}
           />
           <InputField
             label="Date of Birth"
@@ -453,6 +488,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
             value={formData.dateOfBirth}
             onChange={handleChange}
             type="date"
+            error={getError("dateOfBirth")}
           />
           <SelectField
             label="Gender"
@@ -461,6 +497,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
             onChange={handleChange}
             options={GENDER_OPTIONS}
             placeholder="Select gender"
+            error={getError("gender")}
           />
           <SelectField
             label="Marital Status"
@@ -469,6 +506,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
             onChange={handleChange}
             options={MARITAL_OPTIONS}
             placeholder="Select status"
+            error={getError("maritalStatus")}
           />
           <InputField
             label="Nationality"
@@ -477,6 +515,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
             onChange={handleChange}
             icon={Globe}
             placeholder="e.g. Indian"
+            error={getError("nationality")}
           />
           <SelectField
             label="Blood Group"
@@ -485,6 +524,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
             onChange={handleChange}
             options={BLOOD_GROUP_OPTIONS}
             placeholder="Select blood group"
+            error={getError("bloodGroup")}
           />
           <div className="md:col-span-2">
             <SelectField
@@ -493,6 +533,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
               value={formData.timeZone}
               onChange={handleChange}
               options={TIMEZONE_OPTIONS}
+              error={getError("timeZone")}
             />
           </div>
 
@@ -506,8 +547,15 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
               onChange={handleChange}
               rows={3}
               placeholder="Tell us a little about yourself..."
-              className="field-input transition resize-none placeholder:text-slate-700"
+              className={`field-input transition resize-none placeholder:text-slate-700
+                ${getError("bio") ? "border-red-500 focus:ring-red-500" : ""}
+              `}
             />
+            {getError("bio") && (
+              <p className="text-xs text-red-500 mt-1 font-medium">
+                {getError("bio")}
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -530,8 +578,15 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
               value={formData.street}
               onChange={handleChange}
               placeholder="123 Main Street, Apt 4B"
-              className="field-input transition placeholder:text-slate-700"
+              className={`field-input transition placeholder:text-slate-700
+                ${getError("streetAddress") ? "border-red-500 focus:ring-red-500" : ""}
+              `}
             />
+            {getError("streetAddress") && (
+              <p className="text-xs text-red-500 mt-1 font-medium">
+                {getError("streetAddress")}
+              </p>
+            )}
           </div>
           <InputField
             label="City"
@@ -539,6 +594,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
             value={formData.city}
             onChange={handleChange}
             placeholder="e.g. Mumbai"
+            error={getError("city")}
           />
           <InputField
             label="State / Province"
@@ -546,6 +602,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
             value={formData.state}
             onChange={handleChange}
             placeholder="e.g. Maharashtra"
+            error={getError("state")}
           />
           <InputField
             label="Country"
@@ -554,6 +611,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
             onChange={handleChange}
             icon={Globe}
             placeholder="e.g. India"
+            error={getError("country")}
           />
           <InputField
             label="ZIP / Postal Code"
@@ -561,6 +619,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
             value={formData.zipCode}
             onChange={handleChange}
             placeholder="e.g. 400001"
+            error={getError("zipCode")}
           />
         </div>
       </div>
@@ -580,6 +639,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
             onChange={handleChange}
             icon={User}
             placeholder="Jane Doe"
+            error={getError("emergencyContactName")}
           />
           <InputField
             label="Phone Number"
@@ -589,6 +649,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
             type="tel"
             icon={Phone}
             placeholder="+1 (555) 000-0000"
+            error={getError("emergencyContactPhone")}
           />
           <SelectField
             label="Relationship"
@@ -597,6 +658,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
             onChange={handleChange}
             options={RELATION_OPTIONS}
             placeholder="Select relation"
+            error={getError("emergencyContactRelation")}
           />
         </div>
       </div>
@@ -616,6 +678,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
             onChange={handleChange}
             icon={Linkedin}
             placeholder="https://linkedin.com/in/yourname"
+            error={getError("linkedInUrl")}
           />
           <InputField
             label="Personal Website"
@@ -624,6 +687,7 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
             onChange={handleChange}
             icon={Globe}
             placeholder="https://yourwebsite.com"
+            error={getError("personalWebsite")}
           />
         </div>
       </div>

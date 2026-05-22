@@ -12,6 +12,8 @@ import EmployeeKanbanBoard from "@/components/employees/tasks/EmployeeKanbanBoar
 import { Loader2, AlertCircle, RefreshCcw } from "lucide-react";
 import { DashboardLayout } from "@/components/employees/dashboard/DashboardLayout";
 import { cn } from "@/lib/utils";
+import { getSprintsByProjectAction } from "@/actions/company/projects/sprint.actions";
+import { Sprint } from "@/shared/types/company/projects/sprint.type";
 
 export default function EmployeeTasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -21,23 +23,55 @@ export default function EmployeeTasksPage() {
 
   const loadData = useCallback(async () => {
     setIsLoading(true);
+    setError(null);
     try {
       const [tasksResult, projectsResult] = await Promise.all([
         fetchMyTasksAction(),
         getAllProjectsAction(),
       ]);
+
+      let fetchedTasks: Task[] = [];
       if (tasksResult.success && tasksResult.data) {
-        setTasks(
-          (tasksResult.data as MyTasksResponse).tasks ??
-            (tasksResult.data as any),
-        );
+        fetchedTasks = (tasksResult.data as MyTasksResponse).tasks ?? (tasksResult.data as any);
       } else {
         setError(tasksResult.error || "Failed to load tasks");
+        setIsLoading(false);
+        return;
       }
+
       if (projectsResult.success && projectsResult.data) {
         setProjects(projectsResult.data);
       }
-    } catch {
+
+      // --- Filter ONLY Active Sprint Tasks ---
+      if (fetchedTasks.length > 0) {
+        const projectIds = Array.from(new Set(fetchedTasks.map(t => t.projectId)));
+        const sprintsResults = await Promise.all(
+          projectIds.map(id => getSprintsByProjectAction(id))
+        );
+
+        const activeStoryIds = new Set<string>();
+        sprintsResults.forEach(res => {
+          if (res.success && res.data) {
+            const activeSprints = (res.data as Sprint[]).filter(s => s.status === 'ACTIVE');
+            activeSprints.forEach(s => {
+              s.issueIds.forEach(id => activeStoryIds.add(id.toString()));
+            });
+          }
+        });
+
+        const activeTasks = fetchedTasks.filter(t => {
+          if (!t.storyId) return false;
+          return activeStoryIds.has(t.storyId.toString());
+        });
+
+        setTasks(activeTasks);
+      } else {
+        setTasks([]);
+      }
+
+    } catch (err) {
+      console.error("Error loading employee dashboard:", err);
       setError("An unexpected error occurred");
     } finally {
       setIsLoading(false);
@@ -58,9 +92,9 @@ export default function EmployeeTasksPage() {
               Project Board
             </h2>
             <div className="flex items-center gap-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-              <span>{tasks.length} Total Tasks</span>
+              <span>{tasks.length} Active Tasks</span>
               <span className="w-1 h-1 rounded-full bg-slate-800" />
-              <span>{projects.length} Active Projects</span>
+              <span>{projects.length} Projects</span>
             </div>
           </div>
 

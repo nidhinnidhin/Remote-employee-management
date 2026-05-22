@@ -7,6 +7,7 @@ import { moveTaskAction } from "@/actions/company/projects/task.actions";
 import { Task, TaskStatus } from "@/shared/types/company/projects/task.type";
 import { Project } from "@/shared/types/company/projects/project.type";
 import EmployeeKanbanColumn from "./EmployeeKanbanColumn";
+import TaskDetailModal from "./TaskDetailModal";
 
 interface EmployeeKanbanBoardProps {
   tasks: Task[];
@@ -16,6 +17,8 @@ interface EmployeeKanbanBoardProps {
 
 export default function EmployeeKanbanBoard({ tasks: initialTasks, projects, onRefresh }: EmployeeKanbanBoardProps) {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
 
   useEffect(() => {
     setTasks(initialTasks);
@@ -38,6 +41,7 @@ export default function EmployeeKanbanBoard({ tasks: initialTasks, projects, onR
         toast.error("Failed to update status");
         setTasks(originalTasks);
       } else {
+        toast.success(`Task moved to ${destStatus}`);
         onRefresh();
       }
     } catch {
@@ -46,12 +50,17 @@ export default function EmployeeKanbanBoard({ tasks: initialTasks, projects, onR
     }
   };
 
-  const statuses: TaskStatus[] = [TaskStatus.TODO, TaskStatus.IN_PROGRESS, TaskStatus.DONE];
+  const handleTaskClick = (task: Task) => {
+    setSelectedTask(task);
+    setIsDetailOpen(true);
+  };
+
+  const statuses: TaskStatus[] = [TaskStatus.TODO, TaskStatus.IN_PROGRESS, TaskStatus.REVIEW, TaskStatus.DONE];
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className="w-full overflow-x-auto pb-6 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-        <div className="flex items-start gap-6 min-w-max lg:min-w-0">
+      <div className="w-full pb-6">
+        <div className="grid grid-cols-4 gap-4 w-full">
           {statuses.map((status) => (
             <EmployeeKanbanColumn
               key={status}
@@ -59,10 +68,16 @@ export default function EmployeeKanbanBoard({ tasks: initialTasks, projects, onR
               tasks={tasks.filter(t => t.status === status).sort((a, b) => a.order - b.order)}
               projects={projects}
               onRefresh={onRefresh}
+              onTaskClick={handleTaskClick}
             />
           ))}
         </div>
       </div>
+      <TaskDetailModal 
+        task={selectedTask}
+        isOpen={isDetailOpen}
+        onClose={() => setIsDetailOpen(false)}
+      />
     </DragDropContext>
   );
 }

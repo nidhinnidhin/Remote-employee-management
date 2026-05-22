@@ -6,6 +6,8 @@ import { CLOUDINARY_PATH } from 'src/shared/constants/path/cloudinary.path';
 import type { ICloudinaryService } from 'src/shared/services/cloudinary/interfaces/icloudinary.service';
 import { IUploadProfileImageUseCase } from '../../interfaces/profile/profile-use-case.interface';
 
+import { ProfileImageMapper } from '../../mappers/profile/profile-image.mapper';
+
 @Injectable()
 export class UploadProfileImageUseCase implements IUploadProfileImageUseCase {
   constructor(
@@ -14,7 +16,7 @@ export class UploadProfileImageUseCase implements IUploadProfileImageUseCase {
 
     @Inject('ICloudinaryService')
     private readonly _cloudinaryService: ICloudinaryService,
-  ) { }
+  ) {}
 
   async execute(userId: string, file: Express.Multer.File) {
     const user = await this._userRepository.findById(userId);
@@ -32,11 +34,12 @@ export class UploadProfileImageUseCase implements IUploadProfileImageUseCase {
       CLOUDINARY_PATH.UPLOAD_DOCUMENT_PATH,
     );
 
-    await this._userRepository.updateProfileImage(
-      userId,
+    const updatePayload = ProfileImageMapper.toUpdatePayload(
       uploadResult.secure_url,
       uploadResult.public_id,
     );
+    
+    await this._userRepository.updateUserFieldsById(userId, updatePayload);
 
     return {
       message: PROFILE_MESSAGES.PROFILE_IMAGE_UPLOADED,

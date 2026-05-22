@@ -4,87 +4,98 @@ import { Model, Types } from 'mongoose';
 import { UserStoryEntity } from '../../../domain/entities/user-story.entity';
 import type { IUserStoryRepository } from '../../../domain/repositories/user-story.repository.interface';
 import { UserStoryDocument } from '../mongoose/schemas/user-story.schema';
-import { UserStoryStatus } from 'src/shared/enums/project/user-story-status.enum';
-import { UserStoryPriority } from 'src/shared/enums/project/user-story-priority.enum';
+import { BaseRepository } from 'src/shared/repositories/base.repository'; // Adjust path
+import {
+  LeanStoryDocument,
+  UserStoryMapper,
+} from 'src/modules/project/application/mappers/user-story.mapper';
 
 @Injectable()
-export class MongoUserStoryRepository implements IUserStoryRepository {
+export class MongoUserStoryRepository
+  extends BaseRepository<UserStoryDocument, UserStoryEntity>
+  implements IUserStoryRepository
+{
   constructor(
     @InjectModel(UserStoryDocument.name)
     private readonly _storyModel: Model<UserStoryDocument>,
-  ) {}
+  ) {
+    super(_storyModel);
+  }
 
-  private toEntity(userDocument: UserStoryDocument): UserStoryEntity {
-    return new UserStoryEntity(
-      (userDocument._id as Types.ObjectId).toString(),
-      userDocument.companyId,
-      userDocument.projectId?.toString(),
-      userDocument.title,
-      userDocument.status as UserStoryStatus,
-      userDocument.priority as UserStoryPriority,
-      userDocument.order,
-      userDocument.createdBy,
-      userDocument.description,
-      userDocument.acceptanceCriteria,
-      userDocument.assigneeId?.toString(),
-      userDocument.createdAt,
-      userDocument.updatedAt,
-      userDocument.isDeleted,
-    );
+  protected toEntity(
+    userDocument: UserStoryDocument | LeanStoryDocument,
+  ): UserStoryEntity {
+    return UserStoryMapper.toDomain(userDocument);
   }
 
   async create(story: Partial<UserStoryEntity>): Promise<UserStoryEntity> {
-    const created = new this._storyModel({
-      ...story,
+    const persistenceData = UserStoryMapper.toPersistence(story);
+    return this.save({
+      ...persistenceData,
       isDeleted: false,
-    });
-    const saved = await created.save();
-    return this.toEntity(saved);
+    } as Partial<UserStoryDocument>);
   }
 
-  async findById(
+  async findByIdAndCompany(
     id: string,
     companyId: string,
   ): Promise<UserStoryEntity | null> {
     if (!Types.ObjectId.isValid(id)) return null;
-    const doc = await this._storyModel
-      .findOne({ _id: id, companyId, isDeleted: false })
-      .exec();
-    return doc ? this.toEntity(doc) : null;
+    return this.findOne({ _id: id, companyId, isDeleted: false });
   }
 
   async findByProjectId(
     projectId: string,
     companyId: string,
   ): Promise<UserStoryEntity[]> {
-    const docs = await this._storyModel
-      .find({ projectId, companyId, isDeleted: false })
+    const filter: any = { companyId, isDeleted: { $ne: true } };
+    
+    if (Types.ObjectId.isValid(projectId)) {
+      filter.$or = [
+        { projectId: new Types.ObjectId(projectId) },
+        { projectId: projectId }
+      ];
+    } else {
+      filter.projectId = projectId;
+    }
+
+    const docs = await this.model
+      .find(filter)
       .sort({ order: 1 })
+      .lean()
       .exec();
-    return docs.map((doc) => this.toEntity(doc));
+
+    return docs.map((doc) =>
+      this.toEntity(doc as unknown as LeanStoryDocument),
+    );
   }
 
-  async update(
+  async updateStory(
     id: string,
     companyId: string,
     story: Partial<UserStoryEntity>,
   ): Promise<UserStoryEntity | null> {
     if (!Types.ObjectId.isValid(id)) return null;
-    const doc = await this._storyModel
+
+    const doc = await this.model
       .findOneAndUpdate(
         { _id: id, companyId, isDeleted: false },
         { $set: story },
         { new: true },
       )
+      .lean()
       .exec();
-    return doc ? this.toEntity(doc) : null;
+
+    return doc ? this.toEntity(doc as unknown as LeanStoryDocument) : null;
   }
 
-  async softDelete(id: string, companyId: string): Promise<boolean> {
+  async softDeleteStory(id: string, companyId: string): Promise<boolean> {
     if (!Types.ObjectId.isValid(id)) return false;
-    const result = await this._storyModel
+
+    const result = await this.model
       .updateOne({ _id: id, companyId }, { $set: { isDeleted: true } })
       .exec();
+
     return result.modifiedCount > 0;
   }
 }

@@ -5,7 +5,7 @@ import { CalendarDays, CheckCircle2, Info, ArrowRight } from "lucide-react";
 import { LeavePolicyProps } from "@/shared/types/company/policy/policy.type";
 import { cn } from "@/lib/utils";
 
-export function LeavePolicy({ sections }: LeavePolicyProps) {
+export function LeavePolicy({ sections, leaveDistribution }: LeavePolicyProps) {
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-700">
       {/* ── HEADER HERO ── */}
@@ -27,6 +27,49 @@ export function LeavePolicy({ sections }: LeavePolicyProps) {
           </div>
         </div>
       </div>
+
+      {/* ── LEAVE ALLOCATION GRID ── */}
+      {leaveDistribution && leaveDistribution.length > 0 && (
+        <div className="space-y-6">
+          <div className="flex items-center gap-3 px-1 border-l-[3px] border-accent/40 pl-4 py-0.5">
+            <span className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-400">
+              Annual Allocation
+            </span>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {leaveDistribution.map((leave, idx) => (
+              <div 
+                key={idx}
+                className="portal-card p-6 bg-white/[0.02] border border-white/[0.05] hover:border-accent/20 transition-all group overflow-hidden relative"
+              >
+                {/* Visual Accent */}
+                <div className="absolute top-0 right-0 w-24 h-24 bg-accent/[0.02] rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-accent/[0.05] transition-all" />
+                
+                <div className="relative space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="p-2.5 rounded-xl bg-accent/5 text-accent border border-accent/10">
+                      <CalendarDays size={18} strokeWidth={2.5} />
+                    </div>
+                    <span className="text-2xl font-black text-white tracking-tighter">
+                      {leave.days}
+                    </span>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                      Type
+                    </h4>
+                    <p className="text-sm font-bold text-slate-200 truncate">
+                      {leave.type}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ── CONTENT SECTIONS: BENTO GRID ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

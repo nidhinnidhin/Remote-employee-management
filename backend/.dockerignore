@@ -1,0 +1,11 @@
+node_modules
+dist
+.git
+.env
+coverage
+npm-debug.log
+pnpm-debug.log
+Dockerfile
+
+v10
+.pnpm-store

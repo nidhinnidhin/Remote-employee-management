@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { StoryPriority } from '@/shared/types/company/projects/user-story.type';
+import { UserStoryPriority } from '@/shared/types/company/projects/user-story.type';
 import { 
   SignalHigh, 
   SignalMedium, 
@@ -9,21 +9,21 @@ import {
 } from 'lucide-react';
 
 interface StoryPriorityBadgeProps {
-  priority: StoryPriority;
+  priority: UserStoryPriority;
   className?: string;
 }
 
 const StoryPriorityBadge: React.FC<StoryPriorityBadgeProps> = ({ priority, className }) => {
   const config = {
-    High: {
+    [UserStoryPriority.HIGH]: {
       icon: SignalHigh,
       styles: 'bg-red-500/10 text-red-600 border-red-500/20 dark:bg-red-500/20 dark:text-red-400 dark:border-red-500/30',
     },
-    Medium: {
+    [UserStoryPriority.MEDIUM]: {
       icon: SignalMedium,
       styles: 'bg-orange-500/10 text-orange-600 border-orange-500/20 dark:bg-orange-500/20 dark:text-orange-400 dark:border-orange-500/30',
     },
-    Low: {
+    [UserStoryPriority.LOW]: {
       icon: SignalLow,
       styles: 'bg-blue-500/10 text-blue-600 border-blue-500/20 dark:bg-blue-500/20 dark:text-blue-400 dark:border-blue-500/30',
     },
@@ -33,7 +33,8 @@ const StoryPriorityBadge: React.FC<StoryPriorityBadgeProps> = ({ priority, class
     }
   };
 
-  const { icon: Icon, styles } = config[priority] || config.default;
+  const current = config[priority as UserStoryPriority] || config.default;
+  const { icon: Icon, styles } = current;
 
   return (
     <div

@@ -4,106 +4,130 @@ import { Model, Types } from 'mongoose';
 import { TaskEntity } from '../../../domain/entities/task.entity';
 import type { ITaskRepository } from '../../../domain/repositories/task.repository.interface';
 import { TaskDocument } from '../mongoose/schemas/task.schema';
-import { TaskStatus } from 'src/shared/enums/project/task-status.enum';
+import { BaseRepository } from 'src/shared/repositories/base.repository'; // Adjust path
+import {
+  LeanTaskDocument,
+  TaskMapper,
+} from 'src/modules/project/application/mappers/task.mapper';
 
 @Injectable()
-export class MongoTaskRepository implements ITaskRepository {
+export class MongoTaskRepository
+  extends BaseRepository<TaskDocument, TaskEntity>
+  implements ITaskRepository
+{
   constructor(
     @InjectModel(TaskDocument.name)
     private readonly _taskModel: Model<TaskDocument>,
-  ) {}
+  ) {
+    super(_taskModel);
+  }
 
-  private toEntity(taskDocument: TaskDocument): TaskEntity {
-    return new TaskEntity(
-      (taskDocument._id as Types.ObjectId).toString(),
-      taskDocument.companyId,
-      taskDocument.projectId?.toString(),
-      taskDocument.storyId?.toString(),
-      taskDocument.title,
-      taskDocument.status as TaskStatus,
-      taskDocument.order,
-      taskDocument.createdBy,
-      taskDocument.description,
-      taskDocument.assignedTo?.toString(),
-      taskDocument.assignedBy?.toString(),
-      taskDocument.estimatedHours,
-      taskDocument.actualHours,
-      taskDocument.dueDate,
-      taskDocument.createdAt,
-      taskDocument.updatedAt,
-      taskDocument.isDeleted,
-    );
+  protected toEntity(taskDoc: TaskDocument | LeanTaskDocument): TaskEntity {
+    return TaskMapper.toDomain(taskDoc);
   }
 
   async create(task: Partial<TaskEntity>): Promise<TaskEntity> {
-    const created = new this._taskModel({
-      ...task,
+    const persistenceData = TaskMapper.toPersistence(task);
+    return this.save({
+      ...persistenceData,
       isDeleted: false,
-    });
-    const saved = await created.save();
-    return this.toEntity(saved);
+    } as Partial<TaskDocument>);
   }
 
-  async findById(id: string, companyId: string): Promise<TaskEntity | null> {
+  async findByIdAndCompany(
+    id: string,
+    companyId: string,
+  ): Promise<TaskEntity | null> {
     if (!Types.ObjectId.isValid(id)) return null;
-    const doc = await this._taskModel
-      .findOne({ _id: id, companyId, isDeleted: false })
-      .exec();
-    return doc ? this.toEntity(doc) : null;
+    return this.findOne({ _id: id, companyId, isDeleted: false });
   }
 
   async findByStoryId(
     storyId: string,
     companyId: string,
   ): Promise<TaskEntity[]> {
-    const taskDocument = await this._taskModel
-      .find({ storyId, companyId, isDeleted: false })
+    const filter: any = { companyId, isDeleted: { $ne: true } };
+    
+    if (Types.ObjectId.isValid(storyId)) {
+      filter.$or = [
+        { storyId: new Types.ObjectId(storyId) },
+        { storyId: storyId }
+      ];
+    } else {
+      filter.storyId = storyId;
+    }
+
+    console.log('[MongoTaskRepository] findByStoryId filter:', JSON.stringify(filter));
+    const docs = await this.model
+      .find(filter)
       .sort({ order: 1 })
+      .lean()
       .exec();
-    return taskDocument.map((doc) => this.toEntity(doc));
+
+    console.log('[MongoTaskRepository] findByStoryId result count:', docs.length);
+
+    return docs.map((doc) => this.toEntity(doc as unknown as LeanTaskDocument));
   }
 
   async findByProjectId(
     projectId: string,
     companyId: string,
   ): Promise<TaskEntity[]> {
-    const docs = await this._taskModel
-      .find({ projectId, companyId, isDeleted: false })
-      .exec();
-    return docs.map((doc) => this.toEntity(doc));
+    const filter: any = { companyId, isDeleted: { $ne: true } };
+    if (Types.ObjectId.isValid(projectId)) {
+      filter.$or = [
+        { projectId: new Types.ObjectId(projectId) },
+        { projectId: projectId }
+      ];
+    } else {
+      filter.projectId = projectId;
+    }
+    return this.findAll(filter);
   }
 
   async findByAssignee(
     assigneeId: string,
     companyId: string,
   ): Promise<TaskEntity[]> {
-    const docs = await this._taskModel
-      .find({ assignedTo: assigneeId, companyId, isDeleted: false })
-      .exec();
-    return docs.map((doc) => this.toEntity(doc));
+    const filter: any = { companyId, isDeleted: { $ne: true } };
+    if (Types.ObjectId.isValid(assigneeId)) {
+      filter.$or = [
+        { assignedTo: new Types.ObjectId(assigneeId) },
+        { assignedTo: assigneeId }
+      ];
+    } else {
+      filter.assignedTo = assigneeId;
+    }
+    return this.findAll(filter);
   }
 
-  async update(
+  async updateTask(
     id: string,
     companyId: string,
     task: Partial<TaskEntity>,
   ): Promise<TaskEntity | null> {
     if (!Types.ObjectId.isValid(id)) return null;
-    const doc = await this._taskModel
+
+    // Let TS infer the lean result cleanly
+    const doc = await this.model
       .findOneAndUpdate(
         { _id: id, companyId, isDeleted: false },
         { $set: task },
         { new: true },
       )
+      .lean()
       .exec();
-    return doc ? this.toEntity(doc) : null;
+
+    return doc ? this.toEntity(doc as unknown as LeanTaskDocument) : null;
   }
 
-  async softDelete(id: string, companyId: string): Promise<boolean> {
+  async softDeleteTask(id: string, companyId: string): Promise<boolean> {
     if (!Types.ObjectId.isValid(id)) return false;
-    const result = await this._taskModel
+
+    const result = await this.model
       .updateOne({ _id: id, companyId }, { $set: { isDeleted: true } })
       .exec();
+
     return result.modifiedCount > 0;
   }
 }

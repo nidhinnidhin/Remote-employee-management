@@ -111,22 +111,22 @@ const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Desktop Collapse Toggle - Float style from reference */}
         {/* Desktop Collapse Toggle */}
-<button
-  onClick={toggleCollapse}
-  className={cn(
-    "hidden lg:flex items-center justify-center absolute -right-3 top-12 z-[60]",
-    "w-6 h-6 rounded-full border border-white/10 transition-all duration-300 group",
-    "bg-[#08090a] shadow-[0_0_10px_rgba(0,0,0,0.5)] hover:shadow-indigo-500/20",
-    "hover:scale-110 hover:border-indigo-500/50"
-  )}
->
-  <div className={cn(
-    "transition-colors",
-    isCollapsed ? "text-indigo-500" : "text-slate-500 group-hover:text-white"
-  )}>
-    {isCollapsed ? <ChevronRight size={12} strokeWidth={3} /> : <ChevronLeft size={12} strokeWidth={3} />}
-  </div>
-</button>
+        <button
+          onClick={toggleCollapse}
+          className={cn(
+            "hidden lg:flex items-center justify-center absolute -right-3 top-12 z-[60]",
+            "w-6 h-6 rounded-full border border-white/10 transition-all duration-300 group",
+            "bg-[#08090a] shadow-[0_0_10px_rgba(0,0,0,0.5)] hover:shadow-indigo-500/20",
+            "hover:scale-110 hover:border-indigo-500/50"
+          )}
+        >
+          <div className={cn(
+            "transition-colors",
+            isCollapsed ? "text-indigo-500" : "text-slate-500 group-hover:text-white"
+          )}>
+            {isCollapsed ? <ChevronRight size={12} strokeWidth={3} /> : <ChevronLeft size={12} strokeWidth={3} />}
+          </div>
+        </button>
 
         {/* Navigation - Grouped & Aligned */}
         <nav className="flex-1 overflow-y-auto py-6 px-3 space-y-7 custom-scrollbar">
@@ -151,9 +151,9 @@ const Sidebar: React.FC<SidebarProps> = ({
                     title={isCollapsed ? item.label : ""}
                   >
                     <div className="flex items-center gap-3">
-                      <item.icon 
-                        size={18} 
-                        strokeWidth={isActive ? 2.5 : 1.5} 
+                      <item.icon
+                        size={18}
+                        strokeWidth={isActive ? 2.5 : 1.5}
                         className={cn(isActive ? "text-indigo-500" : "text-sidebar-text/60")}
                       />
                       {!isCollapsed && (
@@ -162,7 +162,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                         </span>
                       )}
                     </div>
-                    
+
                     {/* Active Indicator (Reference Style) */}
                     {!isCollapsed && isActive && (
                       <div className="w-1 h-4 bg-indigo-500 rounded-full" />
@@ -176,23 +176,23 @@ const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Bottom Profile Section - SaaS Classic */}
         <div className="p-4 border-t" style={{ borderTopColor: "rgb(var(--color-sidebar-border) / 0.1)" }}>
-           <div className={cn(
-             "flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition-colors group cursor-pointer",
-             isCollapsed && "justify-center"
-           )}>
-              <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-[10px] font-bold text-indigo-700 uppercase shrink-0">
-                AD
-              </div>
-              {!isCollapsed && (
-                <>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-bold truncate">Admin User</p>
-                    <p className="text-[10px] opacity-50 truncate font-medium">Company Manager</p>
-                  </div>
-                  <Settings2 size={14} className="opacity-40 group-hover:opacity-100 transition-opacity" />
-                </>
-              )}
-           </div>
+          <div className={cn(
+            "flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition-colors group cursor-pointer",
+            isCollapsed && "justify-center"
+          )}>
+            <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-[10px] font-bold text-indigo-700 uppercase shrink-0">
+              AD
+            </div>
+            {!isCollapsed && (
+              <>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-bold truncate">Admin User</p>
+                  <p className="text-[10px] opacity-50 truncate font-medium">Company Manager</p>
+                </div>
+                <Settings2 size={14} className="opacity-40 group-hover:opacity-100 transition-opacity" />
+              </>
+            )}
+          </div>
         </div>
       </aside>
     </>

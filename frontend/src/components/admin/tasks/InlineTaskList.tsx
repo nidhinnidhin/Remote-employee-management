@@ -31,6 +31,7 @@ const InlineTaskList: React.FC<InlineTaskListProps> = ({ storyId, projectId, emp
 
   const fetchTasks = useCallback(async () => {
     setLoading(true);
+    console.log('[InlineTaskList] Fetching tasks for storyId:', storyId);
     const result = await getTasksByStoryAction(storyId);
     if (result.success && result.data) {
       setTasks(result.data.sort((a, b) => a.order - b.order));

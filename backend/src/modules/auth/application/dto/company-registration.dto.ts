@@ -3,16 +3,16 @@ import { IsEmail, IsNotEmpty, IsString, IsOptional } from 'class-validator';
 export class CompanyRegistrationDto {
   @IsString()
   @IsNotEmpty()
-  name: string;
+  name!: string;
 
   @IsEmail()
-  email: string;
+  email!: string;
 
   @IsString()
-  size: string;
+  size!: string;
 
   @IsString()
-  industry: string;
+  industry!: string;
 
   @IsOptional()
   @IsString()

@@ -1,5 +1,6 @@
-import { IsString, IsNotEmpty, IsEnum, IsNumber, IsDateString, Min, MinLength, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsEnum, IsNumber, IsDateString, Min, MinLength, IsOptional, IsArray } from 'class-validator';
 import { TaskStatus } from 'src/shared/enums/project/task-status.enum';
+import { UserStoryPriority } from 'src/shared/enums/project/user-story-priority.enum';
 
 export class CreateTaskDto {
   @IsString()
@@ -32,6 +33,10 @@ export class CreateTaskDto {
   @IsNotEmpty({ message: 'Task status is required' })
   status: TaskStatus;
 
+  @IsEnum(UserStoryPriority, { message: 'Invalid priority' })
+  @IsOptional()
+  priority?: UserStoryPriority;
+
   @IsNumber()
   @IsOptional()
   order?: number;
@@ -39,4 +44,14 @@ export class CreateTaskDto {
   @IsDateString({}, { message: 'Due date must be a valid date' })
   @IsNotEmpty({ message: 'Due date is required' })
   dueDate: string;
+
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
+  attachments?: string[];
+
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
+  links?: string[];
 }

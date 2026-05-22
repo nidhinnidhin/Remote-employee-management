@@ -1,4 +1,3 @@
-// infrastructure/repositories/company-policy.repository.impl.ts
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -8,8 +7,8 @@ import {
   CompanyPolicyEntity,
   PolicyItemEntity,
 } from '../../domain/entities/company-policy.entity';
-
 import { BaseRepository } from 'src/shared/repositories/base.repository';
+import { CompanyPolicyMapper, LeanCompanyPolicyDocument } from '../../application/mappers/company-policy.mapper';
 
 @Injectable()
 export class CompanyPolicyRepositoryImpl
@@ -23,6 +22,11 @@ export class CompanyPolicyRepositoryImpl
     super(_companyPolicyModel);
   }
 
+  protected toEntity(doc: CompanyPolicy | LeanCompanyPolicyDocument): CompanyPolicyEntity {
+    return CompanyPolicyMapper.toDomain(doc);
+  }
+
+
   async upsertCompanyPolicies(
     companyId: string,
     policies: PolicyItemEntity[],
@@ -32,29 +36,9 @@ export class CompanyPolicyRepositoryImpl
 
   async getCompanyPolicies(companyId: string): Promise<PolicyItemEntity[]> {
     const companyDoc = await this.findOne({ companyId });
+    
     if (!companyDoc) return [];
-    return companyDoc.policies;
-  }
-
-  protected toEntity(companyPolicy: CompanyPolicy): CompanyPolicyEntity {
-    return new CompanyPolicyEntity(
-      (companyPolicy as any)._id.toString(),
-      companyPolicy.companyId,
-      this.toPolicyItems(companyPolicy.policies ?? []),
-      (companyPolicy as any).createdAt,
-      (companyPolicy as any).updatedAt,
-    );
-  }
-
-  private toPolicyItems(policies: any[]): PolicyItemEntity[] {
-    return policies.map(
-      (p) =>
-        new PolicyItemEntity(
-          p.type,
-          p.title,
-          p.content ?? { sections: [] },
-          p.isActive ?? true,
-        ),
-    );
+    
+    return companyDoc.policies; 
   }
 }

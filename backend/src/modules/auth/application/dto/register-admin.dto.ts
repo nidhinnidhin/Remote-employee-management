@@ -3,18 +3,18 @@ import { IsNotEmpty, IsString, IsEmail, MinLength } from 'class-validator';
 export class RegisterAdminDto {
     @IsString()
     @IsNotEmpty()
-    firstName: string;
+    firstName!: string;
 
     @IsString()
     @IsNotEmpty()
-    lastName: string;
+    lastName!: string;
 
     @IsEmail()
-    email: string;
+    email!: string;
 
     @IsString()
-    phone: string;
+    phone!: string;
 
     @MinLength(8)
-    password: string;
+    password!: string;
 }

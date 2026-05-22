@@ -24,9 +24,12 @@
     "@nestjs/common": "^11.1.11",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.1.11",
+    "@nestjs/mapped-types": "^2.1.1",
     "@nestjs/mongoose": "^11.0.4",
     "@nestjs/platform-express": "^11.1.11",
+    "@nestjs/platform-socket.io": "^11.1.19",
     "@nestjs/schedule": "^6.1.1",
+    "@nestjs/websockets": "^11.1.19",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.3",
@@ -43,9 +46,14 @@
     "mongoose": "^8.23.0",
     "multer": "^2.0.2",
     "nodemailer": "^7.0.12",
+<<<<<<< HEAD
 >>>>>>> develop
+=======
+    "razorpay": "^2.9.6",
+>>>>>>> 6ab66f19bb01e7f32aa738247fe53e06139ceb54
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
+    "socket.io": "^4.8.3",
     "uuid": "^13.0.0"
   },
   "devDependencies": {

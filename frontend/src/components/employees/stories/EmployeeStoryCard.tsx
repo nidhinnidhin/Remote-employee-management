@@ -48,8 +48,8 @@ export default function EmployeeStoryCard({
 
           <div className="flex flex-col min-w-0">
             <div className="flex items-center gap-2">
-               <span className="text-[9px] font-black text-accent/50 uppercase tracking-tighter">US-{story.id?.toString().slice(-3) || '00'}</span>
-               <h4 className="text-[14px] font-bold text-white tracking-tight truncate">
+              <span className="text-[9px] font-black text-accent/50 uppercase tracking-tighter">US-{story.id?.toString().slice(-3) || '00'}</span>
+              <h4 className="text-[14px] font-bold text-white tracking-tight truncate">
                 {story.title}
               </h4>
             </div>
@@ -62,7 +62,11 @@ export default function EmployeeStoryCard({
         </div>
 
         <div className="flex items-center gap-3 shrink-0">
-          <div className="hidden md:flex items-center gap-2 scale-90">
+          <div className="hidden md:flex items-center gap-3 scale-90">
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-accent/10 border border-accent/20 text-accent">
+               <span className="text-[9px] font-black uppercase tracking-tighter">Points</span>
+               <span className="text-[12px] font-black leading-none">{story.storyPoints || 0}</span>
+            </div>
             <StoryPriorityBadge priority={story.priority} />
             <StoryStatusBadge status={story.status} />
           </div>
@@ -87,7 +91,6 @@ export default function EmployeeStoryCard({
             <div className="px-4 pb-5">
               {/* Main Info Block - Tightened Grid */}
               <div className="flex flex-col lg:flex-row gap-4 p-4 rounded-xl bg-white/[0.02] border border-white/5">
-                
                 {/* Objective - Flexible width */}
                 <div className="flex-1 space-y-2">
                   <div className="flex items-center gap-2 text-accent/70">
@@ -109,24 +112,80 @@ export default function EmployeeStoryCard({
                     <span className="text-[9px] font-black uppercase tracking-widest">Success Criteria</span>
                   </div>
                   <div className="pl-5">
-                    <AcceptanceCriteriaList 
-                        criteria={story.acceptanceCriteria} 
-                        className="!text-[12px] !text-slate-400 !space-y-1.5" 
+                    <AcceptanceCriteriaList
+                      criteria={story.acceptanceCriteria}
+                      className="!text-[12px] !text-slate-400 !space-y-1.5"
                     />
                   </div>
                 </div>
               </div>
 
+              {/* Resources & Assets */}
+              {((story.attachments && story.attachments.length > 0) || (story.links && story.links.length > 0)) && (
+                <div className="mt-6 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <span className="text-[9px] font-black text-slate-600 uppercase tracking-[0.2em] whitespace-nowrap">Resources & Assets</span>
+                    <div className="h-px w-full bg-white/5"></div>
+                  </div>
+
+                  <div className="space-y-5">
+                    {/* Image Attachments */}
+                    {story.attachments && story.attachments.length > 0 && (
+                      <div className="space-y-2">
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Attachments</span>
+                        <div className="flex flex-wrap gap-3">
+                          {story.attachments.map((src, idx) => (
+                            <div 
+                              key={idx} 
+                              className="relative group w-24 h-24 rounded-xl overflow-hidden border border-white/10 bg-white/5 cursor-pointer shadow-lg hover:border-accent/40 transition-all duration-300"
+                              onClick={() => window.open(src, '_blank')}
+                            >
+                              <img src={src} alt={`Attachment ${idx}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <Layers size={16} className="text-white" />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* External Links */}
+                    {story.links && story.links.length > 0 && (
+                      <div className="space-y-2">
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Documentation Links</span>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {story.links.map((link, idx) => (
+                            <a
+                              key={idx}
+                              href={link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.05] hover:border-accent/30 hover:bg-white/[0.04] transition-all group shadow-sm"
+                            >
+                              <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center text-accent/60 group-hover:text-accent transition-colors shrink-0">
+                                <Layers size={12} />
+                              </div>
+                              <span className="text-[12px] text-slate-400 group-hover:text-slate-200 truncate">{link}</span>
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Tasks Section */}
               <div className="mt-5">
-                 <div className="flex items-center gap-3 mb-3">
-                    <span className="text-[9px] font-black text-slate-600 uppercase tracking-[0.2em] whitespace-nowrap">Roster & Tasks</span>
-                    <div className="h-px w-full bg-white/5"></div>
-                 </div>
-                 <EmployeeInlineTaskList 
-                    tasks={tasks} 
-                    onRefresh={onRefresh}
-                 />
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="text-[9px] font-black text-slate-600 uppercase tracking-[0.2em] whitespace-nowrap">Roster & Tasks</span>
+                  <div className="h-px w-full bg-white/5"></div>
+                </div>
+                <EmployeeInlineTaskList
+                  tasks={tasks}
+                  onRefresh={onRefresh}
+                />
               </div>
 
               {/* Mobile View Badges */}

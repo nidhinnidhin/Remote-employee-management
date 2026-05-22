@@ -8,7 +8,14 @@ const handleActionError = (error: any, context: string) => {
   let message = "An unexpected error occurred";
 
   if (serverData) {
-    if (Array.isArray(serverData.message)) {
+    if (serverData.errors) {
+      console.error(`[Department Action] ${context} validation errors:`, serverData.errors);
+      // Construct a better message from validation errors
+      const firstError = Object.values(serverData.errors)[0];
+      if (Array.isArray(firstError)) {
+        message = `${Object.keys(serverData.errors)[0]}: ${firstError[0]}`;
+      }
+    } else if (Array.isArray(serverData.message)) {
       message = serverData.message[0]; 
     } else if (typeof serverData.message === 'string') {
       message = serverData.message;
@@ -27,6 +34,15 @@ export const getDepartmentsAction = async (): Promise<Department[]> => {
   } catch (error: any) {
     console.error("Error fetching departments:", error?.message);
     throw error;
+  }
+};
+
+export const searchDepartmentsAction = async (params: { page: number; limit: number; search?: string; employeeId?: string }): Promise<{ data: Department[]; total: number }> => {
+  try {
+    const { page, limit, search, employeeId } = params;
+    return await DepartmentService.searchDepartments({ page, limit, search, employeeId });
+  } catch (error: any) {
+    throw handleActionError(error, "Search");
   }
 };
 

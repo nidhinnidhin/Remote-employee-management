@@ -5,6 +5,7 @@ import { LogOut, User, ChevronDown, Settings } from "lucide-react";
 import { LogoutConfirmationModal } from "./modals/LogoutConfirmationModal";
 import { logoutAction } from "@/actions/auth/logout.action";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 
 interface UserNavProps {
   userEmail?: string;
@@ -49,12 +50,14 @@ export const UserNav: React.FC<UserNavProps> = ({
     }
   };
 
-  const initials = userName
+  const initials = userName?.trim()
     ? userName
         .split(" ")
+        .filter(Boolean)
         .map((n) => n[0])
         .join("")
         .toUpperCase()
+        .slice(0, 2)
     : userEmail
       ? userEmail[0].toUpperCase()
       : "U";
@@ -100,6 +103,24 @@ export const UserNav: React.FC<UserNavProps> = ({
               <p className="text-xs text-muted truncate mt-0.5">
                 {userEmail || "Signed in"}
               </p>
+            </div>
+
+            <div className="p-2 border-b border-border-subtle">
+              {theme === "theme-company" ? (
+                <Link
+                  href="/admin/profile"
+                  onClick={() => setIsDropdownOpen(false)}
+                  className="w-full flex items-center gap-3 px-3 py-2 text-sm text-primary hover:bg-white/5 rounded-lg transition-colors"
+                >
+                  <User size={16} />
+                  <span>Profile</span>
+                </Link>
+              ) : (
+                <div className="w-full flex items-center gap-3 px-3 py-2 text-sm text-primary/50 cursor-not-allowed">
+                  <User size={16} />
+                  <span>Profile</span>
+                </div>
+              )}
             </div>
 
             <div className="p-2  border-border-subtle">

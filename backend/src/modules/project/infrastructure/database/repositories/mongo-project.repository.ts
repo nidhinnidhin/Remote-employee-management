@@ -4,76 +4,73 @@ import { Model, Types } from 'mongoose';
 import { ProjectEntity } from '../../../domain/entities/project.entity';
 import type { IProjectRepository } from '../../../domain/repositories/project.repository.interface';
 import { ProjectDocument } from '../mongoose/schemas/project.schema';
-import { ProjectStatus } from 'src/shared/enums/project/project-status.enum';
+import { BaseRepository } from 'src/shared/repositories/base.repository';
+import { LeanProjectDocument, ProjectMapper } from 'src/modules/project/application/mappers/project.mapper';
 
 @Injectable()
-export class MongoProjectRepository implements IProjectRepository {
+export class MongoProjectRepository 
+  extends BaseRepository<ProjectDocument, ProjectEntity> 
+  implements IProjectRepository 
+{
   constructor(
     @InjectModel(ProjectDocument.name)
     private readonly _projectModel: Model<ProjectDocument>,
-  ) {}
+  ) {
+    super(_projectModel);
+  }
 
-  private toEntity(projectDocument: ProjectDocument): ProjectEntity {
-    return new ProjectEntity(
-      (projectDocument._id as Types.ObjectId).toString(),
-      projectDocument.companyId,
-      projectDocument.name,
-      projectDocument.status as ProjectStatus,
-      projectDocument.createdBy,
-      projectDocument.description,
-      projectDocument.startDate,
-      projectDocument.endDate,
-      projectDocument.createdAt,
-      projectDocument.updatedAt,
-      projectDocument.isDeleted,
-    );
+  protected toEntity(projectDoc: ProjectDocument | LeanProjectDocument): ProjectEntity {
+    return ProjectMapper.toDomain(projectDoc);
   }
 
   async create(project: Partial<ProjectEntity>): Promise<ProjectEntity> {
-    const created = new this._projectModel({
-      ...project,
-      isDeleted: false,
-    });
-    const saved = await created.save();
-    return this.toEntity(saved);
+    const persistenceData = ProjectMapper.toPersistence(project);
+    return this.save({
+      ...persistenceData,
+      isDeleted: false, 
+    } as Partial<ProjectDocument>);
   }
 
-  async findById(id: string, companyId: string): Promise<ProjectEntity | null> {
+  async findByIdAndCompany(id: string, companyId: string): Promise<ProjectEntity | null> {
     if (!Types.ObjectId.isValid(id)) return null;
-    const doc = await this._projectModel
-      .findOne({ _id: id, companyId, isDeleted: false })
-      .exec();
-    return doc ? this.toEntity(doc) : null;
+    return this.findOne({ _id: id, companyId, isDeleted: false });
   }
 
-  async findAll(companyId: string): Promise<ProjectEntity[]> {
-    const projectDocument = await this._projectModel
+  async findAllByCompanyId(companyId: string): Promise<ProjectEntity[]> {
+    const docs = await this.model
       .find({ companyId, isDeleted: false })
+      .lean()
       .exec();
-    return projectDocument.map((doc) => this.toEntity(doc));
+      
+    return docs.map((doc) => this.toEntity(doc as unknown as LeanProjectDocument));
   }
 
-  async update(
+  async updateProject(
     id: string,
     companyId: string,
     project: Partial<ProjectEntity>,
   ): Promise<ProjectEntity | null> {
     if (!Types.ObjectId.isValid(id)) return null;
-    const doc = await this._projectModel
+    
+    const doc = await this.model
       .findOneAndUpdate(
         { _id: id, companyId, isDeleted: false },
         { $set: project },
         { new: true },
       )
+      .lean()
       .exec();
-    return doc ? this.toEntity(doc) : null;
+      
+    return doc ? this.toEntity(doc as unknown as LeanProjectDocument) : null;
   }
 
-  async softDelete(id: string, companyId: string): Promise<boolean> {
+  async softDeleteProject(id: string, companyId: string): Promise<boolean> {
     if (!Types.ObjectId.isValid(id)) return false;
-    const result = await this._projectModel
+    
+    const result = await this.model
       .updateOne({ _id: id, companyId }, { $set: { isDeleted: true } })
       .exec();
+      
     return result.modifiedCount > 0;
   }
 }

@@ -1,13 +1,36 @@
 // src/main.ts
-import { ValidationPipe } from '@nestjs/common';
+
+import {
+  ValidationPipe,
+  BadRequestException,
+} from '@nestjs/common';
+
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+
 import cookieParser from 'cookie-parser';
+
+import { AppModule } from './app.module';
+
+import { ResponseInterceptor } from './common/response/response.interceptor';
+
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+
+import { ILogger } from './common/logger/interface/logger.interface';
+import { LOGGER_SERVICE } from './common/logger/tokens/logger.tokens';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  const logger = app.get<ILogger>(LOGGER_SERVICE);
+  app.useLogger(logger as any);
+
+  logger.log(
+    'Starting NestJS bootstrap...',
+    'Bootstrap',
+  );
+
   app.use(cookieParser());
+
   app.enableCors({
     origin: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
@@ -22,10 +45,57 @@ async function bootstrap() {
       whitelist: true,
       forbidNonWhitelisted: true,
       transform: true,
+
+      exceptionFactory: (errors) => {
+        const formattedErrors: Record<
+          string,
+          string[]
+        > = {};
+
+        const formatErrors = (errs) => {
+          errs.forEach((error) => {
+            if (error.constraints) {
+              formattedErrors[error.property] =
+                Object.values(error.constraints);
+            }
+
+            if (
+              error.children &&
+              error.children.length > 0
+            ) {
+              formatErrors(error.children);
+            }
+          });
+        };
+
+        formatErrors(errors);
+
+        logger.warn(
+          'Validation failed',
+          'ValidationPipe',
+        );
+
+        return new BadRequestException({
+          message: 'Validation failed',
+          errors: formattedErrors,
+        });
+      },
     }),
   );
+  app.useGlobalInterceptors(
+    new ResponseInterceptor(),
+  );
+  app.useGlobalFilters(
+    new HttpExceptionFilter(),
+  );
+  const port = process.env.PORT || 3000;
 
-  await app.listen(process.env.PORT || 3000);
+  await app.listen(port, '0.0.0.0');
+
+  logger.log(
+    `Backend is running on: http://0.0.0.0:${port}`,
+    'Bootstrap',
+  );
 }
 
 void bootstrap();

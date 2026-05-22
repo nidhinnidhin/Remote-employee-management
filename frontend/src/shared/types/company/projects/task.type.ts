@@ -1,6 +1,9 @@
+import { UserStoryPriority } from './user-story.type';
+
 export enum TaskStatus {
   TODO = 'Todo',
   IN_PROGRESS = 'In Progress',
+  REVIEW = 'Review',
   DONE = 'Done',
 }
 
@@ -12,6 +15,7 @@ export interface Task {
   title: string;
   description: string;
   status: TaskStatus;
+  priority: UserStoryPriority;
   order: number;
   assignedTo: string;
   assignedBy: string;
@@ -19,6 +23,8 @@ export interface Task {
   estimatedHours: number;
   actualHours?: number;
   dueDate: string;
+  attachments: string[];
+  links: string[];
   createdAt: string;
   updatedAt: string;
   isDeleted: boolean;
@@ -30,13 +36,18 @@ export interface CreateTaskPayload {
   title: string;
   description: string;
   status: TaskStatus;
+  priority: UserStoryPriority;
   estimatedHours: number;
   assignedTo: string;
   dueDate: string;
+  attachments?: string[];
+  links?: string[];
 }
 
 export interface UpdateTaskPayload extends Partial<Omit<CreateTaskPayload, 'projectId' | 'storyId'>> {
   actualHours?: number;
+  attachments?: string[];
+  links?: string[];
 }
 
 export interface MoveTaskPayload {

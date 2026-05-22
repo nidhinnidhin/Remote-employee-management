@@ -1,4 +1,5 @@
 import {
+// Triggering reload for new statuses
   Controller,
   Get,
   Post,
@@ -17,13 +18,16 @@ import { CompanyAdminGuard } from 'src/shared/guards/company-admin.guard';
 import { CreateTaskDto } from '../../application/dto/task/create-task.dto';
 import { UpdateTaskDto } from '../../application/dto/task/update-task.dto';
 import { MoveTaskDto } from '../../application/dto/task/move-task.dto';
+import { SearchTasksDto } from '../../application/dto/task/search-tasks.dto';
 import type {
   ICreateTaskUseCase,
   IGetTasksByStoryUseCase,
+  IGetTasksByProjectUseCase,
   IGetMyTasksUseCase,
   IUpdateTaskUseCase,
   IMoveTaskUseCase,
   IDeleteTaskUseCase,
+  ISearchTasksUseCase,
 } from '../../application/interfaces/task/task-use-cases.interface';
 
 @Controller('tasks')
@@ -34,6 +38,8 @@ export class TaskController {
     private readonly _createTaskUseCase: ICreateTaskUseCase,
     @Inject('IGetTasksByStoryUseCase')
     private readonly _getTasksByStoryUseCase: IGetTasksByStoryUseCase,
+    @Inject('IGetTasksByProjectUseCase')
+    private readonly _getTasksByProjectUseCase: IGetTasksByProjectUseCase,
     @Inject('IGetMyTasksUseCase')
     private readonly _getMyTasksUseCase: IGetMyTasksUseCase,
     @Inject('IUpdateTaskUseCase')
@@ -42,6 +48,8 @@ export class TaskController {
     private readonly _moveTaskUseCase: IMoveTaskUseCase,
     @Inject('IDeleteTaskUseCase')
     private readonly _deleteTaskUseCase: IDeleteTaskUseCase,
+    @Inject('ISearchTasksUseCase')
+    private readonly _searchTasksUseCase: ISearchTasksUseCase,
   ) {}
 
   @Post()
@@ -55,8 +63,23 @@ export class TaskController {
   }
 
   @Get()
-  async findByStory(@Req() req: Request, @Query('storyId') storyId: string) {
-    return this._getTasksByStoryUseCase.execute(storyId, req.user!.companyId!);
+  async findTasks(
+    @Req() req: Request, 
+    @Query('storyId') storyId?: string,
+    @Query('projectId') projectId?: string
+  ) {
+    if (storyId) {
+      return this._getTasksByStoryUseCase.execute(storyId, req.user!.companyId!);
+    }
+    if (projectId) {
+      return this._getTasksByProjectUseCase.execute(projectId, req.user!.companyId!);
+    }
+    return [];
+  }
+
+  @Get('search')
+  async search(@Req() req: Request, @Query() dto: SearchTasksDto) {
+    return this._searchTasksUseCase.execute(req.user!.companyId!, dto);
   }
 
   @Get('my')

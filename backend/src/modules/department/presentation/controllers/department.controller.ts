@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { Inject } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import type { Request } from 'express';
@@ -11,9 +11,11 @@ import type {
   IDeleteDepartmentUseCase,
   IRemoveEmployeeFromDepartmentUseCase,
   IGetEmployeeDepartmentsUseCase,
+  ISearchDepartmentsUseCase,
 } from '../../application/interfaces/department-usecase.interface';
 
 import { CreateDepartmentDto } from '../../application/dto/create-department.dto';
+import { SearchDepartmentsDto } from '../../application/dto/search-departments.dto';
 import { AddEmployeeToDepartmentDto } from '../../application/dto/add-employee-to-department.dto';
 import { CompanyAdminGuard } from 'src/shared/guards/company-admin.guard';
 import { EMPLOYEE_MESSAGES } from 'src/shared/constants/messages/employee/employee.messages';
@@ -42,6 +44,8 @@ export class DepartmentController {
 
     @Inject('IGetEmployeeDepartmentsUseCase')
     private readonly _getEmployeeDepartmentsUseCase: IGetEmployeeDepartmentsUseCase,
+    @Inject('ISearchDepartmentsUseCase')
+    private readonly _searchDepartmentsUseCase: ISearchDepartmentsUseCase,
   ) {}
 
   @Post()
@@ -57,6 +61,13 @@ export class DepartmentController {
   async getAll(@Req() req: Request) {
     const companyId = (req.user as any).companyId;
     return this._getDepartmentsUseCase.execute(companyId);
+  }
+
+  @Get('search')
+  @UseGuards(JwtAuthGuard)
+  async search(@Req() req: Request, @Query() dto: SearchDepartmentsDto) {
+    const companyId = (req.user as any).companyId;
+    return this._searchDepartmentsUseCase.execute(companyId, dto);
   }
 
   @Get('my-departments')

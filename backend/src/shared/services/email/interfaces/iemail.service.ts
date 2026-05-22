@@ -16,4 +16,22 @@ export interface IEmailService {
     status: UserStatus.ACTIVE | UserStatus.SUSPENDED,
     reason: string,
   ): Promise<void>;
+  sendLateClockInRequestNotification(
+    adminEmail: string,
+    adminName: string,
+    employeeName: string,
+    employeeEmail: string,
+    reason: string,
+  ): Promise<void>;
+  sendLateClockInEmployeeConfirmation(
+    employeeEmail: string,
+    employeeName: string,
+    reason: string,
+  ): Promise<void>;
+  sendLateClockInDecisionNotification(
+    employeeEmail: string,
+    employeeName: string,
+    decision: 'APPROVED' | 'REJECTED',
+    adminRemarks: string,
+  ): Promise<void>;
 }

@@ -10,7 +10,7 @@ export class DeleteUserStoryUseCase implements IDeleteUserStoryUseCase {
   ) {}
 
   async execute(id: string, companyId: string): Promise<boolean> {
-    const deleted = await this._storyRepository.softDelete(id, companyId);
+    const deleted = await this._storyRepository.softDeleteStory(id, companyId);
     if (!deleted) {
       throw new NotFoundException('User story not found');
     }

@@ -2,20 +2,24 @@ import { IsEmail, IsNotEmpty, IsString, IsOptional, ValidateNested, IsObject, Is
 import { Type } from 'class-transformer';
 
 export class OnboardingCompanyDto {
+    @IsOptional()
+    @IsString()
+    id?: string;
+
     @IsString()
     @IsNotEmpty()
-    name: string;
+    name!: string;
 
     @IsEmail()
-    email: string;
+    email!: string;
 
     @IsString()
     @IsNotEmpty()
-    size: string;
+    size!: string;
 
     @IsString()
     @IsNotEmpty()
-    industry: string;
+    industry!: string;
 
     @IsOptional()
     @IsString()
@@ -25,7 +29,7 @@ export class OnboardingCompanyDto {
 export class OnboardingSubscriptionDto {
     @IsString()
     @IsNotEmpty()
-    plan: string;
+    plan!: string;
 }
 
 export class OnboardingDto {
@@ -33,15 +37,15 @@ export class OnboardingDto {
     @IsString()
     userId?: string;
 
-    @IsDefined()
+    @IsOptional()
     @IsObject()
     @ValidateNested()
     @Type(() => OnboardingCompanyDto)
-    company: OnboardingCompanyDto;
+    company?: OnboardingCompanyDto;
 
-    @IsDefined()
+    @IsOptional()
     @IsObject()
     @ValidateNested()
     @Type(() => OnboardingSubscriptionDto)
-    subscription: OnboardingSubscriptionDto;
+    subscription?: OnboardingSubscriptionDto;
 }

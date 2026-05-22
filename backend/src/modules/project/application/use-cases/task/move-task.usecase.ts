@@ -19,7 +19,7 @@ export class MoveTaskUseCase implements IMoveTaskUseCase {
     role: string,
     taskDto: MoveTaskDto,
   ): Promise<TaskEntity> {
-    const task = await this._taskRepository.findById(id, companyId);
+    const task = await this._taskRepository.findByIdAndCompany(id, companyId);
     if (!task) {
       throw new NotFoundException('Task not found');
     }
@@ -28,7 +28,7 @@ export class MoveTaskUseCase implements IMoveTaskUseCase {
       throw new ForbiddenException('You can only move tasks assigned to you');
     }
 
-    const updated = await this._taskRepository.update(id, companyId, {
+    const updated = await this._taskRepository.updateTask(id, companyId, {
       status: taskDto.status,
       order: taskDto.order,
     });

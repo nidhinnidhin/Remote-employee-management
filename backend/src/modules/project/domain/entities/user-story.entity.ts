@@ -1,5 +1,6 @@
 import { UserStoryStatus } from 'src/shared/enums/project/user-story-status.enum';
 import { UserStoryPriority } from 'src/shared/enums/project/user-story-priority.enum';
+import { IssueType } from 'src/shared/enums/project/issue-type.enum';
 
 export class UserStoryEntity {
   constructor(
@@ -9,11 +10,16 @@ export class UserStoryEntity {
     public readonly title: string,
     public readonly status: UserStoryStatus,
     public readonly priority: UserStoryPriority,
+    public readonly type: IssueType,
     public readonly order: number,
     public readonly createdBy: string,
     public readonly description: string,
     public readonly acceptanceCriteria: string[],
     public readonly assigneeId: string,
+    public readonly storyPoints: number,
+    public readonly isInBacklog: boolean = true,
+    public readonly attachments: string[] = [],
+    public readonly links: string[] = [],
     public readonly createdAt?: Date,
     public readonly updatedAt?: Date,
     public readonly isDeleted: boolean = false,

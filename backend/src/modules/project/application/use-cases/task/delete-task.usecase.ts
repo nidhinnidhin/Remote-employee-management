@@ -10,7 +10,7 @@ export class DeleteTaskUseCase implements IDeleteTaskUseCase {
   ) {}
 
   async execute(id: string, companyId: string): Promise<boolean> {
-    const deleted = await this._taskRepository.softDelete(id, companyId);
+    const deleted = await this._taskRepository.softDeleteTask(id, companyId);
     if (!deleted) {
       throw new NotFoundException('Task not found');
     }

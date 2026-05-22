@@ -7,6 +7,7 @@ import Header from "./Header";
 
 export default function EmployeesPage() {
   const [refreshKey, setRefreshKey] = useState(0);
+  const [search, setSearch] = useState("");
 
   const handleInviteSuccess = () => {
     setRefreshKey((prev) => prev + 1);
@@ -14,8 +15,14 @@ export default function EmployeesPage() {
 
   return (
     <AdminLayoutWrapper>
-      <Header onInviteSuccess={handleInviteSuccess} />
-      <EmployeesTable refreshKey={refreshKey} />
+      <Header 
+        onInviteSuccess={handleInviteSuccess} 
+        onSearch={setSearch}
+      />
+      <EmployeesTable 
+        refreshKey={refreshKey} 
+        searchQuery={search}
+      />
     </AdminLayoutWrapper>
   );
 }

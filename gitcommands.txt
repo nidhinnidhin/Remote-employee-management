@@ -9,3 +9,23 @@ git push origin develop
 git checkout feature/company-admin-reset-password
 git merge develop
 git push origin feature/company-admin-reset-password
+
+Conventional commits:-
+
+Feature
+feat(payment): add Razorpay integration
+
+Bug Fix
+fix(api): handle null response from user service
+
+Documentation
+docs(readme): update installation steps
+
+Refactor
+refactor(cart): simplify discount calculation
+
+Performance
+perf(search): optimize query execution
+
+Tests
+test(auth): add login service unit tests

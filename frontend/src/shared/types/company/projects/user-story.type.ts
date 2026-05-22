@@ -1,5 +1,16 @@
-export type StoryStatus = 'Backlog' | 'In Progress' | 'Done';
-export type StoryPriority = 'Low' | 'Medium' | 'High';
+export enum UserStoryStatus {
+  TODO = 'Todo',
+  BACKLOG = 'Backlog',
+  IN_PROGRESS = 'In Progress',
+  REVIEW = 'Review',
+  DONE = 'Done',
+}
+export enum UserStoryPriority {
+  LOW = 'Low',
+  MEDIUM = 'Medium',
+  HIGH = 'High',
+}
+export type IssueType = 'Story' | 'Bug';
 
 export interface UserStory {
   id: string;
@@ -7,10 +18,15 @@ export interface UserStory {
   projectId: string;
   title: string;
   description: string;
-  status: StoryStatus;
-  priority: StoryPriority;
+  status: UserStoryStatus;
+  priority: UserStoryPriority;
+  type: IssueType;
   assigneeId: string;
   acceptanceCriteria: string[];
+  storyPoints: number;
+  isInBacklog: boolean;
+  attachments: string[];
+  links: string[];
   order: number;
   createdBy: string;
   createdAt: string;
@@ -22,10 +38,16 @@ export interface CreateStoryPayload {
   projectId: string;
   title: string;
   description: string;
-  status: StoryStatus;
-  priority: StoryPriority;
+  status: UserStoryStatus;
+  priority: UserStoryPriority;
+  type: IssueType;
   assigneeId: string;
   acceptanceCriteria: string[];
+  storyPoints?: number;
+  isInBacklog?: boolean;
+  addToActiveSprint?: boolean;
+  attachments?: string[];
+  links?: string[];
 }
 
 export interface UpdateStoryPayload extends Partial<Omit<CreateStoryPayload, 'projectId'>> {}

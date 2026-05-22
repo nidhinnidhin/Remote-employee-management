@@ -1,5 +1,6 @@
 import { CreateProjectDto } from '../../dto/project/create-project.dto';
 import { UpdateProjectDto } from '../../dto/project/update-project.dto';
+import { SearchProjectsDto } from '../../dto/project/search-projects.dto';
 import { ProjectEntity } from '../../../domain/entities/project.entity';
 
 export interface ICreateProjectUseCase {
@@ -12,6 +13,15 @@ export interface IGetProjectUseCase {
 
 export interface IListProjectsUseCase {
   execute(companyId: string): Promise<ProjectEntity[]>;
+}
+
+export interface ISearchProjectsUseCase {
+  execute(companyId: string, dto: SearchProjectsDto): Promise<{
+    data: ProjectEntity[];
+    total: number;
+    page: number;
+    limit: number;
+  }>;
 }
 
 export interface IUpdateProjectUseCase {

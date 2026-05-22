@@ -1,13 +1,38 @@
 "use server";
 
 import { TaskService } from "@/services/company/projects/task.service";
+import { ProjectService } from "@/services/company/projects/project.service";
 import { CreateTaskPayload, UpdateTaskPayload, MoveTaskPayload, Task, MyTasksResponse } from "@/shared/types/company/projects/task.type";
 import { getServerApi } from "@/lib/axios/axiosServer";
+
+export const uploadResourceAction = async (formData: FormData) => {
+  try {
+    const api = await getServerApi();
+    const data = await ProjectService.uploadResource(formData, api);
+    return { success: true, data };
+  } catch (error: any) {
+    console.error("Error uploading resource:", error?.message);
+    return { success: false, error: error?.message || "Failed to upload resource" };
+  }
+};
 
 export const getTasksByStoryAction = async (storyId: string) => {
   try {
     const api = await getServerApi();
     const data = await TaskService.getTasksByStory(storyId, api);
+    return { success: true, data };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to fetch tasks",
+    };
+  }
+};
+
+export const getTasksByProjectAction = async (projectId: string) => {
+  try {
+    const api = await getServerApi();
+    const data = await TaskService.getTasksByProject(projectId, api);
     return { success: true, data };
   } catch (error: any) {
     return {
@@ -91,6 +116,27 @@ export const fetchMyTasksAction = async () => {
     return {
       success: false,
       error: error.response?.data?.message || "Failed to fetch your tasks",
+    };
+  }
+};
+export const searchTasksAction = async (params: {
+  projectId?: string;
+  storyId?: string;
+  memberId?: string;
+  status?: string;
+  priority?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
+}) => {
+  try {
+    const api = await getServerApi();
+    const data = await TaskService.searchTasks(params, api);
+    return { success: true, data };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to search tasks",
     };
   }
 };

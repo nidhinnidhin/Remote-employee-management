@@ -1,60 +1,35 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
+import { BaseRepository } from 'src/shared/repositories/base.repository';
 import { ICompanyRepository } from '../../../domain/repositories/icompany.repository';
 import { CompanyEntity } from '../../../domain/entities/company.entity';
 import { CompanyDocument } from '../mongoose/schemas/company.schema';
-import { UserStatus } from 'src/shared/enums/user/user-status.enum';
+import { CompanyMapper } from 'src/modules/auth/application/mappers/company.mapper'; // Adjust path as needed
 
 @Injectable()
-export class MongoCompanyRepository implements ICompanyRepository {
+export class MongoCompanyRepository
+  extends BaseRepository<CompanyDocument, CompanyEntity>
+  implements ICompanyRepository
+{
   constructor(
     @InjectModel(CompanyDocument.name)
     private readonly _companyModel: Model<CompanyDocument>,
-  ) {}
+  ) {
+    super(_companyModel);
+  }
 
-  protected toEntity(companyDoc: CompanyDocument): CompanyEntity {
-    return new CompanyEntity(
-      (companyDoc._id as Types.ObjectId).toString(),
-      companyDoc.name,
-      companyDoc.email,
-      companyDoc.size,
-      companyDoc.industry,
-      companyDoc.website,
-      companyDoc.createdAt,
-      companyDoc.updatedAt,
-      (companyDoc as unknown as { employeeCount?: number }).employeeCount,
-      companyDoc.status || UserStatus.ACTIVE,
-    );
+  protected toEntity(companyDoc: any): CompanyEntity {
+    return CompanyMapper.toDomain(companyDoc);
   }
 
   async create(company: CompanyEntity): Promise<CompanyEntity> {
-    const created = new this._companyModel({
-      name: company.name,
-      email: company.email,
-      size: company.size,
-      industry: company.industry,
-      website: company.website,
-      status: company.status,
-    } as Partial<CompanyDocument>);
-    const saved = await created.save();
-    return this.toEntity(saved as CompanyDocument);
-  }
-
-  async findById(id: string): Promise<CompanyEntity | null> {
-    if (!Types.ObjectId.isValid(id)) return null;
-    const doc = (await this._companyModel
-      .findById(id)
-      .lean()
-      .exec()) as CompanyDocument | null;
-    return doc ? this.toEntity(doc) : null;
+    // Delegate to the Mapper for the payload
+    const persistenceData = CompanyMapper.toPersistence(company);
+    return this.save(persistenceData);
   }
 
   async findByEmail(email: string): Promise<CompanyEntity | null> {
-    const doc = (await this._companyModel
-      .findOne({ email: email.toLowerCase() })
-      .lean()
-      .exec()) as CompanyDocument | null;
-    return doc ? this.toEntity(doc) : null;
+    return this.findOne({ email: email.toLowerCase() });
   }
 }

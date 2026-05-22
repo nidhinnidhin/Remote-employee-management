@@ -12,12 +12,15 @@ import {
   Inject,
   UseGuards,
 } from '@nestjs/common';
+import { SubscriptionLimitGuard } from 'src/shared/guards/subscription-limit.guard';
+import { CheckSubscriptionLimit } from 'src/shared/decorators/subscription-limit.decorator';
 import type {
   IInviteEmployeeUseCase,
   IVerifyInviteUseCase,
   ISetPasswordUseCase,
   IGetEmployeesUseCase,
   IUpdateEmployeeStatusUseCase,
+  ISearchEmployeesUseCase,
 } from '../../application/interfaces/employee-use-cases.interface';
 import type { IRedisService } from 'src/shared/services/redis/interfaces/iredis.service';
 import type { Request, Response } from 'express';
@@ -32,6 +35,7 @@ import {
 } from 'src/shared/config/cookies.config';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import { InviteEmployeeDto } from '../../application/dto/invite-employee.dto';
+import { SearchEmployeesDto } from '../../application/dto/search-employees.dto';
 import { EMPLOYEE_MESSAGES } from 'src/shared/constants/messages/employee/employee.messages';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { POLICY_MESSAGES } from 'src/shared/constants/messages/company-policy/company-policy.message';
@@ -52,6 +56,8 @@ export class EmployeesController {
     private readonly _getEmployeesUseCase: IGetEmployeesUseCase,
     @Inject('IUpdateEmployeeStatusUseCase')
     private readonly _updateEmployeeStatusUseCase: IUpdateEmployeeStatusUseCase,
+    @Inject('ISearchEmployeesUseCase')
+    private readonly _searchEmployeesUseCase: ISearchEmployeesUseCase,
     @Inject('IEmployeeRepository')
     private readonly _employeeRepo: IEmployeeRepository,
     @Inject('IRedisService')
@@ -62,18 +68,30 @@ export class EmployeesController {
     console.log('[EmployeesController] Initialized');
   }
 
+  @Get('search')
+  @UseGuards(JwtAuthGuard)
+  async search(@Req() req: Request, @Query() dto: SearchEmployeesDto) {
+    const companyId = req.user?.companyId;
+    if (!companyId) {
+      throw new UnauthorizedException(AUTH_MESSAGES.INVALID_TOKEN);
+    }
+    return await this._searchEmployeesUseCase.execute(companyId, dto);
+  }
+
   @Get('/')
   @UseGuards(JwtAuthGuard)
-  async findAll(@Req() req: Request) {
+  async findAll(@Req() req: Request, @Query('search') search?: string) {
     console.log(
       '[EmployeesController] findAll called for company:',
       req.user?.companyId,
+      'with search:',
+      search,
     );
     const companyId = req.user?.companyId;
     if (!companyId) {
       throw new UnauthorizedException(POLICY_MESSAGES.COMPANY_ID_NOT_FOUND);
     }
-    return await this._getEmployeesUseCase.execute(companyId);
+    return await this._getEmployeesUseCase.execute(companyId, search);
   }
 
   @Get('verify-invite')
@@ -194,7 +212,8 @@ export class EmployeesController {
   }
 
   @Post('invite')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, SubscriptionLimitGuard)
+  @CheckSubscriptionLimit('members')
   async invite(@Req() req: Request, @Body() InviteEmployeeDto: InviteEmployeeDto) {
     const companyId = req.user?.companyId;
     if (!companyId) {

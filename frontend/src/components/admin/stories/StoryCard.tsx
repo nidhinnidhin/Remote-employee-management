@@ -64,7 +64,11 @@ const StoryCard: React.FC<StoryCardProps> = ({
         </div>
 
         <div className="flex items-center gap-4 shrink-0">
-          <div className="hidden sm:flex items-center gap-2">
+          <div className="hidden sm:flex items-center gap-3">
+            <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-accent/5 border border-accent/10 text-accent">
+               <span className="text-[10px] font-black uppercase tracking-tighter">Points</span>
+               <span className="text-[12px] font-black">{story.storyPoints || 0}</span>
+            </div>
             <StoryPriorityBadge priority={story.priority} />
             <StoryStatusBadge status={story.status} />
           </div>

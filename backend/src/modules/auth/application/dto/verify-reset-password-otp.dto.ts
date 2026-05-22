@@ -2,8 +2,8 @@ import { IsEmail, IsString } from 'class-validator';
 
 export class VerifyResetPasswordOtpDto {
   @IsEmail()
-  email: string;
+  email!: string;
 
   @IsString()
-  otp: string;
+  otp!: string;
 }

@@ -30,6 +30,7 @@ export async function loginAction(email: string, password: string): Promise<Auth
     // Save to session with role and user info
     const session = await getSession();
     session.accessToken = accessToken;
+    session.refreshToken = refreshToken; // Save refresh token so proxy can use it for silent refresh
     session.userId = user.id;
     session.role = user.role;
     session.email = user.email;

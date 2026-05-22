@@ -28,6 +28,9 @@ export class ProjectDocument extends Document {
   @Prop({ required: true, default: false, index: true })
   isDeleted: boolean;
 
+  @Prop({ type: [String], default: [] })
+  members: string[];
+
   createdAt: Date;
   updatedAt: Date;
 }

@@ -46,7 +46,7 @@ interface ProfileState {
   userProfile: UserProfile | null;
   isLoading: boolean;
   error: string | null;
-  fetchProfile: () => Promise<void>;
+  fetchProfile: (force?: boolean) => Promise<void>;
   setProfile: (profile: UserProfile | null) => void;
 }
 
@@ -57,9 +57,9 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
 
   setProfile: (profile) => set({ userProfile: profile }),
 
-  fetchProfile: async () => {
-    // Only fetch if not already loaded or in error state
-    if (get().userProfile && !get().error) return;
+  fetchProfile: async (force = false) => {
+    // Only fetch if not already loaded or in error state, unless forced
+    if (get().userProfile && !get().error && !force) return;
 
     set({ isLoading: true, error: null });
     try {

@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { AuthModule } from '../auth/presentation/auth/auth.module';
 import {
   InviteLinkDocument,
   InviteLinkSchema,
@@ -18,10 +17,18 @@ import { SetPasswordUseCase } from './application/use-cases/set-password.usecase
 import { RedisService } from 'src/shared/services/redis/redis.service';
 import { JwtService } from 'src/shared/services/auth/jwt.service';
 import { InviteLinkCleanupService } from './application/services/invite-link-cleanup.service';
+import { SubscriptionLimitGuard } from 'src/shared/guards/subscription-limit.guard';
+import { SearchEmployeesUseCase } from './application/use-cases/search-employees.usecase';
+
+import { AuthModule } from '../auth/presentation/auth/auth.module';
+import { SubscriptionModule } from '../subscription/subscription.module';
+import { ProjectModule } from '../project/project.module';
 
 @Module({
   imports: [
     AuthModule,
+    SubscriptionModule,
+    ProjectModule,
     MongooseModule.forFeature([
       { name: InviteLinkDocument.name, schema: InviteLinkSchema },
       { name: UserDocument.name, schema: UserSchema },
@@ -73,6 +80,11 @@ import { InviteLinkCleanupService } from './application/services/invite-link-cle
       provide: 'IInviteLinkRepository',
       useClass: InviteLinkRepositoryImpl,
     },
+    {
+      provide: 'ISearchEmployeesUseCase',
+      useClass: SearchEmployeesUseCase,
+    },
+    SubscriptionLimitGuard,
   ],
   exports: ['IEmployeeRepository', 'IInviteLinkRepository'],
 })

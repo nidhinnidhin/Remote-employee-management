@@ -23,7 +23,7 @@ export class UpdateProjectUseCase implements IUpdateProjectUseCase {
         : undefined,
       endDate: projectDto.endDate ? new Date(projectDto.endDate) : undefined,
     };
-    const updated = await this._projectRepository.update(
+    const updated = await this._projectRepository.updateProject(
       id,
       companyId,
       updateData,

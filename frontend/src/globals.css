@@ -81,6 +81,14 @@
 /* ----------------------------------------------------------
    THEME: EMPLOYEE  (Dark Teal / Gaming Cyan — from screenshot)
    ---------------------------------------------------------- */
+   .theme-employee {
+  --color-modal-bg: 10, 20, 15; /* Dark Greenish */
+  --color-modal-border: 20, 40, 30;
+}
+.theme-company {
+  --color-modal-bg: 15, 23, 42; /* Deep Navy (matching your image) */
+  --color-modal-border: 30, 41, 59;
+}
 .theme-employee,
 :root {
 

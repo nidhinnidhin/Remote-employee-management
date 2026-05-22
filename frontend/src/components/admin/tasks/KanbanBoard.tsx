@@ -80,12 +80,12 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
       toast.error(response.error || "Failed to move task");
       setTasks(initialTasks); // Revert on failure
     } else {
-      toast.success(PROJECT_MESSAGES.TASK_MOVED);
+      toast.success(`Task moved to ${destStatus}`);
       onRefresh(); // Refresh parent to get definitive order/data
     }
   };
 
-  const columns: TaskStatus[] = [TaskStatus.TODO, TaskStatus.IN_PROGRESS, TaskStatus.DONE];
+  const columns: TaskStatus[] = [TaskStatus.TODO, TaskStatus.IN_PROGRESS, TaskStatus.REVIEW, TaskStatus.DONE];
 
   const handleAddTask = (status: TaskStatus) => {
     if (stories.length === 0) {
@@ -99,7 +99,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   return (
     <div className="flex flex-col w-full gap-6 animate-in fade-in duration-700">
       <DragDropContext onDragEnd={onDragEnd}>
-        <div className="flex items-start gap-6 overflow-x-auto pb-8 pr-12 w-full [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+        <div className="grid grid-cols-4 gap-4 w-full">
           {columns.map((status) => (
             <KanbanColumn
               key={status}

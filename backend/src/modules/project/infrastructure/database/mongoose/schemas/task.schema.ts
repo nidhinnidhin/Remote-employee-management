@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { TaskStatus } from 'src/shared/enums/project/task-status.enum';
+import { UserStoryPriority } from 'src/shared/enums/project/user-story-priority.enum';
 
 @Schema({ timestamps: true })
 export class TaskDocument extends Document {
@@ -37,11 +38,25 @@ export class TaskDocument extends Document {
   @Prop({ required: true, enum: TaskStatus, default: TaskStatus.TODO, index: true })
   status: string;
 
+  @Prop({
+    required: true,
+    enum: UserStoryPriority,
+    default: UserStoryPriority.MEDIUM,
+    index: true,
+  })
+  priority: string;
+
   @Prop({ required: true, default: 0 })
   order: number;
 
   @Prop({ required: false })
   dueDate?: Date;
+
+  @Prop({ type: [String], default: [] })
+  attachments!: string[];
+
+  @Prop({ type: [String], default: [] })
+  links!: string[];
 
   @Prop({ required: true, default: false, index: true })
   isDeleted: boolean;
