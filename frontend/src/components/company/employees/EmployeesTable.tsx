@@ -168,7 +168,7 @@ const EmployeesTable: React.FC<EmployeesTableProps> = ({
             )}
           </div>
           <div className="flex flex-col min-w-0">
-            <span className="text-sm font-semibold text-slate-900 truncate tracking-tight">
+            <span className="text-sm font-semibold text-white truncate tracking-tight">
               {employee.name}
             </span>
             <span className="text-[11px] text-slate-500 truncate font-normal">
@@ -181,7 +181,7 @@ const EmployeesTable: React.FC<EmployeesTableProps> = ({
     {
       header: "Name",
       accessor: (employee) => (
-        <span className="text-slate-600 text-sm font-medium">
+        <span className="text-white text-sm font-medium">
           {employee.name || "—"}
         </span>
       ),
@@ -189,7 +189,7 @@ const EmployeesTable: React.FC<EmployeesTableProps> = ({
     {
       header: "Role",
       accessor: (employee: Employee) => (
-        <span className="inline-flex px-3 py-1 rounded-full border border-slate-200 bg-transparent text-slate-500 text-[10px] font-bold uppercase tracking-wider">
+        <span className="inline-flex px-3 py-1 rounded-full border border-slate-200 bg-transparent text-white text-[10px] font-bold uppercase tracking-wider">
           {employee.role}
         </span>
       ),

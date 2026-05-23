@@ -74,7 +74,7 @@ const Pagination: React.FC<PaginationProps & { theme?: "dark" | "light" }> = ({
             <button
               onClick={() => onPageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className={`relative inline-flex items-center rounded-l-md px-2 py-2 ring-1 ring-inset focus:z-20 focus:outline-offset-0 transition-colors ${styles.button.base} ${styles.button.disabled}`}
+              className={`relative inline-flex text-white items-center rounded-l-md px-2 py-2 ring-1 ring-inset focus:z-20 focus:outline-offset-0 transition-colors ${styles.button.base} ${styles.button.disabled}`}
             >
               <span className="sr-only">Previous</span>
               <ChevronLeft className="h-4 w-4" aria-hidden="true" />
@@ -84,7 +84,7 @@ const Pagination: React.FC<PaginationProps & { theme?: "dark" | "light" }> = ({
                 <button
                   key={index}
                   onClick={() => onPageChange(page)}
-                  className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold focus:z-20 focus:outline-offset-0 ring-1 ring-inset transition-colors ${
+                  className={`relative text-white inline-flex items-center px-4 py-2 text-sm font-semibold focus:z-20 focus:outline-offset-0 ring-1 ring-inset transition-colors ${
                     currentPage === page
                       ? styles.button.active
                       : styles.button.base
@@ -104,7 +104,7 @@ const Pagination: React.FC<PaginationProps & { theme?: "dark" | "light" }> = ({
             <button
               onClick={() => onPageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className={`relative inline-flex items-center rounded-r-md px-2 py-2 ring-1 ring-inset focus:z-20 focus:outline-offset-0 transition-colors ${styles.button.base} ${styles.button.disabled}`}
+              className={`relative inline-flex text-white items-center rounded-r-md px-2 py-2 ring-1 ring-inset focus:z-20 focus:outline-offset-0 transition-colors ${styles.button.base} ${styles.button.disabled}`}
             >
               <span className="sr-only">Next</span>
               <ChevronRight className="h-4 w-4" aria-hidden="true" />
