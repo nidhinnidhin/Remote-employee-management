@@ -118,7 +118,7 @@ export default function AdminAttendancePage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 border-b border-white/[0.06] pb-6 shrink-0">
           <div className="space-y-1">
             <h2 className="text-2xl font-black text-white tracking-tighter uppercase">
-              Corporate Attendance Control
+               Attendance Control
             </h2>
             <div className="flex items-center gap-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
               <span>{total} Total Logs</span>
@@ -128,14 +128,12 @@ export default function AdminAttendancePage() {
           </div>
         </div>
 
-        {/* METRICS DASHBOARD ROW */}
         <AttendanceStats
           totalCount={total}
           totalHours={statsTotalHours}
           activeOperators={statsActiveWorking}
         />
 
-        {/* Date, Employee & Status Filters */}
         <AdminAttendanceFilters
           employees={employees}
           selectedEmployeeId={selectedEmployeeId}
@@ -167,7 +165,6 @@ export default function AdminAttendancePage() {
           onSearchLogs={fetchLogs}
         />
 
-        {/* Corporate Logs Table and Pagination */}
         <AdminAttendanceTable
           logs={logs}
           loading={loading}
@@ -179,7 +176,6 @@ export default function AdminAttendancePage() {
         />
       </div>
 
-      {/* TIMELINE OVERLAY MODAL */}
       <AdminAttendanceDetailsModal
         selectedLog={selectedLog}
         onClose={() => setSelectedLog(null)}

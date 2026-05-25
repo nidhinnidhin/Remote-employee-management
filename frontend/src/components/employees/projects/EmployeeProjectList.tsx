@@ -8,6 +8,7 @@ import EmployeeProjectCard from "./EmployeeProjectCard";
 import { searchProjectsAction } from "@/actions/company/projects/project.actions";
 import Pagination from "@/components/ui/Pagination";
 import { toast } from "sonner";
+import { useDebounce } from "@/hooks/debounce/useDebounce";
 
 interface EmployeeProjectListProps {
   tasks: Task[];
@@ -21,9 +22,10 @@ export default function EmployeeProjectList({
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearch = useDebounce(searchQuery, 500);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalProjects, setTotalProjects] = useState(0);
-  const itemsPerPage = 6; // Grid looks better with multiples of 2 or 3
+  const itemsPerPage = 6;
 
   const fetchProjects = useCallback(async () => {
     setLoading(true);
@@ -31,7 +33,7 @@ export default function EmployeeProjectList({
       const result = await searchProjectsAction({
         page: currentPage,
         limit: itemsPerPage,
-        search: searchQuery,
+        search: debouncedSearch,
         memberId: userId,
       });
 
@@ -46,21 +48,12 @@ export default function EmployeeProjectList({
     } finally {
       setLoading(false);
     }
-  }, [userId, currentPage, searchQuery]);
+  }, [userId, currentPage, debouncedSearch]);
 
   useEffect(() => {
     fetchProjects();
   }, [fetchProjects]);
 
-  // Debounce search
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setCurrentPage(1);
-    }, 500);
-    return () => clearTimeout(handler);
-  }, [searchQuery]);
-
-  // Derive counts per project (from tasks passed as props)
   const projectStats = useMemo(() => {
     const stats: Record<string, { tasks: number; stories: number }> = {};
     tasks.forEach((task) => {
@@ -136,13 +129,18 @@ export default function EmployeeProjectList({
       {loading && projects.length === 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 lg:gap-8 opacity-50 pointer-events-none">
           {[1, 2, 3, 4].map((i) => (
-             <div key={i} className="h-48 rounded-3xl bg-white/[0.02] border border-white/[0.06] animate-pulse" />
+            <div
+              key={i}
+              className="h-48 rounded-3xl bg-white/[0.02] border border-white/[0.06] animate-pulse"
+            />
           ))}
         </div>
       ) : projects.length === 0 ? (
         <div className="text-center py-20 bg-white/[0.02] rounded-[3rem] border border-dashed border-white/[0.06]">
-          <p className="text-muted text-sm">No projects match your search query.</p>
-          <button 
+          <p className="text-muted text-sm">
+            No projects match your search query.
+          </p>
+          <button
             onClick={() => setSearchQuery("")}
             className="mt-4 text-accent text-xs font-bold uppercase tracking-widest hover:underline"
           >

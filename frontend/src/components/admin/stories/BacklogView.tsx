@@ -49,6 +49,7 @@ import EditSprintModal from "./modals/EditSprintModal";
 import DeleteSprintConfirmationModal from "./modals/DeleteSprintConfirmationModal";
 import DeleteSprintOptionsModal from "./modals/DeleteSprintOptionsModal";
 import { cn } from "@/lib/utils";
+import { useDebounce } from "@/hooks/debounce/useDebounce";
 
 interface BacklogViewProps {
   projectId: string;
@@ -67,6 +68,7 @@ const BacklogView: React.FC<BacklogViewProps> = ({
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearch = useDebounce(searchQuery, 500);
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [priorityFilter, setPriorityFilter] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -93,7 +95,7 @@ const BacklogView: React.FC<BacklogViewProps> = ({
           await Promise.all([
             searchStoriesAction({
               projectId,
-              search: searchQuery || undefined,
+              search: debouncedSearch || undefined,
               status: (statusFilter as any) || undefined,
               priority: (priorityFilter as any) || undefined,
               // Remove isInBacklog filter to fetch all stories for both backlog and sprints
@@ -114,11 +116,13 @@ const BacklogView: React.FC<BacklogViewProps> = ({
         }
 
         if (sprintsResult.success && sprintsResult.data) {
-          const normalizedSprints = (sprintsResult.data as Sprint[]).map(s => ({
-            ...s,
-            id: (s.id || (s as any)._id)?.toString(),
-            issueIds: (s.issueIds || []).map(id => id.toString())
-          }));
+          const normalizedSprints = (sprintsResult.data as Sprint[]).map(
+            (s) => ({
+              ...s,
+              id: (s.id || (s as any)._id)?.toString(),
+              issueIds: (s.issueIds || []).map((id) => id.toString()),
+            }),
+          );
           setSprints(normalizedSprints);
         } else {
           toast.error(sprintsResult.error || "Failed to load sprints");
@@ -148,20 +152,16 @@ const BacklogView: React.FC<BacklogViewProps> = ({
         setLoading(false);
       }
     },
-    [projectId, searchQuery, statusFilter, priorityFilter, currentPage],
+    [projectId, debouncedSearch, statusFilter, priorityFilter, currentPage],
   );
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
-  // Debounce search
   useEffect(() => {
-    const handler = setTimeout(() => {
-      setCurrentPage(1);
-    }, 500);
-    return () => clearTimeout(handler);
-  }, [searchQuery]);
+  setCurrentPage(1);
+}, [debouncedSearch]);
 
   const onDragEnd = async (result: DropResult) => {
     const { destination, source, draggableId } = result;
@@ -212,7 +212,7 @@ const BacklogView: React.FC<BacklogViewProps> = ({
           }),
           updateStoryAction(storyId, {
             isInBacklog: false,
-          })
+          }),
         ]);
 
         if (sprintResult.success && storyResult.success) {
@@ -241,7 +241,9 @@ const BacklogView: React.FC<BacklogViewProps> = ({
       const sourceSprint = sprints.find((s) => s.id === sprintId);
       if (!sourceSprint) return;
 
-      const updatedIssueIds = sourceSprint.issueIds.filter(id => id.toString() !== storyId.toString());
+      const updatedIssueIds = sourceSprint.issueIds.filter(
+        (id) => id.toString() !== storyId.toString(),
+      );
 
       // Optimistic Update
       setSprints((prev) =>
@@ -260,7 +262,7 @@ const BacklogView: React.FC<BacklogViewProps> = ({
           }),
           updateStoryAction(storyId, {
             isInBacklog: true,
-          })
+          }),
         ]);
 
         if (sprintResult.success && storyResult.success) {
@@ -419,7 +421,9 @@ const BacklogView: React.FC<BacklogViewProps> = ({
                                 {...provided.dragHandleProps}
                                 className={cn(
                                   "transition-all duration-200",
-                                  snapshot.isDragging ? "z-50 opacity-90 scale-105" : "opacity-80 hover:opacity-100"
+                                  snapshot.isDragging
+                                    ? "z-50 opacity-90 scale-105"
+                                    : "opacity-80 hover:opacity-100",
                                 )}
                               >
                                 <StoryCard

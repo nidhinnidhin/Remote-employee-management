@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { searchDepartmentsAction } from "@/actions/company/departments/department.actions";
 import Pagination from "@/components/ui/Pagination";
 import { toast } from "sonner";
+import { useDebounce } from "@/hooks/debounce/useDebounce";
 
 interface TeamsListProps {
   userId: string;
@@ -18,6 +19,7 @@ export const TeamsList: React.FC<TeamsListProps> = ({ userId }) => {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearch = useDebounce(searchQuery, 500);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalDepartments, setTotalDepartments] = useState(0);
   const itemsPerPage = 5;
@@ -28,12 +30,12 @@ export const TeamsList: React.FC<TeamsListProps> = ({ userId }) => {
       const result = await searchDepartmentsAction({
         page: currentPage,
         limit: itemsPerPage,
-        search: searchQuery || undefined,
+        search: debouncedSearch || undefined,
         employeeId: userId || undefined,
       });
 
       if (result && result.data) {
-        setDepartments(result.data as any || []);
+        setDepartments((result.data as any) || []);
         setTotalDepartments(result.total || 0);
       }
     } catch (err: any) {
@@ -41,21 +43,16 @@ export const TeamsList: React.FC<TeamsListProps> = ({ userId }) => {
     } finally {
       setLoading(false);
     }
-  }, [userId, currentPage, searchQuery]);
+  }, [userId, currentPage, debouncedSearch]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch]);
 
   useEffect(() => {
     fetchDepartments();
   }, [fetchDepartments]);
 
-  // Debounce search
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setCurrentPage(1);
-    }, 500);
-    return () => clearTimeout(handler);
-  }, [searchQuery]);
-
-  // --- EMPTY STATE (Initial) ---
   if (!loading && departments.length === 0 && !searchQuery) {
     return (
       <div className="flex flex-col items-center justify-center py-20 px-6 rounded-[2rem] border border-white/[0.06] bg-white/[0.01] text-center max-w-2xl mx-auto animate-in fade-in zoom-in-95 duration-700">
@@ -89,7 +86,6 @@ export const TeamsList: React.FC<TeamsListProps> = ({ userId }) => {
           </h2>
         </div>
 
-        {/* Standard SaaS Search Bar */}
         <div className="relative group w-full md:w-72">
           <Search
             className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-accent transition-colors duration-300"
@@ -116,13 +112,18 @@ export const TeamsList: React.FC<TeamsListProps> = ({ userId }) => {
       {loading && departments.length === 0 ? (
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-24 rounded-2xl bg-white/[0.01] border border-white/[0.06] animate-pulse" />
+            <div
+              key={i}
+              className="h-24 rounded-2xl bg-white/[0.01] border border-white/[0.06] animate-pulse"
+            />
           ))}
         </div>
       ) : departments.length === 0 ? (
         <div className="text-center py-20 bg-white/[0.01] rounded-[2rem] border border-dashed border-white/[0.06]">
-          <p className="text-slate-500 text-sm">No departments match your search query.</p>
-          <button 
+          <p className="text-slate-500 text-sm">
+            No departments match your search query.
+          </p>
+          <button
             onClick={() => setSearchQuery("")}
             className="mt-4 text-accent text-xs font-black uppercase tracking-widest hover:underline"
           >
@@ -143,7 +144,7 @@ export const TeamsList: React.FC<TeamsListProps> = ({ userId }) => {
           ))}
 
           <div className="pt-4">
-            <Pagination 
+            <Pagination
               currentPage={currentPage}
               totalPages={Math.ceil(totalDepartments / itemsPerPage)}
               onPageChange={setCurrentPage}
@@ -154,4 +155,3 @@ export const TeamsList: React.FC<TeamsListProps> = ({ userId }) => {
     </div>
   );
 };
-
