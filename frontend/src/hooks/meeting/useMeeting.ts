@@ -288,7 +288,6 @@ export function useMeeting(meetingId: string) {
       // ─── MEETING_ENDED ──────────────────────────────────────────────────────
       socket.on(MeetingSocketEvents.MEETING_ENDED, () => {
         if (destroyed) return;
-        alert('The meeting has been ended by the host.');
         const role = userProfile?.role;
         window.location.href = role === 'COMPANY_ADMIN' ? '/company-admin/discussions' : '/employee/discussions';
       });

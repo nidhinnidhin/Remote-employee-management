@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useMeeting } from "@/hooks/meeting/useMeeting";
-import { Mic, MicOff, Video, VideoOff, MonitorUp, PhoneOff, UserX } from "lucide-react";
+import { Mic, MicOff, Video, VideoOff, MonitorUp, PhoneOff, UserX, XOctagon, AlertTriangle } from "lucide-react";
 import Button from "@/components/ui/Button";
+import { endMeetingAction } from "@/actions/meeting/meeting.actions";
 import { Meeting } from "@/shared/types/company/meeting.type";
 import { useAuthStore } from "@/store/auth.store";
 import { useProfileStore } from "@/store/profile.store";
@@ -91,6 +92,11 @@ export default function MeetingRoom({ meeting }: MeetingRoomProps) {
     eventLog
   } = useMeeting(meeting.id);
 
+  // States for custom UI modal dialogs
+  const [showEndConfirmation, setShowEndConfirmation] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const isCreator = userId === meeting.creatorId;
   const myName = userProfile ? `${userProfile.firstName} ${userProfile.lastName}` : "Me";
   const role = userProfile?.role ?? '';
@@ -99,12 +105,25 @@ export default function MeetingRoom({ meeting }: MeetingRoomProps) {
     window.location.href = role === 'COMPANY_ADMIN' ? '/company-admin/discussions' : '/employee/discussions';
   };
 
+  const handleEndMeeting = async () => {
+    setIsSubmitting(true);
+    setErrorMessage(null);
+    const res = await endMeetingAction(meeting.id);
+    setIsSubmitting(false);
+    
+    if (res.success) {
+      window.location.href = role === 'COMPANY_ADMIN' ? '/company-admin/discussions' : '/employee/discussions';
+    } else {
+      setShowEndConfirmation(false);
+      setErrorMessage(res.error || "An unexpected error occurred while ending the meeting.");
+    }
+  };
+
   const remoteScreenSharerId = participants.find(pId => remoteScreenSharers[pId]);
   const hasActiveScreenShare = isScreenSharing || !!remoteScreenSharerId;
 
   const totalTiles = participants.length + 1;
 
-  // Optimized Layout classes built specifically to preserve aspect ratios safely
   const getGridLayout = () => {
     if (hasActiveScreenShare) {
       return "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 max-w-full mx-auto";
@@ -122,7 +141,7 @@ export default function MeetingRoom({ meeting }: MeetingRoomProps) {
   };
 
   return (
-    <div className="flex flex-col h-screen max-h-screen bg-[#0a0b0d] p-4 md:p-6 animate-in fade-in duration-700 overflow-hidden">
+    <div className="flex flex-col h-screen max-h-screen bg-[#0a0b0d] p-4 md:p-6 animate-in fade-in duration-700 overflow-hidden relative">
       {/* HEADER */}
       <div className="flex items-center justify-between mb-4 shrink-0">
         <div className="flex items-center gap-3">
@@ -260,14 +279,80 @@ export default function MeetingRoom({ meeting }: MeetingRoomProps) {
           <MonitorUp className="w-5 h-5 md:w-5.5 md:h-5.5" />
         </Button>
 
-        <Button
-          onClick={handleLeave}
-          className="h-12 md:h-14 px-6 md:px-8 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-black uppercase tracking-widest text-[11px] md:text-xs flex items-center gap-2.5 md:gap-3 shadow-xl shadow-rose-500/20 transition-all ml-2 md:ml-4"
-        >
-          <PhoneOff className="w-4 h-4 md:w-4.5 md:h-4.5" />
-          Leave
-        </Button>
+        {isCreator ? (
+          <Button
+            onClick={() => setShowEndConfirmation(true)}
+            className="h-12 md:h-14 px-6 md:px-8 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-black uppercase tracking-widest text-[11px] md:text-xs flex items-center gap-2.5 md:gap-3 shadow-xl shadow-rose-600/20 transition-all ml-2 md:ml-4"
+          >
+            <XOctagon className="w-4 h-4 md:w-4.5 md:h-4.5" />
+            End Meeting
+          </Button>
+        ) : (
+          <Button
+            onClick={handleLeave}
+            className="h-12 md:h-14 px-6 md:px-8 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-black uppercase tracking-widest text-[11px] md:text-xs flex items-center gap-2.5 md:gap-3 shadow-xl shadow-rose-500/20 transition-all ml-2 md:ml-4"
+          >
+            <PhoneOff className="w-4 h-4 md:w-4.5 md:h-4.5" />
+            Leave
+          </Button>
+        )}
       </div>
+
+      {/* CUSTOM CONFIRMATION MODAL OVERLAY */}
+      {showEndConfirmation && (
+        <div className="absolute inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+          <div className="bg-[#0e1012] border border-white/10 w-full max-w-md rounded-2xl p-6 shadow-2xl scale-in duration-200 flex flex-col items-center text-center">
+            <div className="p-4 bg-rose-500/10 text-rose-500 border border-rose-500/20 rounded-full mb-4">
+              <AlertTriangle size={32} className="animate-bounce" />
+            </div>
+            <h2 className="text-white text-lg font-black uppercase tracking-wider mb-2">
+              End Session For All?
+            </h2>
+            <p className="text-slate-400 text-sm mb-6 leading-relaxed">
+              Are you absolutely sure you want to terminate this meeting? This will disconnect all active participants and close the room.
+            </p>
+            <div className="flex items-center gap-3 w-full">
+              <button
+                disabled={isSubmitting}
+                onClick={() => setShowEndConfirmation(false)}
+                className="flex-1 h-12 rounded-xl bg-white/5 text-white font-bold text-sm border border-white/10 hover:bg-white/10 transition-all uppercase tracking-wide disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                disabled={isSubmitting}
+                onClick={handleEndMeeting}
+                className="flex-1 h-12 rounded-xl bg-rose-600 text-white font-bold text-sm hover:bg-rose-700 transition-all uppercase tracking-wide shadow-lg shadow-rose-600/20 flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {isSubmitting ? "Ending..." : "End Meeting"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CUSTOM ERROR DISPLAY MODAL */}
+      {errorMessage && (
+        <div className="absolute inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+          <div className="bg-[#0e1012] border border-white/10 w-full max-w-md rounded-2xl p-6 shadow-2xl flex flex-col items-center text-center">
+            <div className="p-4 bg-rose-500/10 text-rose-500 border border-rose-500/20 rounded-full mb-4">
+              <XOctagon size={32} />
+            </div>
+            <h2 className="text-white text-lg font-black uppercase tracking-wider mb-2">
+              Action Failed
+            </h2>
+            <p className="text-slate-400 text-sm mb-6 leading-relaxed">
+              {errorMessage}
+            </p>
+            <button
+              onClick={() => setErrorMessage(null)}
+              className="w-full h-12 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm transition-all uppercase tracking-wide shadow-lg shadow-indigo-600/20"
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

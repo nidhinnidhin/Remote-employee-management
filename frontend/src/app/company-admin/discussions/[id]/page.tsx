@@ -42,5 +42,14 @@ export default function AdminMeetingRoomPage({ params }: { params: Promise<{ id:
     );
   }
 
+  if (meeting.status === 'ENDED') {
+    return (
+      <div className="flex flex-col items-center justify-center h-full bg-[#0a0b0d]">
+        <h1 className="text-xl font-black text-rose-500 uppercase tracking-widest mb-2">Meeting Ended</h1>
+        <p className="text-xs text-slate-400">This meeting has already been ended.</p>
+      </div>
+    );
+  }
+
   return <MeetingRoom meeting={meeting} />;
 }
