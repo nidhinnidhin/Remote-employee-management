@@ -9,7 +9,6 @@ import { ChatWindow } from "./ChatWindow";
 import { useChatStore } from "@/store/chat.store";
 import { useChat } from "@/hooks/chat/useChat";
 import { chatService } from "@/services/employee/chat/chat.service";
-import { Conversation, Message } from "@/shared/types/chat/chat.types";
 
 export default function ChatPageClient() {
   const { 
@@ -66,25 +65,34 @@ export default function ChatPageClient() {
     }
   };
 
+  // --- SORTING LOGIC HAPPENS HERE ---
+  // Sort conversations by 'lastMessageAt' so the latest active threads float to the top
+  const sortedConversations = [...conversations].sort((a, b) => {
+    const timeA = a.lastMessageAt ? new Date(a.lastMessageAt).getTime() : 0;
+    const timeB = b.lastMessageAt ? new Date(b.lastMessageAt).getTime() : 0;
+    
+    // Descending Order (Most recent timestamp shows up first)
+    return timeB - timeA;
+  });
+
   const selectedConversation = conversations.find((c) => c.id === activeConversationId) ?? null;
   const activeMessages = activeConversationId ? (messages[activeConversationId] ?? []) : [];
 
   return (
     <div className="flex h-full overflow-hidden bg-[rgb(var(--color-surface))]">
-      {/* ── LEFT: Conversation List ────────────────────────────────── */}
       <div className={cn(
         "flex flex-col shrink-0 border-r border-white/[0.05] bg-white/[0.01]",
         "sm:flex sm:w-[280px] lg:w-[320px]",
         activeConversationId ? "hidden sm:flex" : "flex w-full"
       )}>
+        {/* We now pass 'sortedConversations' instead of raw 'conversations' */}
         <ChatListPanel
-          conversations={conversations}
+          conversations={sortedConversations}
           selectedId={activeConversationId}
           onSelect={handleSelect}
         />
       </div>
 
-      {/* ── RIGHT: Chat Window / Empty State ───────────────────────── */}
       <div className={cn(
         "flex-1 flex flex-col min-w-0",
         activeConversationId ? "flex" : "hidden sm:flex"
