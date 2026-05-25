@@ -20,7 +20,7 @@ interface AddSubscriptionModalProps {
 const INITIAL_STATE: CreateSubscriptionPlanDto = {
   name: "",
   type: SubscriptionPlanType.FREE,
-  price: "",
+  price: 0,
   description: "",
   features: [],
   maxProjects: 5,
@@ -53,7 +53,7 @@ const AddSubscriptionModal: React.FC<AddSubscriptionModalProps> = ({
       [name]:
         name === "price"
           ? value === ""
-            ? ""
+            ? 0
             : parseFloat(value)
           : name === "maxProjects" || name === "maxMembers"
             ? parseInt(value) || 1
@@ -197,7 +197,7 @@ const AddSubscriptionModal: React.FC<AddSubscriptionModalProps> = ({
           label="Price (₹/month)"
           name="price"
           type="number"
-          value={formData.price}
+          value={formData.price.toString()}
           onChange={handleChange}
           placeholder="0 for free plan"
           error={errors.price}

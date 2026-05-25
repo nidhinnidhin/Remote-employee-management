@@ -15,6 +15,7 @@ import { ChatModule } from './modules/chat/chat.module';
 import { SubscriptionModule } from './modules/subscription/subscription.module';
 import { AttendanceModule } from './modules/attendance/attendance.module';
 import { LoggerModule } from './common/logger/logger.module';
+import { MeetingModule } from './modules/meeting/meeting.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { LoggerModule } from './common/logger/logger.module';
     SubscriptionModule,
     AttendanceModule,
     LoggerModule,
+    MeetingModule,
   ],
   providers: [
     {

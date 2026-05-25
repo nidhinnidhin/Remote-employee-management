@@ -13,6 +13,8 @@ import {
   ChevronRight,
   Edit3,
   Trash2,
+  Video,
+  CalendarClock
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Button from "@/components/ui/Button";
@@ -34,6 +36,8 @@ import DeleteSprintConfirmationModal from "./modals/DeleteSprintConfirmationModa
 import DeleteSprintOptionsModal from "./modals/DeleteSprintOptionsModal";
 import EditStoryModal from "./modals/EditStoryModal";
 import DeleteStoryConfirmation from "./modals/DeleteStoryConfirmation";
+import InstantMeetingModal from "../meetings/modals/InstantMeetingModal";
+import ScheduleMeetingModal from "../meetings/modals/ScheduleMeetingModal";
 
 interface SprintListViewProps {
   projectId: string;
@@ -57,6 +61,10 @@ const SprintListView: React.FC<SprintListViewProps> = ({ projectId }) => {
   const [showDeleteOptions, setShowDeleteOptions] = useState(false);
   const [selectedStoryForEdit, setSelectedStoryForEdit] = useState<UserStory | null>(null);
   const [selectedStoryForDelete, setSelectedStoryForDelete] = useState<UserStory | null>(null);
+  
+  const [showInstantMeeting, setShowInstantMeeting] = useState(false);
+  const [showScheduleMeeting, setShowScheduleMeeting] = useState(false);
+  const [isMeetDropdownOpen, setIsMeetDropdownOpen] = useState(false);
 
   const fetchData = useCallback(async (isSilent = false) => {
     if (!isSilent) setLoading(true);
@@ -208,6 +216,49 @@ const SprintListView: React.FC<SprintListViewProps> = ({ projectId }) => {
               <option key={p} value={p}>{p}</option>
             ))}
           </select>
+
+          {/* MEET BUTTON WITH DROPDOWN */}
+          <div className="relative">
+            <Button
+              onClick={() => setIsMeetDropdownOpen(!isMeetDropdownOpen)}
+              className="h-10 px-5 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 hover:bg-indigo-500/20 transition-all flex items-center gap-2 font-black text-[10px] uppercase tracking-widest"
+            >
+              <Video size={14} />
+              Meet
+            </Button>
+
+            {isMeetDropdownOpen && (
+              <>
+                <div 
+                  className="fixed inset-0 z-40" 
+                  onClick={() => setIsMeetDropdownOpen(false)}
+                />
+                <div className="absolute right-0 mt-2 w-48 bg-[#0f1115] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                  <button 
+                    onClick={() => {
+                      setIsMeetDropdownOpen(false);
+                      setShowInstantMeeting(true);
+                    }}
+                    className="w-full text-left px-4 py-3 text-xs font-bold text-slate-300 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-2"
+                  >
+                    <Video size={14} className="text-orange-500" />
+                    Instant Meeting
+                  </button>
+                  <div className="h-px bg-white/5 w-full" />
+                  <button 
+                    onClick={() => {
+                      setIsMeetDropdownOpen(false);
+                      setShowScheduleMeeting(true);
+                    }}
+                    className="w-full text-left px-4 py-3 text-xs font-bold text-slate-300 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-2"
+                  >
+                    <CalendarClock size={14} className="text-blue-500" />
+                    Schedule Meeting
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
@@ -418,6 +469,18 @@ const SprintListView: React.FC<SprintListViewProps> = ({ projectId }) => {
         onClose={() => setSelectedStoryForDelete(null)}
         onSuccess={fetchData}
         story={selectedStoryForDelete}
+      />
+
+      <InstantMeetingModal
+        isOpen={showInstantMeeting}
+        onClose={() => setShowInstantMeeting(false)}
+        employees={employees}
+      />
+
+      <ScheduleMeetingModal
+        isOpen={showScheduleMeeting}
+        onClose={() => setShowScheduleMeeting(false)}
+        employees={employees}
       />
     </div>
   );

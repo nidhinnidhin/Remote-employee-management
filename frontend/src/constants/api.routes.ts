@@ -77,6 +77,16 @@ export const API_ROUTES = {
             CONVERSATIONS: "/chats/conversations",
             MESSAGES: (id: string) => `/chats/conversations/${id}/messages`,
         },
+        MEETINGS: {
+            BASE: "/meetings",
+            BY_ID: (id: string) => `/meetings/${id}`,
+            SCHEDULE: "/meetings/schedule",
+            INSTANT: "/meetings/instant",
+            START: (id: string) => `/meetings/${id}/start`,
+            END: (id: string) => `/meetings/${id}/end`,
+            ADD_PARTICIPANTS: (id: string) => `/meetings/${id}/participants`,
+            REMOVE_PARTICIPANT: (id: string, participantId: string) => `/meetings/${id}/participants/${participantId}`,
+        },
     },
     SUPER_ADMIN: {
         COMPANIES: "/super-admin/companies",
