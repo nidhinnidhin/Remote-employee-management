@@ -18,6 +18,7 @@ import {
   removeEmployeeFromDepartmentAction,
 } from "@/actions/company/departments/department.actions";
 import { toast } from "sonner";
+import { useDebounce } from "@/hooks/debounce/useDebounce";
 
 const DepartmentsTable = ({
   refreshTrigger,
@@ -31,13 +32,13 @@ const DepartmentsTable = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [totalDepartments, setTotalDepartments] = useState(0);
   const itemsPerPage = 10;
+  const debouncedSearch = useDebounce(searchQuery, 500);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [menuAnchor, setMenuAnchor] = useState<{ x: number; y: number } | null>(
     null,
   );
   const [selectedDept, setSelectedDept] = useState<Department | null>(null);
 
-  // Modal states
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -46,7 +47,6 @@ const DepartmentsTable = ({
   const [selectedMember, setSelectedMember] = useState<any | null>(null);
   const [formMode, setFormMode] = useState<"CREATE" | "EDIT">("CREATE");
 
-  // ✅ FIX: dynamic expansion
   const [expandedDepts, setExpandedDepts] = useState<Record<string, boolean>>(
     {},
   );
@@ -96,7 +96,7 @@ const DepartmentsTable = ({
       fetchDepartments();
     } catch (error: any) {
       toast.error(error?.message || "Failed to delete department");
-      throw error; // Rethrow for modal loading state
+      throw error;
     }
   };
 
@@ -121,12 +121,11 @@ const DepartmentsTable = ({
       const { data, total } = await searchDepartmentsAction({
         page: currentPage,
         limit: itemsPerPage,
-        search: searchQuery,
+        search: debouncedSearch,
       });
       setDepartments(data);
       setTotalDepartments(total);
 
-      // ✅ FIX: auto expand first department if it's the first load
       if (data.length > 0 && Object.keys(expandedDepts).length === 0) {
         setExpandedDepts({
           [data[0].id]: true,
@@ -148,12 +147,11 @@ const DepartmentsTable = ({
 
   useEffect(() => {
     fetchDepartments();
-  }, [refreshTrigger, currentPage, searchQuery]);
+  }, [refreshTrigger, currentPage, debouncedSearch]);
 
-  // Reset to first page on search
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery]);
+  }, [debouncedSearch]);
 
   if (loading) {
     return <div className="p-6 text-sm text-muted">Loading departments...</div>;
