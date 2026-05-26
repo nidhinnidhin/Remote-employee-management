@@ -53,6 +53,7 @@ export class AttendanceController {
   ) {}
 
   @Post('clock-in')
+
   @UseGuards(EmployeeGuard)
   async clockIn(@Req() req: Request, @Body() dto: ClockInDto) {
     const userId = req.user!.userId;

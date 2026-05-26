@@ -114,7 +114,6 @@ export default function ChatPageClient() {
             />
           </>
         ) : (
-          /* Desktop empty state */
           <div className="flex flex-col items-center justify-center flex-1 gap-4 text-center p-8">
             <div className="w-20 h-20 rounded-3xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent">
               <MessagesSquare size={36} strokeWidth={1.5} />
