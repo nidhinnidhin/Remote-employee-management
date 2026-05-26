@@ -1,5 +1,9 @@
 import { LeaveRequestDocument } from '../../infrastructure/database/mongoose/schemas/leave-request.schema';
-import { LeaveRequestEntity, EmergencyContact, EmployeeDetails } from '../../domain/entities/leave-request.entity';
+import {
+  LeaveRequestEntity,
+  EmergencyContact,
+  EmployeeDetails,
+} from '../../domain/entities/leave-request.entity';
 
 interface PopulatedEmployee {
   _id: string;
@@ -9,15 +13,25 @@ interface PopulatedEmployee {
   avatar?: string;
 }
 
-interface PopulatedLeaveDocument extends Omit<LeaveRequestDocument, 'employeeId'> {
+interface PopulatedLeaveDocument extends Omit<
+  LeaveRequestDocument,
+  'employeeId'
+> {
   employeeId: PopulatedEmployee | LeaveRequestDocument['employeeId'];
 }
 
 export class LeaveRequestMapper {
-  static toDomain(doc: LeaveRequestDocument | PopulatedLeaveDocument): LeaveRequestEntity {
-    const rawEmployee = doc.employeeId as PopulatedEmployee | { toString: () => string };
+  static toDomain(
+    doc: LeaveRequestDocument | PopulatedLeaveDocument,
+  ): LeaveRequestEntity {
+    const rawEmployee = doc.employeeId as
+      | PopulatedEmployee
+      | { toString: () => string };
 
-    const isPopulated = rawEmployee && typeof rawEmployee === 'object' && 'firstName' in rawEmployee;
+    const isPopulated =
+      rawEmployee &&
+      typeof rawEmployee === 'object' &&
+      'firstName' in rawEmployee;
 
     const employeeId = isPopulated
       ? (rawEmployee as PopulatedEmployee)._id.toString()
@@ -33,7 +47,9 @@ export class LeaveRequestMapper {
       : undefined;
 
     return new LeaveRequestEntity(
-      (doc as LeaveRequestDocument & { _id: { toString: () => string } })._id.toString(),
+      (
+        doc as LeaveRequestDocument & { _id: { toString: () => string } }
+      )._id.toString(),
       employeeId,
       doc.companyId.toString(),
       doc.leaveType,

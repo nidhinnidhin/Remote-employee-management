@@ -112,4 +112,14 @@ export const API_ROUTES = {
         DETAIL: (id: string) => `/attendance/logs/${id}`,
         DECIDE_REQUEST: "/attendance/admin/decide-request",
     },
+    LEAVES: {
+        APPLY: "/leaves/apply",
+        MY_LEAVES: "/leaves/my-leaves",
+        MY_BALANCE: "/leaves/my-balance",
+        COMPANY_LEAVES: "/leaves/company",
+        APPROVE: (id: string) => `/leaves/${id}/approve`,
+        REJECT: (id: string) => `/leaves/${id}/reject`,
+        CANCEL: (id: string) => `/leaves/${id}/cancel`,
+        DETAIL: (id: string) => `/leaves/${id}`,
+    },
 } as const;

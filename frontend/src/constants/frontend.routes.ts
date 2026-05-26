@@ -41,7 +41,7 @@ export const FRONTEND_ROUTES = {
         PROFILE: "/employee/profile",
         POLICY: "/employee/policy",
         ATTENDANCE: "/attendance",
-        LEAVES: "/leaves",
+        LEAVES: "/employee/leaves",
         TASKS: "/employee/tasks",
         PROJECTS: "/employee/projects",
         TEAMS: "/employee/teams",

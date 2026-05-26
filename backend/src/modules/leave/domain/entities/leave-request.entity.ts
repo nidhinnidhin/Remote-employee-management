@@ -1,16 +1,15 @@
-import { LeaveType } from 'src/shared/enums/leave/leave-type.enum';
 import { LeaveStatus } from 'src/shared/enums/leave/leave-status.enum';
 import { LeaveDurationType } from 'src/shared/enums/leave/leave-duration-type.enum';
 
 export class EmergencyContact {
-  name: string;
-  phone: string;
+  name!: string;
+  phone!: string;
 }
 
 export class EmployeeDetails {
-  firstName: string;
-  lastName: string;
-  email: string;
+  firstName!: string;
+  lastName!: string;
+  email!: string;
   avatar?: string;
 }
 
@@ -19,7 +18,7 @@ export class LeaveRequestEntity {
     public readonly id: string,
     public readonly employeeId: string,
     public readonly companyId: string,
-    public readonly leaveType: LeaveType,
+    public readonly leaveType: string, 
     public readonly startDate: Date,
     public readonly endDate: Date,
     public readonly durationType: LeaveDurationType,

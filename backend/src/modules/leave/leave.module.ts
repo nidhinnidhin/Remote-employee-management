@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { LeaveRequest, LeaveRequestSchema } from './infrastructure/database/mongoose/schemas/leave-request.schema';
+import {
+  LeaveRequest,
+  LeaveRequestSchema,
+} from './infrastructure/database/mongoose/schemas/leave-request.schema';
 import { MongoLeaveRequestRepository } from './infrastructure/database/repositories/mongo-leave-request.repository';
 import { ApplyLeaveUseCase } from './application/use-cases/apply-leave.usecase';
 import { ApproveLeaveUseCase } from './application/use-cases/approve-leave.usecase';
@@ -12,6 +15,7 @@ import { GetLeaveBalanceUseCase } from './application/use-cases/get-leave-balanc
 import { GetLeaveByIdUseCase } from './application/use-cases/get-leave-by-id.usecase';
 import { LeaveController } from './presentation/controllers/leave.controller';
 import { CompanyPolicyModule } from '../company-admin/company-policy.module';
+import { AuthModule } from '../auth/presentation/auth/auth.module';
 
 @Module({
   imports: [
@@ -19,6 +23,7 @@ import { CompanyPolicyModule } from '../company-admin/company-policy.module';
       { name: LeaveRequest.name, schema: LeaveRequestSchema },
     ]),
     CompanyPolicyModule,
+    AuthModule, // Required for ICompanyRepository in JwtAuthGuard
   ],
   controllers: [LeaveController],
   providers: [

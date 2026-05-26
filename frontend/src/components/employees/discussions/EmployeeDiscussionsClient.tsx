@@ -57,7 +57,6 @@ export default function EmployeeDiscussionsClient() {
           </div>
         </div>
       </div>
-
       {/* Meeting Cards */}
       {meetings.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 bg-white/[0.01] border border-dashed border-white/[0.05] rounded-3xl mt-4">
@@ -74,7 +73,7 @@ export default function EmployeeDiscussionsClient() {
           {meetings.map((meeting) => (
             <div
               key={meeting.id}
-              className="group relative bg-[#0f1115] border border-white/[0.05] rounded-2xl p-6 hover:border-indigo-500/30 hover:shadow-2xl hover:shadow-indigo-500/5 transition-all"
+              className="group relative  border border-white/[0.05] rounded-2xl p-6 hover:border-indigo-500/30 hover:shadow-2xl hover:shadow-indigo-500/5 transition-all"
             >
               <div className="flex items-start justify-between mb-4">
                 <div
@@ -123,9 +122,9 @@ export default function EmployeeDiscussionsClient() {
                 className={cn(
                   "w-full rounded-xl font-black text-[10px] uppercase tracking-widest transition-all",
                   meeting.status === "ONGOING"
-                    ? "bg-emerald-500 hover:bg-emerald-600 text-black shadow-lg shadow-emerald-500/20"
+                    ? "bg-emerald-500  text-black shadow-lg shadow-emerald-500/20"
                     : meeting.status === "SCHEDULED"
-                    ? "bg-blue-500 hover:bg-blue-600 text-white shadow-lg shadow-blue-500/20"
+                    ? "  text-white shadow-lg shadow-blue-500/20"
                     : "bg-white/5 text-slate-500 cursor-not-allowed"
                 )}
               >

@@ -24,7 +24,10 @@ export class ApplyLeaveUseCase implements IApplyLeaveUseCase {
     
     let allocatedDays = 0;
     if (leavePolicy && leavePolicy.leaveDistribution) {
-      const distribution = leavePolicy.leaveDistribution.find(d => d.type === dto.leaveType);
+      // ─── Case-insensitive lookup for dynamic policy matches ───
+      const distribution = leavePolicy.leaveDistribution.find(
+        d => String(d.type).trim().toUpperCase() === String(dto.leaveType).trim().toUpperCase()
+      );
       if (distribution) {
         allocatedDays = distribution.days;
       }
@@ -32,25 +35,25 @@ export class ApplyLeaveUseCase implements IApplyLeaveUseCase {
 
     // 2. Fetch employee's approved/pending leaves for this year of the SAME type
     const currentYear = new Date().getFullYear();
-    const existingLeaves = await this._leaveRequestRepository.findByEmployeeIdAndYear(employeeId, currentYear, [LeaveStatus.APPROVED, LeaveStatus.PENDING]);
+    const existingLeaves = await this._leaveRequestRepository.findByEmployeeIdAndYear(
+      employeeId, 
+      currentYear, 
+      [LeaveStatus.APPROVED, LeaveStatus.PENDING]
+    );
     
+    // ─── Case-insensitive filter for current usage calculation ───
     const consumedDays = existingLeaves
-      .filter(l => l.leaveType === dto.leaveType)
+      .filter(l => String(l.leaveType).trim().toUpperCase() === String(dto.leaveType).trim().toUpperCase())
       .reduce((sum, l) => sum + l.totalDays, 0);
 
     const remainingDays = allocatedDays - consumedDays;
-
-    // We don't throw an error if remainingDays < dto.totalDays because the user explicitly stated:
-    // "if the employee already finished all his allocated leaves then the employee should need to request with message and only the admin aprove the leave then only the employee can take leave"
-    // So we just allow it, and maybe the admin can see it exceeds balance later.
-    // However, they MUST provide a reason. (Our DTO already enforces reason).
 
     // 3. Create the Leave Request
     const leaveRequest = new LeaveRequestEntity(
       '',
       employeeId,
       companyId,
-      dto.leaveType,
+      dto.leaveType, 
       new Date(dto.startDate),
       new Date(dto.endDate),
       dto.durationType,

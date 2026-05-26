@@ -9,40 +9,40 @@ export type LeaveRequestDocument = LeaveRequest & Document;
 @Schema({ timestamps: true })
 export class LeaveRequest {
   @Prop({ type: Types.ObjectId, required: true })
-  employeeId: Types.ObjectId;
+  employeeId!: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, required: true })
-  companyId: Types.ObjectId;
-
-  @Prop({ type: String, enum: LeaveType, required: true })
-  leaveType: LeaveType;
-
-  @Prop({ type: Date, required: true })
-  startDate: Date;
-
-  @Prop({ type: Date, required: true })
-  endDate: Date;
-
-  @Prop({ type: String, enum: LeaveDurationType, required: true })
-  durationType: LeaveDurationType;
-
-  @Prop({ type: Number, required: true })
-  totalDays: number;
+  companyId!: Types.ObjectId;
 
   @Prop({ type: String, required: true })
-  reason: string;
+  leaveType!: string;
+
+  @Prop({ type: Date, required: true })
+  startDate!: Date;
+
+  @Prop({ type: Date, required: true })
+  endDate!: Date;
+
+  @Prop({ type: String, enum: LeaveDurationType, required: true })
+  durationType!: LeaveDurationType;
+
+  @Prop({ type: Number, required: true })
+  totalDays!: number;
+
+  @Prop({ type: String, required: true })
+  reason!: string;
 
   @Prop({ type: [String], default: [] })
-  attachments: string[];
+  attachments!: string[];
 
   @Prop({ type: Object })
-  emergencyContact: {
+  emergencyContact!: {
     name: string;
     phone: string;
   };
 
   @Prop({ type: String, enum: LeaveStatus, default: LeaveStatus.PENDING })
-  status: LeaveStatus;
+  status!: LeaveStatus;
 
   @Prop({ type: String })
   adminMessage?: string;
