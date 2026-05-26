@@ -23,6 +23,7 @@ export const getMyLeaves = async (
   api: AxiosInstance = clientApi
 ): Promise<PaginatedLeaveResponse> => {
   const response = await api.get(API_ROUTES.LEAVES.MY_LEAVES, { params });
+  console.log('---------------',response)
   return response.data?.data ?? response.data;
 };
 

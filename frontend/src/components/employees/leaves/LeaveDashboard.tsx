@@ -35,7 +35,6 @@ export const LeaveDashboard: React.FC = () => {
   const fetchBalances = async () => {
     setLoadingBalances(true);
     const res = await getMyLeaveBalanceAction();
-    console.log(res);
     if (res.success && res.data) {
       setBalances(res.data);
     } else {
@@ -53,10 +52,19 @@ export const LeaveDashboard: React.FC = () => {
       startDate: dateFilter.startDate || undefined,
       endDate: dateFilter.endDate || undefined,
     });
-
+    
     if (res.success && res.data) {
-      setLogs(res.data.data);
-      setTotalLogs(res.data.total);
+      // ─── SAFE FIX: Handle both paginated object wrapper or direct array formats ───
+      if (Array.isArray(res.data)) {
+        setLogs(res.data);
+        setTotalLogs(res.data.length);
+      } else if (res.data.data && Array.isArray(res.data.data)) {
+        setLogs(res.data.data);
+        setTotalLogs(res.data.total ?? res.data.data.length);
+      } else {
+        setLogs([]);
+        setTotalLogs(0);
+      }
     } else {
       toast.error(res.error ?? "Failed to load leave history");
     }
@@ -75,7 +83,7 @@ export const LeaveDashboard: React.FC = () => {
         );
       }
     } catch {
-      // Gracefully handle policy fetching errors
+      // Fail silently or handle error gracefully
     }
   };
 
@@ -90,7 +98,6 @@ export const LeaveDashboard: React.FC = () => {
 
   const handleCancelLeave = async (id: string) => {
     const res = await cancelLeaveAction(id);
-    
     if (res.success) {
       toast.success("Leave cancelled successfully");
       fetchLogs();
