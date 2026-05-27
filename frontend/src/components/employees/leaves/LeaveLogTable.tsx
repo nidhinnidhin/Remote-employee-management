@@ -51,12 +51,14 @@ export const LeaveLogTable: React.FC<LeaveLogTableProps> = ({
       [LeaveStatus.CANCELLED]: "bg-slate-100 text-slate-600 border-slate-200",
     };
     return (
-      <span
-        className={`px-2.5 py-1 text-xs font-medium rounded-full border ${badgeMap[status] ?? "bg-slate-100 text-slate-600 border-slate-200"}`}
-      >
-        {status.charAt(0) + status.slice(1).toLowerCase()}
-      </span>
-    );
+        <div className="flex flex-col gap-1 items-start">
+          <span
+            className={`px-2.5 py-1 text-xs font-medium rounded-full border ${badgeMap[status] ?? "bg-slate-100 text-slate-600 border-slate-200"}`}
+          >
+            {status.charAt(0) + status.slice(1).toLowerCase()}
+          </span>
+        </div>
+      );
   };
 
   const columns = [
@@ -92,7 +94,16 @@ export const LeaveLogTable: React.FC<LeaveLogTableProps> = ({
     },
     {
       header: "Status",
-      accessor: (row: LeaveRequest) => getStatusBadge(row.status),
+      accessor: (row: LeaveRequest) => (
+        <div className="flex flex-col gap-1.5 items-start">
+          {getStatusBadge(row.status)}
+          {row.adminMessage && (
+            <div className="text-[10px] text-slate-500 italic max-w-[150px] truncate" title={row.adminMessage}>
+              <span className="font-semibold not-italic text-slate-400">Admin: </span>{row.adminMessage}
+            </div>
+          )}
+        </div>
+      ),
     },
     {
       header: "Action",

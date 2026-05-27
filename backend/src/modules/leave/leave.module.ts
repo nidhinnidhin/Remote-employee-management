@@ -16,6 +16,7 @@ import { GetLeaveByIdUseCase } from './application/use-cases/get-leave-by-id.use
 import { LeaveController } from './presentation/controllers/leave.controller';
 import { CompanyPolicyModule } from '../company-admin/company-policy.module';
 import { AuthModule } from '../auth/presentation/auth/auth.module';
+import { EmployeesModule } from '../employees/employees.module';
 
 @Module({
   imports: [
@@ -23,7 +24,8 @@ import { AuthModule } from '../auth/presentation/auth/auth.module';
       { name: LeaveRequest.name, schema: LeaveRequestSchema },
     ]),
     CompanyPolicyModule,
-    AuthModule, // Required for ICompanyRepository in JwtAuthGuard
+    AuthModule, // Required for ICompanyRepository in JwtAuthGuard and potentially IEmailService
+    EmployeesModule, // Required for IEmployeeRepository
   ],
   controllers: [LeaveController],
   providers: [

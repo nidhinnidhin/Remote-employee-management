@@ -109,13 +109,15 @@ export class LeaveController {
     @Query('status') status?: LeaveStatus,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
+    @Query('search') search?: string,
+    @Query('employeeId') employeeId?: string,
   ) {
     const { companyId } = req.user as AuthenticatedUser;
     const result = await this._getCompanyLeavesUseCase.execute(
       companyId,
       parseInt(page),
       parseInt(limit),
-      { status, startDate, endDate },
+      { status, startDate, endDate, search, employeeId },
     );
     return ApiResponse.success(result, 'Company leaves fetched successfully');
   }

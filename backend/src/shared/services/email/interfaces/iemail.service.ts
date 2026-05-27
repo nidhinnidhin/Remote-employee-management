@@ -34,4 +34,11 @@ export interface IEmailService {
     decision: 'APPROVED' | 'REJECTED',
     adminRemarks: string,
   ): Promise<void>;
+  sendLeaveDecisionNotification(
+    employeeEmail: string,
+    employeeName: string,
+    leaveStartDate: string,
+    decision: 'APPROVED' | 'REJECTED',
+    adminRemarks?: string,
+  ): Promise<void>;
 }

@@ -3,7 +3,9 @@ import { LeaveStatus } from 'src/shared/enums/leave/leave-status.enum';
 
 export interface LeaveRequestFilter {
   status?: LeaveStatus;
-  search?: string;     // search by employee name (admin side)
+  search?: string;
+  employeeId?: string;
+  userIds?: any[]; // For search by name which resolves to an array of ObjectIds
   startDate?: string;
   endDate?: string;
 }

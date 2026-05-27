@@ -274,6 +274,46 @@ export class EmailService implements IEmailService {
     });
   }
 
+  async sendLeaveDecisionNotification(
+    employeeEmail: string,
+    employeeName: string,
+    leaveStartDate: string,
+    decision: 'APPROVED' | 'REJECTED',
+    adminRemarks?: string,
+  ): Promise<void> {
+    const isApproved = decision === 'APPROVED';
+    const html = this.getHtmlWrapper(`
+      <div>
+        <h2 style="color:${isApproved ? '#16a34a' : '#dc2626'};margin-bottom:16px;font-size:24px;">
+          Leave Request: ${isApproved ? 'Approved' : 'Rejected'}
+        </h2>
+        <p style="color:#1e293b;font-size:16px;line-height:24px;margin-bottom:16px;">
+          Hi ${employeeName},
+        </p>
+        <p style="color:#64748b;font-size:16px;line-height:24px;margin-bottom:24px;">
+          The administrator has <strong>${decision.toLowerCase()}</strong> your leave request starting on <strong>${leaveStartDate}</strong>.
+        </p>
+        <div style="background:${isApproved ? '#f0fdf4' : '#fef2f2'};border-left:4px solid ${isApproved ? '#16a34a' : '#dc2626'};padding:20px;margin-bottom:24px;border-radius:4px;">
+          <strong style="color:${isApproved ? '#166534' : '#991b1b'};display:block;margin-bottom:4px;">Admin Remarks:</strong>
+          <p style="color:${isApproved ? '#15803d' : '#b91c1c'};margin:0;">"${adminRemarks || (isApproved ? 'None' : 'No comments provided')}"</p>
+        </div>
+        <p style="color:#64748b;font-size:16px;line-height:24px;">
+          ${
+            isApproved
+              ? 'Have a great time off!'
+              : 'Please contact HR or your manager if you have any questions.'
+          }
+        </p>
+      </div>
+    `);
+
+    await this.sendMail({
+      to: employeeEmail,
+      subject: `Leave Request ${isApproved ? 'Approved' : 'Rejected'}`,
+      html,
+    });
+  }
+
   private getHtmlWrapper(content: string): string {
     return `
       <!DOCTYPE html>

@@ -3,12 +3,18 @@ import type { ILeaveRequestRepository } from '../../domain/repositories/ileave-r
 import { LeaveStatus } from 'src/shared/enums/leave/leave-status.enum';
 import { LeaveRequestEntity } from '../../domain/entities/leave-request.entity';
 import { IRejectLeaveUseCase } from '../interfaces/leave-use-case.interface';
+import type { IEmailService } from 'src/shared/services/email/interfaces/iemail.service';
+import type { IEmployeeRepository } from 'src/modules/employees/domain/repositories/employee.repository';
 
 @Injectable()
 export class RejectLeaveUseCase implements IRejectLeaveUseCase {
   constructor(
     @Inject('ILeaveRequestRepository')
     private readonly _leaveRequestRepository: ILeaveRequestRepository,
+    @Inject('IEmailService')
+    private readonly _emailService: IEmailService,
+    @Inject('IEmployeeRepository')
+    private readonly _employeeRepository: IEmployeeRepository,
   ) {}
 
   async execute(id: string, adminMessage?: string): Promise<LeaveRequestEntity> {
@@ -24,6 +30,22 @@ export class RejectLeaveUseCase implements IRejectLeaveUseCase {
     const updated = await this._leaveRequestRepository.updateStatus(id, LeaveStatus.REJECTED, adminMessage);
     if (!updated) {
       throw new BadRequestException('Failed to reject leave request');
+    }
+
+    // Send email to employee
+    try {
+      const employee = await this._employeeRepository.findById(leaveRequest.employeeId.toString());
+      if (employee) {
+        await this._emailService.sendLeaveDecisionNotification(
+          employee.email,
+          employee.name,
+          new Date(leaveRequest.startDate).toLocaleDateString(),
+          'REJECTED',
+          adminMessage,
+        );
+      }
+    } catch (error) {
+      console.error('Failed to send leave rejection email:', error);
     }
 
     return updated;

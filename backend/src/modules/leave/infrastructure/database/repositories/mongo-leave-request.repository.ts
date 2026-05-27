@@ -95,6 +95,15 @@ export class MongoLeaveRequestRepository implements ILeaveRequestRepository {
 
     if (filter?.status) query.status = filter.status;
 
+    if (filter?.employeeId && Types.ObjectId.isValid(filter.employeeId)) {
+      query.employeeId = new Types.ObjectId(filter.employeeId);
+    } else if (filter?.userIds && filter.userIds.length > 0) {
+      query.employeeId = { $in: filter.userIds };
+    } else if (filter?.userIds && filter.userIds.length === 0) {
+      // If userIds array is provided but empty (search matched no one)
+      return { data: [], total: 0 };
+    }
+
     if (filter?.startDate && filter?.endDate) {
       query.startDate = {
         $gte: new Date(filter.startDate),
