@@ -1,7 +1,15 @@
 import React from "react";
 import { format } from "date-fns";
 import { AdminLeaveRequest } from "@/services/company/leave/leave.service";
-import { Check, X, FileText, AlertCircle, Clock, CheckCircle2, XCircle } from "lucide-react";
+import {
+  Check,
+  X,
+  FileText,
+  AlertCircle,
+  Clock,
+  CheckCircle2,
+  XCircle,
+} from "lucide-react";
 import Table from "@/components/ui/Table";
 import Pagination from "@/components/ui/Pagination";
 
@@ -68,7 +76,11 @@ export const AdminLeaveTable: React.FC<AdminLeaveTableProps> = ({
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center overflow-hidden">
             {log.employeeId?.avatar ? (
-              <img src={log.employeeId.avatar} alt="avatar" className="w-full h-full object-cover" />
+              <img
+                src={log.employeeId.avatar}
+                alt="avatar"
+                className="w-full h-full object-cover"
+              />
             ) : (
               <span className="text-xs font-bold text-slate-400">
                 {log.employeeId?.firstName?.[0] || "?"}
@@ -117,7 +129,7 @@ export const AdminLeaveTable: React.FC<AdminLeaveTableProps> = ({
       header: "Days",
       accessor: (log: AdminLeaveRequest) => (
         <span className="text-sm font-medium text-slate-200">
-          {log.totalDays} day{log.totalDays > 1 ? 's' : ''}
+          {log.totalDays} day{log.totalDays > 1 ? "s" : ""}
         </span>
       ),
     },

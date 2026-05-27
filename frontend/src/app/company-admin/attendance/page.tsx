@@ -86,7 +86,7 @@ export default function AdminAttendancePage() {
           status: status || undefined,
         });
         if (res.success && res.data) {
-          // Handle both paginated format and array directly safely
+          console.log(res.data)
           if (Array.isArray(res.data)) {
             setLeaveLogs(res.data);
             setLeaveTotal(res.data.length);

@@ -16,10 +16,14 @@ export async function getAdminLeaveLogsAction(params: {
   endDate?: string;
   search?: string;
   employeeId?: string;
-}): Promise<{ success: boolean; data?: { data: AdminLeaveRequest[]; total: number }; error?: string }> {
+}): Promise<{
+  success: boolean;
+  data?: { data: AdminLeaveRequest[]; total: number };
+  error?: string;
+}> {
   try {
     const data = await getCompanyLeaves(params);
-    console.log("tgrrhfghfgdhdfghdfhfh")
+    console.log("tgrrhfghfgdhdfghdfhfh");
     return { success: true, data };
   } catch (error: any) {
     return {
@@ -54,4 +58,3 @@ export async function rejectLeaveAction(id: string, adminMessage: string) {
     };
   }
 }
-

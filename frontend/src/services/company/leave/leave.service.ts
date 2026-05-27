@@ -13,6 +13,7 @@ export const getCompanyLeaves = async (params: {
 }): Promise<{ data: AdminLeaveRequest[]; total: number }> => {
   const api = await getServerApi();
   const response = await api.get(API_ROUTES.LEAVES.COMPANY_LEAVES, { params });
+  console.log("tgrrhfghfgdhdfghdfhfh");
   return response.data;
 };
 
