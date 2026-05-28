@@ -7,6 +7,8 @@ import { ProjectStatus } from 'src/shared/enums/project/project-status.enum';
 import type { ICreateConversationUseCase } from 'src/modules/chat/application/interfaces/chat-use-cases.interface';
 import { ChatGateway } from 'src/modules/chat/presentation/gateways/chat.gateway';
 import { ConversationType } from 'src/shared/enums/chat/conversation-type.enum';
+import type { ICreateNotificationUseCase } from 'src/modules/notification/application/interfaces/notification-use-cases.interface';
+import { NotificationType } from 'src/modules/notification/domain/entities/notification.entity';
 
 @Injectable()
 export class CreateProjectUseCase implements ICreateProjectUseCase {
@@ -16,6 +18,8 @@ export class CreateProjectUseCase implements ICreateProjectUseCase {
     @Inject('ICreateConversationUseCase')
     private readonly _createConversationUseCase: ICreateConversationUseCase,
     private readonly _chatGateway: ChatGateway,
+    @Inject('ICreateNotificationUseCase')
+    private readonly _createNotificationUseCase: ICreateNotificationUseCase,
   ) { }
 
   async execute(companyId: string, adminId: string, projectDto: CreateProjectDto): Promise<ProjectEntity> {
@@ -44,6 +48,23 @@ export class CreateProjectUseCase implements ICreateProjectUseCase {
       } catch (error) {
         // Log error but don't fail project creation
         console.error('Failed to create automatic project chat group:', error);
+      }
+    }
+
+    // Send Notification to members
+    if (project.members && project.members.length > 0) {
+      for (const memberId of project.members) {
+        if (memberId !== adminId) { // Optionally skip notifying the creator
+          try {
+            await this._createNotificationUseCase.execute(companyId, {
+              recipientId: memberId,
+              type: NotificationType.PROJECT_ASSIGNED,
+              message: `You have been assigned to project: ${project.name}`,
+            });
+          } catch (error) {
+            console.error(`Failed to send notification to ${memberId}:`, error);
+          }
+        }
       }
     }
 

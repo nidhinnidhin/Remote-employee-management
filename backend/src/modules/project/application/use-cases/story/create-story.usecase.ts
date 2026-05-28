@@ -8,6 +8,8 @@ import { UserStoryEntity } from '../../../domain/entities/user-story.entity';
 import { UserStoryStatus } from 'src/shared/enums/project/user-story-status.enum';
 import { UserStoryPriority } from 'src/shared/enums/project/user-story-priority.enum';
 import { SprintStatus } from 'src/shared/enums/project/sprint-status.enum';
+import type { ICreateNotificationUseCase } from 'src/modules/notification/application/interfaces/notification-use-cases.interface';
+import { NotificationType } from 'src/modules/notification/domain/entities/notification.entity';
 
 @Injectable()
 export class CreateUserStoryUseCase implements ICreateUserStoryUseCase {
@@ -18,6 +20,8 @@ export class CreateUserStoryUseCase implements ICreateUserStoryUseCase {
     private readonly _projectRepository: IProjectRepository,
     @Inject('ISprintRepository')
     private readonly _sprintRepository: ISprintRepository,
+    @Inject('ICreateNotificationUseCase')
+    private readonly _createNotificationUseCase: ICreateNotificationUseCase,
   ) { }
 
   async execute(
@@ -67,6 +71,18 @@ export class CreateUserStoryUseCase implements ICreateUserStoryUseCase {
         await this._sprintRepository.updateSprint(activeSprint.id, companyId, {
           issueIds: [...activeSprint.issueIds, createdStory.id]
         });
+      }
+    }
+
+    if (createdStory.assigneeId && createdStory.assigneeId !== adminId) {
+      try {
+        await this._createNotificationUseCase.execute(companyId, {
+          recipientId: createdStory.assigneeId,
+          type: NotificationType.STORY_ASSIGNED,
+          message: `You have been assigned to story: ${createdStory.title}`,
+        });
+      } catch (error) {
+        console.error(`Failed to send notification to ${createdStory.assigneeId}:`, error);
       }
     }
 

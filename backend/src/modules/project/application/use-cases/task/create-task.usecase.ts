@@ -6,6 +6,8 @@ import type { ICreateTaskUseCase } from '../../interfaces/task/task-use-cases.in
 import { CreateTaskDto } from '../../dto/task/create-task.dto';
 import { TaskEntity } from '../../../domain/entities/task.entity';
 import { TaskStatus } from 'src/shared/enums/project/task-status.enum';
+import type { ICreateNotificationUseCase } from 'src/modules/notification/application/interfaces/notification-use-cases.interface';
+import { NotificationType } from 'src/modules/notification/domain/entities/notification.entity';
 
 @Injectable()
 export class CreateTaskUseCase implements ICreateTaskUseCase {
@@ -16,6 +18,8 @@ export class CreateTaskUseCase implements ICreateTaskUseCase {
     private readonly _storyRepository: IUserStoryRepository,
     @Inject('IProjectRepository')
     private readonly _projectRepository: IProjectRepository,
+    @Inject('ICreateNotificationUseCase')
+    private readonly _createNotificationUseCase: ICreateNotificationUseCase,
   ) { }
 
   async execute(
@@ -51,6 +55,20 @@ export class CreateTaskUseCase implements ICreateTaskUseCase {
       isDeleted: false,
     };
 
-    return this._taskRepository.create(task as Partial<TaskEntity>);
+    const createdTask = await this._taskRepository.create(task as Partial<TaskEntity>);
+
+    if (createdTask.assignedTo && createdTask.assignedTo !== adminId) {
+      try {
+        await this._createNotificationUseCase.execute(companyId, {
+          recipientId: createdTask.assignedTo,
+          type: NotificationType.TASK_ASSIGNED,
+          message: `You have been assigned to task: ${createdTask.title}`,
+        });
+      } catch (error) {
+        console.error(`Failed to send notification to ${createdTask.assignedTo}:`, error);
+      }
+    }
+
+    return createdTask;
   }
 }
