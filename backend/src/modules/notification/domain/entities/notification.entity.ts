@@ -3,6 +3,7 @@ export enum NotificationType {
   TASK_ASSIGNED = 'TASK_ASSIGNED',
   STORY_ASSIGNED = 'STORY_ASSIGNED',
   SYSTEM_ALERT = 'SYSTEM_ALERT',
+  NEW_MESSAGE = 'NEW_MESSAGE',
 }
 
 export class NotificationEntity {

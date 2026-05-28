@@ -17,6 +17,7 @@ import { LeaveConversationUseCase } from './application/use-cases/leave-conversa
 import { EditMessageUseCase } from './application/use-cases/edit-message.usecase';
 import { DeleteMessageUseCase } from './application/use-cases/delete-message.usecase';
 import { AuthModule } from '../auth/presentation/auth/auth.module';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { AuthModule } from '../auth/presentation/auth/auth.module';
       { name: Message.name, schema: MessageSchema },
     ]),
     AuthModule, // Required for ICompanyRepository in WsJwtGuard
+    NotificationModule,
   ],
   controllers: [ChatController],
   providers: [

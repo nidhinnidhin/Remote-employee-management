@@ -6,6 +6,8 @@ import type { IConversationRepository } from '../../domain/repositories/iconvers
 import { SendMessageDto } from '../dto/send-message.dto';
 import { MessageEntity } from '../../domain/entities/message.entity';
 import { v4 as uuidv4 } from 'uuid';
+import type { ICreateNotificationUseCase } from 'src/modules/notification/application/interfaces/notification-use-cases.interface';
+import { NotificationType } from 'src/modules/notification/domain/entities/notification.entity';
 
 @Injectable()
 export class SendMessageUseCase implements ISendMessageUseCase {
@@ -14,6 +16,8 @@ export class SendMessageUseCase implements ISendMessageUseCase {
     private readonly _messageRepository: IMessageRepository,
     @Inject('IConversationRepository')
     private readonly _conversationRepository: IConversationRepository,
+    @Inject('ICreateNotificationUseCase')
+    private readonly _createNotificationUseCase: ICreateNotificationUseCase,
   ) {}
 
   async execute(companyId: string, senderId: string, dto: SendMessageDto): Promise<MessageEntity> {
@@ -39,6 +43,21 @@ export class SendMessageUseCase implements ISendMessageUseCase {
       dto.content,
       new Date(),
     );
+
+    // Send notification to other participants
+    for (const participantId of conversation.participants) {
+      if (participantId !== senderId) {
+        try {
+          await this._createNotificationUseCase.execute(companyId, {
+            recipientId: participantId,
+            type: NotificationType.NEW_MESSAGE,
+            message: `New message received from sender`,
+          });
+        } catch (error) {
+          console.error(`Failed to send message notification to ${participantId}:`, error);
+        }
+      }
+    }
 
     return createdMessage;
   }
