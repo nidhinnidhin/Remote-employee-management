@@ -47,4 +47,4 @@ import { LeaveModule } from './modules/leave/leave.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }

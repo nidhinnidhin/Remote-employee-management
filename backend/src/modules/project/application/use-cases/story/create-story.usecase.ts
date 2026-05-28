@@ -18,7 +18,7 @@ export class CreateUserStoryUseCase implements ICreateUserStoryUseCase {
     private readonly _projectRepository: IProjectRepository,
     @Inject('ISprintRepository')
     private readonly _sprintRepository: ISprintRepository,
-  ) {}
+  ) { }
 
   async execute(
     companyId: string,
@@ -38,7 +38,7 @@ export class CreateUserStoryUseCase implements ICreateUserStoryUseCase {
     if (storyDto.addToActiveSprint) {
       const projectSprints = await this._sprintRepository.findByProjectId(storyDto.projectId, companyId);
       const activeSprint = projectSprints.find(s => s.status === SprintStatus.ACTIVE);
-      
+
       if (!activeSprint) {
         throw new BadRequestException('No active sprint found for this project');
       }

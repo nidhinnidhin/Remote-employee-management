@@ -16,7 +16,7 @@ export class CreateProjectUseCase implements ICreateProjectUseCase {
     @Inject('ICreateConversationUseCase')
     private readonly _createConversationUseCase: ICreateConversationUseCase,
     private readonly _chatGateway: ChatGateway,
-  ) {}
+  ) { }
 
   async execute(companyId: string, adminId: string, projectDto: CreateProjectDto): Promise<ProjectEntity> {
     const projectData = {

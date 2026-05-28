@@ -174,4 +174,4 @@ import { ChatModule } from '../chat/chat.module';
   ],
   exports: ['IProjectRepository'],
 })
-export class ProjectModule {}
+export class ProjectModule { }

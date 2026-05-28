@@ -15,7 +15,7 @@ export class ApproveLeaveUseCase implements IApproveLeaveUseCase {
     private readonly _emailService: IEmailService,
     @Inject('IEmployeeRepository')
     private readonly _employeeRepository: IEmployeeRepository,
-  ) {}
+  ) { }
 
   async execute(id: string, adminMessage?: string): Promise<LeaveRequestEntity> {
     const leaveRequest = await this._leaveRequestRepository.findById(id);

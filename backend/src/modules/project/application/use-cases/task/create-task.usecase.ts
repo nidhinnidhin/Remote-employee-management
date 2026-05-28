@@ -16,7 +16,7 @@ export class CreateTaskUseCase implements ICreateTaskUseCase {
     private readonly _storyRepository: IUserStoryRepository,
     @Inject('IProjectRepository')
     private readonly _projectRepository: IProjectRepository,
-  ) {}
+  ) { }
 
   async execute(
     companyId: string,

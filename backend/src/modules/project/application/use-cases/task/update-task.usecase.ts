@@ -15,7 +15,7 @@ export class UpdateTaskUseCase implements IUpdateTaskUseCase {
   constructor(
     @Inject('ITaskRepository')
     private readonly _taskRepository: ITaskRepository,
-  ) {}
+  ) { }
 
   async execute(
     id: string,

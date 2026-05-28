@@ -9,7 +9,7 @@ export class UpdateUserStoryUseCase implements IUpdateUserStoryUseCase {
   constructor(
     @Inject('IUserStoryRepository')
     private readonly _storyRepository: IUserStoryRepository,
-  ) {}
+  ) { }
 
   async execute(
     id: string,

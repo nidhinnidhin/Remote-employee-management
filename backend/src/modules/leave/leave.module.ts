@@ -68,4 +68,4 @@ import { EmployeesModule } from '../employees/employees.module';
   ],
   exports: ['ILeaveRequestRepository'],
 })
-export class LeaveModule {}
+export class LeaveModule { }

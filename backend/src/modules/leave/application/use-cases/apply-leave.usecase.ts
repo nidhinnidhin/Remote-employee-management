@@ -15,13 +15,13 @@ export class ApplyLeaveUseCase implements IApplyLeaveUseCase {
     private readonly _leaveRequestRepository: ILeaveRequestRepository,
     @Inject(POLICY_MESSAGES.COMPANY_POLICY_REPOSITORY)
     private readonly _companyPolicyRepository: ICompanyPolicyRepository,
-  ) {}
+  ) { }
 
   async execute(companyId: string, employeeId: string, dto: ApplyLeaveDto): Promise<LeaveRequestEntity> {
     // 1. Fetch Company Policy for LEAVE_POLICY
     const policies = await this._companyPolicyRepository.getCompanyPolicies(companyId);
     const leavePolicy = policies.find(p => p.type === PolicyType.LEAVE_POLICY);
-    
+
     let allocatedDays = 0;
     if (leavePolicy && leavePolicy.leaveDistribution) {
       // ─── Case-insensitive lookup for dynamic policy matches ───
@@ -36,11 +36,11 @@ export class ApplyLeaveUseCase implements IApplyLeaveUseCase {
     // 2. Fetch employee's approved/pending leaves for this year of the SAME type
     const currentYear = new Date().getFullYear();
     const existingLeaves = await this._leaveRequestRepository.findByEmployeeIdAndYear(
-      employeeId, 
-      currentYear, 
+      employeeId,
+      currentYear,
       [LeaveStatus.APPROVED, LeaveStatus.PENDING]
     );
-    
+
     // ─── Case-insensitive filter for current usage calculation ───
     const consumedDays = existingLeaves
       .filter(l => String(l.leaveType).trim().toUpperCase() === String(dto.leaveType).trim().toUpperCase())
@@ -53,7 +53,7 @@ export class ApplyLeaveUseCase implements IApplyLeaveUseCase {
       '',
       employeeId,
       companyId,
-      dto.leaveType, 
+      dto.leaveType,
       new Date(dto.startDate),
       new Date(dto.endDate),
       dto.durationType,
@@ -66,4 +66,4 @@ export class ApplyLeaveUseCase implements IApplyLeaveUseCase {
 
     return await this._leaveRequestRepository.create(leaveRequest);
   }
-}
+}  
