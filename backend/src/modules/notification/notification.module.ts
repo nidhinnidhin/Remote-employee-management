@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Notification, NotificationSchema } from './infrastructure/database/mongoose/schemas/notification.schema';
+import {
+  Notification,
+  NotificationSchema,
+} from './infrastructure/database/mongoose/schemas/notification.schema';
 import { MongoNotificationRepository } from './infrastructure/database/repositories/mongo-notification.repository';
 import { CreateNotificationUseCase } from './application/use-cases/create-notification.usecase';
 import { GetUserNotificationsUseCase } from './application/use-cases/get-user-notifications.usecase';
@@ -14,27 +17,23 @@ import { AuthModule } from '../auth/presentation/auth/auth.module';
     MongooseModule.forFeature([
       { name: Notification.name, schema: NotificationSchema },
     ]),
-    AuthModule, // Required for JwtAuthGuard and WsJwtGuard
+    AuthModule,
   ],
   controllers: [NotificationController],
   providers: [
     NotificationGateway,
+
     {
       provide: 'INotificationRepository',
       useClass: MongoNotificationRepository,
     },
+
     {
       provide: 'ICreateNotificationUseCase',
       useClass: CreateNotificationUseCase,
     },
-    {
-      provide: 'IGetUserNotificationsUseCase',
-      useClass: GetUserNotificationsUseCase,
-    },
-    {
-      provide: 'IMarkNotificationReadUseCase',
-      useClass: MarkNotificationReadUseCase,
-    },
+    GetUserNotificationsUseCase,
+    MarkNotificationReadUseCase,
   ],
   exports: ['ICreateNotificationUseCase', NotificationGateway],
 })

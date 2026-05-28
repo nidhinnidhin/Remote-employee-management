@@ -4,6 +4,7 @@ import React from "react";
 import { UserNav } from "@/components/common/UserNav";
 import { Bell, Search } from "lucide-react";
 import { useProfileStore } from "@/store/profile.store";
+import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 
 export const Header: React.FC = () => {
     const { userProfile } = useProfileStore();
@@ -27,10 +28,7 @@ export const Header: React.FC = () => {
                 </div>
 
                 {/* Notifications */}
-                <button className="p-2 text-muted hover:text-accent transition-colors relative">
-                    <Bell size={20} strokeWidth={1.5} />
-                    <span className="absolute top-2 right-2 w-2 h-2 bg-danger rounded-full border border-bg" />
-                </button>
+                <NotificationDropdown />
 
                 {/* User Nav */}
                 <div className="pl-4 border-l border-white/10 flex items-center gap-3">

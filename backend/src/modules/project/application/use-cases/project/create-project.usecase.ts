@@ -10,6 +10,7 @@ import { ConversationType } from 'src/shared/enums/chat/conversation-type.enum';
 import type { ICreateNotificationUseCase } from 'src/modules/notification/application/interfaces/notification-use-cases.interface';
 import { NotificationType } from 'src/modules/notification/domain/entities/notification.entity';
 
+
 @Injectable()
 export class CreateProjectUseCase implements ICreateProjectUseCase {
   constructor(
