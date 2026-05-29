@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Edit3, Trash2, Clock, Calendar } from "lucide-react";
+import { Edit3, Trash2, Clock, Calendar, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Task, TaskStatus } from "@/shared/types/company/projects/task.type";
 import { Employee } from "@/shared/types/company/employees/employee-listing.type";
@@ -14,6 +14,7 @@ interface TaskCardProps {
   storyTitle?: string;
   onEdit: (task: Task) => void;
   onDelete: (task: Task) => void;
+  onComment?: (task: Task) => void;
   isDraggable?: boolean;
   innerRef?: any;
   draggableProps?: any;
@@ -26,6 +27,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   storyTitle,
   onEdit,
   onDelete,
+  onComment,
   isDraggable,
   innerRef,
   draggableProps,
@@ -82,6 +84,16 @@ const TaskCard: React.FC<TaskCardProps> = ({
             >
               <Trash2 size={13} strokeWidth={2.5} />
             </button>
+            {onComment && (
+              <button
+                type="button"
+                className="p-1 text-muted hover:text-accent transition-colors"
+                onClick={() => onComment(task)}
+                title="View Comments"
+              >
+                <MessageSquare size={13} strokeWidth={2.5} />
+              </button>
+            )}
           </div>
         </div>
 

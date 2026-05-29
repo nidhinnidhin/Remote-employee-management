@@ -8,6 +8,7 @@ import {
   Trash2,
   AlignLeft,
   CheckSquare,
+  MessageSquare,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { UserStory } from "@/shared/types/company/projects/user-story.type";
@@ -17,6 +18,8 @@ import StoryStatusBadge from "./StoryStatusBadge";
 import AssigneeDisplay from "./AssigneeDisplay";
 import AcceptanceCriteriaList from "./AcceptanceCriteriaList";
 import InlineTaskList from "../tasks/InlineTaskList";
+import AdminCommentsModal from "../projects/AdminCommentsModal";
+import { CommentEntityType } from "@/shared/types/company/projects/comment.type";
 
 interface StoryCardProps {
   story: UserStory;
@@ -32,6 +35,7 @@ const StoryCard: React.FC<StoryCardProps> = ({
   onDelete,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [commentsOpen, setCommentsOpen] = useState(false);
   const assignee = employees.find((e) => e.id === story.assigneeId);
 
   // REFINED: Thicker Zinc border for better structure
@@ -108,6 +112,19 @@ const StoryCard: React.FC<StoryCardProps> = ({
               <Trash2 size={15} strokeWidth={2} />
             </button>
 
+            {/* Comments Button */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setCommentsOpen(true);
+              }}
+              className="flex items-center justify-center h-8 w-8 rounded-md text-zinc-400 hover:text-accent hover:bg-accent/10 transition-all active:scale-95"
+              title="View Comments"
+            >
+              <MessageSquare size={14} strokeWidth={2} />
+            </button>
+
             {/* Small action divider */}
             <div className={cn("w-[1px] h-4 mx-1 bg-zinc-700/50")} />
 
@@ -177,6 +194,15 @@ const StoryCard: React.FC<StoryCardProps> = ({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Story Comments Modal */}
+      <AdminCommentsModal
+        isOpen={commentsOpen}
+        onClose={() => setCommentsOpen(false)}
+        entityId={story.id?.toString() || ""}
+        entityType={CommentEntityType.USER_STORY}
+        title={`Comments — ${story.title}`}
+      />
     </div>
   );
 };
