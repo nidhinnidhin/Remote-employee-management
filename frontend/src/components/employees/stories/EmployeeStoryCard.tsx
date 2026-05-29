@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, AlignLeft, CheckSquare, Layers, Target } from "lucide-react";
+import { ChevronDown, CheckSquare, Layers, Target, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { UserStory } from "@/shared/types/company/projects/user-story.type";
 import { Task } from "@/shared/types/company/projects/task.type";
@@ -10,6 +10,8 @@ import StoryPriorityBadge from "@/components/admin/stories/StoryPriorityBadge";
 import StoryStatusBadge from "@/components/admin/stories/StoryStatusBadge";
 import AcceptanceCriteriaList from "@/components/admin/stories/AcceptanceCriteriaList";
 import EmployeeInlineTaskList from "../tasks/EmployeeInlineTaskList";
+import ProjectCommentsModal from "../projects/ProjectCommentsModal";
+import { CommentEntityType } from "@/shared/types/company/projects/comment.type";
 
 interface EmployeeStoryCardProps {
   story: UserStory;
@@ -23,6 +25,7 @@ export default function EmployeeStoryCard({
   onRefresh,
 }: EmployeeStoryCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [commentsOpen, setCommentsOpen] = useState(false);
 
   return (
     <div
@@ -70,6 +73,19 @@ export default function EmployeeStoryCard({
             <StoryPriorityBadge priority={story.priority} />
             <StoryStatusBadge status={story.status} />
           </div>
+
+          {/* Comments Button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setCommentsOpen(true);
+            }}
+            className="w-8 h-8 rounded-lg flex items-center justify-center bg-white/[0.04] border border-white/[0.08] text-slate-500 hover:text-accent hover:border-accent/30 hover:bg-accent/10 transition-all duration-200"
+            title="View Comments"
+          >
+            <MessageSquare size={14} />
+          </button>
+
           <motion.div
             animate={{ rotate: isExpanded ? 180 : 0 }}
             className={cn("text-slate-600 transition-colors", isExpanded && "text-white")}
@@ -197,6 +213,15 @@ export default function EmployeeStoryCard({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Story Comments Modal */}
+      <ProjectCommentsModal
+        isOpen={commentsOpen}
+        onClose={() => setCommentsOpen(false)}
+        entityId={story.id?.toString() || story._id?.toString() || ""}
+        entityType={CommentEntityType.USER_STORY}
+        title={`Comments — ${story.title}`}
+      />
     </div>
   );
 }
