@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { FolderKanban, Calendar, ArrowRight, CheckCircle2, Layers } from "lucide-react";
+import { FolderKanban, Calendar, ArrowRight, CheckCircle2, Layers, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Project } from "@/shared/types/company/projects/project.type";
 import ProjectStatusBadge from "@/components/company/projects/ProjectStatusBadge";
@@ -12,12 +12,14 @@ interface EmployeeProjectCardProps {
   project: Project;
   taskCount: number;
   storyCount: number;
+  onOpenComments: (projectId: string, projectName: string) => void;
 }
 
 export default function EmployeeProjectCard({
   project,
   taskCount,
   storyCount,
+  onOpenComments,
 }: EmployeeProjectCardProps) {
   
   const formatDate = (dateString?: string) => {
@@ -32,7 +34,13 @@ export default function EmployeeProjectCard({
   };
 
   const projectId = project.id || project._id;
-  const projectUrl = `${FRONTEND_ROUTES.EMPLOYEE.PROJECTS}/${projectId}`;
+  const projectUrl = `${FRONTEND_ROUTES.EMPLOYEE.PROJECTS}/${projectId as string}`;
+
+  const handleOpenComments = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onOpenComments(projectId as string, project.name);
+  };
 
   return (
     <Link 
@@ -81,6 +89,13 @@ export default function EmployeeProjectCard({
               <Layers size={13} className="text-slate-600" strokeWidth={2} />
               <span className="text-[11px] font-bold text-slate-500">{storyCount} stories</span>
            </div>
+           <button 
+             onClick={handleOpenComments}
+             className="flex items-center gap-1.5 ml-2 px-2 py-1 rounded-md text-slate-500 hover:text-accent hover:bg-accent/10 transition-colors"
+           >
+              <MessageSquare size={13} strokeWidth={2} />
+              <span className="text-[11px] font-bold">Comments</span>
+           </button>
         </div>
         
         {/* Simple Arrow: Smaller and more discreet */}

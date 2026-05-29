@@ -45,6 +45,7 @@ import { MongoCommentRepository } from './infrastructure/database/repositories/m
 import { AddCommentUseCase } from './application/use-cases/add-comment.usecase';
 import { GetCommentsUseCase } from './application/use-cases/get-comments.usecase';
 import { CommentController } from './presentation/controllers/comment.controller';
+import { UserDocument, UserSchema } from '../auth/infrastructure/database/mongoose/schemas/userSchema';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { CommentController } from './presentation/controllers/comment.controller
       { name: TaskDocument.name, schema: TaskSchema },
       { name: SprintDocument.name, schema: SprintSchema },
       { name: CommentDocument.name, schema: CommentSchema },
+      { name: UserDocument.name, schema: UserSchema },
     ]),
   ],
   controllers: [ProjectController, StoryController, TaskController, SprintController, CommentController],

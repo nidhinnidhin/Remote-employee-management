@@ -5,6 +5,9 @@ import type { ITaskRepository } from '../../domain/repositories/task.repository.
 import type { IUserStoryRepository } from '../../domain/repositories/user-story.repository.interface';
 import { CommentEntityType } from 'src/shared/enums/project/comment-entity-type.enum';
 import { CommentEntity } from '../../domain/entities/comment.entity';
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import { UserDocument } from '../../../auth/infrastructure/database/mongoose/schemas/userSchema';
 
 @Injectable()
 export class GetCommentsUseCase {
@@ -17,6 +20,8 @@ export class GetCommentsUseCase {
     private readonly taskRepository: ITaskRepository,
     @Inject('IUserStoryRepository')
     private readonly userStoryRepository: IUserStoryRepository,
+    @InjectModel(UserDocument.name)
+    private readonly userModel: Model<UserDocument>,
   ) {}
 
   async execute(companyId: string, userId: string, entityId: string, entityType: CommentEntityType): Promise<CommentEntity[]> {
@@ -48,6 +53,33 @@ export class GetCommentsUseCase {
     }
 
     const comments = await this.commentRepository.findByEntityId(entityId, entityType);
-    return comments;
+    
+    // Enrich with author names
+    const authorIds = [...new Set(comments.map(c => c.authorId))];
+    const users = await this.userModel.find({ _id: { $in: authorIds } }, 'firstName lastName').lean().exec();
+    
+    const userMap = new Map<string, string>();
+    users.forEach(u => {
+      userMap.set(u._id.toString(), `${u.firstName} ${u.lastName || ''}`.trim());
+    });
+
+    const enrichedComments = comments.map(c => {
+      const authorName = userMap.get(c.authorId) || 'Unknown User';
+      return new CommentEntity(
+        c.id,
+        c.companyId,
+        c.entityId,
+        c.entityType,
+        c.authorId,
+        c.content,
+        authorName,
+        c.parentId,
+        c.createdAt,
+        c.updatedAt,
+        c.isDeleted
+      );
+    });
+
+    return enrichedComments;
   }
 }

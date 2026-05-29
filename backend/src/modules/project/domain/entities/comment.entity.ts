@@ -8,9 +8,10 @@ export class CommentEntity {
     public readonly entityType: CommentEntityType,
     public readonly authorId: string,
     public readonly content: string,
-    public readonly parentId?: string,
-    public readonly createdAt?: Date,
-    public readonly updatedAt?: Date,
+    public readonly authorName: string | undefined = undefined,
+    public readonly parentId: string | undefined = undefined,
+    public readonly createdAt: Date | undefined = undefined,
+    public readonly updatedAt: Date | undefined = undefined,
     public readonly isDeleted: boolean = false,
   ) {}
 }

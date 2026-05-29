@@ -7,6 +7,8 @@ import { LayoutGrid, AlertCircle, Info, Search, Loader2 } from "lucide-react";
 import EmployeeProjectCard from "./EmployeeProjectCard";
 import { searchProjectsAction } from "@/actions/company/projects/project.actions";
 import Pagination from "@/components/ui/Pagination";
+import ProjectCommentsModal from "./ProjectCommentsModal";
+import { CommentEntityType } from "@/shared/types/company/projects/comment.type";
 import { toast } from "sonner";
 import { useDebounce } from "@/hooks/debounce/useDebounce";
 
@@ -26,6 +28,16 @@ export default function EmployeeProjectList({
   const [currentPage, setCurrentPage] = useState(1);
   const [totalProjects, setTotalProjects] = useState(0);
   const itemsPerPage = 6;
+
+  const [commentsModalOpen, setCommentsModalOpen] = useState(false);
+  const [selectedProjectId, setSelectedProjectId] = useState<string>("");
+  const [selectedProjectName, setSelectedProjectName] = useState<string>("");
+
+  const handleOpenComments = useCallback((projectId: string, projectName: string) => {
+    setSelectedProjectId(projectId);
+    setSelectedProjectName(projectName);
+    setCommentsModalOpen(true);
+  }, []);
 
   const fetchProjects = useCallback(async () => {
     setLoading(true);
@@ -156,12 +168,13 @@ export default function EmployeeProjectList({
                 stories: 0,
               };
               return (
-                <EmployeeProjectCard
-                  key={project.id || project._id}
-                  project={project}
-                  taskCount={stats.tasks}
-                  storyCount={stats.stories}
-                />
+                  <EmployeeProjectCard
+                    key={project.id || project._id}
+                    project={project}
+                    taskCount={stats.tasks}
+                    storyCount={stats.stories}
+                    onOpenComments={handleOpenComments}
+                  />
               );
             })}
           </div>
@@ -174,6 +187,16 @@ export default function EmployeeProjectList({
             />
           </div>
         </>
+      )}
+
+      {commentsModalOpen && (
+        <ProjectCommentsModal
+          isOpen={commentsModalOpen}
+          onClose={() => setCommentsModalOpen(false)}
+          entityId={selectedProjectId}
+          entityType={CommentEntityType.PROJECT}
+          title={`Comments - ${selectedProjectName}`}
+        />
       )}
     </div>
   );

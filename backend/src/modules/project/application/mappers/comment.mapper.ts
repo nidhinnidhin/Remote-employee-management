@@ -13,6 +13,7 @@ export class CommentMapper {
       doc.entityType,
       doc.authorId,
       doc.content,
+      undefined,
       doc.parentId ? doc.parentId.toString() : undefined,
       doc.createdAt,
       doc.updatedAt,

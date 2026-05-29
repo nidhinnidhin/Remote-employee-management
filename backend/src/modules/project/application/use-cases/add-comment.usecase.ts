@@ -6,6 +6,9 @@ import type { IUserStoryRepository } from '../../domain/repositories/user-story.
 import { CreateCommentDto } from '../dto/create-comment.dto';
 import { CommentEntityType } from 'src/shared/enums/project/comment-entity-type.enum';
 import { CommentEntity } from '../../domain/entities/comment.entity';
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import { UserDocument } from '../../../auth/infrastructure/database/mongoose/schemas/userSchema';
 
 @Injectable()
 export class AddCommentUseCase {
@@ -18,6 +21,8 @@ export class AddCommentUseCase {
     private readonly taskRepository: ITaskRepository,
     @Inject('IUserStoryRepository')
     private readonly userStoryRepository: IUserStoryRepository,
+    @InjectModel(UserDocument.name)
+    private readonly userModel: Model<UserDocument>,
   ) {}
 
   async execute(companyId: string, authorId: string, dto: CreateCommentDto): Promise<CommentEntity> {
@@ -66,6 +71,21 @@ export class AddCommentUseCase {
       parentId,
     });
 
-    return comment;
+    const user = await this.userModel.findById(authorId, 'firstName lastName').lean().exec();
+    const authorName = user ? `${user.firstName} ${user.lastName || ''}`.trim() : 'Unknown User';
+
+    return new CommentEntity(
+      comment.id,
+      comment.companyId,
+      comment.entityId,
+      comment.entityType,
+      comment.authorId,
+      comment.content,
+      authorName,
+      comment.parentId,
+      comment.createdAt,
+      comment.updatedAt,
+      comment.isDeleted
+    );
   }
 }
