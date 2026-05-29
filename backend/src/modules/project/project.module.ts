@@ -40,6 +40,11 @@ import { AuthModule } from '../auth/presentation/auth/auth.module';
 import { SubscriptionModule } from '../subscription/subscription.module';
 import { ChatModule } from '../chat/chat.module';
 import { NotificationModule } from '../notification/notification.module';
+import { CommentDocument, CommentSchema } from './infrastructure/database/mongoose/schemas/comment.schema';
+import { MongoCommentRepository } from './infrastructure/database/repositories/mongo-comment.repository';
+import { AddCommentUseCase } from './application/use-cases/add-comment.usecase';
+import { GetCommentsUseCase } from './application/use-cases/get-comments.usecase';
+import { CommentController } from './presentation/controllers/comment.controller';
 
 @Module({
   imports: [
@@ -52,9 +57,10 @@ import { NotificationModule } from '../notification/notification.module';
       { name: UserStoryDocument.name, schema: UserStorySchema },
       { name: TaskDocument.name, schema: TaskSchema },
       { name: SprintDocument.name, schema: SprintSchema },
+      { name: CommentDocument.name, schema: CommentSchema },
     ]),
   ],
-  controllers: [ProjectController, StoryController, TaskController, SprintController],
+  controllers: [ProjectController, StoryController, TaskController, SprintController, CommentController],
   providers: [
     // Repositories
     {
@@ -72,6 +78,10 @@ import { NotificationModule } from '../notification/notification.module';
     {
       provide: 'ISprintRepository',
       useClass: MongoSprintRepository,
+    },
+    {
+      provide: 'ICommentRepository',
+      useClass: MongoCommentRepository,
     },
     // Project Use Cases
     {
@@ -173,7 +183,9 @@ import { NotificationModule } from '../notification/notification.module';
       provide: 'IDeleteSprintUseCase',
       useClass: DeleteSprintUseCase,
     },
+    AddCommentUseCase,
+    GetCommentsUseCase,
   ],
-  exports: ['IProjectRepository'],
+  exports: ['IProjectRepository', 'ICommentRepository'],
 })
 export class ProjectModule { }

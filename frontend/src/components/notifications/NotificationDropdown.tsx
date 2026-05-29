@@ -73,8 +73,6 @@ export const NotificationDropdown: React.FC = () => {
       markAsRead(notification.id);
     }
     setIsOpen(false);
-    // Depending on the notification type, we might want to navigate to the specific entity
-    // e.g. router.push(`/employee/projects/${notification.projectId}`)
   };
 
   return (
@@ -95,8 +93,11 @@ export const NotificationDropdown: React.FC = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 md:w-96 bg-[#1a1b1e]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
-          <div className="flex items-center justify-between p-4 border-b border-white/5 bg-white/[0.02]">
+        /* CHANGED: Replaced bg-[#1a1b1e]/95 with bg-transparent. Removed backdrop-blur-xl so it is completely clear. */
+        <div className="absolute right-0 bg-[#1a1b1e]/70 mt-2 w-80 md:w-96 bg-transparent border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
+          
+          {/* CHANGED: Header panel setup to transparent */}
+          <div className="flex items-center justify-between p-4 border-b border-white/5 bg-transparent">
             <h3 className="text-sm font-bold text-white flex items-center gap-2">
               Notifications
               {unreadCount > 0 && (
@@ -106,11 +107,7 @@ export const NotificationDropdown: React.FC = () => {
               )}
             </h3>
             <div className="text-[10px] text-muted font-medium uppercase tracking-widest cursor-pointer hover:text-white transition-colors"
-                 onClick={() => {
-                   // Mark all as read logic could be added here
-                   // For now, let's just close the dropdown
-                   setIsOpen(false);
-                 }}>
+                 onClick={() => setIsOpen(false)}>
               Close
             </div>
           </div>
@@ -135,9 +132,10 @@ export const NotificationDropdown: React.FC = () => {
                         : "bg-accent/[0.03] hover:bg-accent/[0.06]"
                     )}
                   >
+                    {/* CHANGED: Adjusted icon background border logic to look clean over any underlying color */}
                     <div className={cn(
                       "w-10 h-10 rounded-full flex items-center justify-center shrink-0 border",
-                      notification.isRead ? "bg-bg border-white/5" : "bg-bg border-accent/20 shadow-[0_0_15px_rgba(var(--accent),0.15)]"
+                      notification.isRead ? "bg-white/5 border-white/5" : "bg-white/10 border-accent/20 shadow-[0_0_15px_rgba(var(--accent),0.15)]"
                     )}>
                       {getNotificationIcon(notification.type)}
                     </div>
