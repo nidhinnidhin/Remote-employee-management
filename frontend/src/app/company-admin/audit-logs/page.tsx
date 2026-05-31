@@ -1,9 +1,11 @@
 import React from "react";
 import { ActivityLogsView } from "@/components/shared/ActivityLogsView";
 import { getCompanyAdminLogsAction } from "@/actions/activity-logs/activity-logs.actions";
+import AdminLayoutWrapper from "@/components/company/layout/AdminLayoutWrapper";
 
 export default function CompanyAuditLogsPage() {
   return (
+    <AdminLayoutWrapper>
     <div className="h-full">
       <ActivityLogsView
         title="Company Audit Logs"
@@ -11,5 +13,6 @@ export default function CompanyAuditLogsPage() {
         fetchLogsAction={getCompanyAdminLogsAction}
       />
     </div>
+    </AdminLayoutWrapper>
   );
 }

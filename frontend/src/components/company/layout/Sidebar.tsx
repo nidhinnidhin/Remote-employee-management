@@ -53,7 +53,7 @@ const navigationGroups = [
     items: [
       { label: "Subscription", icon: CreditCard, href: FRONTEND_ROUTES.COMPANY.SUBSCRIPTION },
       { label: "Company Profile", icon: Building, href: FRONTEND_ROUTES.COMPANY.PROFILE },
-      { label: "Audit Logs", icon: FileText, href: FRONTEND_ROUTES.COMPANY.AUDIT_LOGS },
+      { label: "Activity Logs", icon: FileText, href: FRONTEND_ROUTES.COMPANY.AUDIT_LOGS },
       { label: "Company Policy", icon: Shield, href: FRONTEND_ROUTES.ADMIN.COMPANY_POLICY },
     ],
   },
