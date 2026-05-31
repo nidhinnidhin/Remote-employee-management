@@ -18,6 +18,7 @@ import { LoggerModule } from './common/logger/logger.module';
 import { MeetingModule } from './modules/meeting/meeting.module';
 import { LeaveModule } from './modules/leave/leave.module';
 import { NotificationModule } from './modules/notification/notification.module';
+import { ActivityLogsModule } from './modules/activity-logs/activity-logs.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { NotificationModule } from './modules/notification/notification.module';
     MeetingModule,
     LeaveModule,
     NotificationModule,
+    ActivityLogsModule,
   ],
   providers: [
     {

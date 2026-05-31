@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useProfileStore } from "@/store/profile.store";
+import { FileText } from "lucide-react";
 
 const navigationGroups = [
   // ... (rest of the file)
@@ -104,6 +105,11 @@ const navigationGroups = [
         icon: ShieldCheck,
         label: "Company Policy",
         href: FRONTEND_ROUTES.EMPLOYEE.POLICY,
+      },
+      {
+        icon: FileText,
+        label: "Activity Logs",
+        href: FRONTEND_ROUTES.EMPLOYEE.LOGS,
       },
     ],
   },

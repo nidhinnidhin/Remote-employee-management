@@ -88,7 +88,7 @@ export default function ProjectCommentsModal({
   const childComments = comments.filter(c => c.parentId);
 
   return (
-    <BaseModal isOpen={isOpen} onClose={onClose} title={title} size="md">
+    <BaseModal isOpen={isOpen} onClose={onClose} title={title}>
       <div className="flex flex-col h-[60vh] max-h-[600px]">
         
         {/* Comments List */}

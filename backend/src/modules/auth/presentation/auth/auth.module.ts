@@ -52,10 +52,12 @@ import {
   DepartmentSchema,
 } from 'src/modules/department/infrastructure/database/mongoose/schemas/department.schema';
 import { MongoDepartmentRepository } from 'src/modules/department/infrastructure/database/repositories/mongo-department.repository';
+import { ActivityLogsModule } from 'src/modules/activity-logs/activity-logs.module';
 
 @Module({
   imports: [
     AppRedisModule,
+    ActivityLogsModule,
     MongooseModule.forFeature([
       { name: UserDocument.name, schema: UserSchema },
       { name: CompanyDocument.name, schema: CompanySchema },

@@ -15,6 +15,8 @@ import { LoginInput } from 'src/shared/types/auth/login-input.type';
 import { LoginResponse } from 'src/shared/types/auth/login-response.type';
 import { AUTH_MESSAGES } from 'src/shared/constants/messages/auth/auth.messages';
 import { comparePassword } from 'src/shared/utils/password.util';
+import type { ICreateActivityLogUseCase } from 'src/modules/activity-logs/application/interfaces/activity-log-use-cases.interface';
+import { ActivityAction } from 'src/modules/activity-logs/domain/entities/activity-log.entity';
 
 @Injectable()
 export class LoginUseCase implements ILoginUseCase {
@@ -25,32 +27,20 @@ export class LoginUseCase implements ILoginUseCase {
     private readonly _companyRepository: ICompanyRepository,
     @Inject('IJwtService')
     private readonly _jwtService: IJwtService,
+    @Inject('ICreateActivityLogUseCase') 
+    private readonly _createLogUseCase: ICreateActivityLogUseCase,
   ) { }
 
   async execute({ email, password }: LoginInput): Promise<LoginResponse> {
     const user = await this._userRepository.findByEmail(email.toLowerCase());
 
-    if (!user) {
-      throw new UnauthorizedException(AUTH_MESSAGES.INVALID_CREDENTIALS);
-    }
-
-    if (user.status === UserStatus.SUSPENDED) {
-      throw new ForbiddenException(AUTH_MESSAGES.USER_BLOCKED);
-    }
-
-    if (user.status !== UserStatus.ACTIVE) {
-      throw new ForbiddenException(AUTH_MESSAGES.ACCOUNT_NOT_VERIFIED);
-    }
-
-    if (!user.passwordHash) {
-      throw new UnauthorizedException(AUTH_MESSAGES.SOCIAL_LOGIN_REQUIRED);
-    }
+    if (!user) throw new UnauthorizedException(AUTH_MESSAGES.INVALID_CREDENTIALS);
+    if (user.status === UserStatus.SUSPENDED) throw new ForbiddenException(AUTH_MESSAGES.USER_BLOCKED);
+    if (user.status !== UserStatus.ACTIVE) throw new ForbiddenException(AUTH_MESSAGES.ACCOUNT_NOT_VERIFIED);
+    if (!user.passwordHash) throw new UnauthorizedException(AUTH_MESSAGES.SOCIAL_LOGIN_REQUIRED);
 
     const isPasswordValid = await comparePassword(password, user.passwordHash);
-
-    if (!isPasswordValid) {
-      throw new UnauthorizedException(AUTH_MESSAGES.INVALID_CREDENTIALS);
-    }
+    if (!isPasswordValid) throw new UnauthorizedException(AUTH_MESSAGES.INVALID_CREDENTIALS);
 
     await this.checkCompanySuspension(user.companyId);
 
@@ -64,19 +54,20 @@ export class LoginUseCase implements ILoginUseCase {
       userId: user.id,
     });
 
+    await this._createLogUseCase.execute({
+      companyId: user.companyId || null,
+      userId: user.id,
+      userRole: user.role,
+      action: ActivityAction.LOGIN,
+      details: `User logged in successfully via email and password credentials.`,
+    }).catch(err => console.error('Activity Log Failed:', err));
+
     if (user.role === 'COMPANY_ADMIN' && !user.isOnboarded) {
       return {
         accessToken,
         refreshToken,
         message: 'Onboarding required',
-        user: {
-          id: user.id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          role: user.role,
-          isOnboarded: false,
-        },
+        user: { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, role: user.role, isOnboarded: false },
       };
     }
 
@@ -84,15 +75,7 @@ export class LoginUseCase implements ILoginUseCase {
       accessToken,
       refreshToken,
       message: AUTH_MESSAGES.LOGIN_SUCCESS,
-      user: {
-        id: user.id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        role: user.role,
-        companyId: user.companyId,
-        isOnboarded: user.role === 'COMPANY_ADMIN' ? user.isOnboarded : true,
-      },
+      user: { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, role: user.role, companyId: user.companyId, isOnboarded: user.role === 'COMPANY_ADMIN' ? user.isOnboarded : true },
     };
   }
 

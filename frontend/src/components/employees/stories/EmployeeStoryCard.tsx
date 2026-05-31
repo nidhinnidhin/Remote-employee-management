@@ -218,7 +218,7 @@ export default function EmployeeStoryCard({
       <ProjectCommentsModal
         isOpen={commentsOpen}
         onClose={() => setCommentsOpen(false)}
-        entityId={story.id?.toString() || story._id?.toString() || ""}
+        entityId={story.id?.toString() || (story as any)._id?.toString() || ""}
         entityType={CommentEntityType.USER_STORY}
         title={`Comments — ${story.title}`}
       />
