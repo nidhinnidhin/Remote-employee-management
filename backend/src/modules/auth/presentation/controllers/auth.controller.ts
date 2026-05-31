@@ -6,6 +6,8 @@ import {
   Res,
   UnauthorizedException,
   BadRequestException,
+  Inject,
+  UseGuards, // 🔹 Added UseGuards import
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 
@@ -24,12 +26,16 @@ import type {
 } from '../../application/interfaces/auth/auth-use-case.interface';
 import type { IOnboardCompanyUseCase } from '../../application/interfaces/onboarding/onboarding-use-case.interface';
 import type { ICookieHelperService } from 'src/shared/services/auth/interfaces/icookie-helper.service';
-import { Inject } from '@nestjs/common';
 
 import { OnboardingDto } from '../../application/dto/onboarding.dto';
 import { RegisterAdminDto } from '../../application/dto/register-admin.dto';
 import { LoginDto } from '../../application/dto/login.dto';
 import type { SocialLoginInput } from 'src/shared/types/auth/social-login.type';
+
+// 🔹 Import Guard and Logging dependencies
+import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
+import type { ICreateActivityLogUseCase } from 'src/modules/activity-logs/application/interfaces/activity-log-use-cases.interface';
+import { ActivityAction } from 'src/modules/activity-logs/domain/entities/activity-log.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -46,6 +52,10 @@ export class AuthController {
     private readonly _socialLoginUseCase: ISocialLoginUseCase,
     @Inject('ICookieHelperService')
     private readonly _cookieHelperService: ICookieHelperService,
+
+    // 🔹 Inject Log UseCase
+    @Inject('ICreateActivityLogUseCase')
+    private readonly _createLogUseCase: ICreateActivityLogUseCase,
   ) {}
 
   @Post('register')
@@ -92,7 +102,6 @@ export class AuthController {
     if (!userId) {
       throw new BadRequestException('User ID is required');
     }
-    // This is a simple update to COMPLETED
     const result = await this._onboardCompanyUseCase.getStatus(userId);
     if (result.company?.id) {
       await this._onboardCompanyUseCase.finalize(userId, result.company.id);
@@ -128,15 +137,6 @@ export class AuthController {
     console.log('[AuthController] socialLogin input:', body.email);
     const result = await this._socialLoginUseCase.execute(body);
 
-    console.log(
-      '[AuthController] sending result:',
-      JSON.stringify({
-        hasUser: !!result.user,
-        isOnboarded: result.user?.isOnboarded,
-        hasAccessToken: !!result.accessToken,
-      }),
-    );
-
     if (result.accessToken && result.refreshToken) {
       this._cookieHelperService.setAuthCookies(
         res,
@@ -171,9 +171,25 @@ export class AuthController {
   }
 
   @Post('logout')
-  async logout(@Res({ passthrough: true }) res: Response) {
+  @UseGuards(JwtAuthGuard) // 🔹 Fixed: Applied guard so req.user gets parsed before processing logs
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const user = req.user as any;
+
+    if (user) {
+      await this._createLogUseCase.execute({
+        companyId: user.companyId || null,
+        userId: user.userId,
+        userRole: user.role,
+        action: ActivityAction.LOGOUT,
+        details: 'User successfully ended the system session and cleared authentication cookie frameworks.',
+      }).catch((err) => {
+        console.error('[AuthController] Logout activity track failed:', err.message);
+      });
+    }
+
     res.clearCookie(ACCESS_TOKEN_COOKIE_NAME, ACCESS_TOKEN_COOKIE_OPTIONS);
     res.clearCookie(REFRESH_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_OPTIONS);
+    
     return {
       message: AUTH_MESSAGES.LOGOUT_SUCCESS || 'Logged out successfully',
     };

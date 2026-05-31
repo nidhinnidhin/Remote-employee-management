@@ -6,6 +6,9 @@ import { UserStoryEntity } from '../../../domain/entities/user-story.entity';
 import type { ICreateNotificationUseCase } from 'src/modules/notification/application/interfaces/notification-use-cases.interface';
 import { NotificationType } from 'src/modules/notification/domain/entities/notification.entity';
 
+import type { ICreateActivityLogUseCase } from 'src/modules/activity-logs/application/interfaces/activity-log-use-cases.interface';
+import { ActivityAction } from 'src/modules/activity-logs/domain/entities/activity-log.entity';
+
 @Injectable()
 export class UpdateUserStoryUseCase implements IUpdateUserStoryUseCase {
   constructor(
@@ -13,6 +16,9 @@ export class UpdateUserStoryUseCase implements IUpdateUserStoryUseCase {
     private readonly _storyRepository: IUserStoryRepository,
     @Inject('ICreateNotificationUseCase')
     private readonly _createNotificationUseCase: ICreateNotificationUseCase,
+
+    @Inject('ICreateActivityLogUseCase')
+    private readonly _createLogUseCase: ICreateActivityLogUseCase,
   ) { }
 
   async execute(
@@ -34,7 +40,6 @@ export class UpdateUserStoryUseCase implements IUpdateUserStoryUseCase {
       throw new NotFoundException('User story not found');
     }
 
-    // Notify if assigneeId changed
     if (storyDto.assigneeId && storyDto.assigneeId !== existingStory.assigneeId && storyDto.assigneeId !== adminId) {
       try {
         await this._createNotificationUseCase.execute(companyId, {
@@ -46,6 +51,16 @@ export class UpdateUserStoryUseCase implements IUpdateUserStoryUseCase {
         console.error(`Failed to send notification to ${storyDto.assigneeId}:`, error);
       }
     }
+
+    await this._createLogUseCase.execute({
+      companyId,
+      userId: adminId,
+      userRole: 'COMPANY_ADMIN',
+      action: ActivityAction.UPDATE,
+      details: `Updated attributes on User Story: "${updated.title}" (ID: ${id}).`,
+    }).catch((err) => {
+      console.error('[UpdateUserStoryUseCase] Logging transaction failed:', err.message);
+    });
 
     return updated;
   }

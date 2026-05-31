@@ -10,6 +10,8 @@ import { ConversationType } from 'src/shared/enums/chat/conversation-type.enum';
 import type { ICreateNotificationUseCase } from 'src/modules/notification/application/interfaces/notification-use-cases.interface';
 import { NotificationType } from 'src/modules/notification/domain/entities/notification.entity';
 
+import type { ICreateActivityLogUseCase } from 'src/modules/activity-logs/application/interfaces/activity-log-use-cases.interface';
+import { ActivityAction } from 'src/modules/activity-logs/domain/entities/activity-log.entity';
 
 @Injectable()
 export class CreateProjectUseCase implements ICreateProjectUseCase {
@@ -21,6 +23,9 @@ export class CreateProjectUseCase implements ICreateProjectUseCase {
     private readonly _chatGateway: ChatGateway,
     @Inject('ICreateNotificationUseCase')
     private readonly _createNotificationUseCase: ICreateNotificationUseCase,
+
+    @Inject('ICreateActivityLogUseCase')
+    private readonly _createLogUseCase: ICreateActivityLogUseCase,
   ) { }
 
   async execute(companyId: string, adminId: string, projectDto: CreateProjectDto): Promise<ProjectEntity> {
@@ -36,18 +41,16 @@ export class CreateProjectUseCase implements ICreateProjectUseCase {
 
     const project = await this._projectRepository.create(projectData as Partial<ProjectEntity>);
 
-    // Automate Chat Group Creation
     if (project.members && project.members.length > 1) {
       try {
         const conversation = await this._createConversationUseCase.execute(companyId, adminId, {
           type: ConversationType.GROUP,
           name: project.name,
-          participants: project.members, // Creator is automatically added by the use case
+          participants: project.members,
         });
 
         this._chatGateway.notifyConversationUpdate(conversation);
       } catch (error) {
-        // Log error but don't fail project creation
         console.error('Failed to create automatic project chat group:', error);
       }
     }
@@ -68,6 +71,15 @@ export class CreateProjectUseCase implements ICreateProjectUseCase {
         }
       }
     }
+    await this._createLogUseCase.execute({
+      companyId,
+      userId: adminId,
+      userRole: 'COMPANY_ADMIN', 
+      action: ActivityAction.CREATE,
+      details: `Project "${project.name}" was successfully created and initialized with ${project.members?.length || 0} members.`,
+    }).catch((err) => {
+      console.error('[CreateProjectUseCase] Activity log persistence failed:', err.message);
+    });
 
     return project;
   }

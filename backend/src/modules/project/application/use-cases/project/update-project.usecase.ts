@@ -6,6 +6,9 @@ import { ProjectEntity } from '../../../domain/entities/project.entity';
 import type { ICreateNotificationUseCase } from 'src/modules/notification/application/interfaces/notification-use-cases.interface';
 import { NotificationType } from 'src/modules/notification/domain/entities/notification.entity';
 
+import type { ICreateActivityLogUseCase } from 'src/modules/activity-logs/application/interfaces/activity-log-use-cases.interface';
+import { ActivityAction } from 'src/modules/activity-logs/domain/entities/activity-log.entity';
+
 @Injectable()
 export class UpdateProjectUseCase implements IUpdateProjectUseCase {
   constructor(
@@ -13,6 +16,9 @@ export class UpdateProjectUseCase implements IUpdateProjectUseCase {
     private readonly _projectRepository: IProjectRepository,
     @Inject('ICreateNotificationUseCase')
     private readonly _createNotificationUseCase: ICreateNotificationUseCase,
+
+    @Inject('ICreateActivityLogUseCase')
+    private readonly _createLogUseCase: ICreateActivityLogUseCase,
   ) {}
 
   async execute(
@@ -41,7 +47,6 @@ export class UpdateProjectUseCase implements IUpdateProjectUseCase {
       throw new NotFoundException('Project not found');
     }
 
-    // Notify newly added members
     if (projectDto.members && projectDto.members.length > 0) {
       const oldMembers = existingProject.members || [];
       const newMembers = projectDto.members.filter(m => !oldMembers.includes(m));
@@ -58,6 +63,16 @@ export class UpdateProjectUseCase implements IUpdateProjectUseCase {
         }
       }
     }
+
+    await this._createLogUseCase.execute({
+      companyId,
+      userId: updated.createdBy, 
+      userRole: 'COMPANY_ADMIN',
+      action: ActivityAction.UPDATE,
+      details: `Project "${updated.name}" (ID: ${id}) was updated with modified parameter inputs.`,
+    }).catch((err) => {
+      console.error('[UpdateProjectUseCase] Activity log persistence failed:', err.message);
+    });
 
     return updated;
   }

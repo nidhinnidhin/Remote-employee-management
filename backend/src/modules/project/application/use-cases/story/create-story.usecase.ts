@@ -11,6 +11,9 @@ import { SprintStatus } from 'src/shared/enums/project/sprint-status.enum';
 import type { ICreateNotificationUseCase } from 'src/modules/notification/application/interfaces/notification-use-cases.interface';
 import { NotificationType } from 'src/modules/notification/domain/entities/notification.entity';
 
+import type { ICreateActivityLogUseCase } from 'src/modules/activity-logs/application/interfaces/activity-log-use-cases.interface';
+import { ActivityAction } from 'src/modules/activity-logs/domain/entities/activity-log.entity';
+
 @Injectable()
 export class CreateUserStoryUseCase implements ICreateUserStoryUseCase {
   constructor(
@@ -22,6 +25,9 @@ export class CreateUserStoryUseCase implements ICreateUserStoryUseCase {
     private readonly _sprintRepository: ISprintRepository,
     @Inject('ICreateNotificationUseCase')
     private readonly _createNotificationUseCase: ICreateNotificationUseCase,
+
+    @Inject('ICreateActivityLogUseCase')
+    private readonly _createLogUseCase: ICreateActivityLogUseCase,
   ) { }
 
   async execute(
@@ -85,6 +91,17 @@ export class CreateUserStoryUseCase implements ICreateUserStoryUseCase {
         console.error(`Failed to send notification to ${createdStory.assigneeId}:`, error);
       }
     }
+
+    const locationInfo = storyDto.addToActiveSprint ? 'Active Sprint' : 'Backlog';
+    await this._createLogUseCase.execute({
+      companyId,
+      userId: adminId,
+      userRole: 'COMPANY_ADMIN',
+      action: ActivityAction.CREATE,
+      details: `Created User Story/Bug: "${createdStory.title}" (${createdStory.storyPoints} SP) inside project "${project.name}". Added directly to ${locationInfo}.`,
+    }).catch((err) => {
+      console.error('[CreateUserStoryUseCase] Logging transaction failed:', err.message);
+    });
 
     return createdStory;
   }

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ProjectDocument, ProjectSchema } from './infrastructure/database/mongoose/schemas/project.schema';
 import { UserStoryDocument, UserStorySchema } from './infrastructure/database/mongoose/schemas/user-story.schema';
@@ -47,12 +47,16 @@ import { GetCommentsUseCase } from './application/use-cases/get-comments.usecase
 import { CommentController } from './presentation/controllers/comment.controller';
 import { UserDocument, UserSchema } from '../auth/infrastructure/database/mongoose/schemas/userSchema';
 
+// 🔹 Import ActivityLogsModule
+import { ActivityLogsModule } from '../activity-logs/activity-logs.module';
+
 @Module({
   imports: [
     AuthModule,
     SubscriptionModule,
     ChatModule,
     NotificationModule,
+    forwardRef(() => ActivityLogsModule), // 🔹 Added with forwardRef
     MongooseModule.forFeature([
       { name: ProjectDocument.name, schema: ProjectSchema },
       { name: UserStoryDocument.name, schema: UserStorySchema },

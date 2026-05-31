@@ -8,6 +8,8 @@ import { TaskEntity } from '../../../domain/entities/task.entity';
 import { TaskStatus } from 'src/shared/enums/project/task-status.enum';
 import type { ICreateNotificationUseCase } from 'src/modules/notification/application/interfaces/notification-use-cases.interface';
 import { NotificationType } from 'src/modules/notification/domain/entities/notification.entity';
+import type { ICreateActivityLogUseCase } from 'src/modules/activity-logs/application/interfaces/activity-log-use-cases.interface';
+import { ActivityAction } from 'src/modules/activity-logs/domain/entities/activity-log.entity';
 
 @Injectable()
 export class CreateTaskUseCase implements ICreateTaskUseCase {
@@ -20,6 +22,9 @@ export class CreateTaskUseCase implements ICreateTaskUseCase {
     private readonly _projectRepository: IProjectRepository,
     @Inject('ICreateNotificationUseCase')
     private readonly _createNotificationUseCase: ICreateNotificationUseCase,
+
+    @Inject('ICreateActivityLogUseCase')
+    private readonly _createLogUseCase: ICreateActivityLogUseCase,
   ) { }
 
   async execute(
@@ -68,6 +73,16 @@ export class CreateTaskUseCase implements ICreateTaskUseCase {
         console.error(`Failed to send notification to ${createdTask.assignedTo}:`, error);
       }
     }
+
+    await this._createLogUseCase.execute({
+      companyId,
+      userId: adminId,
+      userRole: 'COMPANY_ADMIN', 
+      action: ActivityAction.CREATE,
+      details: `Created sub-task "${createdTask.title}" inside User Story: "${story.title}" (Project: ${project.name}).`,
+    }).catch((err) => {
+      console.error('[CreateTaskUseCase] Activity log failed:', err.message);
+    });
 
     return createdTask;
   }

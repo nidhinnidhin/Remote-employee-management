@@ -12,6 +12,9 @@ import { UserRole } from 'src/shared/enums/user/user-role.enum';
 import type { ICreateNotificationUseCase } from 'src/modules/notification/application/interfaces/notification-use-cases.interface';
 import { NotificationType } from 'src/modules/notification/domain/entities/notification.entity';
 
+import type { ICreateActivityLogUseCase } from 'src/modules/activity-logs/application/interfaces/activity-log-use-cases.interface';
+import { ActivityAction } from 'src/modules/activity-logs/domain/entities/activity-log.entity';
+
 @Injectable()
 export class UpdateTaskUseCase implements IUpdateTaskUseCase {
   constructor(
@@ -19,6 +22,9 @@ export class UpdateTaskUseCase implements IUpdateTaskUseCase {
     private readonly _taskRepository: ITaskRepository,
     @Inject('ICreateNotificationUseCase')
     private readonly _createNotificationUseCase: ICreateNotificationUseCase,
+
+    @Inject('ICreateActivityLogUseCase')
+    private readonly _createLogUseCase: ICreateActivityLogUseCase,
   ) { }
 
   async execute(
@@ -33,7 +39,6 @@ export class UpdateTaskUseCase implements IUpdateTaskUseCase {
       throw new NotFoundException('Task not found');
     }
 
-    // RBAC: Employee can only update their own assigned tasks
     if (role === UserRole.EMPLOYEE && task.assignedTo !== userId) {
       throw new ForbiddenException('You can only update tasks assigned to you');
     }
@@ -52,7 +57,6 @@ export class UpdateTaskUseCase implements IUpdateTaskUseCase {
       throw new NotFoundException('Task not found');
     }
 
-    // Notify if assignedTo changed
     if (taskDto.assignedTo && taskDto.assignedTo !== task.assignedTo && taskDto.assignedTo !== userId) {
       try {
         await this._createNotificationUseCase.execute(companyId, {
@@ -64,6 +68,16 @@ export class UpdateTaskUseCase implements IUpdateTaskUseCase {
         console.error(`Failed to send notification to ${taskDto.assignedTo}:`, error);
       }
     }
+
+    await this._createLogUseCase.execute({
+      companyId,
+      userId,
+      userRole: role,
+      action: ActivityAction.UPDATE,
+      details: `Updated task parameters on: "${updated.title}" (ID: ${id}).`,
+    }).catch((err) => {
+      console.error('[UpdateTaskUseCase] Activity log failed:', err.message);
+    });
 
     return updated;
   }
