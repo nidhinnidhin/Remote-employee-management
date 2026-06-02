@@ -1,4 +1,9 @@
-import { Injectable, Inject, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import type { ITaskRepository } from '../../../domain/repositories/task.repository.interface';
 import type { IMoveTaskUseCase } from '../../interfaces/task/task-use-cases.interface';
 import { MoveTaskDto } from '../../dto/task/move-task.dto';
@@ -32,6 +37,8 @@ export class MoveTaskUseCase implements IMoveTaskUseCase {
       status: taskDto.status,
       order: taskDto.order,
     });
+
+    console.log('updatedd----------', updated);
     if (!updated) {
       throw new NotFoundException('Task not found');
     }

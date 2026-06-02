@@ -3,8 +3,8 @@ import { TaskStatus } from 'src/shared/enums/project/task-status.enum';
 
 export class MoveTaskDto {
   @IsEnum(TaskStatus)
-  status: TaskStatus;
+  status!: TaskStatus;
 
   @IsNumber()
-  order: number;
+  order!: number;
 }

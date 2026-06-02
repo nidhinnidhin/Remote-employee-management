@@ -108,7 +108,6 @@ export class MongoTaskRepository
   ): Promise<TaskEntity | null> {
     if (!Types.ObjectId.isValid(id)) return null;
 
-    // Let TS infer the lean result cleanly
     const doc = await this.model
       .findOneAndUpdate(
         { _id: id, companyId, isDeleted: false },

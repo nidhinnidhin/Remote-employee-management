@@ -44,7 +44,7 @@ const navigationGroups = [
   {
     title: "Communication",
     items: [
-      { label: "Discussion Pools", icon: MessageSquare, href: FRONTEND_ROUTES.COMPANY.DISCUSSIONS },
+      { label: "Meeting", icon: MessageSquare, href: FRONTEND_ROUTES.COMPANY.DISCUSSIONS },
       { label: "Attendance & Leave", icon: CalendarDays, href: FRONTEND_ROUTES.COMPANY.ATTENDANCE },
     ],
   },

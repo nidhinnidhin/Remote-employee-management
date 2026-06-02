@@ -19,6 +19,8 @@ export class MongoMessageRepository implements IMessageRepository {
       conversationId: new Types.ObjectId(message.conversationId),
       senderId: new Types.ObjectId(message.senderId),
       content: message.content,
+      type: message.type,         
+      attachments: message.attachments,    
       seenBy: message.seenBy.map((s) => new Types.ObjectId(s)),
     });
     return ChatMapper.toMessageEntity(created);
