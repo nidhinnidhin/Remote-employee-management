@@ -1,4 +1,9 @@
-import { Inject, Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import type { ICommentRepository } from '../../domain/repositories/comment.repository.interface';
 import type { IProjectRepository } from '../../domain/repositories/project.repository.interface';
 import type { ITaskRepository } from '../../domain/repositories/task.repository.interface';
@@ -25,34 +30,51 @@ export class AddCommentUseCase {
     private readonly userModel: Model<UserDocument>,
   ) {}
 
-  async execute(companyId: string, authorId: string, dto: CreateCommentDto): Promise<CommentEntity> {
+  async execute(
+    companyId: string,
+    authorId: string,
+    dto: CreateCommentDto,
+  ): Promise<CommentEntity> {
     const { entityId, entityType, content, parentId } = dto;
-    
+
     let projectId: string;
 
     switch (entityType) {
       case CommentEntityType.PROJECT:
         projectId = entityId;
         break;
-      case CommentEntityType.USER_STORY:
-        const story = await this.userStoryRepository.findByIdAndCompany(entityId, companyId);
+      case CommentEntityType.USER_STORY: {
+        const story = await this.userStoryRepository.findByIdAndCompany(
+          entityId,
+          companyId,
+        );
         if (!story) throw new NotFoundException('User Story not found');
         projectId = story.projectId;
         break;
-      case CommentEntityType.TASK:
-        const task = await this.taskRepository.findByIdAndCompany(entityId, companyId);
+      }
+      case CommentEntityType.TASK: {
+        const task = await this.taskRepository.findByIdAndCompany(
+          entityId,
+          companyId,
+        );
         if (!task) throw new NotFoundException('Task not found');
         projectId = task.projectId;
         break;
+      }
       default:
         throw new NotFoundException('Entity type not supported');
     }
 
-    const project = await this.projectRepository.findByIdAndCompany(projectId, companyId);
+    const project = await this.projectRepository.findByIdAndCompany(
+      projectId,
+      companyId,
+    );
     if (!project) throw new NotFoundException('Project not found');
 
     if (!project.members.includes(authorId) && project.createdBy !== authorId) {
-      throw new ForbiddenException('You must be a member of this project to comment');
+      throw new ForbiddenException(
+        'You must be a member of this project to comment',
+      );
     }
 
     if (parentId) {
@@ -71,8 +93,13 @@ export class AddCommentUseCase {
       parentId,
     });
 
-    const user = await this.userModel.findById(authorId, 'firstName lastName').lean().exec();
-    const authorName = user ? `${user.firstName} ${user.lastName || ''}`.trim() : 'Unknown User';
+    const user = await this.userModel
+      .findById(authorId, 'firstName lastName')
+      .lean()
+      .exec();
+    const authorName = user
+      ? `${user.firstName} ${user.lastName || ''}`.trim()
+      : 'Unknown User';
 
     return new CommentEntity(
       comment.id,
@@ -85,7 +112,7 @@ export class AddCommentUseCase {
       comment.parentId,
       comment.createdAt,
       comment.updatedAt,
-      comment.isDeleted
+      comment.isDeleted,
     );
   }
 }

@@ -24,9 +24,11 @@ import type { IMeetingRepository } from '../../domain/repositories/imeeting.repo
   },
   namespace: 'meeting',
 })
-export class MeetingGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class MeetingGateway
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer()
-  server: Server;
+  server!: Server;
 
   constructor(
     @Inject(LOGGER_SERVICE) private readonly logger: ILogger,
@@ -34,7 +36,6 @@ export class MeetingGateway implements OnGatewayConnection, OnGatewayDisconnect 
     private readonly _meetingRepository: IMeetingRepository,
   ) {}
 
-  // Track participants per room: meetingId -> Set<socketId>
   private readonly roomParticipants = new Map<string, Set<string>>();
 
   notifyMeetingEnded(meetingId: string) {
@@ -42,48 +43,56 @@ export class MeetingGateway implements OnGatewayConnection, OnGatewayDisconnect 
   }
 
   notifyParticipantKicked(meetingId: string, participantId: string) {
-    this.server.to(meetingId).emit(SocketEvents.PARTICIPANT_KICKED, { meetingId, participantId });
+    this.server
+      .to(meetingId)
+      .emit(SocketEvents.PARTICIPANT_KICKED, { meetingId, participantId });
     // Also notify directly to their personal channel just in case
-    this.server.to(`user_${participantId}`).emit(SocketEvents.PARTICIPANT_KICKED, { meetingId, participantId });
+    this.server
+      .to(`user_${participantId}`)
+      .emit(SocketEvents.PARTICIPANT_KICKED, { meetingId, participantId });
   }
 
   async handleConnection(client: AuthenticatedSocket) {
     try {
-      const token = client.handshake.auth?.token || client.handshake.headers.authorization?.split(' ')[1];
-      
+      const token =
+        client.handshake.auth?.token ||
+        client.handshake.headers.authorization?.split(' ')[1];
+
       if (!token) {
-        this.logger.warn(`Client connected without token to meeting ns: ${client.id}`);
-        client.disconnect();
+        this.logger.warn(
+          `Client connected without token to meeting ns: ${client.id}`,
+        );
+        void client.disconnect();
         return;
       }
 
       const payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET!) as any;
       const userId = payload.userId;
-      
+
       client.user = {
         userId: payload.userId,
         role: payload.role,
         companyId: payload.companyId,
       };
 
-      client.join(`user_${userId}`);
-      this.logger.log(`Client connected to meeting ns: ${client.id} (User: ${userId})`);
-    } catch (error) {
+      void client.join(`user_${userId}`);
+      this.logger.log(
+        `Client connected to meeting ns: ${client.id} (User: ${userId})`,
+      );
+    } catch (error: any) {
       this.logger.error(`Meeting WS Connection auth failed: ${error.message}`);
-      client.disconnect();
+      void client.disconnect();
     }
   }
 
   handleDisconnect(client: AuthenticatedSocket) {
     this.logger.log(`Client disconnected from meeting ns: ${client.id}`);
-    // Remove from all rooms they were in
     this.roomParticipants.forEach((participants, meetingId) => {
       if (participants.has(client.id)) {
         participants.delete(client.id);
         if (participants.size === 0) {
           this.roomParticipants.delete(meetingId);
         }
-        // Notify others
         this.server.to(meetingId).emit(SocketEvents.USER_LEFT_MEETING, {
           userId: client.user?.userId,
           socketId: client.id,
@@ -99,25 +108,25 @@ export class MeetingGateway implements OnGatewayConnection, OnGatewayDisconnect 
     @MessageBody() meetingId: string,
   ) {
     if (!client.user) {
-      this.logger.warn(`Unauthenticated JOIN_MEETING attempt from ${client.id}`);
+      this.logger.warn(
+        `Unauthenticated JOIN_MEETING attempt from ${client.id}`,
+      );
       return;
     }
 
-    // Get existing participants before this user joins
     if (!this.roomParticipants.has(meetingId)) {
       this.roomParticipants.set(meetingId, new Set());
     }
     const roomSet = this.roomParticipants.get(meetingId)!;
     const existingSocketIds = Array.from(roomSet); // everyone already here
 
-    // Add this client to our tracking map
     roomSet.add(client.id);
 
-    // Join the socket.io room
-    client.join(meetingId);
-    this.logger.log(`Client ${client.id} (User: ${client.user.userId}) joined meeting room: ${meetingId}. Existing: [${existingSocketIds.join(', ')}]`);
+    void client.join(meetingId);
+    this.logger.log(
+      `Client ${client.id} (User: ${client.user.userId}) joined meeting room: ${meetingId}. Existing: [${existingSocketIds.join(', ')}]`,
+    );
 
-    // Tell the new joiner who is already in the room
     client.emit(SocketEvents.USER_JOINED_MEETING, {
       userId: client.user.userId,
       socketId: client.id,
@@ -125,7 +134,6 @@ export class MeetingGateway implements OnGatewayConnection, OnGatewayDisconnect 
       existingParticipants: existingSocketIds,
     });
 
-    // Tell everyone else that this new user has joined
     client.to(meetingId).emit(SocketEvents.USER_JOINED_MEETING, {
       userId: client.user.userId,
       socketId: client.id,
@@ -144,7 +152,7 @@ export class MeetingGateway implements OnGatewayConnection, OnGatewayDisconnect 
       roomSet.delete(client.id);
       if (roomSet.size === 0) this.roomParticipants.delete(meetingId);
     }
-    client.leave(meetingId);
+    void client.leave(meetingId);
     this.logger.log(`Client ${client.id} left meeting room: ${meetingId}`);
     client.to(meetingId).emit(SocketEvents.USER_LEFT_MEETING, {
       userId: client.user?.userId,
@@ -156,43 +164,43 @@ export class MeetingGateway implements OnGatewayConnection, OnGatewayDisconnect 
   @SubscribeMessage(SocketEvents.TOGGLE_AUDIO)
   handleToggleAudio(
     @ConnectedSocket() client: AuthenticatedSocket,
-    @MessageBody() data: { meetingId: string; isMuted: boolean }
+    @MessageBody() data: { meetingId: string; isMuted: boolean },
   ) {
     client.to(data.meetingId).emit(SocketEvents.AUDIO_STATUS_CHANGED, {
       userId: client.user.userId,
       socketId: client.id,
-      isMuted: data.isMuted
+      isMuted: data.isMuted,
     });
   }
 
   @SubscribeMessage(SocketEvents.TOGGLE_VIDEO)
   handleToggleVideo(
     @ConnectedSocket() client: AuthenticatedSocket,
-    @MessageBody() data: { meetingId: string; isVideoOff: boolean }
+    @MessageBody() data: { meetingId: string; isVideoOff: boolean },
   ) {
     client.to(data.meetingId).emit(SocketEvents.VIDEO_STATUS_CHANGED, {
       userId: client.user.userId,
       socketId: client.id,
-      isVideoOff: data.isVideoOff
+      isVideoOff: data.isVideoOff,
     });
   }
 
   @SubscribeMessage(SocketEvents.TOGGLE_SCREEN_SHARE)
   handleToggleScreenShare(
     @ConnectedSocket() client: AuthenticatedSocket,
-    @MessageBody() data: { meetingId: string; isSharing: boolean }
+    @MessageBody() data: { meetingId: string; isSharing: boolean },
   ) {
     client.to(data.meetingId).emit(SocketEvents.SCREEN_SHARE_CHANGED, {
       userId: client.user.userId,
       socketId: client.id,
-      isSharing: data.isSharing
+      isSharing: data.isSharing,
     });
   }
 
   @SubscribeMessage(SocketEvents.MUTE_PARTICIPANT)
   async handleMuteParticipant(
     @ConnectedSocket() client: AuthenticatedSocket,
-    @MessageBody() data: { meetingId: string; participantId: string }
+    @MessageBody() data: { meetingId: string; participantId: string },
   ) {
     const meeting = await this._meetingRepository.findById(data.meetingId);
     // Only creator can force mute
@@ -200,7 +208,7 @@ export class MeetingGateway implements OnGatewayConnection, OnGatewayDisconnect 
       this.server.to(data.meetingId).emit(SocketEvents.PARTICIPANT_MUTED, {
         meetingId: data.meetingId,
         participantId: data.participantId,
-        mutedBy: client.user.userId
+        mutedBy: client.user.userId,
       });
     }
   }
@@ -208,7 +216,7 @@ export class MeetingGateway implements OnGatewayConnection, OnGatewayDisconnect 
   @SubscribeMessage(SocketEvents.UNMUTE_PARTICIPANT)
   async handleUnmuteParticipant(
     @ConnectedSocket() client: AuthenticatedSocket,
-    @MessageBody() data: { meetingId: string; participantId: string }
+    @MessageBody() data: { meetingId: string; participantId: string },
   ) {
     const meeting = await this._meetingRepository.findById(data.meetingId);
     // Only creator can force unmute
@@ -216,7 +224,7 @@ export class MeetingGateway implements OnGatewayConnection, OnGatewayDisconnect 
       this.server.to(data.meetingId).emit(SocketEvents.PARTICIPANT_UNMUTED, {
         meetingId: data.meetingId,
         participantId: data.participantId,
-        unmutedBy: client.user.userId
+        unmutedBy: client.user.userId,
       });
     }
   }
@@ -226,39 +234,44 @@ export class MeetingGateway implements OnGatewayConnection, OnGatewayDisconnect 
   @SubscribeMessage(SocketEvents.WEBRTC_OFFER)
   handleWebRTCOffer(
     @ConnectedSocket() client: AuthenticatedSocket,
-    @MessageBody() data: { targetSocketId: string; meetingId: string; sdp: any }
+    @MessageBody()
+    data: { targetSocketId: string; meetingId: string; sdp: any },
   ) {
     this.server.to(data.targetSocketId).emit(SocketEvents.WEBRTC_OFFER, {
       fromSocketId: client.id,
       fromUserId: client.user.userId,
       sdp: data.sdp,
-      meetingId: data.meetingId
+      meetingId: data.meetingId,
     });
   }
 
   @SubscribeMessage(SocketEvents.WEBRTC_ANSWER)
   handleWebRTCAnswer(
     @ConnectedSocket() client: AuthenticatedSocket,
-    @MessageBody() data: { targetSocketId: string; meetingId: string; sdp: any }
+    @MessageBody()
+    data: { targetSocketId: string; meetingId: string; sdp: any },
   ) {
     this.server.to(data.targetSocketId).emit(SocketEvents.WEBRTC_ANSWER, {
       fromSocketId: client.id,
       fromUserId: client.user.userId,
       sdp: data.sdp,
-      meetingId: data.meetingId
+      meetingId: data.meetingId,
     });
   }
 
   @SubscribeMessage(SocketEvents.WEBRTC_ICE_CANDIDATE)
   handleWebRTCICECandidate(
     @ConnectedSocket() client: AuthenticatedSocket,
-    @MessageBody() data: { targetSocketId: string; meetingId: string; candidate: any }
+    @MessageBody()
+    data: { targetSocketId: string; meetingId: string; candidate: any },
   ) {
-    this.server.to(data.targetSocketId).emit(SocketEvents.WEBRTC_ICE_CANDIDATE, {
-      fromSocketId: client.id,
-      fromUserId: client.user.userId,
-      candidate: data.candidate,
-      meetingId: data.meetingId
-    });
+    this.server
+      .to(data.targetSocketId)
+      .emit(SocketEvents.WEBRTC_ICE_CANDIDATE, {
+        fromSocketId: client.id,
+        fromUserId: client.user.userId,
+        candidate: data.candidate,
+        meetingId: data.meetingId,
+      });
   }
 }

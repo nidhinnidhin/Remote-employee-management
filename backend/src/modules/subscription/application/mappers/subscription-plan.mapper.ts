@@ -1,5 +1,4 @@
 import { SubscriptionPlanEntity } from '../../domain/entities/subscription-plan.entity';
-import { SubscriptionPlanDocument } from '../../infrastructure/database/mongoose/schemas/subscription-plan.schema';
 
 export class SubscriptionPlanMapper {
   static toDomain(raw: any): SubscriptionPlanEntity {

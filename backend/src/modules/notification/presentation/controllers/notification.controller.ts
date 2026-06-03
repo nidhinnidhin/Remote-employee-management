@@ -9,7 +9,6 @@ import {
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import { GetUserNotificationsUseCase } from '../../application/use-cases/get-user-notifications.usecase';
 import { MarkNotificationReadUseCase } from '../../application/use-cases/mark-notification-read.usecase';
-import { UserRole } from 'src/shared/enums/user/user-role.enum';
 
 @Controller('notifications')
 @UseGuards(JwtAuthGuard)

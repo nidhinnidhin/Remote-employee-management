@@ -1,7 +1,5 @@
-import { Types } from 'mongoose';
 import { CompanyEntity } from '../../domain/entities/company.entity';
 import { CompanyDocument } from '../../infrastructure/database/mongoose/schemas/company.schema';
-import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 
 export class CompanyMapper {
   static toDomain(companyDoc: any): CompanyEntity {

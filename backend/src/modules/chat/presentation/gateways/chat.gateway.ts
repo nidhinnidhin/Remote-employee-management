@@ -29,7 +29,7 @@ import { LOGGER_SERVICE } from 'src/common/logger/tokens/logger.tokens';
 @UseGuards(WsJwtGuard)
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
-  server: Server;
+  server!: Server; 
 
   constructor(
     @Inject(LOGGER_SERVICE) private readonly logger: ILogger,
@@ -70,13 +70,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   notifyMessageDeletion(conversationId: string, messageId: string) {
-    this.server
-      .to(conversationId)
-      .emit(SocketEvents.MESSAGE_DELETED, {
-        conversationId,
-        messageId,
-        type: 'everyone',
-      });
+    this.server.to(conversationId).emit(SocketEvents.MESSAGE_DELETED, {
+      conversationId,
+      messageId,
+      type: 'everyone',
+    });
   }
 
   notifyMessageDeletedForMe(
@@ -84,13 +82,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     messageId: string,
     userId: string,
   ) {
-    this.server
-      .to(`user_${userId}`)
-      .emit(SocketEvents.MESSAGE_DELETED, {
-        conversationId,
-        messageId,
-        type: 'me',
-      });
+    this.server.to(`user_${userId}`).emit(SocketEvents.MESSAGE_DELETED, {
+      conversationId,
+      messageId,
+      type: 'me',
+    });
   }
 
   async handleConnection(client: AuthenticatedSocket) {
@@ -100,7 +96,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         client.handshake.headers.authorization?.split(' ')[1];
       if (!token) {
         this.logger.warn(`Client connected without token: ${client.id}`);
-        client.disconnect();
+        void client.disconnect();
         return;
       }
 
@@ -113,13 +109,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         companyId: payload.companyId,
       };
 
-      client.join(`user_${userId}`);
+      void client.join(`user_${userId}`);
       this.logger.log(
         `Client connected and joined personal room: ${client.id} (User: ${userId})`,
       );
-    } catch (error) {
+    } catch (error: any) {
+      // Fixed: Explicit typing to resolve strict error check
       this.logger.error(`WS Connection auth failed: ${error.message}`);
-      client.disconnect();
+      void client.disconnect();
     }
   }
 
@@ -132,7 +129,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: AuthenticatedSocket,
     @MessageBody() conversationId: string,
   ) {
-    client.join(conversationId);
+    void client.join(conversationId);
     this.logger.log(`Client ${client.id} joined room: ${conversationId}`);
   }
 
@@ -141,7 +138,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: AuthenticatedSocket,
     @MessageBody() conversationId: string,
   ) {
-    client.leave(conversationId);
+    void client.leave(conversationId);
     this.logger.log(`Client ${client.id} left room: ${conversationId}`);
   }
 
@@ -171,7 +168,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
 
       return { status: 'ok', data: message };
-    } catch (error) {
+    } catch (error: any) {
+      // Fixed: Explicit typing to resolve strict error check
       return { status: 'error', message: error.message };
     }
   }

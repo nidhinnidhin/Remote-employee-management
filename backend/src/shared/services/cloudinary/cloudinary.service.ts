@@ -13,7 +13,7 @@ export class CloudinaryService implements ICloudinaryService {
     });
   }
 
-  async uploadFile(file: Express.Multer.File, folder: string): Promise<any> {
+  async uploadFile(file: Express.Multer.File): Promise<any> {
     return new Promise((resolve, reject) => {
       cloudinary.uploader
         .upload_stream(

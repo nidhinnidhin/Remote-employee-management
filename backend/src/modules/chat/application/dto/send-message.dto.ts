@@ -1,5 +1,5 @@
 // src/modules/chat/application/dto/send-message.dto.ts
-import { IsString, IsNotEmpty, MinLength, IsEnum, IsOptional, IsArray } from 'class-validator';
+import { IsString, IsNotEmpty, IsEnum, IsOptional, IsArray } from 'class-validator';
 import { MessageType } from 'src/shared/enums/chat/message-type.enum';
 import { MessageAttachment } from '../../domain/entities/message.entity';
 

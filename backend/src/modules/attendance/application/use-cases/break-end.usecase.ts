@@ -10,7 +10,7 @@ export class BreakEndUseCase implements IBreakEndUseCase {
     private readonly _attendanceRepository: IAttendanceRepository,
   ) {}
 
-  async execute(userId: string, companyId: string): Promise<AttendanceEntity> {
+  async execute(userId: string, _companyId: string): Promise<AttendanceEntity> {
     const activeShift = await this._attendanceRepository.findActiveShift(userId);
     if (!activeShift || activeShift.status !== 'BREAK') {
       throw new BadRequestException('No active break found. You must start a break first.');

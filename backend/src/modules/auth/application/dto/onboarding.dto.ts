@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString, IsOptional, ValidateNested, IsObject, IsDefined } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, IsOptional, ValidateNested, IsObject } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class OnboardingCompanyDto {
