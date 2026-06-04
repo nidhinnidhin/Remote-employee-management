@@ -33,7 +33,7 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
     otherLeaveType: "",
     startDate: "",
     endDate: "",
-    durationType: LeaveDurationType.FULL_DAY as LeaveDurationType,
+    durationType: LeaveDurationType.FULL_DAY, // Locked to Full Day by default
     reason: "",
     emergencyContactName: "",
     emergencyContactPhone: "",
@@ -51,28 +51,43 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
       label: type.replace(/_/g, " "),
       value: type,
     }));
-    return [...types, { label: "Other", value: "OTHER" }];
+    return [
+      { label: "Select Leave Type...", value: "", disabled: true },
+      ...types,
+      { label: "Other", value: "OTHER" },
+    ];
   }, [dynamicLeaveTypes]);
 
+  // Duration options restricted strictly to Full Day
+  const durationOptions = [
+    { label: "Full Day", value: LeaveDurationType.FULL_DAY },
+  ];
+
+  // Reset form states completely when opening/closing the modal safely
   useEffect(() => {
-    if (isOpen && dynamicLeaveTypes.length > 0 && !formData.leaveType) {
-      setFormData((prev) => ({ ...prev, leaveType: dynamicLeaveTypes[0] }));
+    if (isOpen) {
+      setFormData({
+        leaveType: "",
+        otherLeaveType: "",
+        startDate: "",
+        endDate: "",
+        durationType: LeaveDurationType.FULL_DAY,
+        reason: "",
+        emergencyContactName: "",
+        emergencyContactPhone: "",
+      });
+      setSelectedFiles([]);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
-  }, [isOpen, dynamicLeaveTypes, formData.leaveType]);
+  }, [isOpen]);
 
   const currentBalance = useMemo(() => {
+    if (!formData.leaveType) return null;
     return balances.find((b) => b.leaveType === formData.leaveType);
   }, [balances, formData.leaveType]);
 
-  const durationOptions = [
-    { label: "Full Day", value: LeaveDurationType.FULL_DAY },
-    { label: "First Half", value: LeaveDurationType.FIRST_HALF },
-    { label: "Second Half", value: LeaveDurationType.SECOND_HALF },
-  ];
-
   const calculateTotalDays = (): number => {
     if (!formData.startDate || !formData.endDate) return 0;
-    if (formData.durationType !== LeaveDurationType.FULL_DAY) return 0.5;
     const start = new Date(formData.startDate);
     const end = new Date(formData.endDate);
     const diffTime = Math.abs(end.getTime() - start.getTime());
@@ -82,15 +97,16 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
 
   const totalDaysRequested = calculateTotalDays();
 
-  // Policy-based validation using allocated/available from LeaveBalance
   const balanceValidation = useMemo<{
     status: "ok" | "warning" | "exceeded" | "blocked";
     message: string;
   }>(() => {
-    if (!currentBalance || formData.leaveType === "OTHER")
+    if (!formData.leaveType || !currentBalance || formData.leaveType === "OTHER")
       return { status: "ok", message: "" };
+    
     const { available, allocated, consumed, pending } = currentBalance;
     const leaveLabel = formData.leaveType.replace(/_/g, " ");
+    
     if (allocated === 0)
       return {
         status: "blocked",
@@ -142,13 +158,10 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
         )
       : 0;
 
-  // Resolved possible type mismatch signature for form events
-  const handleDropdownChange =
-    (field: keyof typeof formData) =>
-    (e: any) => {
-      const val = e?.target ? e.target.value : e;
-      setFormData((prev) => ({ ...prev, [field]: val }));
-    };
+  const handleDropdownChange = (field: keyof typeof formData) => (e: any) => {
+    const val = e?.target ? e.target.value : e;
+    setFormData((prev) => ({ ...prev, [field]: val }));
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -159,6 +172,10 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!formData.leaveType) {
+      toast.error("Please select a valid Leave Type");
+      return;
+    }
     if (isBlocked) {
       toast.error(balanceValidation.message || "Leave quota exceeded per company policy.");
       return;
@@ -185,11 +202,6 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
         ? formData.otherLeaveType.trim()
         : formData.leaveType;
 
-    if (!finalLeaveType) {
-      toast.error("Leave type is required");
-      return;
-    }
-
     setLoading(true);
     const submissionData = new FormData();
     submissionData.append("leaveType", finalLeaveType);
@@ -208,18 +220,6 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
       toast.success("Leave request submitted successfully");
       onSuccess();
       onClose();
-      setSelectedFiles([]);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-      setFormData({
-        leaveType: dynamicLeaveTypes[0] ?? "",
-        otherLeaveType: "",
-        startDate: "",
-        endDate: "",
-        durationType: LeaveDurationType.FULL_DAY,
-        reason: "",
-        emergencyContactName: "",
-        emergencyContactPhone: "",
-      });
     } else {
       toast.error(result.error ?? "Failed to submit leave request");
     }
@@ -232,7 +232,7 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
 
         {/* ── Live Balance Preview Panel ── */}
         {currentBalance && (
-          <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-4 space-y-3">
+          <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-4 space-y-3 animate-in fade-in duration-200">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">
                 {formData.leaveType.replace(/_/g, " ")} — Policy Balance
@@ -242,7 +242,6 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
               </span>
             </div>
 
-            {/* Stats row */}
             <div className="grid grid-cols-4 gap-2 text-center">
               {[
                 { label: "Allocated", value: currentBalance.allocated, colorClass: "text-slate-200" },
@@ -266,7 +265,6 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
               ))}
             </div>
 
-            {/* Usage progress bar */}
             <div className="space-y-1">
               <div className="flex justify-between text-[10px] text-slate-500">
                 <span>Usage</span>
@@ -326,7 +324,7 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
           </div>
         )}
 
-        {/* Form Fields */}
+        {/* Form Fields Matrix */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <FormDropdown
@@ -339,7 +337,7 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
               variant="company"
             />
             {formData.leaveType === "OTHER" && (
-              <div className="mt-2">
+              <div className="mt-2 animate-in fade-in slide-in-from-top-1 duration-200">
                 <FormInput
                   label="Specify Leave Type"
                   name="otherLeaveType"
@@ -409,7 +407,7 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
           <textarea
             className="w-full px-4 py-3 border border-slate-200/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all resize-none bg-white/5 text-sm text-slate-200 placeholder-slate-500"
             rows={3}
-            placeholder="Please provide a brief reason..."
+            placeholder="Please provide a brief description..."
             value={formData.reason}
             onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
             required
@@ -430,14 +428,14 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
               className="text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-500/10 file:text-indigo-400 hover:file:bg-indigo-500/20 transition-all cursor-pointer"
             />
             {selectedFiles.length > 0 && (
-              <div className="text-xs text-slate-400 mt-1">
+              <div className="text-xs text-slate-400 mt-1 font-medium">
                 Selected: {selectedFiles.map((f) => f.name).join(", ")}
               </div>
             )}
           </div>
         </div>
 
-        <div className="flex justify-end gap-3 pt-4 border-t border-slate-100/10">
+        <div className="flex justify-end gap-3 pt-4 border-t border-t-white/[0.05]">
           <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
             Cancel
           </Button>
@@ -445,7 +443,7 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
             type="submit"
             variant="primary"
             isLoading={loading}
-            disabled={isBlocked || loading}
+            disabled={isBlocked || !formData.leaveType || loading}
             title={isBlocked ? balanceValidation.message : undefined}
           >
             Submit Request
