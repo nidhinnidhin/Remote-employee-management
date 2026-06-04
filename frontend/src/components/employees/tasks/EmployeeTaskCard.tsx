@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Clock, Calendar, AlertCircle, Timer } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Task, TaskStatus } from "@/shared/types/company/projects/task.type";
@@ -37,6 +37,14 @@ export default function EmployeeTaskCard({
 }: EmployeeTaskCardProps) {
   const [isLogModalOpen, setIsLogModalOpen] = useState(false);
   const [currentTask, setCurrentTask] = useState(task);
+  
+  // Real-time ticking string container state
+  const [liveWorkingTime, setLiveWorkingTime] = useState("00:00:00");
+
+  // Sync internal state with upstream prop changes
+  useEffect(() => {
+    setCurrentTask(task);
+  }, [task]);
 
   const isOverdue = () => {
     if (!currentTask.dueDate || currentTask.status === TaskStatus.DONE) return false;
@@ -45,17 +53,49 @@ export default function EmployeeTaskCard({
     return new Date(currentTask.dueDate) < today;
   };
 
-  const calculateWorkedHours = () => {
-    if (!currentTask.startedAt) return "0.0";
-    const start = new Date(currentTask.startedAt).getTime();
-    const end = currentTask.completedAt ? new Date(currentTask.completedAt).getTime() : new Date().getTime();
-    
-    const diffMs = end - start;
-    if (diffMs <= 0) return "0.0";
-    
-    const diffHrs = diffMs / (1000 * 60 * 60);
-    return diffHrs.toFixed(1);
+  // Format utility to convert ms diff into digital stopwatch string (HH:MM:SS)
+  const formatDurationText = (diffMs: number): string => {
+    if (diffMs <= 0) return "00:00:00";
+    const totalSeconds = Math.floor(diffMs / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    return [
+      hours.toString().padStart(2, "0"),
+      minutes.toString().padStart(2, "0"),
+      seconds.toString().padStart(2, "0")
+    ].join(":");
   };
+
+  // Real-time ticker hook: Runs only when task is active
+  useEffect(() => {
+    if (!currentTask.startedAt) {
+      setLiveWorkingTime("00:00:00");
+      return;
+    }
+
+    const startTimestamp = new Date(currentTask.startedAt).getTime();
+
+    // If task is completed, compute static final difference instantly
+    if (currentTask.completedAt) {
+      const endTimestamp = new Date(currentTask.completedAt).getTime();
+      setLiveWorkingTime(formatDurationText(endTimestamp - startTimestamp));
+      return;
+    }
+
+    // Tick executor block
+    const updateTicker = () => {
+      const currentDiff = new Date().getTime() - startTimestamp;
+      setLiveWorkingTime(formatDurationText(currentDiff));
+    };
+
+    // Run first interval calculation instantly on tab/render paint
+    updateTicker();
+
+    const intervalId = setInterval(updateTicker, 1000);
+    return () => clearInterval(intervalId);
+  }, [currentTask.startedAt, currentTask.completedAt]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -111,7 +151,7 @@ export default function EmployeeTaskCard({
           )}
         </div>
 
-        {/* Metrics Section: Clean Grid with Thin Divider */}
+        {/* Metrics Section Layout with Running Live Clock Indicator */}
         <div className="grid grid-cols-2 gap-4 py-3 border-y border-white/[0.05]">
           <div 
             className="space-y-1 cursor-pointer hover:bg-white/[0.03] p-1 -m-1 rounded-lg transition-colors" 
@@ -123,9 +163,19 @@ export default function EmployeeTaskCard({
           >
             <p className="text-[9px] font-black uppercase tracking-[0.15em] text-slate-600">Active Time</p>
             <div className="flex items-center gap-1.5 text-slate-300">
-              <Timer size={13} className="text-accent/60" strokeWidth={1.5} />
-              <span className="text-[11px] font-bold tabular-nums">
-                {calculateWorkedHours()}h
+              <Timer 
+                size={13} 
+                className={cn(
+                  "transition-colors",
+                  currentTask.startedAt && !currentTask.completedAt ? "text-accent animate-pulse" : "text-accent/60"
+                )} 
+                strokeWidth={1.5} 
+              />
+              <span className={cn(
+                "text-[11px] font-bold tabular-nums tracking-tight",
+                currentTask.startedAt && !currentTask.completedAt && "text-accent"
+              )}>
+                {liveWorkingTime}
                 <span className="text-slate-600 font-medium ml-1">/ {currentTask.estimatedHours || 0}h</span>
               </span>
             </div>
@@ -148,6 +198,7 @@ export default function EmployeeTaskCard({
         {/* Action Row */}
         <div className="flex items-center justify-between">
           <button
+            type="button"
             onClick={(e) => {
               e.stopPropagation();
               setIsLogModalOpen(true);
