@@ -11,9 +11,13 @@ export const getComments = async (
 };
 
 export const addComment = async (
-  payload: CreateCommentDto,
+  payload: CreateCommentDto | FormData, // Updated to accept multipart FormData
   api: AxiosInstance,
 ): Promise<Comment> => {
-  const { data } = await api.post(`/comments`, payload);
+  const { data } = await api.post(`/comments`, payload, {
+    headers: payload instanceof FormData 
+      ? { "Content-Type": "multipart/form-data" } 
+      : undefined,
+  });
   return data;
 };

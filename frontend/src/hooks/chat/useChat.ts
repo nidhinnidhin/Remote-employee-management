@@ -1,4 +1,3 @@
-// src/hooks/chat/useChat.ts
 import { useEffect, useCallback } from "react";
 import { useChatStore } from "@/store/chat.store";
 import { useAuthStore } from "@/store/auth.store";
@@ -46,11 +45,13 @@ export function useChat() {
 
         addMessage(message.conversationId, message);
 
-        // Render preview message placeholders dynamically based on attachment contexts
+        // Safely extract the optional type parameter from message object
+        const msgType = (message as any).type || "TEXT";
+
         const lastMessageText =
-          message.type === "TEXT"
+          msgType === "TEXT"
             ? message.content
-            : `📎 [${message.type}] Attachment`;
+            : `📎 [${msgType}] Attachment`;
 
         updateConversationLastMessage(
           message.conversationId,

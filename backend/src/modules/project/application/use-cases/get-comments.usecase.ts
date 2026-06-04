@@ -1,9 +1,4 @@
-import {
-  Inject,
-  Injectable,
-  ForbiddenException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Inject, Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
 import type { ICommentRepository } from '../../domain/repositories/comment.repository.interface';
 import type { IProjectRepository } from '../../domain/repositories/project.repository.interface';
 import type { ITaskRepository } from '../../domain/repositories/task.repository.interface';
@@ -17,24 +12,14 @@ import { UserDocument } from '../../../auth/infrastructure/database/mongoose/sch
 @Injectable()
 export class GetCommentsUseCase {
   constructor(
-    @Inject('ICommentRepository')
-    private readonly commentRepository: ICommentRepository,
-    @Inject('IProjectRepository')
-    private readonly projectRepository: IProjectRepository,
-    @Inject('ITaskRepository')
-    private readonly taskRepository: ITaskRepository,
-    @Inject('IUserStoryRepository')
-    private readonly userStoryRepository: IUserStoryRepository,
-    @InjectModel(UserDocument.name)
-    private readonly userModel: Model<UserDocument>,
+    @Inject('ICommentRepository') private readonly commentRepository: ICommentRepository,
+    @Inject('IProjectRepository') private readonly projectRepository: IProjectRepository,
+    @Inject('ITaskRepository') private readonly taskRepository: ITaskRepository,
+    @Inject('IUserStoryRepository') private readonly userStoryRepository: IUserStoryRepository,
+    @InjectModel(UserDocument.name) private readonly userModel: Model<UserDocument>,
   ) {}
 
-  async execute(
-    companyId: string,
-    userId: string,
-    entityId: string,
-    entityType: CommentEntityType,
-  ): Promise<CommentEntity[]> {
+  async execute(companyId: string, userId: string, entityId: string, entityType: CommentEntityType): Promise<CommentEntity[]> {
     let projectId: string;
 
     switch (entityType) {
@@ -42,19 +27,13 @@ export class GetCommentsUseCase {
         projectId = entityId;
         break;
       case CommentEntityType.USER_STORY: {
-        const story = await this.userStoryRepository.findByIdAndCompany(
-          entityId,
-          companyId,
-        );
+        const story = await this.userStoryRepository.findByIdAndCompany(entityId, companyId);
         if (!story) throw new NotFoundException('User Story not found');
         projectId = story.projectId;
         break;
       }
       case CommentEntityType.TASK: {
-        const task = await this.taskRepository.findByIdAndCompany(
-          entityId,
-          companyId,
-        );
+        const task = await this.taskRepository.findByIdAndCompany(entityId, companyId);
         if (!task) throw new NotFoundException('Task not found');
         projectId = task.projectId;
         break;
@@ -63,39 +42,24 @@ export class GetCommentsUseCase {
         throw new NotFoundException('Entity type not supported');
     }
 
-    const project = await this.projectRepository.findByIdAndCompany(
-      projectId,
-      companyId,
-    );
+    const project = await this.projectRepository.findByIdAndCompany(projectId, companyId);
     if (!project) throw new NotFoundException('Project not found');
 
     if (!project.members.includes(userId) && project.createdBy !== userId) {
-      throw new ForbiddenException(
-        'You must be a member of this project to view comments',
-      );
+      throw new ForbiddenException('You must be a member of this project to view comments');
     }
 
-    const comments = await this.commentRepository.findByEntityId(
-      entityId,
-      entityType,
-    );
+    const comments = await this.commentRepository.findByEntityId(entityId, entityType);
 
-    // Enrich with author names
     const authorIds = [...new Set(comments.map((c) => c.authorId))];
-    const users = await this.userModel
-      .find({ _id: { $in: authorIds } }, 'firstName lastName')
-      .lean()
-      .exec();
+    const users = await this.userModel.find({ _id: { $in: authorIds } }, 'firstName lastName').lean().exec();
 
     const userMap = new Map<string, string>();
     users.forEach((u) => {
-      userMap.set(
-        u._id.toString(),
-        `${u.firstName} ${u.lastName || ''}`.trim(),
-      );
+      userMap.set(u._id.toString(), `${u.firstName} ${u.lastName || ''}`.trim());
     });
 
-    const enrichedComments = comments.map((c) => {
+    return comments.map((c) => {
       const authorName = userMap.get(c.authorId) || 'Unknown User';
       return new CommentEntity(
         c.id,
@@ -106,12 +70,11 @@ export class GetCommentsUseCase {
         c.content,
         authorName,
         c.parentId,
+        c.attachments,
         c.createdAt,
         c.updatedAt,
         c.isDeleted,
       );
     });
-
-    return enrichedComments;
   }
 }

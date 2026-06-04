@@ -11,6 +11,7 @@ export interface Comment {
   entityId: string;
   entityType: CommentEntityType;
   parentId?: string;
+  attachments?: string[];
   authorId: string;
   authorName?: string;
   content: string;

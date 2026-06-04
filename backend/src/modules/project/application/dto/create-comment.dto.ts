@@ -4,18 +4,21 @@ import { CommentEntityType } from 'src/shared/enums/project/comment-entity-type.
 export class CreateCommentDto {
   @IsMongoId()
   @IsNotEmpty()
-  entityId: string;
+  entityId!: string;
 
   @IsEnum(CommentEntityType)
   @IsNotEmpty()
-  entityType: CommentEntityType;
+  entityType!: CommentEntityType;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @MaxLength(1000)
-  content: string;
+  content?: string;
 
   @IsMongoId()
   @IsOptional()
   parentId?: string;
+
+  @IsOptional()
+  attachments?: any;
 }

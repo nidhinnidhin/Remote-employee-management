@@ -5,28 +5,36 @@ import { CommentEntityType } from 'src/shared/enums/project/comment-entity-type.
 @Schema({ timestamps: true })
 export class CommentDocument extends Document {
   @Prop({ required: true, index: true })
-  companyId: string;
+  companyId!: string;
 
   @Prop({ required: true, index: true })
-  entityId: string;
+  entityId!: string;
 
   @Prop({ required: true, enum: CommentEntityType })
-  entityType: CommentEntityType;
+  entityType!: CommentEntityType;
 
   @Prop({ required: true })
-  authorId: string;
+  authorId!: string;
 
-  @Prop({ required: true })
-  content: string;
+  @Prop({ required: false, default: '' })
+  content?: string;
 
-  @Prop({ type: Types.ObjectId, required: false, ref: 'CommentDocument', default: null })
-  parentId: Types.ObjectId | null;
+  @Prop({ type: [String], required: false, default: [] })
+  attachments!: string[];
+
+  @Prop({
+    type: Types.ObjectId,
+    required: false,
+    ref: 'CommentDocument',
+    default: null,
+  })
+  parentId!: Types.ObjectId | null;
 
   @Prop({ required: true, default: false, index: true })
-  isDeleted: boolean;
+  isDeleted!: boolean;
 
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt!: Date;
+  updatedAt!: Date;
 }
 
 export const CommentSchema = SchemaFactory.createForClass(CommentDocument);

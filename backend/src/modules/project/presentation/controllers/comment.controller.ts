@@ -7,7 +7,10 @@ import {
   Req,
   UseGuards,
   Inject,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import type { Request } from 'express';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import { CreateCommentDto } from '../../application/dto/create-comment.dto';
@@ -26,8 +29,18 @@ export class CommentController {
   ) {}
 
   @Post()
-  async create(@Req() req: Request, @Body() dto: CreateCommentDto) {
-    return this.addCommentUseCase.execute(req.user!.companyId!, req.user!.userId, dto);
+  @UseInterceptors(FilesInterceptor('files')) // Intercepts multipart media arrays
+  async create(
+    @Req() req: Request, 
+    @Body() dto: CreateCommentDto,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    return this.addCommentUseCase.execute(
+      req.user!.companyId!, 
+      req.user!.userId, 
+      dto,
+      files,
+    );
   }
 
   @Get(':entityType/:entityId')

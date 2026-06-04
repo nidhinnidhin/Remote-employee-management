@@ -1,9 +1,8 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { getServerApi } from "@/lib/axios/axiosServer";
 import * as commentService from "@/services/employee/project/comment.service";
-import { Comment, CreateCommentDto, CommentEntityType } from "@/shared/types/company/projects/comment.type";
+import { Comment, CommentEntityType } from "@/shared/types/company/projects/comment.type";
 
 export const getCommentsAction = async (
   entityType: CommentEntityType,
@@ -14,35 +13,40 @@ export const getCommentsAction = async (
     const result = await commentService.getComments(entityType, entityId, api);
     return { success: true, data: result };
   } catch (error: unknown) {
-    const err = error as {
-      response?: { data?: { message?: string } };
-      message?: string;
-    };
+    const err = error as { response?: { data?: { message?: string } }; message?: string };
     return {
       success: false,
-      error: err.response?.data?.message || err.message || "Failed to fetch comments.",
+      error: err.response?.data?.message || err.message || "Failed to load comments.",
     };
   }
 };
 
 export const addCommentAction = async (
-  payload: CreateCommentDto,
+  formData: FormData,
 ): Promise<{ success: boolean; data?: Comment; error?: string }> => {
   try {
     const api = await getServerApi();
-    const result = await commentService.addComment(payload, api);
+
+    // Reconstruct the exact FormData layout array to eliminate hidden NextJS boundary payloads
+    const apiPayload = new FormData();
+    apiPayload.append("entityId", formData.get("entityId") as string);
+    apiPayload.append("entityType", formData.get("entityType") as string);
+    apiPayload.append("content", formData.get("content") as string);
     
-    // Optional: We can revalidate path if we want server components to refetch
-    // But mostly this will be handled by client side state in the modal
-    // revalidatePath("/employee/projects");
-    
+    const parentId = formData.get("parentId");
+    if (parentId) {
+      apiPayload.append("parentId", parentId as string);
+    }
+
+    const files = formData.getAll("files") as File[];
+    files.forEach((file) => {
+      apiPayload.append("files", file); 
+    });
+
+    const result = await commentService.addComment(apiPayload, api);
     return { success: true, data: result };
   } catch (error: unknown) {
-    const err = error as {
-      response?: { data?: { message?: any } };
-      message?: string;
-    };
-
+    const err = error as { response?: { data?: { message?: any } }; message?: string };
     let userFriendlyMessage = "Failed to add comment.";
     if (err.response?.data?.message) {
       userFriendlyMessage =
@@ -52,7 +56,6 @@ export const addCommentAction = async (
     } else if (err.message) {
       userFriendlyMessage = err.message;
     }
-
     return { success: false, error: userFriendlyMessage };
   }
 };
