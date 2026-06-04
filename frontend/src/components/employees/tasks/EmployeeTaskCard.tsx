@@ -45,6 +45,18 @@ export default function EmployeeTaskCard({
     return new Date(currentTask.dueDate) < today;
   };
 
+  const calculateWorkedHours = () => {
+    if (!currentTask.startedAt) return "0.0";
+    const start = new Date(currentTask.startedAt).getTime();
+    const end = currentTask.completedAt ? new Date(currentTask.completedAt).getTime() : new Date().getTime();
+    
+    const diffMs = end - start;
+    if (diffMs <= 0) return "0.0";
+    
+    const diffHrs = diffMs / (1000 * 60 * 60);
+    return diffHrs.toFixed(1);
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
@@ -80,9 +92,14 @@ export default function EmployeeTaskCard({
                   {projectName}
                 </span>
               )}
-              <h4 className="text-sm font-bold text-slate-100 leading-snug group-hover:text-accent transition-colors truncate">
-                {currentTask.title}
-              </h4>
+              <div className="flex items-start gap-2 pt-1">
+                <span className="text-[9px] font-black tracking-widest uppercase text-accent bg-accent/10 border border-accent/20 px-1.5 py-0.5 rounded mt-0.5 shrink-0">
+                  TSK-{currentTask.taskNumber || 'NEW'}
+                </span>
+                <h4 className="text-sm font-bold text-slate-100 leading-snug group-hover:text-accent transition-colors truncate">
+                  {currentTask.title}
+                </h4>
+              </div>
             </div>
             <TaskStatusBadge status={currentTask.status} className="scale-90 origin-top-right shrink-0" />
           </div>
@@ -102,12 +119,13 @@ export default function EmployeeTaskCard({
               e.stopPropagation();
               setIsLogModalOpen(true);
             }}
+            title={`Manual Logged: ${currentTask.actualHours || 0}h`}
           >
-            <p className="text-[9px] font-black uppercase tracking-[0.15em] text-slate-600">Hours</p>
+            <p className="text-[9px] font-black uppercase tracking-[0.15em] text-slate-600">Active Time</p>
             <div className="flex items-center gap-1.5 text-slate-300">
               <Timer size={13} className="text-accent/60" strokeWidth={1.5} />
               <span className="text-[11px] font-bold tabular-nums">
-                {currentTask.actualHours || 0}
+                {calculateWorkedHours()}h
                 <span className="text-slate-600 font-medium ml-1">/ {currentTask.estimatedHours || 0}h</span>
               </span>
             </div>

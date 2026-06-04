@@ -45,6 +45,18 @@ const TaskCard: React.FC<TaskCardProps> = ({
     return new Date(task.dueDate) < today;
   };
 
+  const calculateWorkedHours = () => {
+    if (!task.startedAt) return "0.0";
+    const start = new Date(task.startedAt).getTime();
+    const end = task.completedAt ? new Date(task.completedAt).getTime() : new Date().getTime();
+    
+    const diffMs = end - start;
+    if (diffMs <= 0) return "0.0";
+    
+    const diffHrs = diffMs / (1000 * 60 * 60);
+    return diffHrs.toFixed(1);
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
@@ -99,9 +111,14 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
         {/* --- TITLE --- */}
         <div className="min-h-[1.5rem]">
-          <h5 className="text-[13px] font-bold text-primary leading-snug">
-            {task.title}
-          </h5>
+          <div className="flex items-start gap-2">
+            <span className="text-[9px] font-black tracking-widest uppercase text-accent bg-accent/10 border border-accent/20 px-1.5 py-0.5 rounded mt-0.5 shrink-0">
+              TSK-{task.taskNumber || 'NEW'}
+            </span>
+            <h5 className="text-[13px] font-bold text-primary leading-snug">
+              {task.title}
+            </h5>
+          </div>
           {storyTitle && (
             <div className="mt-1 flex items-center gap-1.5 opacity-40">
               <span className="text-[9px] font-bold uppercase tracking-tighter text-muted">Story:</span>
@@ -116,9 +133,12 @@ const TaskCard: React.FC<TaskCardProps> = ({
             <div className="flex items-center gap-1.5 text-muted" title="Estimated Hours">
               <Clock size={12} className="opacity-40" strokeWidth={2.5} />
               <span className="text-[11px] font-bold tabular-nums">{task.estimatedHours}h</span>
+              <span className="text-[10px] font-medium opacity-60 ml-1 text-accent" title="Auto Elapsed Time">
+                ({calculateWorkedHours()}h auto)
+              </span>
               {task.actualHours !== undefined && (
-                <span className="text-[10px] font-medium opacity-40">
-                  ({task.actualHours}h act.)
+                <span className="text-[10px] font-medium opacity-40 ml-1" title="Manual Logged Hours">
+                  ({task.actualHours}h man)
                 </span>
               )}
             </div>

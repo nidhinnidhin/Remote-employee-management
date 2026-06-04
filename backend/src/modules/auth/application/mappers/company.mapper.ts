@@ -15,6 +15,7 @@ export class CompanyMapper {
       companyDoc.employeeCount,
       companyDoc.status,
       companyDoc.onboardingStep,
+      companyDoc.projectCounter || 0,
     );
   }
 
@@ -27,6 +28,7 @@ export class CompanyMapper {
       website: company.website,
       status: company.status,
       onboardingStep: company.onboardingStep,
+      projectCounter: company.projectCounter,
     } as Partial<CompanyDocument>;
   }
 }

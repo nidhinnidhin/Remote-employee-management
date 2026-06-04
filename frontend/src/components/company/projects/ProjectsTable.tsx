@@ -37,8 +37,13 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
       header: "Project Name",
       accessor: (project) => (
         <div className="flex flex-col">
-          <span className="font-bold text-primary">{project.name}</span>
-          <span className="text-[10px] text-muted truncate max-w-[200px]">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-black tracking-widest uppercase text-accent bg-accent/10 border border-accent/20 px-1.5 py-0.5 rounded">
+              PRJ-{project.projectNumber || 'NEW'}
+            </span>
+            <span className="font-bold text-primary">{project.name}</span>
+          </div>
+          <span className="text-[10px] text-muted truncate max-w-[200px] mt-0.5">
             {project.description || "No description"}
           </span>
         </div>

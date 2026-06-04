@@ -50,6 +50,15 @@ export class UpdateSprintUseCase implements IUpdateSprintUseCase {
       const sprintStories = projectStories.filter(s => existingSprint.issueIds.includes(s.id));
       const plannedPoints = sprintStories.reduce((sum, s) => sum + (s.storyPoints || 0), 0);
       updateData.plannedPoints = plannedPoints;
+
+      // Start all tasks that belong to these stories (if not already started)
+      const storyIds = sprintStories.map(s => s.id);
+      if (storyIds.length > 0) {
+        await this._taskRepository.updateMany(
+          { storyId: { $in: storyIds }, companyId, startedAt: { $exists: false } },
+          { $set: { startedAt: new Date() } }
+        );
+      }
     }
 
     // Handle Manual Completion: Granular migration

@@ -21,6 +21,7 @@ export const getStoriesByProjectAction = async (projectId: string) => {
   try {
     const api = await getServerApi();
     const data = await StoryService.getStoriesByProject(projectId, api);
+    console.log('------------------------',data)
     return { success: true, data };
   } catch (error: any) {
     const message = error.response?.data?.message || error.message || "Failed to fetch stories";

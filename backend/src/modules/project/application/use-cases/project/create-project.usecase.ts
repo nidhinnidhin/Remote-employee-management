@@ -1,5 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { IProjectRepository } from '../../../domain/repositories/project.repository.interface';
+import type { ICompanyRepository } from 'src/modules/auth/domain/repositories/icompany.repository';
 import type { ICreateProjectUseCase } from '../../interfaces/project/project-use-cases.interface';
 import { CreateProjectDto } from '../../dto/project/create-project.dto';
 import { ProjectEntity } from '../../../domain/entities/project.entity';
@@ -18,6 +19,8 @@ export class CreateProjectUseCase implements ICreateProjectUseCase {
   constructor(
     @Inject('IProjectRepository')
     private readonly _projectRepository: IProjectRepository,
+    @Inject('ICompanyRepository')
+    private readonly _companyRepository: ICompanyRepository,
     @Inject('ICreateConversationUseCase')
     private readonly _createConversationUseCase: ICreateConversationUseCase,
     private readonly _chatGateway: ChatGateway,
@@ -29,8 +32,11 @@ export class CreateProjectUseCase implements ICreateProjectUseCase {
   ) { }
 
   async execute(companyId: string, adminId: string, projectDto: CreateProjectDto): Promise<ProjectEntity> {
+    const nextProjectNumber = await this._companyRepository.incrementAndGetProjectCounter(companyId);
+
     const projectData = {
       ...projectDto,
+      projectNumber: nextProjectNumber,
       startDate: projectDto.startDate ? new Date(projectDto.startDate) : undefined,
       endDate: projectDto.endDate ? new Date(projectDto.endDate) : undefined,
       companyId,

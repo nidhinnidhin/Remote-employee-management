@@ -30,6 +30,7 @@ export class MongoUserStoryRepository
 
   async create(story: Partial<UserStoryEntity>): Promise<UserStoryEntity> {
     const persistenceData = UserStoryMapper.toPersistence(story);
+    console.log('--- PERSISTENCE DATA BEING SENT TO MONGO ---', persistenceData);
     return this.save({
       ...persistenceData,
       isDeleted: false,

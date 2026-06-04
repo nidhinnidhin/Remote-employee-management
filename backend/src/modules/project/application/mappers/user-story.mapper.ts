@@ -13,26 +13,29 @@ export class UserStoryMapper {
   static toDomain(
     userDocument: UserStoryDocument | LeanStoryDocument,
   ): UserStoryEntity {
+    const doc = userDocument as any;
+
     return new UserStoryEntity(
-      userDocument._id.toString(),
-      userDocument.companyId,
-      userDocument.projectId?.toString(),
-      userDocument.title,
-      (userDocument.status as UserStoryStatus) || UserStoryStatus.TODO,
-      (userDocument.priority as UserStoryPriority) || UserStoryPriority.MEDIUM,
-      (userDocument.type as IssueType) || IssueType.STORY,
-      userDocument.order || 0,
-      userDocument.createdBy,
-      userDocument.description || '',
-      userDocument.acceptanceCriteria || [],
-      userDocument.assigneeId?.toString(),
-      userDocument.storyPoints || 0,
-      userDocument.isInBacklog !== undefined ? !!userDocument.isInBacklog : true,
-      userDocument.attachments || [],
-      userDocument.links || [],
-      userDocument.createdAt || new Date(),
-      userDocument.updatedAt || new Date(),
-      !!userDocument.isDeleted,
+      doc._id.toString(),
+      doc.companyId,
+      doc.projectId?.toString(),
+      Number(doc.storyNumber || 0), 
+      doc.title,                    
+      (doc.status as UserStoryStatus) || UserStoryStatus.TODO,
+      (doc.priority as UserStoryPriority) || UserStoryPriority.MEDIUM,
+      (doc.type as IssueType) || IssueType.STORY,
+      doc.order || 0,
+      doc.createdBy,
+      doc.description || '',
+      doc.acceptanceCriteria || [],
+      doc.assigneeId?.toString(),
+      doc.storyPoints || 0,
+      doc.isInBacklog !== undefined ? !!doc.isInBacklog : true,
+      doc.attachments || [],
+      doc.links || [],
+      doc.createdAt || new Date(),
+      doc.updatedAt || new Date(),
+      !!doc.isDeleted,
     );
   }
 
@@ -40,7 +43,23 @@ export class UserStoryMapper {
     story: Partial<UserStoryEntity>,
   ): Partial<UserStoryDocument> {
     return {
-      ...story,
+      companyId: story.companyId,
+      projectId: story.projectId,
+      storyNumber: story.storyNumber, 
+      title: story.title,
+      description: story.description,
+      acceptanceCriteria: story.acceptanceCriteria,
+      assigneeId: story.assigneeId,
+      status: story.status,
+      priority: story.priority,
+      type: story.type,
+      order: story.order,
+      createdBy: story.createdBy,
+      storyPoints: story.storyPoints,
+      isInBacklog: story.isInBacklog,
+      attachments: story.attachments,
+      links: story.links,
+      isDeleted: story.isDeleted,
     } as Partial<UserStoryDocument>;
   }
 }

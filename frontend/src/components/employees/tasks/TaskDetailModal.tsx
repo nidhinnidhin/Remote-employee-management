@@ -93,11 +93,23 @@ export default function TaskDetailModal({ task, isOpen, onClose }: TaskDetailMod
 
   if (!task) return null;
 
+  const calculateWorkedHours = () => {
+    if (!task?.startedAt) return "0.0";
+    const start = new Date(task.startedAt).getTime();
+    const end = task.completedAt ? new Date(task.completedAt).getTime() : new Date().getTime();
+    
+    const diffMs = end - start;
+    if (diffMs <= 0) return "0.0";
+    
+    const diffHrs = diffMs / (1000 * 60 * 60);
+    return diffHrs.toFixed(1);
+  };
+
   const detailItems = [
     { label: "Estimated", value: `${task.estimatedHours || 0} hrs`, icon: Clock },
-    { label: "Actual Spent", value: `${task.actualHours || 0} hrs`, icon: CheckCircle2 },
+    { label: "Auto Time", value: `${calculateWorkedHours()} hrs`, icon: CheckCircle2 },
+    { label: "Manual Log", value: `${task.actualHours || 0} hrs`, icon: AlignLeft },
     { label: "Due Date", value: task.dueDate ? formatDate(task.dueDate) : "No Date", icon: Calendar },
-    { label: "Task ID", value: task.id.slice(-8).toUpperCase(), icon: Hash },
   ];
 
   return (

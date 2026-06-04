@@ -51,7 +51,7 @@ export default function EmployeeStoryCard({
 
           <div className="flex flex-col min-w-0">
             <div className="flex items-center gap-2">
-              <span className="text-[9px] font-black text-accent/50 uppercase tracking-tighter">US-{story.id?.toString().slice(-3) || '00'}</span>
+              <span className="text-[9px] font-black text-accent/50 uppercase tracking-tighter">US-{story.storyNumber || 'NEW'}</span>
               <h4 className="text-[14px] font-bold text-white tracking-tight truncate">
                 {story.title}
               </h4>

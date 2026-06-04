@@ -5,4 +5,5 @@ import { CompanyDocument } from '../../infrastructure/database/mongoose/schemas/
 export interface ICompanyRepository extends IBaseRepository<CompanyDocument, CompanyEntity> {
   findByEmail(email: string): Promise<CompanyEntity | null>;
   create(company: CompanyEntity): Promise<CompanyEntity>;
+  incrementAndGetProjectCounter(companyId: string): Promise<number>;
 }

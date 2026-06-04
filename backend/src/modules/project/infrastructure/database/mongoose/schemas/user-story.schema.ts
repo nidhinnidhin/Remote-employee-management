@@ -12,6 +12,9 @@ export class UserStoryDocument extends Document {
   @Prop({ required: true, type: Types.ObjectId, ref: 'ProjectDocument', index: true })
   projectId!: string;
 
+  @Prop({ required: true, type: Number, index: true })
+  storyNumber!: number;
+
   @Prop({ required: true })
   title!: string;
 

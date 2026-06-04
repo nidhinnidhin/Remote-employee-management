@@ -15,6 +15,7 @@ export class ProjectMapper {
       projectDoc._id.toString(),
       projectDoc.companyId,
       projectDoc.name || 'Unnamed Project',
+      projectDoc.projectNumber || 0,
       (projectDoc.status as ProjectStatus) || ProjectStatus.PLANNING,
       projectDoc.createdBy?.toString() || '',
       projectDoc.description || '',
@@ -24,6 +25,7 @@ export class ProjectMapper {
       projectDoc.updatedAt || new Date(),
       !!projectDoc.isDeleted,
       projectDoc.members || [],
+      projectDoc.taskCounter || 0,
     );
   }
 

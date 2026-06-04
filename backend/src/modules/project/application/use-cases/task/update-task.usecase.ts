@@ -9,6 +9,7 @@ import type { IUpdateTaskUseCase } from '../../interfaces/task/task-use-cases.in
 import { UpdateTaskDto } from '../../dto/task/update-task.dto';
 import { TaskEntity } from '../../../domain/entities/task.entity';
 import { UserRole } from 'src/shared/enums/user/user-role.enum';
+import { TaskStatus } from 'src/shared/enums/project/task-status.enum';
 import type { ICreateNotificationUseCase } from 'src/modules/notification/application/interfaces/notification-use-cases.interface';
 import { NotificationType } from 'src/modules/notification/domain/entities/notification.entity';
 
@@ -25,7 +26,7 @@ export class UpdateTaskUseCase implements IUpdateTaskUseCase {
 
     @Inject('ICreateActivityLogUseCase')
     private readonly _createLogUseCase: ICreateActivityLogUseCase,
-  ) { }
+  ) {}
 
   async execute(
     id: string,
@@ -43,21 +44,40 @@ export class UpdateTaskUseCase implements IUpdateTaskUseCase {
       throw new ForbiddenException('You can only update tasks assigned to you');
     }
 
-    const updateData: Partial<TaskEntity> = {
+    const updateData: any = {
       ...taskDto,
       dueDate: taskDto.dueDate ? new Date(taskDto.dueDate) : undefined,
     };
 
+    if (taskDto.status) {
+      if (
+        taskDto.status === TaskStatus.DONE &&
+        task.status !== TaskStatus.DONE
+      ) {
+        updateData.completedAt = new Date();
+      } else if (
+        taskDto.status !== TaskStatus.DONE &&
+        task.status === TaskStatus.DONE
+      ) {
+        updateData.completedAt = null;
+      }
+    }
+
     const updated = await this._taskRepository.updateTask(
       id,
       companyId,
-      updateData,
+      updateData as Partial<TaskEntity>,
     );
+
     if (!updated) {
       throw new NotFoundException('Task not found');
     }
 
-    if (taskDto.assignedTo && taskDto.assignedTo !== task.assignedTo && taskDto.assignedTo !== userId) {
+    if (
+      taskDto.assignedTo &&
+      taskDto.assignedTo !== task.assignedTo &&
+      taskDto.assignedTo !== userId
+    ) {
       try {
         await this._createNotificationUseCase.execute(companyId, {
           recipientId: taskDto.assignedTo,
@@ -65,19 +85,24 @@ export class UpdateTaskUseCase implements IUpdateTaskUseCase {
           message: `You have been assigned to task: ${updated.title}`,
         });
       } catch (error) {
-        console.error(`Failed to send notification to ${taskDto.assignedTo}:`, error);
+        console.error(
+          `Failed to send notification to ${taskDto.assignedTo}:`,
+          error,
+        );
       }
     }
 
-    await this._createLogUseCase.execute({
-      companyId,
-      userId,
-      userRole: role,
-      action: ActivityAction.UPDATE,
-      details: `Updated task parameters on: "${updated.title}" (ID: ${id}).`,
-    }).catch((err) => {
-      console.error('[UpdateTaskUseCase] Activity log failed:', err.message);
-    });
+    await this._createLogUseCase
+      .execute({
+        companyId,
+        userId,
+        userRole: role,
+        action: ActivityAction.UPDATE,
+        details: `Updated task parameters on: "${updated.title}" (ID: ${id}).`,
+      })
+      .catch((err) => {
+        console.error('[UpdateTaskUseCase] Activity log failed:', err.message);
+      });
 
     return updated;
   }

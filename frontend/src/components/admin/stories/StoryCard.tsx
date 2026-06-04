@@ -38,7 +38,6 @@ const StoryCard: React.FC<StoryCardProps> = ({
   const [commentsOpen, setCommentsOpen] = useState(false);
   const assignee = employees.find((e) => e.id === story.assigneeId);
 
-  // REFINED: Thicker Zinc border for better structure
   const zincBorder = "border-zinc-700/80";
 
   return (
@@ -57,9 +56,14 @@ const StoryCard: React.FC<StoryCardProps> = ({
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex flex-col min-w-0 flex-1">
-          <h4 className="text-[14px] font-bold text-primary truncate leading-tight">
-            {story.title}
-          </h4>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-black tracking-widest uppercase text-accent bg-accent/10 border border-accent/20 px-1.5 py-0.5 rounded">
+              US-{story.storyNumber || 'NEW'}
+            </span>
+            <h4 className="text-[14px] font-bold text-primary truncate leading-tight">
+              {story.title}
+            </h4>
+          </div>
           {!isExpanded && story.description && (
             <p className="text-[11px] text-muted/40 truncate max-w-[400px] mt-0.5">
               {story.description}
