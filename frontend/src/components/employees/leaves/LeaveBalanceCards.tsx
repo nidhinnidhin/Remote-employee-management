@@ -18,14 +18,14 @@ export const LeaveBalanceCards: React.FC<LeaveBalanceCardsProps> = ({
       {balances.map((balance) => (
         <div
           key={balance.leaveType}
-          className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group"
+         className="p-6 rounded-2xl border border-slate-200/50 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group"
         >
           <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
             <Plane className="w-16 h-16 text-indigo-600" />
           </div>
           <div className="flex items-center gap-3 mb-4">
             <div className="p-2 bg-indigo-50 rounded-lg text-indigo-600">
-              <CalendarRange className="w-5 h-5" />
+              <CalendarRange className="w-5z h-5" />
             </div>
             <h3 className="font-semibold text-slate-700 capitalize">
               {balance.leaveType.toLowerCase().replace("_", " ")}

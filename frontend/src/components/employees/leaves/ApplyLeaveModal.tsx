@@ -33,13 +33,12 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
     otherLeaveType: "",
     startDate: "",
     endDate: "",
-    durationType: LeaveDurationType.FULL_DAY,
+    durationType: LeaveDurationType.FULL_DAY as LeaveDurationType,
     reason: "",
     emergencyContactName: "",
     emergencyContactPhone: "",
   });
 
-  // Extract names from balance array. Fallback to availableLeaveTypes if empty.
   const dynamicLeaveTypes = useMemo(() => {
     if (balances && balances.length > 0) {
       return balances.map((b) => b.leaveType);
@@ -47,22 +46,23 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
     return availableLeaveTypes;
   }, [balances, availableLeaveTypes]);
 
-  // Construct options for dropdown dynamically. Fallback literal string 'OTHER' replaces old strict enum.
   const leaveTypeOptions = useMemo(() => {
     const types = dynamicLeaveTypes.map((type) => ({
       label: type.replace(/_/g, " "),
       value: type,
     }));
-
     return [...types, { label: "Other", value: "OTHER" }];
   }, [dynamicLeaveTypes]);
 
-  // Set default selection when modal opens
   useEffect(() => {
     if (isOpen && dynamicLeaveTypes.length > 0 && !formData.leaveType) {
       setFormData((prev) => ({ ...prev, leaveType: dynamicLeaveTypes[0] }));
     }
   }, [isOpen, dynamicLeaveTypes, formData.leaveType]);
+
+  const currentBalance = useMemo(() => {
+    return balances.find((b) => b.leaveType === formData.leaveType);
+  }, [balances, formData.leaveType]);
 
   const durationOptions = [
     { label: "Full Day", value: LeaveDurationType.FULL_DAY },
@@ -70,10 +70,84 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
     { label: "Second Half", value: LeaveDurationType.SECOND_HALF },
   ];
 
+  const calculateTotalDays = (): number => {
+    if (!formData.startDate || !formData.endDate) return 0;
+    if (formData.durationType !== LeaveDurationType.FULL_DAY) return 0.5;
+    const start = new Date(formData.startDate);
+    const end = new Date(formData.endDate);
+    const diffTime = Math.abs(end.getTime() - start.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    return isNaN(diffDays) ? 0 : diffDays;
+  };
+
+  const totalDaysRequested = calculateTotalDays();
+
+  // Policy-based validation using allocated/available from LeaveBalance
+  const balanceValidation = useMemo<{
+    status: "ok" | "warning" | "exceeded" | "blocked";
+    message: string;
+  }>(() => {
+    if (!currentBalance || formData.leaveType === "OTHER")
+      return { status: "ok", message: "" };
+    const { available, allocated, consumed, pending } = currentBalance;
+    const leaveLabel = formData.leaveType.replace(/_/g, " ");
+    if (allocated === 0)
+      return {
+        status: "blocked",
+        message: `No "${leaveLabel}" leaves allocated under the current company policy.`,
+      };
+    if (available <= 0)
+      return {
+        status: "blocked",
+        message: `You have used all your "${leaveLabel}" quota (${consumed} consumed + ${pending} pending of ${allocated} allocated).`,
+      };
+    if (totalDaysRequested > available)
+      return {
+        status: "exceeded",
+        message: `Requesting ${totalDaysRequested} day(s) exceeds your available "${leaveLabel}" balance of ${available} day(s). Company policy limit: ${allocated} days.`,
+      };
+    if (available - totalDaysRequested <= 1 && totalDaysRequested > 0)
+      return {
+        status: "warning",
+        message: `After this request you will have ${Math.max(0, available - totalDaysRequested).toFixed(1)} "${leaveLabel}" day(s) remaining.`,
+      };
+    return { status: "ok", message: "" };
+  }, [currentBalance, totalDaysRequested, formData.leaveType]);
+
+  const isBlocked =
+    balanceValidation.status === "blocked" ||
+    balanceValidation.status === "exceeded";
+
+  const usagePercent =
+    currentBalance && currentBalance.allocated > 0
+      ? Math.min(
+          100,
+          Math.round(
+            ((currentBalance.consumed + currentBalance.pending) /
+              currentBalance.allocated) *
+              100
+          )
+        )
+      : 0;
+
+  const projectedPercent =
+    currentBalance && currentBalance.allocated > 0
+      ? Math.min(
+          100,
+          Math.round(
+            ((currentBalance.consumed + currentBalance.pending + totalDaysRequested) /
+              currentBalance.allocated) *
+              100
+          )
+        )
+      : 0;
+
+  // Resolved possible type mismatch signature for form events
   const handleDropdownChange =
     (field: keyof typeof formData) =>
-    (e: { target: { name: string; value: string } }) => {
-      setFormData({ ...formData, [field]: e.target.value });
+    (e: any) => {
+      const val = e?.target ? e.target.value : e;
+      setFormData((prev) => ({ ...prev, [field]: val }));
     };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,41 +156,27 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
     }
   };
 
-  // Helper to dynamically calculate total leave days requested
-  const calculateTotalDays = (): number => {
-    if (!formData.startDate || !formData.endDate) return 1;
-    if (formData.durationType !== LeaveDurationType.FULL_DAY) return 0.5;
-
-    const start = new Date(formData.startDate);
-    const end = new Date(formData.endDate);
-    const diffTime = Math.abs(end.getTime() - start.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-    return isNaN(diffDays) ? 1 : diffDays;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (isBlocked) {
+      toast.error(balanceValidation.message || "Leave quota exceeded per company policy.");
+      return;
+    }
     if (!formData.startDate || !formData.endDate) {
       toast.error("Start and end dates are required");
       return;
     }
-
     if (new Date(formData.startDate) > new Date(formData.endDate)) {
       toast.error("End date cannot be before start date");
       return;
     }
-
-    if (!formData.reason.trim()) {
-      toast.error("Reason is required");
+    if (!formData.emergencyContactName.trim() || !formData.emergencyContactPhone.trim()) {
+      toast.error("Emergency contact details are required");
       return;
     }
-
-    if (
-      !formData.emergencyContactName.trim() ||
-      !formData.emergencyContactPhone.trim()
-    ) {
-      toast.error("Emergency contact details are required");
+    if (!formData.reason.trim()) {
+      toast.error("Reason is required");
       return;
     }
 
@@ -131,28 +191,16 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
     }
 
     setLoading(true);
-
-    // Construct native FormData transport map to safely clear Server Action boundaries
     const submissionData = new FormData();
     submissionData.append("leaveType", finalLeaveType);
     submissionData.append("startDate", formData.startDate);
     submissionData.append("endDate", formData.endDate);
     submissionData.append("durationType", formData.durationType);
-    submissionData.append("totalDays", String(calculateTotalDays()));
+    submissionData.append("totalDays", String(totalDaysRequested));
     submissionData.append("reason", formData.reason);
-    submissionData.append(
-      "emergencyContactName",
-      formData.emergencyContactName,
-    );
-    submissionData.append(
-      "emergencyContactPhone",
-      formData.emergencyContactPhone,
-    );
-
-    // Append binary file objects to array track keys
-    selectedFiles.forEach((file) => {
-      submissionData.append("attachments", file);
-    });
+    submissionData.append("emergencyContactName", formData.emergencyContactName);
+    submissionData.append("emergencyContactPhone", formData.emergencyContactPhone);
+    selectedFiles.forEach((file) => submissionData.append("attachments", file));
 
     const result = await applyLeaveAction(submissionData);
 
@@ -179,13 +227,106 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
   };
 
   return (
-    <BaseModal
-      isOpen={isOpen}
-      onClose={onClose}
-      title="Apply for Leave"
-      maxWidth="max-w-2xl"
-    >
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <BaseModal isOpen={isOpen} onClose={onClose} title="Apply for Leave" maxWidth="max-w-2xl">
+      <form onSubmit={handleSubmit} className="space-y-5">
+
+        {/* ── Live Balance Preview Panel ── */}
+        {currentBalance && (
+          <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                {formData.leaveType.replace(/_/g, " ")} — Policy Balance
+              </span>
+              <span className="text-[10px] text-slate-500">
+                Policy Limit: <strong className="text-slate-300">{currentBalance.allocated} days</strong>
+              </span>
+            </div>
+
+            {/* Stats row */}
+            <div className="grid grid-cols-4 gap-2 text-center">
+              {[
+                { label: "Allocated", value: currentBalance.allocated, colorClass: "text-slate-200" },
+                { label: "Consumed",  value: currentBalance.consumed,  colorClass: "text-orange-400" },
+                { label: "Pending",   value: currentBalance.pending,   colorClass: "text-amber-400" },
+                {
+                  label: "Available",
+                  value: currentBalance.available,
+                  colorClass:
+                    currentBalance.available <= 0
+                      ? "text-red-400"
+                      : currentBalance.available <= 2
+                      ? "text-yellow-400"
+                      : "text-emerald-400",
+                },
+              ].map((s) => (
+                <div key={s.label} className="p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] flex flex-col items-center gap-0.5">
+                  <span className={`text-xl font-black leading-none ${s.colorClass}`}>{s.value}</span>
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600">{s.label}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Usage progress bar */}
+            <div className="space-y-1">
+              <div className="flex justify-between text-[10px] text-slate-500">
+                <span>Usage</span>
+                <span>
+                  {usagePercent}% used
+                  {totalDaysRequested > 0 && ` → ${projectedPercent}% after this request`}
+                </span>
+              </div>
+              <div className="h-2.5 w-full bg-white/[0.05] rounded-full overflow-hidden relative">
+                <div
+                  className="absolute left-0 top-0 h-full rounded-full transition-all duration-500"
+                  style={{ width: `${usagePercent}%`, background: usagePercent >= 100 ? "#ef4444" : "#f97316" }}
+                />
+                {totalDaysRequested > 0 && projectedPercent > usagePercent && (
+                  <div
+                    className="absolute top-0 h-full rounded-full transition-all duration-500"
+                    style={{
+                      left: `${usagePercent}%`,
+                      width: `${Math.min(projectedPercent - usagePercent, 100 - usagePercent)}%`,
+                      background: balanceValidation.status === "exceeded" ? "rgba(239,68,68,0.85)" : "rgba(251,191,36,0.85)",
+                    }}
+                  />
+                )}
+              </div>
+              {totalDaysRequested > 0 && (
+                <p className="text-[10px] text-slate-500">
+                  Requesting <strong className="text-slate-200">{totalDaysRequested} day(s)</strong>
+                  {" · "}Remaining after approval:{" "}
+                  <strong
+                    className={
+                      Math.max(0, currentBalance.available - totalDaysRequested) <= 0
+                        ? "text-red-400"
+                        : Math.max(0, currentBalance.available - totalDaysRequested) <= 2
+                        ? "text-yellow-400"
+                        : "text-emerald-400"
+                    }
+                  >
+                    {Math.max(0, currentBalance.available - totalDaysRequested).toFixed(1)} day(s)
+                  </strong>
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ── Validation Alert Banner ── */}
+        {balanceValidation.message && (
+          <div
+            className={`flex items-start gap-3 px-4 py-3 rounded-xl border text-[13px] font-medium ${
+              isBlocked
+                ? "bg-red-500/10 border-red-500/30 text-red-400"
+                : "bg-amber-500/10 border-amber-500/30 text-amber-300"
+            }`}
+          >
+            <span className="mt-0.5 shrink-0 text-base leading-none">{isBlocked ? "🚫" : "⚠️"}</span>
+            {balanceValidation.message}
+          </div>
+        )}
+
+        {/* Form Fields */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <FormDropdown
@@ -205,9 +346,7 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
                   type="text"
                   placeholder="E.g. Study Leave"
                   value={formData.otherLeaveType}
-                  onChange={(e) =>
-                    setFormData({ ...formData, otherLeaveType: e.target.value })
-                  }
+                  onChange={(e: any) => setFormData({ ...formData, otherLeaveType: e.target.value })}
                   required
                 />
               </div>
@@ -229,9 +368,7 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
             name="startDate"
             type="date"
             value={formData.startDate}
-            onChange={(e) =>
-              setFormData({ ...formData, startDate: e.target.value })
-            }
+            onChange={(e: any) => setFormData({ ...formData, startDate: e.target.value })}
             required
           />
 
@@ -240,9 +377,7 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
             name="endDate"
             type="date"
             value={formData.endDate}
-            onChange={(e) =>
-              setFormData({ ...formData, endDate: e.target.value })
-            }
+            onChange={(e: any) => setFormData({ ...formData, endDate: e.target.value })}
             required
           />
 
@@ -252,9 +387,7 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
             type="text"
             placeholder="Name of contact person"
             value={formData.emergencyContactName}
-            onChange={(e) =>
-              setFormData({ ...formData, emergencyContactName: e.target.value })
-            }
+            onChange={(e: any) => setFormData({ ...formData, emergencyContactName: e.target.value })}
             required
           />
 
@@ -264,12 +397,7 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
             type="tel"
             placeholder="Phone number"
             value={formData.emergencyContactPhone}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                emergencyContactPhone: e.target.value,
-              })
-            }
+            onChange={(e: any) => setFormData({ ...formData, emergencyContactPhone: e.target.value })}
             required
           />
         </div>
@@ -283,9 +411,7 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
             rows={3}
             placeholder="Please provide a brief reason..."
             value={formData.reason}
-            onChange={(e) =>
-              setFormData({ ...formData, reason: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
             required
           />
         </div>
@@ -312,15 +438,16 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
         </div>
 
         <div className="flex justify-end gap-3 pt-4 border-t border-slate-100/10">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onClose}
-            disabled={loading}
-          >
+          <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
             Cancel
           </Button>
-          <Button type="submit" variant="primary" isLoading={loading}>
+          <Button
+            type="submit"
+            variant="primary"
+            isLoading={loading}
+            disabled={isBlocked || loading}
+            title={isBlocked ? balanceValidation.message : undefined}
+          >
             Submit Request
           </Button>
         </div>
