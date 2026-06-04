@@ -1,6 +1,6 @@
 import { Types, FlattenMaps } from 'mongoose';
-import { UserStoryEntity } from '../../domain/entities/user-story.entity';
-import { UserStoryDocument } from '../../infrastructure/database/mongoose/schemas/user-story.schema';
+import { UserStoryEntity } from '../../../domain/entities/user-story.entity';
+import { UserStoryDocument } from '../../../infrastructure/database/mongoose/schemas/user-story.schema';
 import { UserStoryStatus } from 'src/shared/enums/project/user-story-status.enum';
 import { UserStoryPriority } from 'src/shared/enums/project/user-story-priority.enum';
 import { IssueType } from 'src/shared/enums/project/issue-type.enum';

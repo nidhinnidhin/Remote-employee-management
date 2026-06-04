@@ -1,6 +1,6 @@
 import { Types, FlattenMaps } from 'mongoose';
-import { TaskEntity } from '../../domain/entities/task.entity';
-import { TaskDocument } from '../../infrastructure/database/mongoose/schemas/task.schema';
+import { TaskEntity } from 'src/modules/project/domain/entities/task.entity';
+import { TaskDocument } from 'src/modules/project/infrastructure/database/mongoose/schemas/task.schema';
 import { TaskStatus } from 'src/shared/enums/project/task-status.enum';
 import { UserStoryPriority } from 'src/shared/enums/project/user-story-priority.enum';
 

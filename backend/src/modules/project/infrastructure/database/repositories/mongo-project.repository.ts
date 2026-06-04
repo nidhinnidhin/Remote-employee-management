@@ -5,10 +5,8 @@ import { ProjectEntity } from '../../../domain/entities/project.entity';
 import type { IProjectRepository } from '../../../domain/repositories/project.repository.interface';
 import { ProjectDocument } from '../mongoose/schemas/project.schema';
 import { BaseRepository } from 'src/shared/repositories/base.repository';
-import {
-  LeanProjectDocument,
-  ProjectMapper,
-} from 'src/modules/project/application/mappers/project.mapper';
+import { LeanProjectDocument, ProjectMapper } from 'src/modules/project/application/mappers/project/project.mapper';
+
 
 @Injectable()
 export class MongoProjectRepository

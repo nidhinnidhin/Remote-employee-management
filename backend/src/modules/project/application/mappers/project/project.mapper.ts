@@ -1,6 +1,6 @@
 import { Types, FlattenMaps } from 'mongoose';
-import { ProjectEntity } from '../../domain/entities/project.entity';
-import { ProjectDocument } from '../../infrastructure/database/mongoose/schemas/project.schema';
+import { ProjectEntity } from 'src/modules/project/domain/entities/project.entity';
+import { ProjectDocument } from 'src/modules/project/infrastructure/database/mongoose/schemas/project.schema';
 import { ProjectStatus } from 'src/shared/enums/project/project-status.enum';
 
 export type LeanProjectDocument = FlattenMaps<ProjectDocument> & {

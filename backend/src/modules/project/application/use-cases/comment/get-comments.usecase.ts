@@ -1,22 +1,28 @@
 import { Inject, Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
-import type { ICommentRepository } from '../../domain/repositories/comment.repository.interface';
-import type { IProjectRepository } from '../../domain/repositories/project.repository.interface';
-import type { ITaskRepository } from '../../domain/repositories/task.repository.interface';
-import type { IUserStoryRepository } from '../../domain/repositories/user-story.repository.interface';
+import type { ICommentRepository } from '../../../domain/repositories/comment.repository.interface';
+import type { IProjectRepository } from '../../../domain/repositories/project.repository.interface';
+import type { ITaskRepository } from '../../../domain/repositories/task.repository.interface';
+import type { IUserStoryRepository } from '../../../domain/repositories/user-story.repository.interface';
 import { CommentEntityType } from 'src/shared/enums/project/comment-entity-type.enum';
-import { CommentEntity } from '../../domain/entities/comment.entity';
+import { CommentEntity } from '../../../domain/entities/comment.entity';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { UserDocument } from '../../../auth/infrastructure/database/mongoose/schemas/userSchema';
+import { UserDocument } from '../../../../auth/infrastructure/database/mongoose/schemas/userSchema';
+import type { IGetCommentsUseCase } from '../../interfaces/comment/comment-use-cases.interface';
 
 @Injectable()
-export class GetCommentsUseCase {
+export class GetCommentsUseCase implements IGetCommentsUseCase {
   constructor(
-    @Inject('ICommentRepository') private readonly commentRepository: ICommentRepository,
-    @Inject('IProjectRepository') private readonly projectRepository: IProjectRepository,
-    @Inject('ITaskRepository') private readonly taskRepository: ITaskRepository,
-    @Inject('IUserStoryRepository') private readonly userStoryRepository: IUserStoryRepository,
-    @InjectModel(UserDocument.name) private readonly userModel: Model<UserDocument>,
+    @Inject('ICommentRepository')
+    private readonly _commentRepository: ICommentRepository,
+    @Inject('IProjectRepository')
+    private readonly _projectRepository: IProjectRepository,
+    @Inject('ITaskRepository')
+    private readonly _taskRepository: ITaskRepository,
+    @Inject('IUserStoryRepository')
+    private readonly _userStoryRepository: IUserStoryRepository,
+    @InjectModel(UserDocument.name)
+    private readonly _userModel: Model<UserDocument>,
   ) {}
 
   async execute(companyId: string, userId: string, entityId: string, entityType: CommentEntityType): Promise<CommentEntity[]> {
@@ -27,13 +33,13 @@ export class GetCommentsUseCase {
         projectId = entityId;
         break;
       case CommentEntityType.USER_STORY: {
-        const story = await this.userStoryRepository.findByIdAndCompany(entityId, companyId);
+        const story = await this._userStoryRepository.findByIdAndCompany(entityId, companyId);
         if (!story) throw new NotFoundException('User Story not found');
         projectId = story.projectId;
         break;
       }
       case CommentEntityType.TASK: {
-        const task = await this.taskRepository.findByIdAndCompany(entityId, companyId);
+        const task = await this._taskRepository.findByIdAndCompany(entityId, companyId);
         if (!task) throw new NotFoundException('Task not found');
         projectId = task.projectId;
         break;
@@ -42,17 +48,17 @@ export class GetCommentsUseCase {
         throw new NotFoundException('Entity type not supported');
     }
 
-    const project = await this.projectRepository.findByIdAndCompany(projectId, companyId);
+    const project = await this._projectRepository.findByIdAndCompany(projectId, companyId);
     if (!project) throw new NotFoundException('Project not found');
 
     if (!project.members.includes(userId) && project.createdBy !== userId) {
       throw new ForbiddenException('You must be a member of this project to view comments');
     }
 
-    const comments = await this.commentRepository.findByEntityId(entityId, entityType);
+    const comments = await this._commentRepository.findByEntityId(entityId, entityType);
 
     const authorIds = [...new Set(comments.map((c) => c.authorId))];
-    const users = await this.userModel.find({ _id: { $in: authorIds } }, 'firstName lastName').lean().exec();
+    const users = await this._userModel.find({ _id: { $in: authorIds } }, 'firstName lastName').lean().exec();
 
     const userMap = new Map<string, string>();
     users.forEach((u) => {

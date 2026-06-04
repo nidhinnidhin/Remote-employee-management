@@ -1,9 +1,21 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ProjectDocument, ProjectSchema } from './infrastructure/database/mongoose/schemas/project.schema';
-import { UserStoryDocument, UserStorySchema } from './infrastructure/database/mongoose/schemas/user-story.schema';
-import { TaskDocument, TaskSchema } from './infrastructure/database/mongoose/schemas/task.schema';
-import { SprintDocument, SprintSchema } from './infrastructure/database/mongoose/schemas/sprint.schema';
+import {
+  ProjectDocument,
+  ProjectSchema,
+} from './infrastructure/database/mongoose/schemas/project.schema';
+import {
+  UserStoryDocument,
+  UserStorySchema,
+} from './infrastructure/database/mongoose/schemas/user-story.schema';
+import {
+  TaskDocument,
+  TaskSchema,
+} from './infrastructure/database/mongoose/schemas/task.schema';
+import {
+  SprintDocument,
+  SprintSchema,
+} from './infrastructure/database/mongoose/schemas/sprint.schema';
 import { MongoProjectRepository } from './infrastructure/database/repositories/mongo-project.repository';
 import { MongoUserStoryRepository } from './infrastructure/database/repositories/mongo-user-story.repository';
 import { MongoTaskRepository } from './infrastructure/database/repositories/mongo-task.repository';
@@ -40,12 +52,18 @@ import { AuthModule } from '../auth/presentation/auth/auth.module';
 import { SubscriptionModule } from '../subscription/subscription.module';
 import { ChatModule } from '../chat/chat.module';
 import { NotificationModule } from '../notification/notification.module';
-import { CommentDocument, CommentSchema } from './infrastructure/database/mongoose/schemas/comment.schema';
+import {
+  CommentDocument,
+  CommentSchema,
+} from './infrastructure/database/mongoose/schemas/comment.schema';
 import { MongoCommentRepository } from './infrastructure/database/repositories/mongo-comment.repository';
-import { AddCommentUseCase } from './application/use-cases/add-comment.usecase';
-import { GetCommentsUseCase } from './application/use-cases/get-comments.usecase';
+import { AddCommentUseCase } from './application/use-cases/comment/add-comment.usecase';
+import { GetCommentsUseCase } from './application/use-cases/comment/get-comments.usecase';
 import { CommentController } from './presentation/controllers/comment.controller';
-import { UserDocument, UserSchema } from '../auth/infrastructure/database/mongoose/schemas/userSchema';
+import {
+  UserDocument,
+  UserSchema,
+} from '../auth/infrastructure/database/mongoose/schemas/userSchema';
 
 // 🔹 Import ActivityLogsModule
 import { ActivityLogsModule } from '../activity-logs/activity-logs.module';
@@ -66,7 +84,13 @@ import { ActivityLogsModule } from '../activity-logs/activity-logs.module';
       { name: UserDocument.name, schema: UserSchema },
     ]),
   ],
-  controllers: [ProjectController, StoryController, TaskController, SprintController, CommentController],
+  controllers: [
+    ProjectController,
+    StoryController,
+    TaskController,
+    SprintController,
+    CommentController,
+  ],
   providers: [
     // Repositories
     {
@@ -93,6 +117,14 @@ import { ActivityLogsModule } from '../activity-logs/activity-logs.module';
     {
       provide: 'ICreateProjectUseCase',
       useClass: CreateProjectUseCase,
+    },
+    {
+      provide: 'IAddCommentUseCase',
+      useClass: AddCommentUseCase,
+    },
+    {
+      provide: 'IGetCommentsUseCase',
+      useClass: GetCommentsUseCase,
     },
     {
       provide: 'IGetProjectUseCase',
@@ -189,9 +221,9 @@ import { ActivityLogsModule } from '../activity-logs/activity-logs.module';
       provide: 'IDeleteSprintUseCase',
       useClass: DeleteSprintUseCase,
     },
-    AddCommentUseCase,
-    GetCommentsUseCase,
+    // AddCommentUseCase,
+    // GetCommentsUseCase,
   ],
   exports: ['IProjectRepository', 'ICommentRepository'],
 })
-export class ProjectModule { }
+export class ProjectModule {}

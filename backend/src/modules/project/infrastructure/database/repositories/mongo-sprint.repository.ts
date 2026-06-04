@@ -5,10 +5,7 @@ import { SprintEntity } from '../../../domain/entities/sprint.entity';
 import type { ISprintRepository } from '../../../domain/repositories/sprint.repository.interface';
 import { SprintDocument } from '../mongoose/schemas/sprint.schema';
 import { BaseRepository } from 'src/shared/repositories/base.repository';
-import {
-  LeanSprintDocument,
-  SprintMapper,
-} from 'src/modules/project/application/mappers/sprint.mapper';
+import { LeanSprintDocument, SprintMapper } from 'src/modules/project/application/mappers/sprint/sprint.mapper';
 
 @Injectable()
 export class MongoSprintRepository

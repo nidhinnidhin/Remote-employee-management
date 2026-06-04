@@ -5,7 +5,6 @@ export type LeanStoryDocument = Omit<UserStoryDocument, keyof import('mongoose')
 
 export class UserStoryMapper {
   static toDomain(raw: UserStoryDocument | LeanStoryDocument): UserStoryEntity {
-    // Explicitly casting variables before passing to guarantee types match up perfectly
     const id = raw._id ? raw._id.toString() : '';
     const companyId = raw.companyId || '';
     const projectId = raw.projectId ? raw.projectId.toString() : '';

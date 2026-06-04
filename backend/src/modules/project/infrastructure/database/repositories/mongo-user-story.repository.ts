@@ -8,7 +8,7 @@ import { BaseRepository } from 'src/shared/repositories/base.repository'; // Adj
 import {
   LeanStoryDocument,
   UserStoryMapper,
-} from 'src/modules/project/application/mappers/user-story.mapper';
+} from 'src/modules/project/application/mappers/story/user-story.mapper';
 
 @Injectable()
 export class MongoUserStoryRepository

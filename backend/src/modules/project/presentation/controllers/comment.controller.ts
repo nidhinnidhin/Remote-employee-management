@@ -13,29 +13,31 @@ import {
 import { FilesInterceptor } from '@nestjs/platform-express';
 import type { Request } from 'express';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
-import { CreateCommentDto } from '../../application/dto/create-comment.dto';
-import { AddCommentUseCase } from '../../application/use-cases/add-comment.usecase';
-import { GetCommentsUseCase } from '../../application/use-cases/get-comments.usecase';
+import { CreateCommentDto } from '../../application/dto/comment/create-comment.dto';
+import type {
+  IAddCommentUseCase,
+  IGetCommentsUseCase,
+} from '../../application/interfaces/comment/comment-use-cases.interface';
 import { CommentEntityType } from 'src/shared/enums/project/comment-entity-type.enum';
 
 @Controller('comments')
 @UseGuards(JwtAuthGuard)
 export class CommentController {
   constructor(
-    @Inject(AddCommentUseCase)
-    private readonly addCommentUseCase: AddCommentUseCase,
-    @Inject(GetCommentsUseCase)
-    private readonly getCommentsUseCase: GetCommentsUseCase,
+    @Inject('IAddCommentUseCase')
+    private readonly _addCommentUseCase: IAddCommentUseCase,
+    @Inject('IGetCommentsUseCase')
+    private readonly _getCommentsUseCase: IGetCommentsUseCase,
   ) {}
 
   @Post()
-  @UseInterceptors(FilesInterceptor('files')) // Intercepts multipart media arrays
+  @UseInterceptors(FilesInterceptor('files'))
   async create(
     @Req() req: Request, 
     @Body() dto: CreateCommentDto,
     @UploadedFiles() files: Express.Multer.File[],
   ) {
-    return this.addCommentUseCase.execute(
+    return this._addCommentUseCase.execute(
       req.user!.companyId!, 
       req.user!.userId, 
       dto,
@@ -49,7 +51,7 @@ export class CommentController {
     @Param('entityType') entityType: CommentEntityType,
     @Param('entityId') entityId: string,
   ) {
-    return this.getCommentsUseCase.execute(
+    return this._getCommentsUseCase.execute(
       req.user!.companyId!,
       req.user!.userId,
       entityId,

@@ -37,27 +37,64 @@ export default function ProjectCommentsModal({
   
   const [attachments, setAttachments] = useState<AttachedFile[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  const fetchComments = useCallback(async () => {
-    setLoading(true);
+  // Instantly snaps scroll to the bottom maximum boundary
+  const scrollToBottom = useCallback((behavior: "smooth" | "instant" = "instant") => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({
+        top: scrollContainerRef.current.scrollHeight,
+        behavior,
+      });
+    }
+  }, []);
+
+  const fetchComments = useCallback(async (skipGlobalLoading = false) => {
+    if (!skipGlobalLoading) setLoading(true);
     const result = await getCommentsAction(entityType, entityId);
     if (result.success && result.data) {
       setComments(result.data);
     } else {
       toast.error(result.error || "Failed to load comments");
     }
-    setLoading(false);
+    if (!skipGlobalLoading) setLoading(false);
   }, [entityId, entityType]);
 
+  // Initial Open Trigger Sequence
   useEffect(() => {
     if (isOpen) {
-      fetchComments();
+      fetchComments(false).then(() => {
+        // Enforce sequential ticks to handle delayed modal animation paint times
+        requestAnimationFrame(() => {
+          scrollToBottom("instant");
+          setTimeout(() => scrollToBottom("instant"), 50);
+          setTimeout(() => scrollToBottom("instant"), 180);
+        });
+      });
       setReplyTo(null);
       setNewComment("");
       attachments.forEach(attr => URL.revokeObjectURL(attr.previewUrl));
       setAttachments([]);
     }
-  }, [isOpen, fetchComments]);
+  }, [isOpen, fetchComments, scrollToBottom]);
+
+  // MutationObserver: Keeps the scroll locked to the bottom instantly as nodes append
+  useEffect(() => {
+    if (!isOpen || !scrollContainerRef.current) return;
+
+    const observer = new MutationObserver(() => {
+      scrollToBottom("instant");
+    });
+
+    observer.observe(scrollContainerRef.current, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+
+    return () => observer.disconnect();
+  }, [isOpen, scrollToBottom]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
@@ -107,7 +144,10 @@ export default function ProjectCommentsModal({
       setReplyTo(null);
       attachments.forEach(attr => URL.revokeObjectURL(attr.previewUrl));
       setAttachments([]);
-      fetchComments();
+      
+      // Background re-fetch payload to avoid breaking UI layout skeletons
+      await fetchComments(true);
+      setTimeout(() => scrollToBottom("smooth"), 50);
     } else {
       toast.error(result.error || "Failed to add comment");
     }
@@ -145,7 +185,12 @@ export default function ProjectCommentsModal({
               title="View attachment"
             >
               {isImage ? (
-                <img src={url} alt="Attachment" className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                <img 
+                  src={url} 
+                  alt="Attachment" 
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" 
+                  onLoad={() => scrollToBottom("instant")}
+                />
               ) : (
                 <FileText size={20} className="text-slate-400" />
               )}
@@ -161,8 +206,14 @@ export default function ProjectCommentsModal({
 
   return (
     <BaseModal isOpen={isOpen} onClose={onClose} title={title}>
-      <div className="flex flex-col h-[60vh] max-h-[600px]">
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+      {/* Container wraps inner views to lock scroll parameters */}
+      <div className="flex flex-col h-[60vh] max-h-[600px] relative overflow-hidden">
+        
+        {/* Comment list container scrolls independently */}
+        <div 
+          ref={scrollContainerRef}
+          className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar pb-6"
+        >
           {loading ? (
             <div className="flex items-center justify-center h-full">
               <Loader2 className="animate-spin text-accent" size={24} />
@@ -220,7 +271,8 @@ export default function ProjectCommentsModal({
           )}
         </div>
 
-        <div className="p-4 border-t border-white/[0.08] bg-surface/50 space-y-3">
+        {/* Form elements stay completely fixed at the bottom wrapper */}
+        <div className="shrink-0 p-4 border-t border-white/[0.08] space-y-3 sticky bottom-0 z-10 w-full">
           {replyTo && (
             <div className="flex items-center justify-between px-3 py-1.5 bg-accent/10 border border-accent/20 rounded-lg">
               <span className="text-xs text-accent">Replying to comment</span>
@@ -255,6 +307,7 @@ export default function ProjectCommentsModal({
             
             <button
               type="button"
+              disabled={submitting}
               onClick={() => fileInputRef.current?.click()}
               className={cn(
                 "p-2.5 rounded-xl border transition-all shrink-0",

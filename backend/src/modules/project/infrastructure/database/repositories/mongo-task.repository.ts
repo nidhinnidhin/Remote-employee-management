@@ -5,10 +5,8 @@ import { TaskEntity } from '../../../domain/entities/task.entity';
 import type { ITaskRepository } from '../../../domain/repositories/task.repository.interface';
 import { TaskDocument } from '../mongoose/schemas/task.schema';
 import { BaseRepository } from 'src/shared/repositories/base.repository'; // Adjust path
-import {
-  LeanTaskDocument,
-  TaskMapper,
-} from 'src/modules/project/application/mappers/task.mapper';
+import { LeanTaskDocument, TaskMapper } from 'src/modules/project/application/mappers/task/task.mapper';
+
 
 @Injectable()
 export class MongoTaskRepository
