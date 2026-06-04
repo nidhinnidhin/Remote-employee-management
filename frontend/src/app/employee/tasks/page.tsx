@@ -1,15 +1,12 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { fetchMyTasksAction } from "@/actions/company/projects/task.actions";
 import { getAllProjectsAction } from "@/actions/company/projects/project.actions";
-import {
-  Task,
-  MyTasksResponse,
-} from "@/shared/types/company/projects/task.type";
+import { Task, MyTasksResponse } from "@/shared/types/company/projects/task.type";
 import { Project } from "@/shared/types/company/projects/project.type";
 import EmployeeKanbanBoard from "@/components/employees/tasks/EmployeeKanbanBoard";
-import { Loader2, AlertCircle, RefreshCcw } from "lucide-react";
+import { Loader2, RefreshCcw, Layers } from "lucide-react";
 import { DashboardLayout } from "@/components/employees/dashboard/DashboardLayout";
 import { cn } from "@/lib/utils";
 import { getSprintsByProjectAction } from "@/actions/company/projects/sprint.actions";
@@ -18,6 +15,7 @@ import { Sprint } from "@/shared/types/company/projects/sprint.type";
 export default function EmployeeTasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [selectedProjectId, setSelectedProjectId] = useState<string>("ALL"); // 'ALL' or specific project ID
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -82,40 +80,80 @@ export default function EmployeeTasksPage() {
     loadData();
   }, [loadData]);
 
+  // --- Dynamic Client-Side Filtering Engine Logic ---
+  const filteredTasks = useMemo(() => {
+    if (selectedProjectId === "ALL") return tasks;
+    return tasks.filter(task => task.projectId === selectedProjectId);
+  }, [tasks, selectedProjectId]);
+
+  // --- Map Projects that explicitly have tasks assigned to this employee ---
+  const availableProjects = useMemo(() => {
+    const assignedProjectIds = new Set(tasks.map(t => t.projectId));
+    return projects.filter(p => assignedProjectIds.has(p.id || p._id));
+  }, [projects, tasks]);
+
   return (
     <DashboardLayout>
       <div className="flex flex-col w-full min-h-screen animate-in fade-in duration-700">
-        {/* SaaS Header */}
-        <div className="flex items-center justify-between mb-8 border-b border-white/[0.06] pb-6 shrink-0">
+        
+        {/* SaaS Header Dashboard Console layout */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 border-b border-white/[0.06] pb-6 shrink-0">
           <div className="space-y-1">
             <h2 className="text-2xl font-black text-white tracking-tighter uppercase">
               Project Board
             </h2>
             <div className="flex items-center gap-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-              <span>{tasks.length} Active Tasks</span>
+              <span>{filteredTasks.length} Visible Tasks</span>
               <span className="w-1 h-1 rounded-full bg-slate-800" />
-              <span>{projects.length} Projects</span>
+              <span>{availableProjects.length} Active Contexts</span>
             </div>
           </div>
 
-          <button
-            onClick={loadData}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/[0.06] bg-white/[0.02] text-slate-400 hover:text-white transition-all active:scale-95"
-          >
-            <RefreshCcw size={14} className={cn(isLoading && "animate-spin")} />
-            <span className="text-[10px] font-black uppercase tracking-widest">
-              Sync Board
-            </span>
-          </button>
+          {/* Controls Panel: Integrated Droppable Pipeline Select */}
+          <div className="flex items-center gap-3 self-end sm:self-auto">
+            <div className="relative flex items-center">
+              <Layers size={14} className="absolute left-3 text-slate-500 pointer-events-none" />
+              <select
+                value={selectedProjectId}
+                onChange={(e) => setSelectedProjectId(e.target.value)}
+                className="appearance-none bg-white/[0.02] border border-white/[0.08] focus:border-accent/40 rounded-xl py-2 pl-9 pr-8 text-xs font-bold uppercase tracking-wider text-slate-300 outline-none cursor-pointer transition-all hover:bg-white/[0.04]"
+              >
+                <option value="ALL" className="bg-[#0f1115] text-slate-300">ALL PROJECTS</option>
+                {availableProjects.map((project) => (
+                  <option key={project.id || project._id} value={project.id || project._id} className="bg-[#0f1115] text-slate-300">
+                    {project.name.toUpperCase()}
+                  </option>
+                ))}
+              </select>
+              <div className="absolute right-3 pointer-events-none w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-t-[4px] border-t-slate-500" />
+            </div>
+
+            <button
+              onClick={loadData}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl border border-white/[0.06] bg-white/[0.02] text-slate-400 hover:text-white transition-all active:scale-95"
+            >
+              <RefreshCcw size={14} className={cn(isLoading && "animate-spin")} />
+              <span className="text-[10px] font-black uppercase tracking-widest">
+                Sync Board
+              </span>
+            </button>
+          </div>
         </div>
 
+        {/* Board Main Pipeline Container view */}
         <div className="flex-1">
           {!isLoading && !error && tasks.length > 0 && (
             <EmployeeKanbanBoard
-              tasks={tasks}
+              tasks={filteredTasks} // Feeds filtered tasks dynamic memory layers directly
               projects={projects}
               onRefresh={loadData}
             />
+          )}
+
+          {!isLoading && !error && tasks.length === 0 && (
+            <div className="py-24 flex flex-col items-center justify-center border border-dashed border-white/[0.04] rounded-2xl bg-white/[0.01]">
+              <p className="text-sm font-medium text-slate-500">No active sprint assignments mapped to this user token.</p>
+            </div>
           )}
 
           {isLoading && (
