@@ -4,28 +4,33 @@ import React, { useState, useEffect, useMemo } from "react";
 import { ActivityLog } from "@/shared/types/activity-log.type";
 import {
   Search,
-  Filter,
-  ChevronLeft,
-  ChevronRight,
   Activity,
   FileText,
   AlertCircle,
   RefreshCcw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Pagination from "@/components/ui/Pagination"; // 👈 Integrated your global pagination module
 
 interface ActivityLogsViewProps {
   title: string;
   description: string;
-  fetchLogsAction: () => Promise<{ success: boolean; data?: ActivityLog[]; error?: string }>;
+  fetchLogsAction: () => Promise<{
+    success: boolean;
+    data?: ActivityLog[];
+    error?: string;
+  }>;
 }
 
-export function ActivityLogsView({ title, description, fetchLogsAction }: ActivityLogsViewProps) {
+export function ActivityLogsView({
+  title,
+  description,
+  fetchLogsAction,
+}: ActivityLogsViewProps) {
   const [logs, setLogs] = useState<ActivityLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Pagination & Search state
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -39,6 +44,7 @@ export function ActivityLogsView({ title, description, fetchLogsAction }: Activi
     } else {
       setError(result.error || "Failed to load activity logs.");
     }
+    document.getSelection()?.removeAllRanges();
     setLoading(false);
   };
 
@@ -46,7 +52,6 @@ export function ActivityLogsView({ title, description, fetchLogsAction }: Activi
     loadLogs();
   }, []);
 
-  // Filter logs based on search query (action or details)
   const filteredLogs = useMemo(() => {
     if (!searchQuery.trim()) return logs;
     const query = searchQuery.toLowerCase();
@@ -54,25 +59,24 @@ export function ActivityLogsView({ title, description, fetchLogsAction }: Activi
       (log) =>
         log.action.toLowerCase().includes(query) ||
         log.details.toLowerCase().includes(query) ||
-        (log.ipAddress && log.ipAddress.toLowerCase().includes(query))
+        (log.ipAddress && log.ipAddress.toLowerCase().includes(query)),
     );
   }, [logs, searchQuery]);
 
-  // Calculate pagination
   const totalPages = Math.ceil(filteredLogs.length / itemsPerPage);
+
   const currentLogs = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     return filteredLogs.slice(startIndex, startIndex + itemsPerPage);
   }, [filteredLogs, currentPage, itemsPerPage]);
 
-  // Handle page change safely
-  const handlePageChange = (newPage: number) => {
-    if (newPage >= 1 && newPage <= totalPages) {
-      setCurrentPage(newPage);
+  const handlePageChange = (pageNumber: number) => {
+    if (pageNumber >= 1 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber);
     }
   };
 
-  // Reset to first page when searching
+  // Reset to first page when searching to handle array sizing dynamically
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery]);
@@ -135,14 +139,18 @@ export function ActivityLogsView({ title, description, fetchLogsAction }: Activi
         {loading ? (
           <div className="flex-1 flex flex-col items-center justify-center p-12">
             <div className="w-10 h-10 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin mb-4" />
-            <p className="text-slate-400 font-medium">Loading activity logs...</p>
+            <p className="text-slate-400 font-medium">
+              Loading activity logs...
+            </p>
           </div>
         ) : error ? (
           <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
             <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
               <AlertCircle className="text-red-500" size={32} />
             </div>
-            <h3 className="text-lg font-bold text-white mb-2">Error Loading Logs</h3>
+            <h3 className="text-lg font-bold text-white mb-2">
+              Error Loading Logs
+            </h3>
             <p className="text-slate-400 max-w-md">{error}</p>
             <button
               onClick={loadLogs}
@@ -154,9 +162,15 @@ export function ActivityLogsView({ title, description, fetchLogsAction }: Activi
         ) : filteredLogs.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
             <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-4 border border-white/10">
-              <FileText className="text-slate-500" size={32} strokeWidth={1.5} />
+              <FileText
+                className="text-slate-500"
+                size={32}
+                strokeWidth={1.5}
+              />
             </div>
-            <h3 className="text-lg font-bold text-white mb-2">No activity logs found</h3>
+            <h3 className="text-lg font-bold text-white mb-2">
+              No activity logs found
+            </h3>
             <p className="text-slate-400 max-w-md">
               {searchQuery
                 ? "Try adjusting your search criteria."
@@ -191,17 +205,26 @@ export function ActivityLogsView({ title, description, fetchLogsAction }: Activi
                     >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-slate-300">
-                          {new Date(log.createdAt).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' })}
+                          {new Date(log.createdAt).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          })}
                         </div>
                         <div className="text-[11px] text-slate-500 mt-0.5">
-                          {new Date(log.createdAt).toLocaleTimeString("en-US", { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true })}
+                          {new Date(log.createdAt).toLocaleTimeString("en-US", {
+                            hour: "numeric",
+                            minute: "2-digit",
+                            second: "2-digit",
+                            hour12: true,
+                          })}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span
                           className={cn(
                             "inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-black tracking-wider uppercase border",
-                            getActionColor(log.action)
+                            getActionColor(log.action),
                           )}
                         >
                           {log.action}
@@ -223,43 +246,30 @@ export function ActivityLogsView({ title, description, fetchLogsAction }: Activi
               </table>
             </div>
 
-            {/* Pagination Controls */}
-            {totalPages > 1 && (
-              <div className="p-4 border-t border-white/[0.05] bg-white/[0.01] flex items-center justify-between">
-                <span className="text-xs text-slate-500 font-medium">
-                  Showing{" "}
-                  <span className="text-white">
-                    {(currentPage - 1) * itemsPerPage + 1}
-                  </span>{" "}
-                  to{" "}
-                  <span className="text-white">
-                    {Math.min(currentPage * itemsPerPage, filteredLogs.length)}
-                  </span>{" "}
-                  of <span className="text-white">{filteredLogs.length}</span>{" "}
-                  entries
-                </span>
+            {/* 🔥 Refactored Standard Pagination Wrapper Footer Section */}
+            <div className="p-4 border-t border-white/[0.06] bg-white/[0.01] flex items-center justify-between flex-col sm:flex-row gap-4">
+              <span className="text-xs text-slate-500 font-medium">
+                Showing{" "}
+                <span className="text-white font-semibold">
+                  {(currentPage - 1) * itemsPerPage + 1}
+                </span>{" "}
+                to{" "}
+                <span className="text-white font-semibold">
+                  {Math.min(currentPage * itemsPerPage, filteredLogs.length)}
+                </span>{" "}
+                of{" "}
+                <span className="text-white font-semibold">
+                  {filteredLogs.length}
+                </span>{" "}
+                entries
+              </span>
 
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="p-2 rounded-lg bg-[#08090a] border border-white/10 text-slate-400 hover:text-white hover:bg-white/5 disabled:opacity-50 transition-all"
-                  >
-                    <ChevronLeft size={16} />
-                  </button>
-                  <div className="px-4 text-sm font-medium text-slate-300">
-                    Page {currentPage} of {totalPages}
-                  </div>
-                  <button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className="p-2 rounded-lg bg-[#08090a] border border-white/10 text-slate-400 hover:text-white hover:bg-white/5 disabled:opacity-50 transition-all"
-                  >
-                    <ChevronRight size={16} />
-                  </button>
-                </div>
-              </div>
-            )}
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </div>
           </>
         )}
       </div>
