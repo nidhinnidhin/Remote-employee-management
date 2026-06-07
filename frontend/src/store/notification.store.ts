@@ -1,6 +1,10 @@
 import { create } from 'zustand';
 import { Notification } from '@/shared/types/notification.type';
-import { getUserNotificationsAction, markNotificationReadAction } from '@/actions/notification/notification.actions';
+import { 
+  getUserNotificationsAction, 
+  markNotificationReadAction,
+  markAllNotificationsReadAction 
+} from '@/actions/notification/notification.actions';
 import { notificationSocketClient } from '@/lib/socket/notification.socket.client';
 
 interface NotificationState {
@@ -8,9 +12,10 @@ interface NotificationState {
   unreadCount: number;
   isLoading: boolean;
   
-  // Actions
+  // Handlers
   fetchNotifications: () => Promise<void>;
   markAsRead: (id: string) => Promise<void>;
+  markAllAsRead: () => Promise<void>;
   addNotification: (notification: Notification) => void;
   connectSocket: (token: string, userId: string) => void;
   disconnectSocket: () => void;
@@ -54,6 +59,21 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     }
   },
 
+  markAllAsRead: async () => {
+    // Optimistic UI state clear
+    set((state) => ({
+      notifications: state.notifications.map((n) => ({ ...n, isRead: true })),
+      unreadCount: 0,
+    }));
+
+    try {
+      await markAllNotificationsReadAction();
+    } catch (error) {
+      console.error("Failed to sync structural clear-all down api tunnel:", error);
+      get().fetchNotifications(); // Rollback local state from server data on error
+    }
+  },
+
   addNotification: (notification: Notification) => {
     set((state) => ({
       notifications: [notification, ...state.notifications],
@@ -64,7 +84,6 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
   connectSocket: (token: string, userId: string) => {
     notificationSocketClient.connect(token, userId);
     
-    // Set up listeners
     notificationSocketClient.on('new_notification', (notification: Notification) => {
       get().addNotification(notification);
     });

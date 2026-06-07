@@ -1,3 +1,4 @@
+// src/notifications/notifications.module.ts
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import {
@@ -8,6 +9,7 @@ import { MongoNotificationRepository } from './infrastructure/database/repositor
 import { CreateNotificationUseCase } from './application/use-cases/create-notification.usecase';
 import { GetUserNotificationsUseCase } from './application/use-cases/get-user-notifications.usecase';
 import { MarkNotificationReadUseCase } from './application/use-cases/mark-notification-read.usecase';
+import { MarkAllNotificationsReadUseCase } from './application/use-cases/mark-all-notifications-read.usecase';
 import { NotificationController } from './presentation/controllers/notification.controller';
 import { NotificationGateway } from './presentation/gateways/notification.gateway';
 import { AuthModule } from '../auth/presentation/auth/auth.module';
@@ -27,13 +29,22 @@ import { AuthModule } from '../auth/presentation/auth/auth.module';
       provide: 'INotificationRepository',
       useClass: MongoNotificationRepository,
     },
-
     {
       provide: 'ICreateNotificationUseCase',
       useClass: CreateNotificationUseCase,
     },
-    GetUserNotificationsUseCase,
-    MarkNotificationReadUseCase,
+    {
+      provide: 'IGetUserNotificationsUseCase',
+      useClass: GetUserNotificationsUseCase,
+    },
+    {
+      provide: 'IMarkNotificationReadUseCase',
+      useClass: MarkNotificationReadUseCase,
+    },
+    {
+      provide: 'IMarkAllNotificationsReadUseCase',
+      useClass: MarkAllNotificationsReadUseCase,
+    },
   ],
   exports: ['ICreateNotificationUseCase', NotificationGateway],
 })

@@ -11,4 +11,11 @@ export class NotificationService {
     const response = await api.patch(`/notifications/${id}/read`);
     return response.data;
   }
+
+  // ─── BATCH MUTATION API ROUTE CONNECTION ───
+  static async markAllAsRead(api: AxiosInstance): Promise<{ success: boolean }> {
+    // Hits the new DIP NestJS controller route we created earlier
+    const response = await api.patch("/notifications/mark-all-read");
+    return response.data;
+  }
 }

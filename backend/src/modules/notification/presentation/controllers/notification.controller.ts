@@ -1,3 +1,4 @@
+// src/notifications/presentation/controllers/notification.controller.ts
 import {
   Controller,
   Get,
@@ -5,22 +6,40 @@ import {
   Param,
   UseGuards,
   Req,
+  Inject, // <-- Make sure Inject is imported from @nestjs/common
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
-import { GetUserNotificationsUseCase } from '../../application/use-cases/get-user-notifications.usecase';
-import { MarkNotificationReadUseCase } from '../../application/use-cases/mark-notification-read.usecase';
+import type {
+  IGetUserNotificationsUseCase,
+  IMarkAllNotificationsReadUseCase,
+  IMarkNotificationReadUseCase,
+} from '../../application/interfaces/notification-use-cases.interface';
 
 @Controller('notifications')
 @UseGuards(JwtAuthGuard)
 export class NotificationController {
   constructor(
-    private readonly _getUserNotificationsUseCase: GetUserNotificationsUseCase,
-    private readonly _markNotificationReadUseCase: MarkNotificationReadUseCase,
+    @Inject('IGetUserNotificationsUseCase')
+    private readonly _getUserNotificationsUseCase: IGetUserNotificationsUseCase,
+
+    @Inject('IMarkNotificationReadUseCase')
+    private readonly _markNotificationReadUseCase: IMarkNotificationReadUseCase,
+
+    @Inject('IMarkAllNotificationsReadUseCase')
+    private readonly _markAllNotificationsReadUseCase: IMarkAllNotificationsReadUseCase,
   ) {}
 
   @Get()
   async getUserNotifications(@Req() req: any) {
     return this._getUserNotificationsUseCase.execute(
+      req.user.userId,
+      req.user.companyId,
+    );
+  }
+
+  @Patch('mark-all-read')
+  async markAllAsRead(@Req() req: any) {
+    return this._markAllNotificationsReadUseCase.execute(
       req.user.userId,
       req.user.companyId,
     );

@@ -24,3 +24,14 @@ export const markNotificationReadAction = async (id: string) => {
     return { success: false, error: error?.message || "Failed to mark notification read" };
   }
 };
+
+export const markAllNotificationsReadAction = async () => {
+  try {
+    const api = await getServerApi();
+    const data = await NotificationService.markAllAsRead(api);
+    return { success: true, data };
+  } catch (error: any) {
+    console.error("Error batch mutating read flags:", error?.message);
+    return { success: false, error: error?.message || "Failed to mark all notifications read" };
+  }
+};
