@@ -34,7 +34,7 @@ const VideoPlayer = ({ stream, isLocal, name, isMuted, isScreenShare }: VideoPla
   return (
     <div className={cn(
       "relative bg-[#08090a] rounded-2xl overflow-hidden border border-white/5 group w-full flex flex-col justify-center items-center shadow-md",
-      isScreenShare ? "h-full min-h-[300px]" : "aspect-video"
+      isScreenShare ? "h-full min-h-[250px]" : "aspect-video"
     )}>
       {stream ? (
         <video
@@ -62,7 +62,7 @@ const VideoPlayer = ({ stream, isLocal, name, isMuted, isScreenShare }: VideoPla
         </span>
         {isMuted && (
           <div className="bg-rose-500/80 backdrop-blur-md p-1.5 rounded-lg text-white shadow-lg">
-            <MicOff size={14} />
+            <MicOff className="w-4 h-4" strokeWidth={2.5} />
           </div>
         )}
       </div>
@@ -83,16 +83,13 @@ export default function MeetingRoom({ meeting }: MeetingRoomProps) {
     screenStream,
     isScreenSharing,
     remoteScreenSharers,
-    isSocketConnected,
     toggleAudio,
     toggleVideo,
     toggleScreenShare,
     muteParticipant,
     kickParticipant,
-    eventLog
   } = useMeeting(meeting.id);
 
-  // States for custom UI modal dialogs
   const [showEndConfirmation, setShowEndConfirmation] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -145,8 +142,8 @@ export default function MeetingRoom({ meeting }: MeetingRoomProps) {
       {/* HEADER */}
       <div className="flex items-center justify-between mb-4 shrink-0">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 md:p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-500">
-            <Video size={18} className="md:w-5 md:h-5" />
+          <div className="p-2.5 md:p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-500 flex items-center justify-center">
+            <Video className="w-6 h-6" strokeWidth={2.5} />
           </div>
           <div>
             <h1 className="text-lg md:text-xl font-black text-white uppercase tracking-widest">
@@ -161,7 +158,7 @@ export default function MeetingRoom({ meeting }: MeetingRoomProps) {
       </div>
 
       {/* MAIN CONTENT AREA */}
-      <div className="flex-1 flex flex-col min-h-0 gap-4 justify-center items-center w-full">
+      <div className="flex-1 flex flex-col min-h-0 gap-4 justify-center items-center w-full overflow-hidden">
         {/* PINNED SCREEN SHARE AREA */}
         {hasActiveScreenShare && (
           <div className="w-full flex-1 min-h-0 bg-black rounded-2xl overflow-hidden border border-white/10 shadow-2xl relative">
@@ -189,10 +186,10 @@ export default function MeetingRoom({ meeting }: MeetingRoomProps) {
 
         {/* PARTICIPANTS GRID */}
         <div className={cn(
-          "w-full overflow-y-auto flex items-center justify-center transition-all duration-300",
+          "w-full flex items-center justify-center transition-all duration-300 overflow-y-auto min-h-0",
           hasActiveScreenShare ? "h-auto max-h-[160px] md:max-h-[200px]" : "flex-1"
         )}>
-          <div className={cn("grid gap-3 md:gap-4 w-full justify-center items-center", getGridLayout())}>
+          <div className={cn("grid gap-3 md:gap-4 w-full justify-center items-center p-1", getGridLayout())}>
             {/* Local User */}
             <div className="relative group w-full flex items-center justify-center">
               <VideoPlayer
@@ -220,17 +217,17 @@ export default function MeetingRoom({ meeting }: MeetingRoomProps) {
                     <div className="absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-20">
                       <button
                         onClick={() => muteParticipant(pUserId)}
-                        className="p-1.5 md:p-2 bg-black/60 backdrop-blur-md rounded-lg text-white hover:text-rose-400 hover:bg-black/80 transition-colors"
+                        className="p-1.5 md:p-2 bg-black/60 backdrop-blur-md rounded-lg text-white hover:text-rose-400 hover:bg-black/80 transition-colors flex items-center justify-center"
                         title="Mute Participant"
                       >
-                        <MicOff size={13} />
+                        <MicOff className="w-4 h-4" strokeWidth={2} />
                       </button>
                       <button
                         onClick={() => kickParticipant(pUserId)}
-                        className="p-1.5 md:p-2 bg-rose-500/80 backdrop-blur-md rounded-lg text-white hover:bg-rose-600 transition-colors"
+                        className="p-1.5 md:p-2 bg-rose-500/80 backdrop-blur-md rounded-lg text-white hover:bg-rose-600 transition-colors flex items-center justify-center"
                         title="Remove Participant"
                       >
-                        <UserX size={13} />
+                        <UserX className="w-4 h-4" strokeWidth={2} />
                       </button>
                     </div>
                   )}
@@ -242,57 +239,65 @@ export default function MeetingRoom({ meeting }: MeetingRoomProps) {
       </div>
 
       {/* CONTROLS BAR */}
-      <div className="mt-4 pt-4 border-t border-white/[0.05] flex items-center justify-center gap-3 md:gap-4 shrink-0">
+      <div className="mt-4 pt-4 border-t border-white/[0.05] flex items-center justify-center gap-3 md:gap-4 shrink-0 z-30">
         <Button
           onClick={() => toggleAudio()}
           className={cn(
-            "w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center transition-all shadow-xl",
-            isMuted
+            "w-12 h-12 md:w-16 md:h-16 rounded-2xl flex items-center justify-center transition-all shadow-xl",
+            (isMuted ?? false)
               ? "bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-rose-500/20"
               : "bg-white/5 text-white border border-white/10 hover:bg-white/10"
           )}
         >
-          {isMuted ? <MicOff className="w-5 h-5 md:w-5.5 md:h-5.5" /> : <Mic className="w-5 h-5 md:w-5.5 md:h-5.5" />}
+          {(isMuted ?? false) ? (
+            <MicOff className="w-6 h-6 md:w-7 md:h-7" strokeWidth={2.5} />
+          ) : (
+            <Mic className="w-6 h-6 md:w-7 md:h-7" strokeWidth={2.5} />
+          )}
         </Button>
 
         <Button
           onClick={toggleVideo}
           className={cn(
-            "w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center transition-all shadow-xl",
-            isVideoOff
+            "w-12 h-12 md:w-16 md:h-16 rounded-2xl flex items-center justify-center transition-all shadow-xl",
+            (isVideoOff ?? false)
               ? "bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-rose-500/20"
               : "bg-white/5 text-white border border-white/10 hover:bg-white/10"
           )}
         >
-          {isVideoOff ? <VideoOff className="w-5 h-5 md:w-5.5 md:h-5.5" /> : <Video className="w-5 h-5 md:w-5.5 md:h-5.5" />}
+          {(isVideoOff ?? false) ? (
+            <VideoOff className="w-6 h-6 md:w-7 md:h-7" strokeWidth={2.5} />
+          ) : (
+            <Video className="w-6 h-6 md:w-7 md:h-7" strokeWidth={2.5} />
+          )}
         </Button>
 
         <Button
           onClick={toggleScreenShare}
           className={cn(
-            "w-12 h-12 md:w-14 md:h-14 rounded-2xl transition-all flex items-center justify-center shadow-xl",
-            isScreenSharing
+            "w-12 h-12 md:w-16 md:h-16 rounded-2xl transition-all flex items-center justify-center shadow-xl",
+            (isScreenSharing ?? false)
               ? "bg-blue-500 text-white shadow-blue-500/20 hover:bg-blue-600"
               : "bg-blue-500/10 text-blue-500 border border-blue-500/20 hover:bg-blue-500/20"
           )}
         >
-          <MonitorUp className="w-5 h-5 md:w-5.5 md:h-5.5" />
+          <MonitorUp className="w-6 h-6 md:w-7 md:h-7" strokeWidth={2.5} />
         </Button>
 
         {isCreator ? (
           <Button
             onClick={() => setShowEndConfirmation(true)}
-            className="h-12 md:h-14 px-6 md:px-8 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-black uppercase tracking-widest text-[11px] md:text-xs flex items-center gap-2.5 md:gap-3 shadow-xl shadow-rose-600/20 transition-all ml-2 md:ml-4"
+            className="h-12 md:h-16 px-6 md:px-8 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-black uppercase tracking-widest text-[11px] md:text-xs flex items-center justify-center gap-2.5 md:gap-3 shadow-xl shadow-rose-600/20 transition-all ml-2 md:ml-4"
           >
-            <XOctagon className="w-4 h-4 md:w-4.5 md:h-4.5" />
+            <XOctagon className="w-5 h-5 md:w-5.5 md:h-5.5" strokeWidth={2.5} />
             End Meeting
           </Button>
         ) : (
           <Button
             onClick={handleLeave}
-            className="h-12 md:h-14 px-6 md:px-8 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-black uppercase tracking-widest text-[11px] md:text-xs flex items-center gap-2.5 md:gap-3 shadow-xl shadow-rose-500/20 transition-all ml-2 md:ml-4"
+            className="h-12 md:h-16 px-6 md:px-8 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-black uppercase tracking-widest text-[11px] md:text-xs flex items-center justify-center gap-2.5 md:gap-3 shadow-xl shadow-rose-500/20 transition-all ml-2 md:ml-4"
           >
-            <PhoneOff className="w-4 h-4 md:w-4.5 md:h-4.5" />
+            <PhoneOff className="w-5 h-5 md:w-5.5 md:h-5.5" strokeWidth={2.5} />
             Leave
           </Button>
         )}
@@ -302,8 +307,8 @@ export default function MeetingRoom({ meeting }: MeetingRoomProps) {
       {showEndConfirmation && (
         <div className="absolute inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
           <div className="bg-[#0e1012] border border-white/10 w-full max-w-md rounded-2xl p-6 shadow-2xl scale-in duration-200 flex flex-col items-center text-center">
-            <div className="p-4 bg-rose-500/10 text-rose-500 border border-rose-500/20 rounded-full mb-4">
-              <AlertTriangle size={32} className="animate-bounce" />
+            <div className="p-4 bg-rose-500/10 text-rose-500 border border-rose-500/20 rounded-full mb-4 flex items-center justify-center">
+              <AlertTriangle size={36} className="animate-bounce" />
             </div>
             <h2 className="text-white text-lg font-black uppercase tracking-wider mb-2">
               End Session For All?
@@ -335,8 +340,8 @@ export default function MeetingRoom({ meeting }: MeetingRoomProps) {
       {errorMessage && (
         <div className="absolute inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
           <div className="bg-[#0e1012] border border-white/10 w-full max-w-md rounded-2xl p-6 shadow-2xl flex flex-col items-center text-center">
-            <div className="p-4 bg-rose-500/10 text-rose-500 border border-rose-500/20 rounded-full mb-4">
-              <XOctagon size={32} />
+            <div className="p-4 bg-rose-500/10 text-rose-500 border border-rose-500/20 rounded-full mb-4 flex items-center justify-center">
+              <XOctagon size={36} />
             </div>
             <h2 className="text-white text-lg font-black uppercase tracking-wider mb-2">
               Action Failed
