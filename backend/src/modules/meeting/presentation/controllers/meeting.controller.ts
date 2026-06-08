@@ -1,5 +1,5 @@
 // src/modules/meeting/presentation/controllers/meeting.controller.ts
-import { Controller, Post, Get, Put, Delete, Body, Param, UseGuards, Inject, Req, NotFoundException } from '@nestjs/common';
+import { Controller, Post, Get, Put, Delete, Body, Param, UseGuards, Inject, Req, NotFoundException, Query } from '@nestjs/common';
 import type { Request } from 'express';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import { ApiResponse } from 'src/common/response/api-response.util';
@@ -49,10 +49,26 @@ export class MeetingController {
   }
 
   @Get()
-  async getMeetings(@Req() req: Request) {
+  async getMeetings(
+    @Req() req: Request,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
     const { companyId } = req.user as any;
-    const meetings = await this._meetingRepository.findByCompanyId(companyId);
-    return ApiResponse.success(meetings, 'Meetings fetched successfully');
+    const pageNum = parseInt(page || '1', 10);
+    const limitNum = parseInt(limit || '9', 10); 
+
+    const { meetings, total } = await this._meetingRepository.findByCompanyId(companyId, pageNum, limitNum);
+    
+    return ApiResponse.success({
+      meetings,
+      meta: {
+        total,
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(total / limitNum),
+      }
+    }, 'Meetings fetched successfully');
   }
 
   @Get(':id')
@@ -60,7 +76,6 @@ export class MeetingController {
     const meeting = await this._meetingRepository.findById(id);
     if (!meeting) throw new NotFoundException('Meeting not found');
 
-    // Enrich with participant details
     const users = await this._userRepository.findAll({ _id: { $in: meeting.participants } });
     const participantDetails = users.map(u => ({
       id: u.id,
@@ -103,7 +118,6 @@ export class MeetingController {
     const { companyId, userId } = req.user as any;
     const meeting = await this._endMeetingUseCase.execute(id, companyId, userId);
     
-    // Notify all participants that meeting has ended
     this._meetingGateway.notifyMeetingEnded(id);
     
     return ApiResponse.success(meeting, 'Meeting ended successfully');

@@ -1,4 +1,3 @@
-// src/modules/meeting/domain/entities/meeting.entity.ts
 import { MeetingType } from 'src/shared/enums/meeting/meeting-type.enum';
 import { MeetingStatus } from 'src/shared/enums/meeting/meeting-status.enum';
 

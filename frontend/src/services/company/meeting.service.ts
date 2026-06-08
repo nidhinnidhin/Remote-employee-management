@@ -1,10 +1,21 @@
+// src/services/company/meeting.service.ts
 import { API_ROUTES } from "@/constants/api.routes";
 import { Meeting, ScheduleMeetingData, InstantMeetingData, AddParticipantsData } from "@/shared/types/company/meeting.type";
 import { AxiosInstance } from "axios";
 
+export interface PaginatedMeetingsResponse {
+  meetings: Meeting[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
 export const MeetingService = {
-  getMeetings: async (api: AxiosInstance): Promise<Meeting[]> => {
-    const response = await api.get(API_ROUTES.COMPANY.MEETINGS.BASE);
+  getMeetings: async (api: AxiosInstance, page?: number, limit?: number): Promise<PaginatedMeetingsResponse> => {
+    const response = await api.get(API_ROUTES.COMPANY.MEETINGS.BASE(page, limit));
     return response.data;
   },
 
