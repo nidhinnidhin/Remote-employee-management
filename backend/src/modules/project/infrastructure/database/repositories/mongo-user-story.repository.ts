@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model, Types, FilterQuery } from 'mongoose';
 import { UserStoryEntity } from '../../../domain/entities/user-story.entity';
 import type { IUserStoryRepository } from '../../../domain/repositories/user-story.repository.interface';
 import { UserStoryDocument } from '../mongoose/schemas/user-story.schema';
@@ -49,7 +49,7 @@ export class MongoUserStoryRepository
     projectId: string,
     companyId: string,
   ): Promise<UserStoryEntity[]> {
-    const filter: any = { companyId, isDeleted: { $ne: true } };
+    const filter: FilterQuery<UserStoryDocument> = { companyId, isDeleted: { $ne: true } };
     
     if (Types.ObjectId.isValid(projectId)) {
       filter.$or = [

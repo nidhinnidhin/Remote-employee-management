@@ -39,7 +39,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly _conversationRepository: IConversationRepository,
   ) {}
 
-  notifyConversationUpdate(conversation: any) {
+  notifyConversationUpdate(conversation: { participants: string[] }) {
     if (!conversation.participants) return;
     conversation.participants.forEach((participantId: string) => {
       this.server
@@ -63,7 +63,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       .emit(SocketEvents.CONVERSATION_UPDATED, { id: conversationId });
   }
 
-  notifyMessageUpdate(message: any) {
+  notifyMessageUpdate(message: { conversationId: string }) {
     this.server
       .to(message.conversationId)
       .emit(SocketEvents.MESSAGE_UPDATED, message);
@@ -100,7 +100,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         return;
       }
 
-      const payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET!) as any;
+      const payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET!) as { userId: string; role: string; companyId: string };
       const userId = payload.userId;
 
       client.user = {
@@ -113,9 +113,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.logger.log(
         `Client connected and joined personal room: ${client.id} (User: ${userId})`,
       );
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Fixed: Explicit typing to resolve strict error check
-      this.logger.error(`WS Connection auth failed: ${error.message}`);
+      const err = error as Error;
+      this.logger.error(`WS Connection auth failed: ${err.message}`);
       void client.disconnect();
     }
   }
@@ -168,9 +169,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
 
       return { status: 'ok', data: message };
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Fixed: Explicit typing to resolve strict error check
-      return { status: 'error', message: error.message };
+      const err = error as Error;
+      return { status: 'error', message: err.message };
     }
   }
 

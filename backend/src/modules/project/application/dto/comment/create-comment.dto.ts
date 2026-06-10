@@ -20,5 +20,5 @@ export class CreateCommentDto {
   parentId?: string;
 
   @IsOptional()
-  attachments?: any;
+  attachments?: unknown;
 }

@@ -67,7 +67,7 @@ export class ClockOutUseCase implements IClockOutUseCase {
     // Save and return
     const doc = await this._attendanceRepository.updateById(
       activeShift.id,
-      updatedShift as any
+      updatedShift as Partial<AttendanceEntity>
     );
     if (!doc) {
       throw new BadRequestException('Failed to complete clock out.');

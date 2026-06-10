@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { Inject } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
-import type { Request } from 'express';
+import type { AuthenticatedRequest } from 'src/shared/types/express/authenticated-request.interface';
 
 import type {
   ICreateDepartmentUseCase,
@@ -51,30 +51,30 @@ export class DepartmentController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @UseGuards(CompanyAdminGuard)
-  async create(@Body() createDepartmentDto: CreateDepartmentDto, @Req() req: Request) {
-    const companyId = (req.user as any).companyId;
+  async create(@Body() createDepartmentDto: CreateDepartmentDto, @Req() req: AuthenticatedRequest) {
+    const companyId = req.user.companyId;
     return this._createDepartmentUseCase.execute(createDepartmentDto.name, companyId);
   }
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  async getAll(@Req() req: Request) {
-    const companyId = (req.user as any).companyId;
+  async getAll(@Req() req: AuthenticatedRequest) {
+    const companyId = req.user.companyId;
     return this._getDepartmentsUseCase.execute(companyId);
   }
 
   @Get('search')
   @UseGuards(JwtAuthGuard)
-  async search(@Req() req: Request, @Query() dto: SearchDepartmentsDto) {
-    const companyId = (req.user as any).companyId;
+  async search(@Req() req: AuthenticatedRequest, @Query() dto: SearchDepartmentsDto) {
+    const companyId = req.user.companyId;
     return this._searchDepartmentsUseCase.execute(companyId, dto);
   }
 
   @Get('my-departments')
   @UseGuards(JwtAuthGuard)
-  async getMyDepartments(@Req() req: Request) {
-    const employeeId = (req.user as any).userId;
-    const companyId = (req.user as any).companyId;
+  async getMyDepartments(@Req() req: AuthenticatedRequest) {
+    const employeeId = req.user.userId;
+    const companyId = req.user.companyId;
     return this._getEmployeeDepartmentsUseCase.execute(employeeId, companyId);
   }
 

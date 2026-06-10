@@ -13,12 +13,33 @@ export class UserStoryMapper {
   static toDomain(
     userDocument: UserStoryDocument | LeanStoryDocument,
   ): UserStoryEntity {
-    const doc = userDocument as any;
+    const doc = userDocument as unknown as {
+      _id: Types.ObjectId;
+      companyId: string;
+      projectId?: Types.ObjectId;
+      storyNumber?: number;
+      title: string;
+      status?: UserStoryStatus;
+      priority?: UserStoryPriority;
+      type?: IssueType;
+      order?: number;
+      createdBy: string;
+      description?: string;
+      acceptanceCriteria?: string[];
+      assigneeId?: Types.ObjectId;
+      storyPoints?: number;
+      isInBacklog?: boolean;
+      attachments?: string[];
+      links?: string[];
+      createdAt?: Date;
+      updatedAt?: Date;
+      isDeleted?: boolean;
+    };
 
     return new UserStoryEntity(
       doc._id.toString(),
       doc.companyId,
-      doc.projectId?.toString(),
+      doc.projectId?.toString() ?? '',
       Number(doc.storyNumber || 0), 
       doc.title,                    
       (doc.status as UserStoryStatus) || UserStoryStatus.TODO,
@@ -28,7 +49,7 @@ export class UserStoryMapper {
       doc.createdBy,
       doc.description || '',
       doc.acceptanceCriteria || [],
-      doc.assigneeId?.toString(),
+      doc.assigneeId?.toString() ?? '',
       doc.storyPoints || 0,
       doc.isInBacklog !== undefined ? !!doc.isInBacklog : true,
       doc.attachments || [],

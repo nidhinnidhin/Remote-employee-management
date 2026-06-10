@@ -14,6 +14,7 @@ import type {
   IMarkAllNotificationsReadUseCase,
   IMarkNotificationReadUseCase,
 } from '../../application/interfaces/notification-use-cases.interface';
+import type { AuthenticatedRequest } from 'src/shared/types/express/authenticated-request.interface';
 
 @Controller('notifications')
 @UseGuards(JwtAuthGuard)
@@ -30,7 +31,7 @@ export class NotificationController {
   ) {}
 
   @Get()
-  async getUserNotifications(@Req() req: any) {
+  async getUserNotifications(@Req() req: AuthenticatedRequest) {
     return this._getUserNotificationsUseCase.execute(
       req.user.userId,
       req.user.companyId,
@@ -38,7 +39,7 @@ export class NotificationController {
   }
 
   @Patch('mark-all-read')
-  async markAllAsRead(@Req() req: any) {
+  async markAllAsRead(@Req() req: AuthenticatedRequest) {
     return this._markAllNotificationsReadUseCase.execute(
       req.user.userId,
       req.user.companyId,
@@ -46,7 +47,7 @@ export class NotificationController {
   }
 
   @Patch(':id/read')
-  async markAsRead(@Param('id') id: string, @Req() req: any) {
+  async markAsRead(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
     return this._markNotificationReadUseCase.execute(id, req.user.companyId);
   }
 }

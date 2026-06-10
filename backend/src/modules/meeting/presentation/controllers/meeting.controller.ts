@@ -1,6 +1,6 @@
 // src/modules/meeting/presentation/controllers/meeting.controller.ts
 import { Controller, Post, Get, Put, Delete, Body, Param, UseGuards, Inject, Req, NotFoundException, Query } from '@nestjs/common';
-import type { Request } from 'express';
+import type { AuthenticatedRequest } from 'src/shared/types/express/authenticated-request.interface';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import { ApiResponse } from 'src/common/response/api-response.util';
 import { ScheduleMeetingDto } from '../../application/dto/schedule-meeting.dto';
@@ -42,19 +42,19 @@ export class MeetingController {
   ) {}
 
   @Post('schedule')
-  async scheduleMeeting(@Req() req: Request, @Body() dto: ScheduleMeetingDto) {
-    const { companyId, userId } = req.user as any;
+  async scheduleMeeting(@Req() req: AuthenticatedRequest, @Body() dto: ScheduleMeetingDto) {
+    const { companyId, userId } = req.user;
     const meeting = await this._scheduleMeetingUseCase.execute(companyId, userId, dto);
     return ApiResponse.success(meeting, 'Meeting scheduled successfully');
   }
 
   @Get()
   async getMeetings(
-    @Req() req: Request,
+    @Req() req: AuthenticatedRequest,
     @Query('page') page?: string,
     @Query('limit') limit?: string,
   ) {
-    const { companyId } = req.user as any;
+    const { companyId } = req.user;
     const pageNum = parseInt(page || '1', 10);
     const limitNum = parseInt(limit || '9', 10); 
 
@@ -72,7 +72,7 @@ export class MeetingController {
   }
 
   @Get(':id')
-  async getMeetingById(@Req() req: Request, @Param('id') id: string) {
+  async getMeetingById(@Req() req: AuthenticatedRequest, @Param('id') id: string) {
     const meeting = await this._meetingRepository.findById(id);
     if (!meeting) throw new NotFoundException('Meeting not found');
 
@@ -100,22 +100,22 @@ export class MeetingController {
   }
 
   @Post('instant')
-  async createInstantMeeting(@Req() req: Request, @Body() dto: CreateInstantMeetingDto) {
-    const { companyId, userId } = req.user as any;
+  async createInstantMeeting(@Req() req: AuthenticatedRequest, @Body() dto: CreateInstantMeetingDto) {
+    const { companyId, userId } = req.user;
     const meeting = await this._createInstantMeetingUseCase.execute(companyId, userId, dto);
     return ApiResponse.success(meeting, 'Instant meeting created successfully');
   }
 
   @Put(':id/start')
-  async startMeeting(@Req() req: Request, @Param('id') id: string) {
-    const { companyId, userId } = req.user as any;
+  async startMeeting(@Req() req: AuthenticatedRequest, @Param('id') id: string) {
+    const { companyId, userId } = req.user;
     const meeting = await this._startMeetingUseCase.execute(id, companyId, userId);
     return ApiResponse.success(meeting, 'Meeting started successfully');
   }
 
   @Put(':id/end')
-  async endMeeting(@Req() req: Request, @Param('id') id: string) {
-    const { companyId, userId } = req.user as any;
+  async endMeeting(@Req() req: AuthenticatedRequest, @Param('id') id: string) {
+    const { companyId, userId } = req.user;
     const meeting = await this._endMeetingUseCase.execute(id, companyId, userId);
     
     this._meetingGateway.notifyMeetingEnded(id);
@@ -124,15 +124,15 @@ export class MeetingController {
   }
 
   @Put(':id/participants')
-  async addParticipants(@Req() req: Request, @Param('id') id: string, @Body() dto: AddParticipantsDto) {
-    const { companyId, userId } = req.user as any;
+  async addParticipants(@Req() req: AuthenticatedRequest, @Param('id') id: string, @Body() dto: AddParticipantsDto) {
+    const { companyId, userId } = req.user;
     const meeting = await this._addParticipantUseCase.execute(id, companyId, userId, dto);
     return ApiResponse.success(meeting, 'Participants added successfully');
   }
 
   @Delete(':id/participants/:participantId')
-  async removeParticipant(@Req() req: Request, @Param('id') id: string, @Param('participantId') participantId: string) {
-    const { companyId, userId } = req.user as any; // userId here is the admin who is requesting to remove participant
+  async removeParticipant(@Req() req: AuthenticatedRequest, @Param('id') id: string, @Param('participantId') participantId: string) {
+    const { companyId, userId } = req.user; // userId here is the admin who is requesting to remove participant
     const meeting = await this._removeParticipantUseCase.execute(id, companyId, userId, participantId);
     
     // Notify the removed participant

@@ -2,7 +2,7 @@ import { CompanyEntity } from '../../domain/entities/company.entity';
 import { CompanyDocument } from '../../infrastructure/database/mongoose/schemas/company.schema';
 
 export class CompanyMapper {
-  static toDomain(companyDoc: any): CompanyEntity {
+  static toDomain(companyDoc: import('../../infrastructure/database/mongoose/schemas/company.schema').CompanyDocument & { employeeCount?: number, projectCounter?: number }): CompanyEntity {
     return new CompanyEntity(
       companyDoc._id?.toString() || companyDoc.id,
       companyDoc.name,

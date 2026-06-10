@@ -35,7 +35,7 @@ export class DecideLateClockInUseCase implements IDecideLateClockInUseCase {
       throw new BadRequestException('This request is not in a pending state.');
     }
 
-    const finalDecision = dto.decision || (dto as any).status;
+    const finalDecision = dto.decision || (dto as Record<string, string>).status;
     if (!finalDecision || (finalDecision !== 'APPROVED' && finalDecision !== 'REJECTED')) {
       throw new BadRequestException('Invalid decision state.');
     }
@@ -61,7 +61,7 @@ export class DecideLateClockInUseCase implements IDecideLateClockInUseCase {
       dto.adminRemarks || undefined
     );
 
-    const savedEntity = await this._attendanceRepository.updateById(attendance.id, updatedAttendance as any);
+    const savedEntity = await this._attendanceRepository.updateById(attendance.id, updatedAttendance as Partial<AttendanceEntity>);
     if (!savedEntity) {
       throw new BadRequestException('Failed to update attendance request.');
     }

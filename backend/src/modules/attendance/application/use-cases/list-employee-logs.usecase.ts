@@ -3,7 +3,8 @@ import type { IAttendanceRepository } from '../../domain/repositories/iattendanc
 import { IListEmployeeLogsUseCase } from '../interfaces/attendance-use-cases.interface';
 import { AttendanceEntity } from '../../domain/entities/attendance.entity';
 import { ListLogsDto } from '../dto/list-logs.dto';
-import { Types } from 'mongoose';
+import { Types, FilterQuery } from 'mongoose';
+import { AttendanceDocument } from '../../infrastructure/database/mongoose/schemas/attendance.schema';
 
 @Injectable()
 export class ListEmployeeLogsUseCase implements IListEmployeeLogsUseCase {
@@ -20,7 +21,7 @@ export class ListEmployeeLogsUseCase implements IListEmployeeLogsUseCase {
     const page = dto.page || 1;
     const limit = dto.limit || 5;
 
-    const filter: any = {
+    const filter: FilterQuery<AttendanceDocument> = {
       userId: new Types.ObjectId(userId),
       companyId: new Types.ObjectId(companyId),
     };
@@ -42,8 +43,8 @@ export class ListEmployeeLogsUseCase implements IListEmployeeLogsUseCase {
     const endStr = dto.endDate?.trim();
     if (startStr || endStr) {
       filter.date = {};
-      if (startStr) filter.date.$gte = startStr;
-      if (endStr) filter.date.$lte = endStr;
+      if (startStr) (filter.date as Record<string, string>).$gte = startStr;
+      if (endStr) (filter.date as Record<string, string>).$lte = endStr;
     }
 
     return this._attendanceRepository.findPaginatedLogs(filter, page, limit);

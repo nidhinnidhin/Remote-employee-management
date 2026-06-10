@@ -66,7 +66,7 @@ export class MeetingGateway
         return;
       }
 
-      const payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET!) as any;
+      const payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET!) as { userId: string; role: string; companyId: string };
       const userId = payload.userId;
 
       client.user = {
@@ -79,8 +79,9 @@ export class MeetingGateway
       this.logger.log(
         `Client connected to meeting ns: ${client.id} (User: ${userId})`,
       );
-    } catch (error: any) {
-      this.logger.error(`Meeting WS Connection auth failed: ${error.message}`);
+    } catch (error: unknown) {
+      const err = error as Error;
+      this.logger.error(`Meeting WS Connection auth failed: ${err.message}`);
       void client.disconnect();
     }
   }
@@ -235,7 +236,7 @@ export class MeetingGateway
   handleWebRTCOffer(
     @ConnectedSocket() client: AuthenticatedSocket,
     @MessageBody()
-    data: { targetSocketId: string; meetingId: string; sdp: any },
+    data: { targetSocketId: string; meetingId: string; sdp: Record<string, unknown> },
   ) {
     this.server.to(data.targetSocketId).emit(SocketEvents.WEBRTC_OFFER, {
       fromSocketId: client.id,
@@ -249,7 +250,7 @@ export class MeetingGateway
   handleWebRTCAnswer(
     @ConnectedSocket() client: AuthenticatedSocket,
     @MessageBody()
-    data: { targetSocketId: string; meetingId: string; sdp: any },
+    data: { targetSocketId: string; meetingId: string; sdp: Record<string, unknown> },
   ) {
     this.server.to(data.targetSocketId).emit(SocketEvents.WEBRTC_ANSWER, {
       fromSocketId: client.id,
@@ -263,7 +264,7 @@ export class MeetingGateway
   handleWebRTCICECandidate(
     @ConnectedSocket() client: AuthenticatedSocket,
     @MessageBody()
-    data: { targetSocketId: string; meetingId: string; candidate: any },
+    data: { targetSocketId: string; meetingId: string; candidate: Record<string, unknown> },
   ) {
     this.server
       .to(data.targetSocketId)

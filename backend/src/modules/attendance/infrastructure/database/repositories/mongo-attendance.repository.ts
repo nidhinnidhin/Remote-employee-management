@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model, Types, FilterQuery } from 'mongoose';
 import { IAttendanceRepository } from '../../../domain/repositories/iattendance.repository';
 import { AttendanceEntity } from '../../../domain/entities/attendance.entity';
 import { AttendanceDocument } from '../mongoose/schemas/attendance.schema';
@@ -36,7 +36,7 @@ export class MongoAttendanceRepository
   }
 
   async findPaginatedLogs(
-    filter: any,
+    filter: FilterQuery<AttendanceDocument>,
     page: number,
     limit: number,
   ): Promise<{ data: AttendanceEntity[]; total: number }> {
@@ -49,7 +49,7 @@ export class MongoAttendanceRepository
         .skip(skip)
         .limit(limit)
         .lean()
-        .exec() as Promise<any[]>,
+        .exec() as Promise<LeanAttendanceDocument[]>,
       this._attendanceModel.countDocuments(filter).exec(),
     ]);
 

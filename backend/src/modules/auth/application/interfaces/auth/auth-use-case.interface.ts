@@ -20,17 +20,17 @@ export interface IRefreshAccessTokenUseCase {
 }
 
 export interface IRegisterAdminUseCase {
-    execute(dto: RegisterAdminDto): Promise<any>;
+    execute(dto: RegisterAdminDto): Promise<Record<string, unknown>>;
 }
 
 export interface IForgotPasswordUseCase {
-    execute(input: ForgotPasswordDto): Promise<any>;
+    execute(input: ForgotPasswordDto): Promise<void>;
 }
 
 export interface IResetPasswordUseCase {
-    execute(input: ResetPasswordDto): Promise<any>;
+    execute(input: ResetPasswordDto): Promise<Record<string, unknown>>;
 }
 
 export interface IVerifyResetPasswordOtpUseCase {
-    execute(input: VerifyResetPasswordOtpDto): Promise<any>;
+    execute(input: VerifyResetPasswordOtpDto): Promise<Record<string, unknown>>;
 }

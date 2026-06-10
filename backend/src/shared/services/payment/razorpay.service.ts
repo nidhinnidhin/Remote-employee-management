@@ -37,7 +37,7 @@ export class RazorpayService implements IPaymentService {
         receipt,
       };
       return await this.razorpay.orders.create(options);
-    } catch (error: any) {
+    } catch (error) {
       this.logger.error('Failed to create Razorpay order', error);
       throw error;
     }

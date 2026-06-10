@@ -32,7 +32,7 @@ export class BreakEndUseCase implements IBreakEndUseCase {
       .findIndex((act) => act.type === 'BREAK_START');
 
     let breakDurationMins = 0;
-    let breakTypeLabel: any = null;
+    let breakTypeLabel: 'TEA' | 'LUNCH' | 'EVENING_TEA' | null = null;
 
     if (lastBreakStartIndex !== -1) {
       // Because we reversed it, the real index from start is:
@@ -67,7 +67,7 @@ export class BreakEndUseCase implements IBreakEndUseCase {
       now
     );
 
-    const doc = await this._attendanceRepository.updateById(activeShift.id, updatedShift as any);
+    const doc = await this._attendanceRepository.updateById(activeShift.id, updatedShift as Partial<AttendanceEntity>);
     if (!doc) {
       throw new BadRequestException('Failed to end break.');
     }

@@ -13,7 +13,7 @@ function parseTimeToMinutes(timeStr: string): number {
   return hours * 60 + minutes;
 }
 
-function getAllowedBreakMinutes(policyDoc: any, targetType: 'TEA' | 'LUNCH' | 'EVENING_TEA'): number {
+function getAllowedBreakMinutes(policyDoc: CompanyPolicy | null, targetType: 'TEA' | 'LUNCH' | 'EVENING_TEA'): number {
   const workingHoursPolicy = policyDoc?.policies?.find(p => p.type === 'WORKING_HOURS');
   if (!workingHoursPolicy || !workingHoursPolicy.content) {
     if (targetType === 'TEA') return 15;
@@ -46,7 +46,7 @@ function getAllowedBreakMinutes(policyDoc: any, targetType: 'TEA' | 'LUNCH' | 'E
   return diff > 0 ? diff : (targetType === 'LUNCH' ? 45 : 15);
 }
 
-function getElapsedBreakMinutesForType(activities: any[], targetType: 'TEA' | 'LUNCH' | 'EVENING_TEA'): number {
+function getElapsedBreakMinutesForType(activities: AttendanceActivityEntity[], targetType: 'TEA' | 'LUNCH' | 'EVENING_TEA'): number {
   let totalMs = 0;
   for (let i = 0; i < activities.length; i++) {
     const act = activities[i];
@@ -134,7 +134,7 @@ export class BreakStartUseCase implements IBreakStartUseCase {
       now
     );
 
-    const doc = await this._attendanceRepository.updateById(activeShift.id, updatedShift as any);
+    const doc = await this._attendanceRepository.updateById(activeShift.id, updatedShift as Partial<AttendanceEntity>);
     if (!doc) {
       throw new BadRequestException('Failed to start break.');
     }

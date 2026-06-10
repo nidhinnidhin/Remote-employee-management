@@ -19,7 +19,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const logger = app.get<ILogger>(LOGGER_SERVICE);
-  app.useLogger(logger as any);
+  app.useLogger(logger as unknown as import('@nestjs/common').LoggerService);
 
   logger.log('Starting NestJS bootstrap...', 'Bootstrap');
 

@@ -19,7 +19,7 @@ export class MongoCompanyRepository
     super(_companyModel);
   }
 
-  protected toEntity(companyDoc: any): CompanyEntity {
+  protected toEntity(companyDoc: import('../mongoose/schemas/company.schema').CompanyDocument): CompanyEntity {
     return CompanyMapper.toDomain(companyDoc);
   }
 

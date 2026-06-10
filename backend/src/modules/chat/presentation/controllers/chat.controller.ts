@@ -18,7 +18,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import type { Request } from 'express';
+import type { AuthenticatedRequest } from 'src/shared/types/express/authenticated-request.interface';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import { ApiResponse } from 'src/common/response/api-response.util';
 import { CreateConversationDto } from '../../application/dto/create-conversation.dto';
@@ -63,10 +63,10 @@ export class ChatController {
 
   @Post('conversations')
   async createConversation(
-    @Req() req: Request,
+    @Req() req: AuthenticatedRequest,
     @Body() dto: CreateConversationDto,
   ) {
-    const { companyId, userId } = req.user as any;
+    const { companyId, userId } = req.user;
     const conversation = await this._createConversationUseCase.execute(
       companyId,
       userId,
@@ -80,8 +80,8 @@ export class ChatController {
   }
 
   @Get('conversations')
-  async getUserConversations(@Req() req: Request) {
-    const { companyId, userId } = req.user as any;
+  async getUserConversations(@Req() req: AuthenticatedRequest) {
+    const { companyId, userId } = req.user;
     const conversations = await this._getUserConversationsUseCase.execute(
       companyId,
       userId,
@@ -94,12 +94,12 @@ export class ChatController {
 
   @Get('conversations/:id/messages')
   async getMessages(
-    @Req() req: Request,
+    @Req() req: AuthenticatedRequest,
     @Param('id') conversationId: string,
     @Query('limit') limit?: number,
     @Query('before') before?: string,
   ) {
-    const { userId } = req.user as any;
+    const { userId } = req.user;
     const messages = await this._getConversationMessagesUseCase.execute(
       conversationId,
       limit ? Number(limit) : undefined,
@@ -111,7 +111,7 @@ export class ChatController {
 
   @Patch('conversations/:id')
   async updateConversation(
-    @Req() req: Request,
+    @Req() req: AuthenticatedRequest,
     @Param('id') id: string,
     @Body()
     dto: {
@@ -121,7 +121,7 @@ export class ChatController {
       admins?: string[];
     },
   ) {
-    const { userId } = req.user as any;
+    const { userId } = req.user;
     const conversation = await this._updateConversationUseCase.execute(
       id,
       userId,
@@ -135,8 +135,8 @@ export class ChatController {
   }
 
   @Delete('conversations/:id')
-  async deleteConversation(@Req() req: Request, @Param('id') id: string) {
-    const { userId } = req.user as any;
+  async deleteConversation(@Req() req: AuthenticatedRequest, @Param('id') id: string) {
+    const { userId } = req.user;
     await this._deleteConversationUseCase.execute(id, userId);
     this._chatGateway.notifyConversationDeletion(id);
     return ApiResponse.success(null, 'Conversation deleted successfully');
@@ -144,8 +144,8 @@ export class ChatController {
 
   @Post('conversations/:id/leave')
   @HttpCode(HttpStatus.OK)
-  async leaveConversation(@Req() req: Request, @Param('id') id: string) {
-    const { userId } = req.user as any;
+  async leaveConversation(@Req() req: AuthenticatedRequest, @Param('id') id: string) {
+    const { userId } = req.user;
     await this._leaveConversationUseCase.execute(id, userId);
     this._chatGateway.notifyUserLeft(id, userId);
     return ApiResponse.success(null, 'Left conversation successfully');
@@ -153,11 +153,11 @@ export class ChatController {
 
   @Patch('messages/:id')
   async editMessage(
-    @Req() req: Request,
+    @Req() req: AuthenticatedRequest,
     @Param('id') id: string,
     @Body('content') content: string,
   ) {
-    const { userId } = req.user as any;
+    const { userId } = req.user;
     const message = await this._editMessageUseCase.execute(id, userId, content);
     this._chatGateway.notifyMessageUpdate(message);
     return ApiResponse.success(message, 'Message edited successfully');
@@ -165,11 +165,11 @@ export class ChatController {
 
   @Delete('messages/:id')
   async deleteMessage(
-    @Req() req: Request,
+    @Req() req: AuthenticatedRequest,
     @Param('id') id: string,
     @Query('type') type: 'me' | 'everyone',
   ) {
-    const { userId } = req.user as any;
+    const { userId } = req.user;
     const message = await this._deleteMessageUseCase.execute(id, userId, type);
 
     if (type === 'everyone') {
@@ -187,7 +187,7 @@ export class ChatController {
   @Post('upload-attachment')
   @UseInterceptors(FileInterceptor('file'))
   async uploadChatAttachment(
-    @Req() req: Request,
+    @Req() req: AuthenticatedRequest,
     @UploadedFile() file: Express.Multer.File,
   ) {
     if (!file) {
@@ -213,7 +213,7 @@ export class ChatController {
   @Post('upload-image')
   @UseInterceptors(FileInterceptor('file'))
   async uploadGroupImage(
-    @Req() req: Request,
+    @Req() req: AuthenticatedRequest,
     @UploadedFile() file: Express.Multer.File,
   ) {
     if (!file) {

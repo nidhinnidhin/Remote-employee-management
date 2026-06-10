@@ -1,7 +1,10 @@
 import { UserStoryDocument } from 'src/modules/project/infrastructure/database/mongoose/schemas/user-story.schema';
 import { UserStoryEntity } from 'src/modules/project/domain/entities/user-story.entity';
+import { UserStoryStatus } from 'src/shared/enums/project/user-story-status.enum';
+import { UserStoryPriority } from 'src/shared/enums/project/user-story-priority.enum';
+import { IssueType } from 'src/shared/enums/project/issue-type.enum';
 
-export type LeanStoryDocument = Omit<UserStoryDocument, keyof import('mongoose').Document> & { _id: any };
+export type LeanStoryDocument = Omit<UserStoryDocument, keyof import('mongoose').Document> & { _id: unknown };
 
 export class UserStoryMapper {
   static toDomain(raw: UserStoryDocument | LeanStoryDocument): UserStoryEntity {
@@ -10,9 +13,9 @@ export class UserStoryMapper {
     const projectId = raw.projectId ? raw.projectId.toString() : '';
     const storyNumber = typeof raw.storyNumber === 'number' ? raw.storyNumber : Number(raw.storyNumber || 0);
     const title = raw.title || '';
-    const status = raw.status as any;
-    const priority = raw.priority as any;
-    const type = raw.type as any;
+    const status = raw.status as UserStoryStatus;
+    const priority = raw.priority as UserStoryPriority;
+    const type = raw.type as IssueType;
     const order = typeof raw.order === 'number' ? raw.order : 0;
     const createdBy = raw.createdBy || '';
     const description = raw.description || '';
@@ -22,8 +25,8 @@ export class UserStoryMapper {
     const isInBacklog = raw.isInBacklog !== undefined ? raw.isInBacklog : true;
     const attachments = raw.attachments || [];
     const links = raw.links || [];
-    const createdAt = (raw as any).createdAt;
-    const updatedAt = (raw as any).updatedAt;
+    const createdAt = (raw as unknown as { createdAt: Date }).createdAt;
+    const updatedAt = (raw as unknown as { updatedAt: Date }).updatedAt;
     const isDeleted = raw.isDeleted !== undefined ? raw.isDeleted : false;
 
     return new UserStoryEntity(
@@ -50,7 +53,7 @@ export class UserStoryMapper {
     );
   }
 
-  static toPersistence(entity: Partial<UserStoryEntity>): any {
+  static toPersistence(entity: Partial<UserStoryEntity>): Record<string, unknown> {
     return {
       companyId: entity.companyId,
       projectId: entity.projectId,

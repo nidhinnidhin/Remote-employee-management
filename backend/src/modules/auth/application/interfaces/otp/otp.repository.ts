@@ -5,7 +5,7 @@ import { SendEmailOtpInput } from 'src/shared/types/company/otp/send-email-otp-i
 export interface IOtpRepository {
   sendEmailOtp(input: SendEmailOtpInput): Promise<void>;
 
-  verifyEmailOtp(input: VerifyEmailOtpDto): Promise<any>;
+  verifyEmailOtp(input: VerifyEmailOtpDto): Promise<Record<string, unknown>>;
 
   resendEmailOtp(input: ResendOtpDto): Promise<void>;
 }

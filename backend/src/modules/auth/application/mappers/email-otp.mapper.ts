@@ -9,7 +9,7 @@ export class EmailOtpMapper {
 
   static toDomain(doc: EmailOtpDocument | LeanEmailOtpDocument): EmailOtpEntity {
     return new EmailOtpEntity(
-      doc._id?.toString() || (doc as any).id,
+      doc._id?.toString() || (doc as unknown as { id?: string }).id || '',
       doc.userId,
       doc.email,
       doc.otpHash,

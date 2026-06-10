@@ -79,8 +79,10 @@ export class SubscriptionController {
         throw new BadRequestException('Degrading plan is not allowed');
       }
 
-      if ((existingSubscription as any)._id) {
-        await this._subscriptionRepository.updateById((existingSubscription as any)._id.toString(), {
+      const existingSubId = existingSubscription as unknown as { _id?: { toString(): string }; id?: string };
+      if (existingSubId._id || existingSubId.id) {
+        const idToUpdate = existingSubId.id || existingSubId._id?.toString() || '';
+        await this._subscriptionRepository.updateById(idToUpdate, {
           status: 'CANCELLED',
         });
       }

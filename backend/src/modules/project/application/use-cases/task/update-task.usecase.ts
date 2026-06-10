@@ -44,7 +44,7 @@ export class UpdateTaskUseCase implements IUpdateTaskUseCase {
       throw new ForbiddenException('You can only update tasks assigned to you');
     }
 
-    const updateData: any = {
+    const updateData: Record<string, unknown> = {
       ...taskDto,
       dueDate: taskDto.dueDate ? new Date(taskDto.dueDate) : undefined,
     };
@@ -54,12 +54,12 @@ export class UpdateTaskUseCase implements IUpdateTaskUseCase {
         taskDto.status === TaskStatus.DONE &&
         task.status !== TaskStatus.DONE
       ) {
-        updateData.completedAt = new Date();
+        updateData['completedAt'] = new Date();
       } else if (
         taskDto.status !== TaskStatus.DONE &&
         task.status === TaskStatus.DONE
       ) {
-        updateData.completedAt = null;
+        updateData['completedAt'] = null;
       }
     }
 

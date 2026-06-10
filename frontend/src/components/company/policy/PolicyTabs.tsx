@@ -10,9 +10,6 @@ import {
 const tabs: TabItem[] = [
   { id: "Working Hours", label: "Working Hours", icon: Clock },
   { id: "Leave Policy", label: "Leave Policy", icon: Calendar },
-  { id: "Attendance Rules", label: "Attendance Rules", icon: Users },
-  { id: "Remote Work", label: "Remote Work", icon: Globe },
-  { id: "General", label: "General", icon: Settings },
 ];
 
 interface PolicyTabsProps {

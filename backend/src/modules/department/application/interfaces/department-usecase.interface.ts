@@ -6,7 +6,7 @@ export interface ICreateDepartmentUseCase {
 }
 
 export interface IGetDepartmentsUseCase {
-  execute(companyId: string): Promise<any[]>;
+  execute(companyId: string): Promise<unknown[]>;
 }
 
 export interface IAddEmployeeToDepartmentUseCase {
@@ -22,7 +22,7 @@ export interface IUpdateDepartmentUseCase {
 }
 
 export interface IGetEmployeeDepartmentsUseCase {
-  execute(employeeId: string, companyId: string): Promise<any[]>;
+  execute(employeeId: string, companyId: string): Promise<unknown[]>;
 }
 
 export interface IDeleteDepartmentUseCase {
@@ -31,7 +31,7 @@ export interface IDeleteDepartmentUseCase {
 
 export interface ISearchDepartmentsUseCase {
   execute(companyId: string, dto: SearchDepartmentsDto): Promise<{
-    data: any[];
+    data: unknown[];
     total: number;
     page: number;
     limit: number;
