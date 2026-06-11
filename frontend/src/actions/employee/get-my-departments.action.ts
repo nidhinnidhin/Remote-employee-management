@@ -15,8 +15,12 @@ export const getMyDepartmentsAction = async (): Promise<DashboardResponse<Depart
     const api = await getServerApi();
     const departments = await getMyDepartments(api);
     return { success: true, data: departments };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } }; message?: string };
     console.error("Error fetching my departments:", error);
-    return { success: false, error: error.message || "Failed to fetch departments" };
+    return {
+      success: false,
+      error: err.response?.data?.message || err.message || "Failed to fetch your departments"
+    };
   }
 };

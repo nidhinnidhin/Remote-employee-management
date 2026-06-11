@@ -10,8 +10,9 @@ export const uploadResourceAction = async (formData: FormData) => {
     const api = await getServerApi();
     const data = await ProjectService.uploadResource(formData, api);
     return { success: true, data };
-  } catch (error: any) {
-    const message = error.response?.data?.message || error.message || "Failed to upload resource";
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } }; message?: string };
+    const message = err.response?.data?.message || err.message || "Failed to upload resource";
     console.error("Error uploading resource:", message);
     return { success: false, error: message };
   }
@@ -23,8 +24,9 @@ export const getStoriesByProjectAction = async (projectId: string) => {
     const data = await StoryService.getStoriesByProject(projectId, api);
     console.log('------------------------',data)
     return { success: true, data };
-  } catch (error: any) {
-    const message = error.response?.data?.message || error.message || "Failed to fetch stories";
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } }; message?: string };
+    const message = err.response?.data?.message || err.message || "Failed to fetch stories";
     console.error("Error fetching stories:", message);
     return { success: false, error: message };
   }
@@ -35,8 +37,9 @@ export const createStoryAction = async (payload: CreateStoryPayload) => {
     const api = await getServerApi();
     const data = await StoryService.createStory(payload, api);
     return { success: true, data };
-  } catch (error: any) {
-    const message = error.response?.data?.message || error.message || "Failed to create story";
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } }; message?: string };
+    const message = err.response?.data?.message || err.message || "Failed to create story";
     console.error("Error creating story:", message);
     return { success: false, error: message };
   }
@@ -47,8 +50,9 @@ export const updateStoryAction = async (id: string, payload: UpdateStoryPayload)
     const api = await getServerApi();
     const data = await StoryService.updateStory(id, payload, api);
     return { success: true, data };
-  } catch (error: any) {
-    const message = error.response?.data?.message || error.message || "Failed to update story";
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } }; message?: string };
+    const message = err.response?.data?.message || err.message || "Failed to update story";
     console.error("Error updating story:", message);
     return { success: false, error: message };
   }
@@ -59,8 +63,9 @@ export const deleteStoryAction = async (id: string) => {
     const api = await getServerApi();
     await StoryService.deleteStory(id, api);
     return { success: true };
-  } catch (error: any) {
-    const message = error.response?.data?.message || error.message || "Failed to delete story";
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } }; message?: string };
+    const message = err.response?.data?.message || err.message || "Failed to delete story";
     console.error("Error deleting story:", message);
     return { success: false, error: message };
   }
@@ -79,8 +84,9 @@ export const searchStoriesAction = async (params: {
     const api = await getServerApi();
     const data = await StoryService.searchStories(params, api);
     return { success: true, data };
-  } catch (error: any) {
-    const message = error.response?.data?.message || error.message || "Failed to search stories";
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } }; message?: string };
+    const message = err.response?.data?.message || err.message || "Failed to search stories";
     console.error("Error searching stories:", message);
     return { success: false, error: message };
   }

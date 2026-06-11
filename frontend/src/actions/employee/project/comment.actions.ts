@@ -46,7 +46,10 @@ export const addCommentAction = async (
     const result = await commentService.addComment(apiPayload, api);
     return { success: true, data: result };
   } catch (error: unknown) {
-    const err = error as { response?: { data?: { message?: any } }; message?: string };
+    const err = error as {
+      response?: { data?: { message?: string | string[] } };
+      message?: string;
+    };
     let userFriendlyMessage = "Failed to add comment.";
     if (err.response?.data?.message) {
       userFriendlyMessage =

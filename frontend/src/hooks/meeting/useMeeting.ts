@@ -36,7 +36,7 @@ export function useMeeting(meetingId: string) {
   const localStreamRef = useRef<MediaStream | null>(null);
   const screenStreamRef = useRef<MediaStream | null>(null);
 
-  const log = (msg: string, data?: any) => {
+  const log = (msg: string, data?: unknown) => {
     console.log(`[Meeting] ${msg}`, data ?? '');
     setEventLog(prev => [...prev.slice(-6), `${new Date().toLocaleTimeString()} ${msg}`]);
   };

@@ -3,7 +3,7 @@ import { useChatStore } from "@/store/chat.store";
 import { useAuthStore } from "@/store/auth.store";
 import { socketClient } from "@/lib/socket/socket.client";
 import { chatService } from "@/services/employee/chat/chat.service";
-import { SocketEvents, Message } from "@/shared/types/chat/chat.types";
+import { SocketEvents, Message, Conversation } from "@/shared/types/chat/chat.types";
 
 export function useChat() {
   const { accessToken } = useAuthStore();
@@ -46,7 +46,7 @@ export function useChat() {
         addMessage(message.conversationId, message);
 
         // Safely extract the optional type parameter from message object
-        const msgType = (message as any).type || "TEXT";
+        const msgType = (message as Message & { type?: string }).type || "TEXT";
 
         const lastMessageText =
           msgType === "TEXT"
@@ -64,7 +64,7 @@ export function useChat() {
         }
       };
 
-      const handleConversationUpdated = (conversation: any) => {
+      const handleConversationUpdated = (conversation: Conversation) => {
         console.log("[Chat] Conversation updated received:", conversation);
         addConversation(conversation);
         socketClient.emit(SocketEvents.JOIN_CONVERSATION, conversation.id);
@@ -146,7 +146,7 @@ export function useChat() {
       conversationId: string,
       content: string,
       type: string = "TEXT",
-      attachments: any[] = [],
+      attachments: string[] = [],
     ) => {
       socketClient.emit(SocketEvents.SEND_MESSAGE, {
         conversationId,

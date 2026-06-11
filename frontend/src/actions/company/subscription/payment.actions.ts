@@ -8,8 +8,9 @@ export async function createPaymentOrderAction(planId: string, companyId: string
         const api = await getServerApi();
         const response = await api.post('/subscriptions/create-order', { planId, companyId });
         return { success: true, data: response.data };
-    } catch (error: any) {
-        return { success: false, error: error.response?.data?.message || "Failed to create order" };
+    } catch (error: unknown) {
+        const err = error as { response?: { data?: { message?: string } }; message?: string };
+        return { success: false, error: err.response?.data?.message || "Failed to create order" };
     }
 }
 
@@ -26,8 +27,9 @@ export async function verifyPaymentAction(payload: {
         const api = await getServerApi();
         const response = await api.post('/subscriptions/verify-payment', payload);
         return { success: true, data: response.data };
-    } catch (error: any) {
-        return { success: false, error: error.response?.data?.message || "Payment verification failed" };
+    } catch (error: unknown) {
+        const err = error as { response?: { data?: { message?: string } }; message?: string };
+        return { success: false, error: err.response?.data?.message || "Payment verification failed" };
     }
 }
 
@@ -36,8 +38,9 @@ export async function getSubscriptionPlansAction(activeOnly: boolean = true) {
         const api = await getServerApi();
         const response = await api.get(`/subscription-plans?activeOnly=${activeOnly}`);
         return { success: true, data: response.data };
-    } catch (error: any) {
-        return { success: false, error: error.response?.data?.message || "Failed to load subscription plans" };
+    } catch (error: unknown) {
+        const err = error as { response?: { data?: { message?: string } }; message?: string };
+        return { success: false, error: err.response?.data?.message || "Failed to load subscription plans" };
     }
 }
 
@@ -46,7 +49,8 @@ export async function getCurrentSubscriptionAction(companyId: string) {
         const api = await getServerApi();
         const response = await api.get(`/subscriptions/current/${companyId}`);
         return { success: true, data: response.data };
-    } catch (error: any) {
-        return { success: false, error: error.response?.data?.message || "Failed to load current subscription" };
+    } catch (error: unknown) {
+        const err = error as { response?: { data?: { message?: string } }; message?: string };
+        return { success: false, error: err.response?.data?.message || "Failed to load current subscription" };
     }
 }

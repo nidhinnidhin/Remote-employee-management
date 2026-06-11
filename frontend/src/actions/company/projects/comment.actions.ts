@@ -52,7 +52,7 @@ export const addCommentAdminAction = async (
     return { success: true, data: result };
   } catch (error: unknown) {
     const err = error as {
-      response?: { data?: { message?: any } };
+      response?: { data?: { message?: string | string[] } };
       message?: string;
     };
     let userFriendlyMessage = "Failed to add comment.";

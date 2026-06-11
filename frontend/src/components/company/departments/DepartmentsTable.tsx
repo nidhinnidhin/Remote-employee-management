@@ -177,7 +177,7 @@ const DepartmentsTable = ({
           </span>
         </div>
 
-        <div className="divide-y divide-[rgb(var(--color-border-subtle))]/30">
+        <div >
           {departments.map((dept) => (
             <div key={dept.id} className="group transition-colors duration-200">
               {/* Department Row */}
