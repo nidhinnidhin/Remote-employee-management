@@ -1,12 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { ChevronDown, ChevronRight, FolderOpen, Users } from "lucide-react";
+import { ChevronDown, ChevronRight, Users } from "lucide-react";
 import Image from "next/image";
 import { Department } from "@/shared/types/company/departments/department.type";
 import { searchDepartmentsAction } from "@/actions/company/departments/department.actions";
 import Pagination from "@/components/ui/Pagination";
-import { Column } from "@/shared/types/ui/table-props.type";
 import { createPortal } from "react-dom";
 import { Eye, Edit3, Trash2, MoreVertical, Plus } from "lucide-react";
 import { DepartmentDetailsModal } from "./DepartmentDetailsModal";
@@ -154,18 +153,19 @@ const DepartmentsTable = ({
   }, [debouncedSearch]);
 
   if (loading) {
-    return <div className="p-6 text-sm text-muted">Loading departments...</div>;
+    return <div className="p-6 text-sm text-muted bg-transparent">Loading departments...</div>;
   }
 
   if (!departments.length) {
-    return <div className="p-6 text-sm text-muted">No departments found.</div>;
+    return <div className="p-6 text-sm text-muted bg-transparent">No departments found.</div>;
   }
 
   return (
     <>
-      <div className="portal-card overflow-hidden bg-[rgb(var(--color-bg-subtle))]/60 border border-[rgb(var(--color-border-subtle))] shadow-2xl backdrop-blur-md w-full">
-        {/* Header */}
-        <div className="grid grid-cols-[1fr_100px_80px] px-6 py-4 bg-[rgb(var(--color-surface-raised))]/30 border-b border-[rgb(var(--color-border-subtle))]">
+      {/* Container altered to fully transparent variant wrapper */}
+      <div className="overflow-hidden bg-transparent border border-[rgb(var(--color-border-subtle))] rounded-2xl w-full">
+        {/* Header Block with background cleaned to plain translucent layout line */}
+        <div className="grid grid-cols-[1fr_100px_80px] px-6 py-4 border-b border-[rgb(var(--color-border-subtle))] bg-white/[0.01]">
           <span className="text-[10px] font-bold text-muted uppercase tracking-widest px-8">
             Department Name
           </span>
@@ -177,7 +177,7 @@ const DepartmentsTable = ({
           </span>
         </div>
 
-        <div >
+        <div className="divide-y divide-[rgb(var(--color-border-subtle))]/30">
           {departments.map((dept) => (
             <div key={dept.id} className="group transition-colors duration-200">
               {/* Department Row */}
@@ -219,7 +219,7 @@ const DepartmentsTable = ({
                 menuAnchor &&
                 createPortal(
                   <div
-                    className="fixed glass-dropdown rounded-xl z-[9999] overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+                    className="fixed glass-dropdown bg-[#0c0e12] border border-white/[0.08] rounded-xl z-[9999] overflow-hidden animate-in fade-in zoom-in-95 duration-200 shadow-2xl"
                     style={{
                       top: `${menuAnchor.y + 8}px`,
                       right: `${window.innerWidth - menuAnchor.x}px`,
@@ -265,7 +265,7 @@ const DepartmentsTable = ({
 
               {/* Expanded Section - Employee List */}
               {expandedDepts[dept.id] && (
-                <div className="bg-black/20 border-t border-white/5 p-4 animate-in slide-in-from-top-2 duration-300">
+                <div className="bg-transparent border-t border-white/5 p-4 animate-in slide-in-from-top-2 duration-300">
                   <div className="flex items-center justify-between mb-4 px-2">
                     <h4 className="text-[11px] font-black text-muted uppercase tracking-[0.2em]">
                       Department Members ({dept.employeeIds?.length || 0})
@@ -288,7 +288,7 @@ const DepartmentsTable = ({
                       dept.employeeIds.map((employee: any) => (
                         <div
                           key={employee.id}
-                          className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.06] hover:border-white/10 transition-all cursor-default group/emp"
+                          className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] hover:border-white/10 transition-all cursor-default group/emp"
                         >
                           <div className="relative flex-shrink-0">
                             <div className="h-10 w-10 rounded-full overflow-hidden border border-white/10 ring-2 ring-black/20 bg-white/5 flex items-center justify-center">
@@ -309,7 +309,7 @@ const DepartmentsTable = ({
                             </div>
 
                             {/* Status Dot */}
-                            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-[rgb(var(--color-bg))] rounded-full shadow-lg shadow-green-500/20" />
+                            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-[#08090a] rounded-full shadow-lg shadow-green-500/20" />
                           </div>
 
                           <div className="flex flex-col min-w-0">
@@ -340,12 +340,12 @@ const DepartmentsTable = ({
                               <MoreVertical size={14} />
                             </button>
 
-                            {/* Member Specific Menu */}
+                            {/* Member Specific Dropdown Menu */}
                             {openMenuId === `member-${employee.id}` &&
                               menuAnchor &&
                               createPortal(
                                 <div
-                                  className="fixed glass-dropdown rounded-xl z-[9999] overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+                                  className="fixed glass-dropdown bg-[#0c0e12] border border-white/[0.08] rounded-xl z-[9999] overflow-hidden animate-in fade-in zoom-in-95 duration-200 shadow-2xl"
                                   style={{
                                     top: `${menuAnchor.y + 8}px`,
                                     right: `${window.innerWidth - menuAnchor.x}px`,
@@ -372,7 +372,7 @@ const DepartmentsTable = ({
                         </div>
                       ))
                     ) : (
-                      <div className="col-span-full py-8 flex flex-col items-center justify-center border border-dashed border-white/5 rounded-2xl bg-white/[0.01]">
+                      <div className="col-span-full py-8 flex flex-col items-center justify-center border border-dashed border-white/5 rounded-2xl bg-transparent">
                         <Users size={24} className="text-muted/20 mb-2" />
                         <p className="text-xs text-muted/40 font-medium italic">
                           No employees assigned to this department
@@ -386,7 +386,7 @@ const DepartmentsTable = ({
           ))}
         </div>
 
-        {/* Modals */}
+        {/* Modals Containers */}
         <DepartmentDetailsModal
           isOpen={isDetailsOpen}
           onClose={() => setIsDetailsOpen(false)}
@@ -438,12 +438,10 @@ const DepartmentsTable = ({
           title="Remove Member"
           itemName={selectedMember?.name || ""}
         />
-
-        {/* Pagination */}
-        {/* {totalDepartments > itemsPerPage && ( */}
-        {/* )} */}
       </div>
-      <div className="px-6 py-4 border-t border-[rgb(var(--color-border-subtle))] bg-[rgb(var(--color-surface-raised))]/10">
+
+      {/* Pagination Block Container completely converted to a transparent context item layout */}
+      <div className="flex items-center justify-center mt-6 w-full bg-transparent">
         <Pagination
           currentPage={currentPage}
           totalPages={Math.ceil(totalDepartments / itemsPerPage)}
