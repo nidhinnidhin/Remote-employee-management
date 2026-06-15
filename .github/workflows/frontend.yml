@@ -39,7 +39,7 @@ jobs:
           script: |
             cd ~/stafflow
 
-            docker compose pull frontend
-            docker compose up -d frontend
+            sudo docker compose pull frontend
+            sudo docker compose up -d frontend
 
-            docker image prune -af
+            sudo docker image prune -af
