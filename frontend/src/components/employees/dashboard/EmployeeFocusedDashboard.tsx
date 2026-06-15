@@ -18,6 +18,7 @@ import { Project } from "@/shared/types/company/projects/project.type";
 import EmployeeProjectList from "@/components/employees/projects/EmployeeProjectList";
 import EmployeeTaskCard from "@/components/employees/tasks/EmployeeTaskCard";
 import { motion } from "framer-motion";
+import { TaskStatusChart } from "@/components/employees/dashboard/charts/TaskStatusChart";
 import Link from "next/link";
 import { FRONTEND_ROUTES } from "@/constants/frontend.routes";
 import { useProfileStore } from "@/store/profile.store";
@@ -105,6 +106,13 @@ export default function EmployeeFocusedDashboard() {
     },
   ];
 
+  const chartData = [
+    { name: "Done", value: done.length, color: "#10b981" },
+    { name: "In Progress", value: inProgress.length, color: "#3b82f6" },
+    { name: "Overdue", value: overdue.length, color: "#ef4444" },
+    { name: "Pending/Other", value: tasks.length - done.length - inProgress.length - overdue.length, color: "#8b5cf6" },
+  ].filter(d => d.value > 0);
+
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-32 gap-4">
@@ -132,25 +140,47 @@ export default function EmployeeFocusedDashboard() {
   }
 
   return (
-    <div className="space-y-14 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      {/* ── 1. Stat Cards ── */}
-      <StatCards stats={stats} />
+    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      {/* ── 1. Overview Grid ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <StatCards stats={stats} />
+        </div>
+        <div className="portal-card p-6 h-full flex flex-col justify-center">
+          <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 mb-4 text-center">Task Distribution</h3>
+          {chartData.length > 0 ? (
+            <TaskStatusChart data={chartData} />
+          ) : (
+            <div className="h-[200px] flex items-center justify-center text-muted text-sm">No task data available</div>
+          )}
+        </div>
+      </div>
 
       {/* ── 2. Due Today Strip ── */}
       {dueToday.length > 0 && (
         <section className="space-y-6">
-          <div className="flex items-center gap-3">
-            <div className="w-2 h-2 rounded-full bg-warning animate-pulse" />
-            <h2 className="text-base font-black text-primary uppercase tracking-[0.15em]">
-              Due Today
-            </h2>
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-warning/10 text-warning border border-warning/30">
-              {dueToday.length}
-            </span>
-            <div className="h-[1px] flex-1 bg-warning/10" />
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 rounded-full bg-warning animate-pulse" />
+              <h2 className="text-base font-black text-primary uppercase tracking-[0.15em]">
+                Due Today
+              </h2>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-warning/10 text-warning border border-warning/30">
+                {dueToday.length}
+              </span>
+              <div className="h-[1px] flex-1 bg-warning/10" />
+            </div>
+            {dueToday.length > 2 && (
+              <Link
+                href={FRONTEND_ROUTES.EMPLOYEE.TASKS}
+                className="text-[11px] font-black uppercase tracking-widest text-accent hover:text-accent/70 transition-colors shrink-0"
+              >
+                View More →
+              </Link>
+            )}
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-5">
-            {dueToday.map((task, i) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {dueToday.slice(0, 2).map((task, i) => (
               <motion.div
                 key={task.id}
                 initial={{ opacity: 0, y: 10 }}
@@ -183,15 +213,17 @@ export default function EmployeeFocusedDashboard() {
               </span>
               <div className="h-[1px] flex-1 bg-accent/10" />
             </div>
-            <Link
-              href={FRONTEND_ROUTES.EMPLOYEE.TASKS}
-              className="text-[11px] font-black uppercase tracking-widest text-accent hover:text-accent/70 transition-colors flex items-center gap-1.5"
-            >
-              View Board →
-            </Link>
+            {inProgress.length > 2 && (
+              <Link
+                href={FRONTEND_ROUTES.EMPLOYEE.TASKS}
+                className="text-[11px] font-black uppercase tracking-widest text-accent hover:text-accent/70 transition-colors shrink-0"
+              >
+                View More →
+              </Link>
+            )}
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-5">
-            {inProgress.slice(0, 6).map((task, i) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {inProgress.slice(0, 2).map((task, i) => (
               <motion.div
                 key={task.id}
                 initial={{ opacity: 0, y: 10 }}
@@ -213,18 +245,28 @@ export default function EmployeeFocusedDashboard() {
       {/* ── 4. Overdue Alert ── */}
       {overdue.length > 0 && (
         <section className="space-y-6">
-          <div className="flex items-center gap-3">
-            <div className="w-2 h-2 rounded-full bg-danger animate-pulse" />
-            <h2 className="text-base font-black text-danger uppercase tracking-[0.15em]">
-              Overdue
-            </h2>
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-danger/10 text-danger border border-danger/30">
-              {overdue.length}
-            </span>
-            <div className="h-[1px] flex-1 bg-danger/10" />
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 rounded-full bg-danger animate-pulse" />
+              <h2 className="text-base font-black text-danger uppercase tracking-[0.15em]">
+                Overdue
+              </h2>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-danger/10 text-danger border border-danger/30">
+                {overdue.length}
+              </span>
+              <div className="h-[1px] flex-1 bg-danger/10" />
+            </div>
+            {overdue.length > 2 && (
+              <Link
+                href={FRONTEND_ROUTES.EMPLOYEE.TASKS}
+                className="text-[11px] font-black uppercase tracking-widest text-accent hover:text-accent/70 transition-colors shrink-0"
+              >
+                View More →
+              </Link>
+            )}
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-5">
-            {overdue.map((task, i) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {overdue.slice(0, 2).map((task, i) => (
               <motion.div
                 key={task.id}
                 initial={{ opacity: 0, y: 10 }}
@@ -244,7 +286,7 @@ export default function EmployeeFocusedDashboard() {
       )}
 
       {/* ── 5. My Projects ── */}
-      <EmployeeProjectList tasks={tasks} userId={userProfile?.id || ""} />
+      <EmployeeProjectList tasks={tasks} userId={userProfile?.id || ""} isDashboardView={true} />
 
       {/* ── 6. Empty State ── */}
       {tasks.length === 0 && !isLoading && (

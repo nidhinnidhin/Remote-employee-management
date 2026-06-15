@@ -1,3 +1,9 @@
+export interface DepartmentTeam {
+  id: string;
+  name: string;
+  memberCount?: number;
+}
+
 export interface Department {
   id: string;
   name: string;
@@ -13,5 +19,5 @@ export interface Department {
 
   // UI derived fields (optional)
   teamCount?: number;
-  teams?: any[];
+  teams?: DepartmentTeam[];
 }

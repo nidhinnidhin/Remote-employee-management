@@ -20,10 +20,11 @@ export async function registerAction(formData: RegisterFormData) {
   try {
     const data = await registerAdmin(payload);
     return { success: true, data };
-  } catch (e: any) {
+  } catch (e: unknown) {
+    const err = e as { message?: string };
     return {
       success: false,
-      error: e.message || AUTH_MESSAGES.REGISTRATION_FAILED,
+      error: err.message || AUTH_MESSAGES.REGISTRATION_FAILED,
     };
   }
 }

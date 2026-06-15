@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types, UpdateQuery } from 'mongoose';
+import { Model, UpdateQuery, FilterQuery, Types } from 'mongoose';
 import { IEmployeeRepository } from '../../domain/repositories/employee.repository';
 import { Employee } from '../../domain/entities/employee.entity';
 import { UserDocument } from 'src/modules/auth/infrastructure/database/mongoose/schemas/userSchema';
@@ -22,12 +22,12 @@ export class EmployeeRepositoryImpl
   }
 
   // Bulletproof mapping to prevent 500 errors on lean() documents
-  protected toEntity(userDoc: any): Employee {
+  protected toEntity(userDoc: Partial<UserDocument> & { _id?: Types.ObjectId }): Employee {
     return new Employee(
-      userDoc._id?.toString() || userDoc.id,
+      userDoc._id?.toString() || userDoc.id || '',
       `${userDoc.firstName || ''} ${userDoc.lastName || ''}`.trim(),
-      userDoc.email,
-      userDoc.role,
+      userDoc.email ?? '',
+      userDoc.role ?? '',
       userDoc.department || '',
       userDoc.phone || '',
       userDoc.status === UserStatus.ACTIVE,
@@ -70,7 +70,7 @@ export class EmployeeRepositoryImpl
   }
 
   async findAllByCompanyId(companyId: string, search?: string): Promise<Employee[]> {
-    const query: any = { companyId, role: UserRole.EMPLOYEE };
+    const query: FilterQuery<UserDocument> = { companyId, role: UserRole.EMPLOYEE };
 
     if (search) {
       const searchRegex = new RegExp(search, 'i');

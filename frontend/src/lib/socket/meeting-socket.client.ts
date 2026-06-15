@@ -1,6 +1,6 @@
 import { io, Socket } from 'socket.io-client';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:4000';
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')
 
 class MeetingSocketClient {
   private socket: Socket | null = null;
@@ -40,19 +40,19 @@ class MeetingSocketClient {
     return this.socket;
   }
 
-  emit(event: string, data?: any) {
+  emit(event: string, data?: unknown) {
     if (this.socket) {
       this.socket.emit(event, data);
     }
   }
 
-  on(event: string, callback: (...args: any[]) => void) {
+  on(event: string, callback: Parameters<Socket['on']>[1]) {
     if (this.socket) {
       this.socket.on(event, callback);
     }
   }
 
-  off(event: string, callback?: (...args: any[]) => void) {
+  off(event: string, callback?: Parameters<Socket['off']>[1]) {
     if (this.socket) {
       this.socket.off(event, callback);
     }

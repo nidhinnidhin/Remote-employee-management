@@ -22,7 +22,7 @@ export class SubscriptionService {
     const plan = await this.getActivePlan(companyId);
     if (!plan) throw new ForbiddenException('No active subscription found');
 
-    const limit = (plan as any)[type];
+    const limit = plan[type];
     if (limit === -1) return true; // Unlimited
 
     if (currentCount >= limit) {

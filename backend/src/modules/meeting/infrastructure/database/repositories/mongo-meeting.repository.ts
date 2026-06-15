@@ -1,8 +1,10 @@
-// src/modules/meeting/infrastructure/database/repositories/mongo-meeting.repository.ts
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { IMeetingRepository } from '../../../domain/repositories/imeeting.repository';
+import {
+  IMeetingRepository,
+  PaginatedMeetings,
+} from '../../../domain/repositories/imeeting.repository';
 import { MeetingEntity } from '../../../domain/entities/meeting.entity';
 import { Meeting, MeetingDocument } from '../mongoose/schemas/meeting.schema';
 import { MeetingMapper } from '../../../application/mappers/meeting.mapper';
@@ -21,7 +23,7 @@ export class MongoMeetingRepository implements IMeetingRepository {
       creatorId: new Types.ObjectId(meeting.creatorId),
       type: meeting.type,
       status: meeting.status,
-      participants: meeting.participants.map(p => new Types.ObjectId(p)),
+      participants: meeting.participants.map((p) => new Types.ObjectId(p)),
       scheduledAt: meeting.scheduledAt,
       endedAt: meeting.endedAt,
     });
@@ -33,35 +35,64 @@ export class MongoMeetingRepository implements IMeetingRepository {
     return found ? MeetingMapper.toDomain(found) : null;
   }
 
-  async findByCompanyId(companyId: string): Promise<MeetingEntity[]> {
-    const meetings = await this._meetingModel.find({ companyId: new Types.ObjectId(companyId) }).sort({ createdAt: -1 });
-    return meetings.map(MeetingMapper.toDomain);
+  async findByCompanyId(
+    companyId: string,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<PaginatedMeetings> {
+    const skip = (page - 1) * limit;
+    const filter = { companyId: new Types.ObjectId(companyId) };
+
+    const [meetings, total] = await Promise.all([
+      this._meetingModel
+        .find(filter)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .exec(),
+      this._meetingModel.countDocuments(filter).exec(),
+    ]);
+
+    return {
+      meetings: meetings.map(MeetingMapper.toDomain),
+      total,
+    };
   }
 
-  async updateStatus(id: string, status: MeetingStatus, endedAt?: Date): Promise<MeetingEntity | null> {
+  async updateStatus(
+    id: string,
+    status: MeetingStatus,
+    endedAt?: Date,
+  ): Promise<MeetingEntity | null> {
     const updated = await this._meetingModel.findByIdAndUpdate(
       id,
       { status, ...(endedAt && { endedAt }) },
-      { new: true }
+      { new: true },
     );
     return updated ? MeetingMapper.toDomain(updated) : null;
   }
 
-  async addParticipants(id: string, participants: string[]): Promise<MeetingEntity | null> {
-    const objectIds = participants.map(p => new Types.ObjectId(p));
+  async addParticipants(
+    id: string,
+    participants: string[],
+  ): Promise<MeetingEntity | null> {
+    const objectIds = participants.map((p) => new Types.ObjectId(p));
     const updated = await this._meetingModel.findByIdAndUpdate(
       id,
       { $addToSet: { participants: { $each: objectIds } } },
-      { new: true }
+      { new: true },
     );
     return updated ? MeetingMapper.toDomain(updated) : null;
   }
 
-  async removeParticipant(id: string, participantId: string): Promise<MeetingEntity | null> {
+  async removeParticipant(
+    id: string,
+    participantId: string,
+  ): Promise<MeetingEntity | null> {
     const updated = await this._meetingModel.findByIdAndUpdate(
       id,
       { $pull: { participants: new Types.ObjectId(participantId) } },
-      { new: true }
+      { new: true },
     );
     return updated ? MeetingMapper.toDomain(updated) : null;
   }

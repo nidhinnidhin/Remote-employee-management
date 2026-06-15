@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronDown,
@@ -36,10 +36,20 @@ const StoryCard: React.FC<StoryCardProps> = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
+  const [isDescExpanded, setIsDescExpanded] = useState(false); // Controls Read More state
+  
   const assignee = employees.find((e) => e.id === story.assigneeId);
-
-  // REFINED: Thicker Zinc border for better structure
   const zincBorder = "border-zinc-700/80";
+
+  // Configuration for description trimming thresholds
+  const CHAR_LIMIT = 180;
+  const rawDescription = story.description || "No description provided.";
+  const isLongDescription = rawDescription.length > CHAR_LIMIT;
+
+  const displayDescription = useMemo(() => {
+    if (!isLongDescription || isDescExpanded) return rawDescription;
+    return `${rawDescription.substring(0, CHAR_LIMIT).trim()}...`;
+  }, [rawDescription, isLongDescription, isDescExpanded]);
 
   return (
     <div
@@ -57,9 +67,14 @@ const StoryCard: React.FC<StoryCardProps> = ({
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex flex-col min-w-0 flex-1">
-          <h4 className="text-[14px] font-bold text-primary truncate leading-tight">
-            {story.title}
-          </h4>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-black tracking-widest uppercase text-accent bg-accent/10 border border-accent/20 px-1.5 py-0.5 rounded">
+              US-{story.storyNumber || 'NEW'}
+            </span>
+            <h4 className="text-[14px] font-bold text-primary truncate leading-tight">
+              {story.title}
+            </h4>
+          </div>
           {!isExpanded && story.description && (
             <p className="text-[11px] text-muted/40 truncate max-w-[400px] mt-0.5">
               {story.description}
@@ -151,7 +166,8 @@ const StoryCard: React.FC<StoryCardProps> = ({
               className={cn("px-6 pb-5 pt-4 border-t bg-black/5", zincBorder)}
             >
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                {/* Description */}
+                
+                {/* Description Column with Read More Implementation */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 text-zinc-400 uppercase">
                     <AlignLeft size={13} strokeWidth={2.5} />
@@ -159,10 +175,23 @@ const StoryCard: React.FC<StoryCardProps> = ({
                       Description
                     </span>
                   </div>
-                  <div className={cn("pl-5 border-l-2", zincBorder)}>
-                    <p className="text-secondary text-[13px] leading-relaxed">
-                      {story.description || "No description provided."}
+                  <div className={cn("pl-5 border-l-2 relative group/desc", zincBorder)}>
+                    <p className="text-secondary text-[13px] leading-relaxed transition-all duration-300">
+                      {displayDescription}
                     </p>
+                    
+                    {isLongDescription && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsDescExpanded(!isDescExpanded);
+                        }}
+                        className="mt-1.5 text-[11px] font-black uppercase tracking-wider text-accent/80 hover:text-accent transition-colors block select-none"
+                      >
+                        {isDescExpanded ? "Show Less ▲" : "Read More ▼"}
+                      </button>
+                    )}
                   </div>
                 </div>
 

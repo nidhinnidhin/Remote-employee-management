@@ -6,6 +6,7 @@ import { AxiosInstance } from "axios";
 export const StoryService = {
   getStoriesByProject: async (projectId: string, api: AxiosInstance = clientApi) => {
     const response = await api.get<UserStory[]>(API_ROUTES.COMPANY.STORIES.BY_PROJECT(projectId));
+    console.log('------------------------',response)
     return response.data;
   },
 

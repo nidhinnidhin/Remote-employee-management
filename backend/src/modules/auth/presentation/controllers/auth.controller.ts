@@ -78,12 +78,12 @@ export class AuthController {
     const result = await this._onboardCompanyUseCase.execute(
       onboardingDto.userId,
       onboardingDto,
-    );
+    ) as { accessToken?: string; refreshToken?: string; company?: { id?: string }; [key: string]: unknown };
 
     this._cookieHelperService.setAuthCookies(
       res,
-      result.accessToken,
-      result.refreshToken,
+      result.accessToken ?? '',
+      result.refreshToken ?? '',
     );
 
     return result;
@@ -102,7 +102,7 @@ export class AuthController {
     if (!userId) {
       throw new BadRequestException('User ID is required');
     }
-    const result = await this._onboardCompanyUseCase.getStatus(userId);
+    const result = await this._onboardCompanyUseCase.getStatus(userId) as { company?: { id?: string }; [key: string]: unknown };
     if (result.company?.id) {
       await this._onboardCompanyUseCase.finalize(userId, result.company.id);
     }
@@ -173,7 +173,7 @@ export class AuthController {
   @Post('logout')
   @UseGuards(JwtAuthGuard) // 🔹 Fixed: Applied guard so req.user gets parsed before processing logs
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    const user = req.user as any;
+    const user = req.user as { userId: string, id: string, role: string, companyId: string };
 
     if (user) {
       await this._createLogUseCase.execute({

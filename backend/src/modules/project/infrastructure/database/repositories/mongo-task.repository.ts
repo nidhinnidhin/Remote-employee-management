@@ -1,14 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model, Types, FilterQuery } from 'mongoose';
 import { TaskEntity } from '../../../domain/entities/task.entity';
 import type { ITaskRepository } from '../../../domain/repositories/task.repository.interface';
 import { TaskDocument } from '../mongoose/schemas/task.schema';
 import { BaseRepository } from 'src/shared/repositories/base.repository'; // Adjust path
-import {
-  LeanTaskDocument,
-  TaskMapper,
-} from 'src/modules/project/application/mappers/task.mapper';
+import { LeanTaskDocument, TaskMapper } from 'src/modules/project/application/mappers/task/task.mapper';
+
 
 @Injectable()
 export class MongoTaskRepository
@@ -46,7 +44,7 @@ export class MongoTaskRepository
     storyId: string,
     companyId: string,
   ): Promise<TaskEntity[]> {
-    const filter: any = { companyId, isDeleted: { $ne: true } };
+    const filter: FilterQuery<TaskDocument> = { companyId, isDeleted: { $ne: true } };
     
     if (Types.ObjectId.isValid(storyId)) {
       filter.$or = [
@@ -73,7 +71,7 @@ export class MongoTaskRepository
     projectId: string,
     companyId: string,
   ): Promise<TaskEntity[]> {
-    const filter: any = { companyId, isDeleted: { $ne: true } };
+    const filter: FilterQuery<TaskDocument> = { companyId, isDeleted: { $ne: true } };
     if (Types.ObjectId.isValid(projectId)) {
       filter.$or = [
         { projectId: new Types.ObjectId(projectId) },
@@ -89,7 +87,7 @@ export class MongoTaskRepository
     assigneeId: string,
     companyId: string,
   ): Promise<TaskEntity[]> {
-    const filter: any = { companyId, isDeleted: { $ne: true } };
+    const filter: FilterQuery<TaskDocument> = { companyId, isDeleted: { $ne: true } };
     if (Types.ObjectId.isValid(assigneeId)) {
       filter.$or = [
         { assignedTo: new Types.ObjectId(assigneeId) },
@@ -108,7 +106,6 @@ export class MongoTaskRepository
   ): Promise<TaskEntity | null> {
     if (!Types.ObjectId.isValid(id)) return null;
 
-    // Let TS infer the lean result cleanly
     const doc = await this.model
       .findOneAndUpdate(
         { _id: id, companyId, isDeleted: false },

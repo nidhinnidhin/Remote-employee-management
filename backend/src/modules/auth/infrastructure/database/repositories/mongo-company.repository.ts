@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { BaseRepository } from 'src/shared/repositories/base.repository';
 import { ICompanyRepository } from '../../../domain/repositories/icompany.repository';
 import { CompanyEntity } from '../../../domain/entities/company.entity';
@@ -19,7 +19,7 @@ export class MongoCompanyRepository
     super(_companyModel);
   }
 
-  protected toEntity(companyDoc: any): CompanyEntity {
+  protected toEntity(companyDoc: import('../mongoose/schemas/company.schema').CompanyDocument): CompanyEntity {
     return CompanyMapper.toDomain(companyDoc);
   }
 
@@ -31,5 +31,21 @@ export class MongoCompanyRepository
 
   async findByEmail(email: string): Promise<CompanyEntity | null> {
     return this.findOne({ email: email.toLowerCase() });
+  }
+
+  async incrementAndGetProjectCounter(companyId: string): Promise<number> {
+    const updatedCompany = await this._companyModel
+      .findOneAndUpdate(
+        { _id: new Types.ObjectId(companyId) },
+        { $inc: { projectCounter: 1 } },
+        { new: true, useFindAndModify: false },
+      )
+      .exec();
+
+    if (!updatedCompany) {
+      throw new Error('Company tracking verification failed');
+    }
+
+    return updatedCompany.projectCounter;
   }
 }

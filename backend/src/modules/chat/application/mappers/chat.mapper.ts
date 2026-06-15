@@ -3,6 +3,7 @@ import { ConversationEntity } from '../../domain/entities/conversation.entity';
 import { MessageEntity } from '../../domain/entities/message.entity';
 import { ConversationDocument } from '../../infrastructure/database/mongoose/schemas/conversation.schema';
 import { MessageDocument } from '../../infrastructure/database/mongoose/schemas/message.schema';
+import { MessageType } from 'src/shared/enums/chat/message-type.enum';
 
 export class ChatMapper {
   static toConversationEntity(doc: ConversationDocument): ConversationEntity {
@@ -28,6 +29,8 @@ export class ChatMapper {
       doc.conversationId.toString(),
       doc.senderId.toString(),
       doc.content,
+      doc.type as MessageType, 
+      doc.attachments || [],   
       doc.seenBy.map((s) => s.toString()),
       doc.isEdited,
       doc.deletedFor?.map((d) => d.toString()) || [],

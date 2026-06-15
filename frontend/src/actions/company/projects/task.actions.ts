@@ -10,9 +10,10 @@ export const uploadResourceAction = async (formData: FormData) => {
     const api = await getServerApi();
     const data = await ProjectService.uploadResource(formData, api);
     return { success: true, data };
-  } catch (error: any) {
-    console.error("Error uploading resource:", error?.message);
-    return { success: false, error: error?.message || "Failed to upload resource" };
+  } catch (error: unknown) {
+    const err = error as { message?: string };
+    console.error("Error uploading resource:", err?.message);
+    return { success: false, error: err?.message || "Failed to upload resource" };
   }
 };
 
@@ -21,10 +22,11 @@ export const getTasksByStoryAction = async (storyId: string) => {
     const api = await getServerApi();
     const data = await TaskService.getTasksByStory(storyId, api);
     return { success: true, data };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } }; message?: string };
     return {
       success: false,
-      error: error.response?.data?.message || "Failed to fetch tasks",
+      error: err.response?.data?.message || "Failed to fetch tasks",
     };
   }
 };
@@ -34,10 +36,11 @@ export const getTasksByProjectAction = async (projectId: string) => {
     const api = await getServerApi();
     const data = await TaskService.getTasksByProject(projectId, api);
     return { success: true, data };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } }; message?: string };
     return {
       success: false,
-      error: error.response?.data?.message || "Failed to fetch tasks",
+      error: err.response?.data?.message || "Failed to fetch tasks",
     };
   }
 };
@@ -47,10 +50,11 @@ export const getTaskByIdAction = async (id: string) => {
     const api = await getServerApi();
     const data = await TaskService.getTaskById(id, api);
     return { success: true, data };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } }; message?: string };
     return {
       success: false,
-      error: error.response?.data?.message || "Failed to fetch task",
+      error: err.response?.data?.message || "Failed to fetch task",
     };
   }
 };
@@ -60,10 +64,11 @@ export const createTaskAction = async (payload: CreateTaskPayload) => {
     const api = await getServerApi();
     const data = await TaskService.createTask(payload, api);
     return { success: true, data };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } }; message?: string };
     return {
       success: false,
-      error: error.response?.data?.message || "Failed to create task",
+      error: err.response?.data?.message || "Failed to create task",
     };
   }
 };
@@ -73,10 +78,11 @@ export const updateTaskAction = async (id: string, payload: UpdateTaskPayload) =
     const api = await getServerApi();
     const data = await TaskService.updateTask(id, payload, api);
     return { success: true, data };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } }; message?: string };
     return {
       success: false,
-      error: error.response?.data?.message || "Failed to update task",
+      error: err.response?.data?.message || "Failed to update task",
     };
   }
 };
@@ -86,10 +92,11 @@ export const moveTaskAction = async (id: string, payload: MoveTaskPayload) => {
     const api = await getServerApi();
     const data = await TaskService.moveTask(id, payload, api);
     return { success: true, data };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } }; message?: string };
     return {
       success: false,
-      error: error.response?.data?.message || "Failed to move task",
+      error: err.response?.data?.message || "Failed to move task",
     };
   }
 };
@@ -99,10 +106,11 @@ export const deleteTaskAction = async (id: string) => {
     const api = await getServerApi();
     await TaskService.deleteTask(id, api);
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } }; message?: string };
     return {
       success: false,
-      error: error.response?.data?.message || "Failed to delete task",
+      error: err.response?.data?.message || "Failed to delete task",
     };
   }
 };
@@ -112,10 +120,11 @@ export const fetchMyTasksAction = async () => {
     const api = await getServerApi();
     const data = await TaskService.getMyTasks(api);
     return { success: true, data };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } }; message?: string };
     return {
       success: false,
-      error: error.response?.data?.message || "Failed to fetch your tasks",
+      error: err.response?.data?.message || "Failed to fetch your tasks",
     };
   }
 };
@@ -133,10 +142,11 @@ export const searchTasksAction = async (params: {
     const api = await getServerApi();
     const data = await TaskService.searchTasks(params, api);
     return { success: true, data };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } }; message?: string };
     return {
       success: false,
-      error: error.response?.data?.message || "Failed to search tasks",
+      error: err.response?.data?.message || "Failed to search tasks",
     };
   }
 };

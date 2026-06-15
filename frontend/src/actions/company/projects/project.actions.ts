@@ -9,9 +9,10 @@ export const getAllProjectsAction = async () => {
     const api = await getServerApi();
     const data = await ProjectService.getAllProjects(api);
     return { success: true, data };
-  } catch (error: any) {
-    console.error("Error fetching projects:", error?.message);
-    return { success: false, error: error?.message || "Failed to fetch projects" };
+  } catch (error: unknown) {
+    const err = error as { message?: string };
+    console.error("Error fetching projects:", err?.message);
+    return { success: false, error: err?.message || "Failed to fetch projects" };
   }
 };
 
@@ -20,9 +21,10 @@ export const getProjectByIdAction = async (id: string) => {
     const api = await getServerApi();
     const data = await ProjectService.getProjectById(id, api);
     return { success: true, data };
-  } catch (error: any) {
-    console.error("Error fetching project:", error?.message);
-    return { success: false, error: error?.message || "Failed to fetch project" };
+  } catch (error: unknown) {
+    const err = error as { message?: string };
+    console.error("Error fetching project:", err?.message);
+    return { success: false, error: err?.message || "Failed to fetch project" };
   }
 };
 
@@ -31,10 +33,11 @@ export const createProjectAction = async (payload: CreateProjectPayload) => {
     const api = await getServerApi();
     const data = await ProjectService.createProject(payload, api);
     return { success: true, data };
-  } catch (error: any) {
-    if (error.response?.status === 400) {
-      const data = error.response.data;
-      const messages = data.errors || data.message;
+  } catch (error: unknown) {
+    const err = error as { response?: { status?: number; data?: { message?: string | string[]; errors?: Record<string, string> } }; message?: string };
+    if (err.response?.status === 400) {
+      const data = err.response.data;
+      const messages = data?.errors || data?.message;
       const errors: Record<string, string> = {};
 
       if (Array.isArray(messages)) {
@@ -55,11 +58,11 @@ export const createProjectAction = async (payload: CreateProjectPayload) => {
       }
 
       // Fallback for single message strings
-      return { success: false, error: messages || "Validation failed" };
+      return { success: false, error: (typeof messages === 'string' ? messages : "Validation failed") };
     }
 
-    console.error("Error creating project:", error?.message);
-    return { success: false, error: error?.response?.data?.message || error?.message || "Failed to create project" };
+    console.error("Error creating project:", err?.message);
+    return { success: false, error: err?.response?.data?.message || err?.message || "Failed to create project" };
   }
 };
 
@@ -68,10 +71,11 @@ export const updateProjectAction = async (id: string, payload: UpdateProjectPayl
     const api = await getServerApi();
     const data = await ProjectService.updateProject(id, payload, api);
     return { success: true, data };
-  } catch (error: any) {
-    if (error.response?.status === 400) {
-      const data = error.response.data;
-      const messages = data.errors || data.message;
+  } catch (error: unknown) {
+    const err = error as { response?: { status?: number; data?: { message?: string | string[]; errors?: Record<string, string> } }; message?: string };
+    if (err.response?.status === 400) {
+      const data = err.response.data;
+      const messages = data?.errors || data?.message;
       const errors: Record<string, string> = {};
 
       if (Array.isArray(messages)) {
@@ -89,11 +93,11 @@ export const updateProjectAction = async (id: string, payload: UpdateProjectPayl
         }
         return { success: false, error: messages[0] || "Validation failed" };
       }
-      return { success: false, error: messages || "Validation failed" };
+      return { success: false, error: (typeof messages === 'string' ? messages : "Validation failed") };
     }
 
-    console.error("Error updating project:", error?.message);
-    return { success: false, error: error?.response?.data?.message || error?.message || "Failed to update project" };
+    console.error("Error updating project:", err?.message);
+    return { success: false, error: err?.response?.data?.message || err?.message || "Failed to update project" };
   }
 };
 
@@ -102,9 +106,10 @@ export const deleteProjectAction = async (id: string) => {
     const api = await getServerApi();
     await ProjectService.deleteProject(id, api);
     return { success: true };
-  } catch (error: any) {
-    console.error("Error deleting project:", error?.message);
-    return { success: false, error: error?.message || "Failed to delete project" };
+  } catch (error: unknown) {
+    const err = error as { message?: string };
+    console.error("Error deleting project:", err?.message);
+    return { success: false, error: err?.message || "Failed to delete project" };
   }
 };
 
@@ -113,9 +118,10 @@ export const uploadResourceAction = async (formData: FormData) => {
     const api = await getServerApi();
     const data = await ProjectService.uploadResource(formData, api);
     return { success: true, data };
-  } catch (error: any) {
-    console.error("Error uploading resource:", error?.message);
-    return { success: false, error: error?.message || "Failed to upload resource" };
+  } catch (error: unknown) {
+    const err = error as { message?: string };
+    console.error("Error uploading resource:", err?.message);
+    return { success: false, error: err?.message || "Failed to upload resource" };
   }
 };
 
@@ -124,8 +130,9 @@ export const searchProjectsAction = async (params: { page: number; limit: number
     const api = await getServerApi();
     const data = await ProjectService.searchProjects(params, api);
     return { success: true, data };
-  } catch (error: any) {
-    console.error("Error searching projects:", error?.message);
-    return { success: false, error: error?.message || "Failed to search projects" };
+  } catch (error: unknown) {
+    const err = error as { message?: string };
+    console.error("Error searching projects:", err?.message);
+    return { success: false, error: err?.message || "Failed to search projects" };
   }
 };

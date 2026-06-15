@@ -26,7 +26,7 @@ export class UpdateConversationUseCase implements IUpdateConversationUseCase {
       throw new ForbiddenException('Only admins can update group details');
     }
 
-    const updatedData: any = {};
+    const updatedData: Record<string, unknown> = {};
     if (dto.name !== undefined) updatedData.name = dto.name;
     if (dto.avatar !== undefined) updatedData.avatar = dto.avatar;
     if (dto.participants !== undefined) updatedData.participants = dto.participants;

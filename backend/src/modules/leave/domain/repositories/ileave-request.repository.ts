@@ -5,7 +5,7 @@ export interface LeaveRequestFilter {
   status?: LeaveStatus;
   search?: string;
   employeeId?: string;
-  userIds?: any[]; // For search by name which resolves to an array of ObjectIds
+  userIds?: unknown[]; // For search by name which resolves to an array of ObjectIds
   startDate?: string;
   endDate?: string;
 }

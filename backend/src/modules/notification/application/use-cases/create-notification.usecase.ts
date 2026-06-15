@@ -13,7 +13,7 @@ export class CreateNotificationUseCase implements ICreateNotificationUseCase {
     private readonly _notificationRepository: INotificationRepository,
     // We will inject the gateway to emit real-time events
     private readonly _notificationGateway: NotificationGateway,
-  ) {}
+  ) { }
 
   async execute(
     companyId: string,

@@ -11,5 +11,5 @@ export interface IEditDocumentUseCase {
 }
 
 export interface IDeleteDocumentUseCase {
-    execute(userId: string, documentId: string, publicId: string, resourceType: CloudinaryResourceType): Promise<any>;
+    execute(userId: string, documentId: string, publicId: string, resourceType: CloudinaryResourceType): Promise<unknown>;
 }

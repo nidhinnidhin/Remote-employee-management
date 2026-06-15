@@ -48,8 +48,14 @@ export class CreateTaskUseCase implements ICreateTaskUseCase {
       throw new NotFoundException('User story not found');
     }
 
+    const nextTaskNumber = await this._projectRepository.incrementAndGetTaskCounter(
+      taskDto.projectId,
+      companyId,
+    );
+
     const task = {
       ...taskDto,
+      taskNumber: nextTaskNumber,
       dueDate: taskDto.dueDate ? new Date(taskDto.dueDate) : undefined,
       companyId,
       createdBy: adminId,

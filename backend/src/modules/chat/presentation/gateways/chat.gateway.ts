@@ -29,7 +29,7 @@ import { LOGGER_SERVICE } from 'src/common/logger/tokens/logger.tokens';
 @UseGuards(WsJwtGuard)
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
-  server: Server;
+  server!: Server; 
 
   constructor(
     @Inject(LOGGER_SERVICE) private readonly logger: ILogger,
@@ -38,64 +38,86 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @Inject('IConversationRepository')
     private readonly _conversationRepository: IConversationRepository,
   ) {}
-  
-  // Method to be called from REST controller
-  notifyConversationUpdate(conversation: any) {
+
+  notifyConversationUpdate(conversation: { participants: string[] }) {
     if (!conversation.participants) return;
-    
     conversation.participants.forEach((participantId: string) => {
-      this.server.to(`user_${participantId}`).emit(SocketEvents.CONVERSATION_UPDATED, conversation);
+      this.server
+        .to(`user_${participantId}`)
+        .emit(SocketEvents.CONVERSATION_UPDATED, conversation);
     });
   }
 
   notifyConversationDeletion(conversationId: string) {
-    this.server.to(conversationId).emit(SocketEvents.CONVERSATION_DELETED, conversationId);
+    this.server
+      .to(conversationId)
+      .emit(SocketEvents.CONVERSATION_DELETED, conversationId);
   }
 
   notifyUserLeft(conversationId: string, userId: string) {
-    // Notify the user specifically
-    this.server.to(`user_${userId}`).emit(SocketEvents.CONVERSATION_DELETED, conversationId);
-    
-    // Notify the rest of the group to refresh their member list
-    this.server.to(conversationId).emit(SocketEvents.CONVERSATION_UPDATED, { id: conversationId });
+    this.server
+      .to(`user_${userId}`)
+      .emit(SocketEvents.CONVERSATION_DELETED, conversationId);
+    this.server
+      .to(conversationId)
+      .emit(SocketEvents.CONVERSATION_UPDATED, { id: conversationId });
   }
 
-  notifyMessageUpdate(message: any) {
-    this.server.to(message.conversationId).emit(SocketEvents.MESSAGE_UPDATED, message);
+  notifyMessageUpdate(message: { conversationId: string }) {
+    this.server
+      .to(message.conversationId)
+      .emit(SocketEvents.MESSAGE_UPDATED, message);
   }
 
   notifyMessageDeletion(conversationId: string, messageId: string) {
-    this.server.to(conversationId).emit(SocketEvents.MESSAGE_DELETED, { conversationId, messageId, type: 'everyone' });
+    this.server.to(conversationId).emit(SocketEvents.MESSAGE_DELETED, {
+      conversationId,
+      messageId,
+      type: 'everyone',
+    });
   }
 
-  notifyMessageDeletedForMe(conversationId: string, messageId: string, userId: string) {
-    this.server.to(`user_${userId}`).emit(SocketEvents.MESSAGE_DELETED, { conversationId, messageId, type: 'me' });
+  notifyMessageDeletedForMe(
+    conversationId: string,
+    messageId: string,
+    userId: string,
+  ) {
+    this.server.to(`user_${userId}`).emit(SocketEvents.MESSAGE_DELETED, {
+      conversationId,
+      messageId,
+      type: 'me',
+    });
   }
 
   async handleConnection(client: AuthenticatedSocket) {
     try {
-      const token = client.handshake.auth?.token || client.handshake.headers.authorization?.split(' ')[1];
-      
+      const token =
+        client.handshake.auth?.token ||
+        client.handshake.headers.authorization?.split(' ')[1];
       if (!token) {
         this.logger.warn(`Client connected without token: ${client.id}`);
-        client.disconnect();
+        void client.disconnect();
         return;
       }
 
-      const payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET!) as any;
+      const payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET!) as { userId: string; role: string; companyId: string };
       const userId = payload.userId;
-      
+
       client.user = {
         userId: payload.userId,
         role: payload.role,
         companyId: payload.companyId,
       };
 
-      client.join(`user_${userId}`);
-      this.logger.log(`Client connected and joined personal room: ${client.id} (User: ${userId})`);
-    } catch (error) {
-      this.logger.error(`WS Connection auth failed: ${error.message}`);
-      client.disconnect();
+      void client.join(`user_${userId}`);
+      this.logger.log(
+        `Client connected and joined personal room: ${client.id} (User: ${userId})`,
+      );
+    } catch (error: unknown) {
+      // Fixed: Explicit typing to resolve strict error check
+      const err = error as Error;
+      this.logger.error(`WS Connection auth failed: ${err.message}`);
+      void client.disconnect();
     }
   }
 
@@ -108,7 +130,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: AuthenticatedSocket,
     @MessageBody() conversationId: string,
   ) {
-    client.join(conversationId);
+    void client.join(conversationId);
     this.logger.log(`Client ${client.id} joined room: ${conversationId}`);
   }
 
@@ -117,7 +139,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: AuthenticatedSocket,
     @MessageBody() conversationId: string,
   ) {
-    client.leave(conversationId);
+    void client.leave(conversationId);
     this.logger.log(`Client ${client.id} left room: ${conversationId}`);
   }
 
@@ -127,21 +149,30 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() dto: SendMessageDto,
   ) {
     const { userId, companyId } = client.user;
-    
+
     try {
-      const message = await this._sendMessageUseCase.execute(companyId, userId, dto);
-      const conversation = await this._conversationRepository.findById(dto.conversationId);
-      
+      const message = await this._sendMessageUseCase.execute(
+        companyId,
+        userId,
+        dto,
+      );
+      const conversation = await this._conversationRepository.findById(
+        dto.conversationId,
+      );
+
       if (conversation) {
-        // Emit to each participant's personal room
         conversation.participants.forEach((participantId: string) => {
-          this.server.to(`user_${participantId}`).emit(SocketEvents.RECEIVE_MESSAGE, message);
+          this.server
+            .to(`user_${participantId}`)
+            .emit(SocketEvents.RECEIVE_MESSAGE, message);
         });
       }
-      
+
       return { status: 'ok', data: message };
-    } catch (error) {
-      return { status: 'error', message: error.message };
+    } catch (error: unknown) {
+      // Fixed: Explicit typing to resolve strict error check
+      const err = error as Error;
+      return { status: 'error', message: err.message };
     }
   }
 
@@ -150,7 +181,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: AuthenticatedSocket,
     @MessageBody() conversationId: string,
   ) {
-    const conversation = await this._conversationRepository.findById(conversationId);
+    const conversation =
+      await this._conversationRepository.findById(conversationId);
     if (conversation) {
       conversation.participants.forEach((participantId: string) => {
         if (participantId !== client.user.userId) {
@@ -168,14 +200,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: AuthenticatedSocket,
     @MessageBody() conversationId: string,
   ) {
-    const conversation = await this._conversationRepository.findById(conversationId);
+    const conversation =
+      await this._conversationRepository.findById(conversationId);
     if (conversation) {
       conversation.participants.forEach((participantId: string) => {
         if (participantId !== client.user.userId) {
-          this.server.to(`user_${participantId}`).emit(SocketEvents.STOP_TYPING, {
-            userId: client.user.userId,
-            conversationId,
-          });
+          this.server
+            .to(`user_${participantId}`)
+            .emit(SocketEvents.STOP_TYPING, {
+              userId: client.user.userId,
+              conversationId,
+            });
         }
       });
     }

@@ -14,6 +14,9 @@ export class TaskDocument extends Document {
   @Prop({ required: true, type: Types.ObjectId, ref: 'UserStoryDocument', index: true })
   storyId: string;
 
+  @Prop({ required: true, index: true })
+  taskNumber!: number;
+
   @Prop({ required: true })
   title: string;
 
@@ -51,6 +54,12 @@ export class TaskDocument extends Document {
 
   @Prop({ required: false })
   dueDate?: Date;
+
+  @Prop({ required: false })
+  startedAt?: Date;
+
+  @Prop({ required: false })
+  completedAt?: Date;
 
   @Prop({ type: [String], default: [] })
   attachments!: string[];

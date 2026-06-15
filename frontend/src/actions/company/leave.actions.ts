@@ -25,10 +25,11 @@ export async function getAdminLeaveLogsAction(params: {
     const data = await getCompanyLeaves(params);
     console.log("tgrrhfghfgdhdfghdfhfh");
     return { success: true, data };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } }; message?: string };
     return {
       success: false,
-      error: error.response?.data?.message || "Failed to fetch company leaves",
+      error: err.response?.data?.message || "Failed to fetch company leaves",
     };
   }
 }
@@ -38,10 +39,11 @@ export async function approveLeaveAction(id: string, adminMessage?: string) {
     const data = await approveLeaveRequest(id, adminMessage);
     revalidatePath("/company-admin/attendance");
     return { success: true, data };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } }; message?: string };
     return {
       success: false,
-      error: error.response?.data?.message || "Failed to approve leave request",
+      error: err.response?.data?.message || "Failed to approve leave request",
     };
   }
 }
@@ -51,10 +53,11 @@ export async function rejectLeaveAction(id: string, adminMessage: string) {
     const data = await rejectLeaveRequest(id, adminMessage);
     revalidatePath("/company-admin/attendance");
     return { success: true, data };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } }; message?: string };
     return {
       success: false,
-      error: error.response?.data?.message || "Failed to reject leave request",
+      error: err.response?.data?.message || "Failed to reject leave request",
     };
   }
 }

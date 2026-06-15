@@ -12,9 +12,10 @@ export class CommentMapper {
       doc.entityId,
       doc.entityType,
       doc.authorId,
-      doc.content,
+      doc.content || '', 
       undefined,
       doc.parentId ? doc.parentId.toString() : undefined,
+      doc.attachments || [],
       doc.createdAt,
       doc.updatedAt,
       doc.isDeleted,
@@ -27,8 +28,9 @@ export class CommentMapper {
       entityId: entity.entityId,
       entityType: entity.entityType,
       authorId: entity.authorId,
-      content: entity.content,
+      content: entity.content || '', 
       parentId: entity.parentId ? new Types.ObjectId(entity.parentId) : null,
+      attachments: entity.attachments || [],
       isDeleted: entity.isDeleted,
     };
   }

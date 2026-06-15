@@ -5,7 +5,7 @@ import { CommentEntity } from '../../../domain/entities/comment.entity';
 import type { ICommentRepository } from '../../../domain/repositories/comment.repository.interface';
 import { CommentDocument } from '../mongoose/schemas/comment.schema';
 import { BaseRepository } from 'src/shared/repositories/base.repository';
-import { LeanCommentDocument, CommentMapper } from 'src/modules/project/application/mappers/comment.mapper';
+import { LeanCommentDocument, CommentMapper } from 'src/modules/project/application/mappers/comment/comment.mapper';
 import { CommentEntityType } from 'src/shared/enums/project/comment-entity-type.enum';
 
 @Injectable()

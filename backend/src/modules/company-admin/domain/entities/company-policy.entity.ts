@@ -1,5 +1,3 @@
-import { PolicyType } from 'src/shared/enums/company-policy/policy-type.enum';
-
 export class CompanyPolicyEntity {
   constructor(
     public readonly id: string,

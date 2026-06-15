@@ -5,13 +5,22 @@ import { ProjectStatus } from 'src/shared/enums/project/project-status.enum';
 @Schema({ timestamps: true })
 export class ProjectDocument extends Document {
   @Prop({ required: true, index: true })
-  companyId: string;
+  companyId!: string;
 
   @Prop({ required: true })
-  name: string;
+  name!: string;
 
   @Prop({ required: false })
   description?: string;
+
+  @Prop({ required: false, default: 0 })
+  storyCounter!: number;
+
+  @Prop({ required: false, default: 0 })
+  taskCounter!: number;
+
+  @Prop({ required: true, index: true })
+  projectNumber!: number;
 
   @Prop({ required: false })
   startDate?: Date;
@@ -19,20 +28,25 @@ export class ProjectDocument extends Document {
   @Prop({ required: false })
   endDate?: Date;
 
-  @Prop({ required: true, enum: ProjectStatus, default: ProjectStatus.ACTIVE, index: true })
-  status: string;
+  @Prop({
+    required: true,
+    enum: ProjectStatus,
+    default: ProjectStatus.ACTIVE,
+    index: true,
+  })
+  status!: string;
 
   @Prop({ required: true })
-  createdBy: string;
+  createdBy!: string;
 
   @Prop({ required: true, default: false, index: true })
-  isDeleted: boolean;
+  isDeleted!: boolean;
 
   @Prop({ type: [String], default: [] })
-  members: string[];
+  members!: string[];
 
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt!: Date;
+  updatedAt!: Date;
 }
 
 export const ProjectSchema = SchemaFactory.createForClass(ProjectDocument);

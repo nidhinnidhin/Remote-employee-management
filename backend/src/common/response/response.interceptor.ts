@@ -8,8 +8,8 @@ import { Observable, map } from 'rxjs';
 import { ApiResponseModel } from './response.model';
 
 @Injectable()
-export class ResponseInterceptor<T> implements NestInterceptor<T, any> {
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+export class ResponseInterceptor<T> implements NestInterceptor<T, unknown> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const http = context.switchToHttp();
     const request = http.getRequest();
     const response = http.getResponse();

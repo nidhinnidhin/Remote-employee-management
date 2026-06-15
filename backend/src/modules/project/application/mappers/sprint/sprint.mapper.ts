@@ -1,6 +1,6 @@
 import { Types, FlattenMaps } from 'mongoose';
-import { SprintEntity } from '../../domain/entities/sprint.entity';
-import { SprintDocument } from '../../infrastructure/database/mongoose/schemas/sprint.schema';
+import { SprintEntity } from 'src/modules/project/domain/entities/sprint.entity';
+import { SprintDocument } from 'src/modules/project/infrastructure/database/mongoose/schemas/sprint.schema';
 import { SprintStatus } from 'src/shared/enums/project/sprint-status.enum';
 
 export type LeanSprintDocument = FlattenMaps<SprintDocument> & {

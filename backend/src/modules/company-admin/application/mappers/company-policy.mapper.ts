@@ -17,8 +17,8 @@ export class CompanyPolicyMapper {
       doc._id.toString(),
       doc.companyId,
       this.toPolicyItems(doc.policies || []),
-      (doc as any).createdAt || new Date(),
-      (doc as any).updatedAt || new Date(),
+      (doc as unknown as { createdAt?: Date }).createdAt || new Date(),
+      (doc as unknown as { updatedAt?: Date }).updatedAt || new Date(),
     );
   }
 

@@ -17,8 +17,9 @@ export const clockIn = async (
   try {
     const response = await api.post(API_ROUTES.ATTENDANCE.CLOCK_IN, { remarks, lateReason });
     return { success: true, data: response.data };
-  } catch (err: any) {
-    const errMsg = err.response?.data?.message || err.message || "Failed to Clock In.";
+  } catch (err: unknown) {
+    const e = err as { response?: { data?: { message?: string } }; message?: string };
+    const errMsg = e.response?.data?.message || e.message || "Failed to Clock In.";
     return { success: false, error: errMsg };
   }
 };

@@ -3,7 +3,6 @@ import {
   CanActivate,
   ExecutionContext,
   Inject,
-  ForbiddenException,
 } from '@nestjs/common';
 import { SubscriptionService } from 'src/modules/subscription/application/services/subscription.service';
 import type { IProjectRepository } from 'src/modules/project/domain/repositories/project.repository.interface';

@@ -94,7 +94,7 @@ export class OnboardCompanyUseCase implements IOnboardCompanyUseCase {
             const existingCompany = await this._companyRepository.findById(user.companyId);
             if (!existingCompany) throw new NotFoundException('Company not found');
             
-            const updateData: any = {};
+            const updateData: Record<string, unknown> = {};
             if (dto.company) {
                 updateData.name = dto.company.name;
                 updateData.size = dto.company.size;

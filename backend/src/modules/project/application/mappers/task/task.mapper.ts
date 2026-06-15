@@ -1,6 +1,6 @@
 import { Types, FlattenMaps } from 'mongoose';
-import { TaskEntity } from '../../domain/entities/task.entity';
-import { TaskDocument } from '../../infrastructure/database/mongoose/schemas/task.schema';
+import { TaskEntity } from 'src/modules/project/domain/entities/task.entity';
+import { TaskDocument } from 'src/modules/project/infrastructure/database/mongoose/schemas/task.schema';
 import { TaskStatus } from 'src/shared/enums/project/task-status.enum';
 import { UserStoryPriority } from 'src/shared/enums/project/user-story-priority.enum';
 
@@ -15,6 +15,7 @@ export class TaskMapper {
       taskDoc.companyId,
       taskDoc.projectId?.toString(),
       taskDoc.storyId?.toString(),
+      taskDoc.taskNumber || 0,
       taskDoc.title,
       (taskDoc.status as TaskStatus) || TaskStatus.TODO,
       (taskDoc.priority as UserStoryPriority) || UserStoryPriority.MEDIUM,
@@ -26,6 +27,8 @@ export class TaskMapper {
       taskDoc.estimatedHours || 0,
       taskDoc.actualHours || 0,
       taskDoc.dueDate,
+      taskDoc.startedAt,
+      taskDoc.completedAt,
       taskDoc.attachments || [],
       taskDoc.links || [],
       taskDoc.createdAt || new Date(),

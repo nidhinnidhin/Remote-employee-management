@@ -62,8 +62,8 @@ export class LeaveRequestMapper {
       doc.emergencyContact as EmergencyContact,
       doc.status,
       doc.adminMessage,
-      (doc as any).createdAt as Date,
-      (doc as any).updatedAt as Date,
+      (doc as unknown as { createdAt: Date }).createdAt,
+      (doc as unknown as { updatedAt: Date }).updatedAt,
       employeeDetails,
     );
   }

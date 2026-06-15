@@ -65,11 +65,6 @@ const navigationGroups = [
         href: FRONTEND_ROUTES.EMPLOYEE.LEAVES,
       },
       { icon: Users2, label: "Department", href: FRONTEND_ROUTES.EMPLOYEE.TEAMS },
-      {
-        icon: Search,
-        label: "Directory",
-        href: FRONTEND_ROUTES.EMPLOYEE.DIRECTORY,
-      },
     ],
   },
   {
@@ -85,22 +80,12 @@ const navigationGroups = [
         label: "Discussions",
         href: FRONTEND_ROUTES.EMPLOYEE.DISCUSSIONS,
       },
-      {
-        icon: Megaphone,
-        label: "Announcements",
-        href: FRONTEND_ROUTES.EMPLOYEE.ANNOUNCEMENTS,
-      },
     ],
   },
   {
     title: "Growth & Policy",
     items: [
-      {
-        icon: LineChart,
-        label: "Performance",
-        href: FRONTEND_ROUTES.EMPLOYEE.PERFORMANCE,
-      },
-      { icon: Heart, label: "Mood Check", href: FRONTEND_ROUTES.EMPLOYEE.MOOD },
+      
       {
         icon: ShieldCheck,
         label: "Company Policy",

@@ -23,7 +23,7 @@ export class NotificationGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {
   @WebSocketServer()
-  server: Server;
+  server!: Server;
 
   // Track connected users: userId -> socketId[]
   private connectedUsers = new Map<string, string[]>();
@@ -53,10 +53,9 @@ export class NotificationGateway
     if (!userSockets.includes(client.id)) {
       userSockets.push(client.id);
     }
-    
-    // Also join a room for the user to make broadcasting easier
-    client.join(`user_${userId}`);
-    
+
+    void client.join(`user_${userId}`);
+
     return { status: 'registered' };
   }
 

@@ -12,3 +12,7 @@ export interface IGetUserNotificationsUseCase {
 export interface IMarkNotificationReadUseCase {
   execute(id: string, companyId: string): Promise<NotificationEntity>;
 }
+
+export interface IMarkAllNotificationsReadUseCase{
+  execute(userId: string, companyId: string): Promise<{success: boolean}>
+}

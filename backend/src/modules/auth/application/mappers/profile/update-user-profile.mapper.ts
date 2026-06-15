@@ -1,8 +1,8 @@
 import { UpdateProfileDto } from '../../dto/update-profile.dto';
 
 export class UpdateUserProfileMapper {
-  static toPersistence(dto: UpdateProfileDto): Record<string, any> {
-    const rawUpdate: Record<string, any> = {
+  static toPersistence(dto: UpdateProfileDto): Record<string, unknown> {
+    const rawUpdate: Record<string, unknown> = {
       firstName: dto.firstName,
       lastName: dto.lastName,
       phone: dto.phone,

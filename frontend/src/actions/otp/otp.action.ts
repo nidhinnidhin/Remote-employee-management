@@ -33,12 +33,13 @@ export async function verifyOtpAction(payload: { email: string; otp: string }) {
       success: true,
       data: response.data,
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } }; message?: string };
     return {
       success: false,
       error:
-        error.response?.data?.message ||
-        error.message ||
+        err.response?.data?.message ||
+        err.message ||
         OTP_MESSAGES.OTP_NOT_VERIFIED,
     };
   }

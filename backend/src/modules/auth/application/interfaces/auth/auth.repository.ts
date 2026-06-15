@@ -12,15 +12,15 @@ import {
 export interface IAuthRepository {
   login(input: LoginInput): Promise<LoginResponse>;
 
-  registerAdmin(dto: RegisterAdminDto): Promise<any>;
+  registerAdmin(dto: RegisterAdminDto): Promise<Record<string, unknown>>;
 
   socialLogin(input: SocialLoginInput): Promise<SocialLoginResponse>;
 
   refreshAccessToken(refreshToken: string): Promise<{ accessToken: string }>;
 
-  forgotPassword(input: ForgotPasswordDto): Promise<any>;
+  forgotPassword(input: ForgotPasswordDto): Promise<Record<string, unknown>>;
 
-  verifyResetPasswordOtp(input: VerifyResetPasswordOtpDto): Promise<any>;
+  verifyResetPasswordOtp(input: VerifyResetPasswordOtpDto): Promise<Record<string, unknown>>;
 
-  resetPassword(input: ResetPasswordDto): Promise<any>;
+  resetPassword(input: ResetPasswordDto): Promise<Record<string, unknown>>;
 }

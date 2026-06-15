@@ -1,5 +1,5 @@
 export interface IPaymentService {
-  createOrder(amount: number, currency: string, receipt: string): Promise<any>;
+  createOrder(amount: number, currency: string, receipt: string): Promise<unknown>;
   verifyPayment(orderId: string, paymentId: string, signature: string): boolean;
 }
 

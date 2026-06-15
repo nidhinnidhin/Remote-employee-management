@@ -1,5 +1,7 @@
 // src/modules/chat/application/dto/send-message.dto.ts
-import { IsString, IsNotEmpty, MinLength } from 'class-validator';
+import { IsString, IsNotEmpty, IsEnum, IsOptional, IsArray } from 'class-validator';
+import { MessageType } from 'src/shared/enums/chat/message-type.enum';
+import { MessageAttachment } from '../../domain/entities/message.entity';
 
 export class SendMessageDto {
   @IsString()
@@ -7,7 +9,14 @@ export class SendMessageDto {
   conversationId!: string;
 
   @IsString()
-  @IsNotEmpty({ message: 'Content is required' })
-  @MinLength(1, { message: 'Content cannot be empty' })
-  content!: string;
+  @IsOptional()
+  content!: string; 
+
+  @IsEnum(MessageType, { message: 'Invalid message type' })
+  @IsOptional()
+  type?: MessageType;
+
+  @IsArray()
+  @IsOptional()
+  attachments?: MessageAttachment[];
 }

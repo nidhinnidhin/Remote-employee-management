@@ -3,7 +3,7 @@ import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import { CompanyAdminGuard } from 'src/shared/guards/company-admin.guard';
 import { EmployeeGuard } from 'src/shared/guards/employee.guard';
 import { SuperAdminGuard } from 'src/shared/guards/super-admin.guard';
-import type { Request } from 'express';
+import type { AuthenticatedRequest } from 'src/shared/types/express/authenticated-request.interface';
 import type {
   IGetEmployeeActivityLogsUseCase,
   IGetCompanyAdminActivityLogsUseCase,
@@ -26,15 +26,15 @@ export class ActivityLogController {
 
   @Get('employee')
   @UseGuards(EmployeeGuard)
-  async getEmployeeLogs(@Req() req: Request) {
-    const user = req.user as any;
+  async getEmployeeLogs(@Req() req: AuthenticatedRequest) {
+    const user = req.user;
     return this._getEmployeeLogsUseCase.execute(user.userId, user.companyId);
   }
 
   @Get('company-admin')
   @UseGuards(CompanyAdminGuard)
-  async getCompanyAdminLogs(@Req() req: Request) {
-    const user = req.user as any;
+  async getCompanyAdminLogs(@Req() req: AuthenticatedRequest) {
+    const user = req.user;
     return this._getCompanyAdminLogsUseCase.execute(user.companyId);
   }
 

@@ -21,11 +21,6 @@ export default async function EmployeeDashboardPage() {
         {/* Main Content: Live Focus Dashboard */}
         <EmployeeFocusedDashboard />
 
-        {/* Bottom Sections: Context Widgets */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-8 border-t border-white/[0.05]">
-          <QuickActions />
-          <TeamPresence />
-        </div>
       </div>
     </DashboardLayout>
   );

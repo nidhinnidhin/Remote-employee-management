@@ -1,6 +1,6 @@
 import { io, Socket } from 'socket.io-client';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL
 
 class NotificationSocketClient {
   private socket: Socket | null = null;
@@ -42,13 +42,13 @@ class NotificationSocketClient {
     return this.socket;
   }
 
-  on(event: string, callback: (...args: any[]) => void) {
+  on(event: string, callback: Parameters<Socket['on']>[1]) {
     if (this.socket) {
       this.socket.on(event, callback);
     }
   }
 
-  off(event: string, callback?: (...args: any[]) => void) {
+  off(event: string, callback?: Parameters<Socket['off']>[1]) {
     if (this.socket) {
       this.socket.off(event, callback);
     }

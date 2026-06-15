@@ -13,7 +13,7 @@ export class CloudinaryService implements ICloudinaryService {
     });
   }
 
-  async uploadFile(file: Express.Multer.File, folder: string): Promise<any> {
+  async uploadFile(file: Express.Multer.File): Promise<import('cloudinary').UploadApiResponse> {
     return new Promise((resolve, reject) => {
       cloudinary.uploader
         .upload_stream(
@@ -23,7 +23,7 @@ export class CloudinaryService implements ICloudinaryService {
           },
           (error, result) => {
             if (error) return reject(error);
-            resolve(result);
+            resolve(result as import('cloudinary').UploadApiResponse);
           },
         )
         .end(file.buffer);

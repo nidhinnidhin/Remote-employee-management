@@ -34,6 +34,9 @@ export class CompanyDocument extends Document {
   @Prop()
   website?: string;
 
+  @Prop({ required: false, default: 0 })
+  projectCounter!: number;
+
   createdAt: Date;
   updatedAt: Date;
 }

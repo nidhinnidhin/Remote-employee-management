@@ -14,5 +14,6 @@ export class CompanyEntity {
     public readonly employeeCount?: number,
     public readonly status: CompanyStatus = CompanyStatus.ACTIVE,
     public readonly onboardingStep: OnboardingStep = OnboardingStep.ORGANIZATION,
+    public readonly projectCounter: number = 0,
   ) { }
 }

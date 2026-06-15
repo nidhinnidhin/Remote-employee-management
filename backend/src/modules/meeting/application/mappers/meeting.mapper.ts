@@ -13,8 +13,8 @@ export class MeetingMapper {
       document.participants.map(p => p.toString()),
       document.scheduledAt,
       document.endedAt,
-      (document as any).createdAt,
-      (document as any).updatedAt,
+      (document as unknown as { createdAt: Date }).createdAt,
+      (document as unknown as { updatedAt: Date }).updatedAt,
     );
   }
 }

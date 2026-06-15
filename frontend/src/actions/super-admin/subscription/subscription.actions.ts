@@ -16,8 +16,16 @@ export async function getSubscriptionPlansAction(activeOnly = false) {
   try {
     const data = await fetchSubscriptionPlans(activeOnly);
     return { success: true, data };
-  } catch (error: any) {
-    return { success: false, error: error.message || "Failed to fetch subscription plans" };
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } }; message?: string };
+    console.error("Error fetching subscription plans:", err);
+    return {
+      success: false,
+      error:
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to fetch subscription plans",
+    };
   }
 }
 
@@ -26,8 +34,16 @@ export async function createSubscriptionPlanAction(data: CreateSubscriptionPlanD
     const result = await createSubscriptionPlan(data);
     revalidatePath("/super-admin/subscriptions");
     return { success: true, data: result };
-  } catch (error: any) {
-    return { success: false, error: error.message || "Failed to create subscription plan" };
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } }; message?: string };
+    console.error("Error creating subscription plan:", err);
+    return {
+      success: false,
+      error:
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to create subscription plan",
+    };
   }
 }
 
@@ -36,8 +52,16 @@ export async function updateSubscriptionPlanAction(id: string, data: UpdateSubsc
     const result = await updateSubscriptionPlan(id, data);
     revalidatePath("/super-admin/subscriptions");
     return { success: true, data: result };
-  } catch (error: any) {
-    return { success: false, error: error.message || "Failed to update subscription plan" };
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } }; message?: string };
+    console.error("Error updating subscription plan:", err);
+    return {
+      success: false,
+      error:
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to update subscription plan",
+    };
   }
 }
 
@@ -46,7 +70,15 @@ export async function deleteSubscriptionPlanAction(id: string) {
     await deleteSubscriptionPlan(id);
     revalidatePath("/super-admin/subscriptions");
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message || "Failed to delete subscription plan" };
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } }; message?: string };
+    console.error("Error deleting subscription plan:", err);
+    return {
+      success: false,
+      error:
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to delete subscription plan",
+    };
   }
 }

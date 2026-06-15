@@ -1,7 +1,7 @@
 // src/modules/chat/infrastructure/database/repositories/mongo-message.repository.ts
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model, Types, FilterQuery, UpdateQuery } from 'mongoose';
 import { IMessageRepository } from '../../../domain/repositories/imessage.repository';
 import { MessageEntity } from '../../../domain/entities/message.entity';
 import { Message, MessageDocument } from '../mongoose/schemas/message.schema';
@@ -19,6 +19,8 @@ export class MongoMessageRepository implements IMessageRepository {
       conversationId: new Types.ObjectId(message.conversationId),
       senderId: new Types.ObjectId(message.senderId),
       content: message.content,
+      type: message.type,         
+      attachments: message.attachments,    
       seenBy: message.seenBy.map((s) => new Types.ObjectId(s)),
     });
     return ChatMapper.toMessageEntity(created);
@@ -30,7 +32,7 @@ export class MongoMessageRepository implements IMessageRepository {
   }
 
   async findByConversationId(conversationId: string, limit: number = 50, before?: Date, currentUserId?: string): Promise<MessageEntity[]> {
-    const query: any = {
+    const query: FilterQuery<MessageDocument> = {
       conversationId: new Types.ObjectId(conversationId),
     };
 
@@ -58,7 +60,7 @@ export class MongoMessageRepository implements IMessageRepository {
   }
 
   async update(id: string, message: Partial<MessageEntity>): Promise<MessageEntity | null> {
-    const updateData: any = { ...message };
+    const updateData: UpdateQuery<MessageDocument> = { ...message };
     if (message.senderId) updateData.senderId = new Types.ObjectId(message.senderId);
     if (message.conversationId) updateData.conversationId = new Types.ObjectId(message.conversationId);
     if (message.seenBy) updateData.seenBy = message.seenBy.map(s => new Types.ObjectId(s));

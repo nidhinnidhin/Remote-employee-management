@@ -10,7 +10,7 @@ export class ClockOutUseCase implements IClockOutUseCase {
     private readonly _attendanceRepository: IAttendanceRepository,
   ) {}
 
-  async execute(userId: string, companyId: string): Promise<AttendanceEntity> {
+  async execute(userId: string, _companyId: string): Promise<AttendanceEntity> {
     const activeShift = await this._attendanceRepository.findActiveShift(userId);
     if (!activeShift) {
       throw new BadRequestException('No active shift found. Please clock in first.');
@@ -67,7 +67,7 @@ export class ClockOutUseCase implements IClockOutUseCase {
     // Save and return
     const doc = await this._attendanceRepository.updateById(
       activeShift.id,
-      updatedShift as any
+      updatedShift as Partial<AttendanceEntity>
     );
     if (!doc) {
       throw new BadRequestException('Failed to complete clock out.');

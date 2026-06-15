@@ -1,10 +1,8 @@
-import { Types } from 'mongoose';
 import { CompanyEntity } from '../../domain/entities/company.entity';
 import { CompanyDocument } from '../../infrastructure/database/mongoose/schemas/company.schema';
-import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 
 export class CompanyMapper {
-  static toDomain(companyDoc: any): CompanyEntity {
+  static toDomain(companyDoc: import('../../infrastructure/database/mongoose/schemas/company.schema').CompanyDocument & { employeeCount?: number, projectCounter?: number }): CompanyEntity {
     return new CompanyEntity(
       companyDoc._id?.toString() || companyDoc.id,
       companyDoc.name,
@@ -17,6 +15,7 @@ export class CompanyMapper {
       companyDoc.employeeCount,
       companyDoc.status,
       companyDoc.onboardingStep,
+      companyDoc.projectCounter || 0,
     );
   }
 
@@ -29,6 +28,7 @@ export class CompanyMapper {
       website: company.website,
       status: company.status,
       onboardingStep: company.onboardingStep,
+      projectCounter: company.projectCounter,
     } as Partial<CompanyDocument>;
   }
 }

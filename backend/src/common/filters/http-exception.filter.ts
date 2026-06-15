@@ -31,8 +31,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
         typeof exceptionResponse === 'object' &&
         exceptionResponse !== null
       ) {
-        const res = exceptionResponse as any;
-        message = res.message || message;
+        const res = exceptionResponse as Record<string, unknown>;
+        message = (res.message as string) || message;
         errors = res.errors || null;
 
         if (Array.isArray(res.message)) {

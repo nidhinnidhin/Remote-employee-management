@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { LeaveType } from 'src/shared/enums/leave/leave-type.enum';
 import { LeaveStatus } from 'src/shared/enums/leave/leave-status.enum';
 import { LeaveDurationType } from 'src/shared/enums/leave/leave-duration-type.enum';
 

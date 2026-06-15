@@ -6,6 +6,8 @@ import { UpdateSprintDto } from '../../dto/sprint/update-sprint.dto';
 import { SprintEntity } from '../../../domain/entities/sprint.entity';
 import { SprintStatus } from 'src/shared/enums/project/sprint-status.enum';
 import { UserStoryStatus } from 'src/shared/enums/project/user-story-status.enum';
+import { UserStoryPriority } from 'src/shared/enums/project/user-story-priority.enum';
+import { IssueType } from 'src/shared/enums/project/issue-type.enum';
 import { TaskStatus } from 'src/shared/enums/project/task-status.enum';
 import type { ITaskRepository } from '../../../domain/repositories/task.repository.interface';
 
@@ -27,7 +29,7 @@ export class UpdateSprintUseCase implements IUpdateSprintUseCase {
       throw new NotFoundException('Sprint not found');
     }
 
-    const updateData: any = { ...dto };
+    const updateData: Record<string, unknown> = { ...dto };
 
     if (dto.startDate) updateData.startDate = new Date(dto.startDate);
     if (dto.endDate) updateData.endDate = new Date(dto.endDate);
@@ -50,6 +52,15 @@ export class UpdateSprintUseCase implements IUpdateSprintUseCase {
       const sprintStories = projectStories.filter(s => existingSprint.issueIds.includes(s.id));
       const plannedPoints = sprintStories.reduce((sum, s) => sum + (s.storyPoints || 0), 0);
       updateData.plannedPoints = plannedPoints;
+
+      // Start all tasks that belong to these stories (if not already started)
+      const storyIds = sprintStories.map(s => s.id);
+      if (storyIds.length > 0) {
+        await this._taskRepository.updateMany(
+          { storyId: { $in: storyIds }, companyId, startedAt: { $exists: false } },
+          { $set: { startedAt: new Date() } }
+        );
+      }
     }
 
     // Handle Manual Completion: Granular migration
@@ -92,8 +103,8 @@ export class UpdateSprintUseCase implements IUpdateSprintUseCase {
               title: `${story.title} (Cont.)`,
               description: story.description,
               acceptanceCriteria: story.acceptanceCriteria,
-              priority: story.priority as any,
-              type: story.type as any,
+              priority: story.priority as UserStoryPriority,
+              type: story.type as IssueType,
               assigneeId: story.assigneeId,
               storyPoints: story.storyPoints, // Reallocate ALL points to the new story
               createdBy: story.createdBy,

@@ -1,6 +1,6 @@
 import { Types, FlattenMaps } from 'mongoose';
-import { ProjectEntity } from '../../domain/entities/project.entity';
-import { ProjectDocument } from '../../infrastructure/database/mongoose/schemas/project.schema';
+import { ProjectEntity } from 'src/modules/project/domain/entities/project.entity';
+import { ProjectDocument } from 'src/modules/project/infrastructure/database/mongoose/schemas/project.schema';
 import { ProjectStatus } from 'src/shared/enums/project/project-status.enum';
 
 export type LeanProjectDocument = FlattenMaps<ProjectDocument> & {
@@ -15,6 +15,7 @@ export class ProjectMapper {
       projectDoc._id.toString(),
       projectDoc.companyId,
       projectDoc.name || 'Unnamed Project',
+      projectDoc.projectNumber || 0,
       (projectDoc.status as ProjectStatus) || ProjectStatus.PLANNING,
       projectDoc.createdBy?.toString() || '',
       projectDoc.description || '',
@@ -24,6 +25,7 @@ export class ProjectMapper {
       projectDoc.updatedAt || new Date(),
       !!projectDoc.isDeleted,
       projectDoc.members || [],
+      projectDoc.taskCounter || 0,
     );
   }
 
