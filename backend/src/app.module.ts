@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+
 import { AuthModule } from './modules/auth/presentation/auth/auth.module';
 import { MongoDatabaseModule } from './shared/config/mongoose.module';
 import { SuperAdminModule } from './modules/super-admin/super-admin.module';
@@ -51,4 +52,4 @@ import { ActivityLogsModule } from './modules/activity-logs/activity-logs.module
     },
   ],
 })
-export class AppModule { }
+export class AppModule {}
