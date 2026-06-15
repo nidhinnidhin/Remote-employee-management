@@ -23,7 +23,7 @@ export class GetCommentsUseCase implements IGetCommentsUseCase {
     private readonly _userStoryRepository: IUserStoryRepository,
     @InjectModel(UserDocument.name)
     private readonly _userModel: Model<UserDocument>,
-  ) {}
+  ) { }
 
   async execute(companyId: string, userId: string, entityId: string, entityType: CommentEntityType): Promise<CommentEntity[]> {
     let projectId: string;
@@ -77,7 +77,7 @@ export class GetCommentsUseCase implements IGetCommentsUseCase {
         authorName,
         c.parentId,
         c.attachments,
-        c.reactions,
+        c.reactions || [],
         c.createdAt,
         c.updatedAt,
         c.isDeleted,

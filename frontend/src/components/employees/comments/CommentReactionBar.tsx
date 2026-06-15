@@ -29,6 +29,8 @@ export function CommentReactionBar({
   const [pickerOpen, setPickerOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
+  console.log("CommentReactionBar rendering for comment:", comment.id || comment._id);
+
   const commentId = (comment.id || comment._id) as string;
   const reactions = comment.reactions || [];
 

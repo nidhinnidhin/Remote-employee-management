@@ -35,7 +35,7 @@ export class AddCommentUseCase implements IAddCommentUseCase {
     private readonly _userModel: Model<UserDocument>,
     @Inject('ICloudinaryService')
     private readonly _cloudinaryService: ICloudinaryService,
-  ) {}
+  ) { }
 
   async execute(
     companyId: string,
@@ -144,7 +144,7 @@ export class AddCommentUseCase implements IAddCommentUseCase {
       authorName,
       comment.parentId,
       comment.attachments,
-      comment.reactions,
+      comment.reactions || [],
       comment.createdAt,
       comment.updatedAt,
       comment.isDeleted,

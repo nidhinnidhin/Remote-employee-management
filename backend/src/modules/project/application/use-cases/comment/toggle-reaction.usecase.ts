@@ -1,5 +1,5 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
-import type { IToggleReactionUseCase } from '../../interfaces/comment/comment-use-cases.interface';
+import { IToggleReactionUseCase } from '../../interfaces/comment/comment-use-cases.interface';
 import type { ICommentRepository } from '../../../domain/repositories/comment.repository.interface';
 import { CommentEntity } from '../../../domain/entities/comment.entity';
 
@@ -8,7 +8,7 @@ export class ToggleReactionUseCase implements IToggleReactionUseCase {
   constructor(
     @Inject('ICommentRepository')
     private readonly _commentRepo: ICommentRepository,
-  ) {}
+  ) { }
 
   async execute(
     companyId: string,
@@ -45,9 +45,9 @@ export class ToggleReactionUseCase implements IToggleReactionUseCase {
     }
 
     const updated = await this._commentRepo.updateById(commentId, { reactions });
-    
+
     if (!updated) {
-       throw new NotFoundException('Comment not found');
+      throw new NotFoundException('Comment not found');
     }
     return updated;
   }

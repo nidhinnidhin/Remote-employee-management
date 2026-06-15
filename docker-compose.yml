@@ -1,10 +1,7 @@
 services:
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    build: ./backend
     image: nidhintech/nexus-backend:latest
-    command: pnpm run start
     env_file:
       - ./backend/.env
     restart: unless-stopped
@@ -23,11 +20,8 @@ services:
   #     - "3001:3000"
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: dockerfile
+    build: ./frontend
     image: nidhintech/nexus-frontend:latest
-    command: pnpm start
     env_file:
       - ./frontend/.env
     restart: unless-stopped
