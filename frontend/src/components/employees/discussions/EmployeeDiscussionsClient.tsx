@@ -109,7 +109,7 @@ export default function EmployeeDiscussionsClient() {
             {meetings.map((meeting) => (
               <div
                 key={meeting.id}
-                className="group relative bg-[#0a0c10] border border-white/[0.05] rounded-2xl p-6 hover:border-indigo-500/30 hover:shadow-2xl hover:shadow-indigo-500/5 transition-all"
+                className="group relative  border border-white/[0.05] rounded-2xl p-6 hover:border-indigo-500/30 hover:shadow-2xl hover:shadow-indigo-500/5 transition-all"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div

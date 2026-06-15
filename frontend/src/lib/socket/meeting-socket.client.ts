@@ -1,6 +1,6 @@
 import { io, Socket } from 'socket.io-client';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:4000';
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')
 
 class MeetingSocketClient {
   private socket: Socket | null = null;

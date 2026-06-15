@@ -30,7 +30,7 @@ const handler = NextAuth({
     async signIn({ user, account }: any) {
       console.log("SignIn callback triggered for:", user.email);
       const email = user.email?.toLowerCase();
-      const res = await fetch("http://localhost:4000/api/auth/social-login", {
+      const res = await fetch(`${process.env.API_URL_INTERNAL}/auth/social-login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

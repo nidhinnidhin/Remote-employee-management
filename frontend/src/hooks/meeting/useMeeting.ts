@@ -4,7 +4,7 @@ import { useProfileStore } from '@/store/profile.store';
 import { io, Socket } from 'socket.io-client';
 import { MeetingSocketEvents } from '@/shared/types/company/meeting-socket.type';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:4000';
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')
 
 const ICE_SERVERS = {
   iceServers: [
