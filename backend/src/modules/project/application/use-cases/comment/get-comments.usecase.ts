@@ -77,6 +77,7 @@ export class GetCommentsUseCase implements IGetCommentsUseCase {
         authorName,
         c.parentId,
         c.attachments,
+        c.reactions,
         c.createdAt,
         c.updatedAt,
         c.isDeleted,

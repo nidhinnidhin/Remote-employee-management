@@ -9,8 +9,9 @@ export async function createPaymentOrderAction(planId: string, companyId: string
         const response = await api.post('/subscriptions/create-order', { planId, companyId });
         return { success: true, data: response.data };
     } catch (error: unknown) {
-        const err = error as { response?: { data?: { message?: string } }; message?: string };
-        return { success: false, error: err.response?.data?.message || "Failed to create order" };
+        const err = error as any;
+        const errorMessage = err?.response?.data?.message || err?.message || "Failed to create order";
+        return { success: false, error: errorMessage };
     }
 }
 
@@ -28,8 +29,9 @@ export async function verifyPaymentAction(payload: {
         const response = await api.post('/subscriptions/verify-payment', payload);
         return { success: true, data: response.data };
     } catch (error: unknown) {
-        const err = error as { response?: { data?: { message?: string } }; message?: string };
-        return { success: false, error: err.response?.data?.message || "Payment verification failed" };
+        const err = error as any;
+        const errorMessage = err?.response?.data?.message || err?.message || "Payment verification failed";
+        return { success: false, error: errorMessage };
     }
 }
 

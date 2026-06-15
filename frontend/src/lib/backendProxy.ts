@@ -8,7 +8,7 @@ export async function proxyToBackend(
   method: "GET" | "POST" | "PUT" | "DELETE" = "POST"
 ) {
   const body = method !== "GET" ? await req.json() : undefined;
-  const BACKEND_URL = process.env.BACKEND_URL_INTERNAL || process.env.NEXT_PUBLIC_BACKEND_URL;
+  const BACKEND_URL = (process.env.API_URL_INTERNAL || "http://localhost:4000/api").replace(/\/api$/, "");
 
   const backendRes = await axios({
     url: `${BACKEND_URL}${path}`,

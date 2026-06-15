@@ -9,3 +9,7 @@ Dockewr compose run command [Project]:-
 
 docker compose down
 docker compose up --build
+
+### RUN ###
+docker compose up --build -d
+docker compose up 

@@ -26,9 +26,12 @@ import {
 import {
   getCommentsAction,
   addCommentAction,
+  toggleCommentReactionAction,
 } from "@/actions/employee/project/comment.actions";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/store/auth.store";
+import { CommentReactionBar } from "@/components/employees/comments/CommentReactionBar";
 
 interface TaskDetailModalProps {
   task: Task | null;
@@ -49,12 +52,14 @@ export default function TaskDetailModal({
   isOpen,
   onClose,
 }: TaskDetailModalProps) {
+  const { userId } = useAuthStore();
   const [activeTab, setActiveTab] = useState<Tab>("details");
   const [comments, setComments] = useState<Comment[]>([]);
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [replyTo, setReplyTo] = useState<{ id: string } | null>(null);
+  const [togglingReaction, setTogglingReaction] = useState(false);
 
   const [attachments, setAttachments] = useState<AttachedFile[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -205,6 +210,48 @@ export default function TaskDetailModal({
     });
   };
 
+  // Single toggle handler shared by ReactionBar instances
+  const handleReact = useCallback(
+    async (commentId: string, emoji: string) => {
+      if (togglingReaction) return;
+      setTogglingReaction(true);
+
+      // Optimistic update
+      setComments((prev) =>
+        prev.map((c) => {
+          if ((c.id || c._id) !== commentId) return c;
+          const reactions = [...(c.reactions || [])];
+          const idx = reactions.findIndex((r) => r.emoji === emoji);
+          if (idx >= 0) {
+            const r = { ...reactions[idx], userIds: [...reactions[idx].userIds] };
+            const uIdx = r.userIds.indexOf(userId!);
+            if (uIdx >= 0) r.userIds.splice(uIdx, 1);
+            else r.userIds.push(userId!);
+            if (r.userIds.length === 0) reactions.splice(idx, 1);
+            else reactions[idx] = r;
+          } else {
+            reactions.push({ emoji, userIds: [userId!] });
+          }
+          return { ...c, reactions };
+        })
+      );
+
+      const result = await toggleCommentReactionAction(commentId, emoji);
+      if (result.success && result.data) {
+        setComments((prev) =>
+          prev.map((c) =>
+            (c.id || c._id) === commentId ? { ...c, reactions: result.data!.reactions } : c
+          )
+        );
+      } else {
+        toast.error(result.error || "Failed to toggle reaction");
+        await fetchComments(true);
+      }
+      setTogglingReaction(false);
+    },
+    [userId, togglingReaction, fetchComments]
+  );
+
   const parentComments = comments.filter((c) => !c.parentId);
   const childComments = comments.filter((c) => c.parentId);
 
@@ -282,6 +329,8 @@ export default function TaskDetailModal({
       </div>
     );
   };
+
+  // ReactionBar is now the top-level isolated component — no shared refs needed
 
   return (
     <BaseModal
@@ -387,7 +436,7 @@ export default function TaskDetailModal({
 
       {activeTab === "comments" && (
         <div
-          className="flex flex-col relative overflow-hidden"
+          className="flex flex-col relative"
           style={{ height: "460px" }}
         >
           {/* Scrollable Message Box Area */}
@@ -403,7 +452,7 @@ export default function TaskDetailModal({
               <div className="flex flex-col items-center justify-center h-full text-slate-600 space-y-2">
                 <MessageSquare size={32} strokeWidth={1} />
                 <p className="text-sm">
-                  No comments yet. Start the conversation!
+                  No comments yet. Start the conversation! 
                 </p>
               </div>
             ) : (
@@ -424,18 +473,19 @@ export default function TaskDetailModal({
                     </p>
 
                     <RenderAttachments urls={parent.attachments} />
-
-                    <div className="mt-3 flex justify-end">
+                    {/* Reactions + Reply row */}
+                    <div className="mt-2 flex items-end justify-between gap-2">
+                      <CommentReactionBar comment={parent} userId={userId} onReact={handleReact} />
                       <button
                         onClick={() =>
                           setReplyTo({
                             id: (parent.id || parent._id) as string,
                           })
                         }
-                        className="text-[11px] font-semibold text-accent/70 hover:text-accent transition-colors flex items-center gap-1"
+                        className="shrink-0 text-[11px] font-semibold text-accent/70 hover:text-accent transition-colors flex items-center gap-1 pb-0.5"
                       >
                         <CornerDownRight size={12} />
-                        Reply
+                        Reply sdsdf
                       </button>
                     </div>
                   </div>
@@ -463,6 +513,8 @@ export default function TaskDetailModal({
                         </p>
 
                         <RenderAttachments urls={child.attachments} />
+
+                        <CommentReactionBar comment={child} userId={userId} onReact={handleReact} />
                       </div>
                     ))}
                 </div>

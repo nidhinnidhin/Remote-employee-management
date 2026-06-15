@@ -17,7 +17,7 @@ export async function setEmployeePasswordAction(password: string) {
         .join("; ");
 
     const response = await axios.post(
-        `${process.env.API_URL_INTERNAL || process.env.NEXT_PUBLIC_API_URL}/company/employees/set-password`,
+        `${process.env.API_URL_INTERNAL || "http://localhost:4000/api"}/company/employees/set-password`,
         { password },
         {
             headers: {

@@ -115,7 +115,7 @@ const SubscriptionStep: React.FC<SubscriptionStepProps> = ({
             toast.success("Payment successful!");
             onPaymentSuccess();
           } else {
-            toast.error("Payment verification failed");
+            toast.error(verifyResult.error || "Payment verification failed");
           }
         },
         prefill: {

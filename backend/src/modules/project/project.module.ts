@@ -59,6 +59,7 @@ import {
 import { MongoCommentRepository } from './infrastructure/database/repositories/mongo-comment.repository';
 import { AddCommentUseCase } from './application/use-cases/comment/add-comment.usecase';
 import { GetCommentsUseCase } from './application/use-cases/comment/get-comments.usecase';
+import { ToggleReactionUseCase } from './application/use-cases/comment/toggle-reaction.usecase';
 import { CommentController } from './presentation/controllers/comment.controller';
 import {
   UserDocument,
@@ -125,6 +126,10 @@ import { ActivityLogsModule } from '../activity-logs/activity-logs.module';
     {
       provide: 'IGetCommentsUseCase',
       useClass: GetCommentsUseCase,
+    },
+    {
+      provide: 'IToggleReactionUseCase',
+      useClass: ToggleReactionUseCase,
     },
     {
       provide: 'IGetProjectUseCase',

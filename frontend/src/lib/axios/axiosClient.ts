@@ -1,12 +1,11 @@
 import axios from "axios";
 import { API_ROUTES } from "@/constants/api.routes";
 
-console.log("api ",process.env.API_URL_INTERNAL, process.env.NEXT_PUBLIC_API_URL)
-
+// API_URL_INTERNAL is server-only (no NEXT_PUBLIC_ prefix).
+// On the server: resolves to http://backend:4000/api (Docker internal network).
+// In the browser: process.env.API_URL_INTERNAL is undefined → falls back to localhost.
 export const clientApi = axios.create({
-  baseURL: (typeof window === "undefined" && process.env.API_URL_INTERNAL)
-    ? process.env.API_URL_INTERNAL
-    : process.env.NEXT_PUBLIC_API_URL,
+  baseURL: process.env.API_URL_INTERNAL || "http://localhost:4000/api",
   withCredentials: true,
 });
 
@@ -53,8 +52,15 @@ clientApi.interceptors.response.use(
       if (typeof window !== "undefined") {
         const message = err.response.data?.message || "";
         const isBlocked = message.includes("blocked") || message.includes("Blocked");
-        const errorType = isBlocked ? "blocked" : "suspended";
-        window.location.href = `/auth/login?error=${errorType}`;
+        const isSuspended = message.includes("suspended") || message.includes("Suspended");
+
+        // Only redirect to login for genuine account status errors.
+        // Other 403s (e.g. subscription limits, role permissions) should
+        // be rejected normally so the calling component can handle them.
+        if (isBlocked || isSuspended) {
+          const errorType = isBlocked ? "blocked" : "suspended";
+          window.location.href = `/auth/login?error=${errorType}`;
+        }
       }
     }
 

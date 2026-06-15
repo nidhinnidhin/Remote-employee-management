@@ -1,5 +1,8 @@
 services:
   backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     image: nidhintech/nexus-backend:latest
     command: pnpm run start
     env_file:
@@ -10,7 +13,19 @@ services:
     ports:
       - "4000:4000"
 
+  # frontend:
+  #   image: nidhintech/nexus-frontend:latest
+  #   command: pnpm start
+  #   env_file:
+  #     - ./frontend/.env
+  #   restart: unless-stopped
+  #   ports:
+  #     - "3001:3000"
+
   frontend:
+    build:
+      context: ./frontend
+      dockerfile: dockerfile
     image: nidhintech/nexus-frontend:latest
     command: pnpm start
     env_file:

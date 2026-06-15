@@ -62,3 +62,20 @@ export const addCommentAction = async (
     return { success: false, error: userFriendlyMessage };
   }
 };
+
+export const toggleCommentReactionAction = async (
+  commentId: string,
+  emoji: string,
+): Promise<{ success: boolean; data?: Comment; error?: string }> => {
+  try {
+    const api = await getServerApi();
+    const result = await commentService.toggleReaction(commentId, emoji, api);
+    return { success: true, data: result };
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } }; message?: string };
+    return {
+      success: false,
+      error: err.response?.data?.message || err.message || "Failed to toggle reaction.",
+    };
+  }
+};

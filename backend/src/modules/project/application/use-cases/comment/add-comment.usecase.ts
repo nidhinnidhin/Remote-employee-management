@@ -144,6 +144,7 @@ export class AddCommentUseCase implements IAddCommentUseCase {
       authorName,
       comment.parentId,
       comment.attachments,
+      comment.reactions,
       comment.createdAt,
       comment.updatedAt,
       comment.isDeleted,

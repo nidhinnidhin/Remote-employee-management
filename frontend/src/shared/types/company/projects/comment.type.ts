@@ -15,6 +15,7 @@ export interface Comment {
   authorId: string;
   authorName?: string;
   content: string;
+  reactions?: { emoji: string; userIds: string[] }[];
   createdAt?: string;
   updatedAt?: string;
   isDeleted?: boolean;

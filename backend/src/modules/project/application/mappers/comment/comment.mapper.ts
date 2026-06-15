@@ -16,6 +16,7 @@ export class CommentMapper {
       undefined,
       doc.parentId ? doc.parentId.toString() : undefined,
       doc.attachments || [],
+      doc.reactions || [],
       doc.createdAt,
       doc.updatedAt,
       doc.isDeleted,
@@ -31,6 +32,7 @@ export class CommentMapper {
       content: entity.content || '', 
       parentId: entity.parentId ? new Types.ObjectId(entity.parentId) : null,
       attachments: entity.attachments || [],
+      reactions: entity.reactions || [],
       isDeleted: entity.isDeleted,
     };
   }

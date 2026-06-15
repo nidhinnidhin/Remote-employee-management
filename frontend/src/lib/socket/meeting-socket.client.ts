@@ -1,6 +1,7 @@
 import { io, Socket } from 'socket.io-client';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')
+// API_URL_INTERNAL is undefined in the browser (server-only var) → falls back to localhost:4000
+const BACKEND_URL = (process.env.API_URL_INTERNAL || "http://localhost:4000/api").replace(/\/api$/, "");
 
 class MeetingSocketClient {
   private socket: Socket | null = null;

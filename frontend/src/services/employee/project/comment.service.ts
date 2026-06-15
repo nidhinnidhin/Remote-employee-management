@@ -21,3 +21,12 @@ export const addComment = async (
   });
   return data;
 };
+
+export const toggleReaction = async (
+  commentId: string,
+  emoji: string,
+  api: AxiosInstance,
+): Promise<Comment> => {
+  const { data } = await api.post(`/comments/${commentId}/reactions`, { emoji });
+  return data;
+};

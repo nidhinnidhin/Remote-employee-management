@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { getSession } from "@/lib/iron-session/getSession";
 import { COOKIE_KEYS } from "@/shared/constants/temp/cookie-keys";
 
-const BASE_URL = process.env.API_URL_INTERNAL || process.env.NEXT_PUBLIC_API_URL!;
+const BASE_URL = process.env.API_URL_INTERNAL || "http://localhost:4000/api";
 
 export async function getServerApi() {
   const session = await getSession();

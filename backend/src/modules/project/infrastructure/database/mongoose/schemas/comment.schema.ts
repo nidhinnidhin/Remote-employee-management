@@ -30,6 +30,18 @@ export class CommentDocument extends Document {
   })
   parentId!: Types.ObjectId | null;
 
+  @Prop({
+    type: [
+      {
+        emoji: { type: String, required: true },
+        userIds: [{ type: String, required: true }],
+      },
+    ],
+    default: [],
+    _id: false,
+  })
+  reactions!: { emoji: string; userIds: string[] }[];
+
   @Prop({ required: true, default: false, index: true })
   isDeleted!: boolean;
 

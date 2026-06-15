@@ -11,6 +11,7 @@ export class CommentEntity {
     public readonly authorName: string | undefined = undefined,
     public readonly parentId: string | undefined = undefined,
     public readonly attachments: string[] = [],
+    public readonly reactions: { emoji: string; userIds: string[] }[] = [],
     public readonly createdAt: Date | undefined = undefined,
     public readonly updatedAt: Date | undefined = undefined,
     public readonly isDeleted: boolean = false,

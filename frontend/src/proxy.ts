@@ -4,14 +4,13 @@ import { getRedirectForRole } from "@/lib/auth/auth-constants";
 import { API_ROUTES } from "@/constants/api.routes";
 import { FRONTEND_ROUTES } from "@/constants/frontend.routes";
 
-const BACKEND_URL = process.env.API_URL_INTERNAL || process.env.NEXT_PUBLIC_API_URL!;
+const BACKEND_URL = process.env.API_URL_INTERNAL || "http://localhost:4000/api";
 
 /**
  * Attempt to silently refresh the access token using the refresh_token cookie
  * OR the refresh token stored in the iron-session (whichever is available).
  * Returns the new access token string, or null if the refresh failed.
  */
-console.log("BACKEND_URL:", BACKEND_URL);
 async function tryRefreshToken(req: NextRequest, sessionRefreshToken?: string): Promise<string | null> {
     // Prefer the raw httpOnly cookie from the browser (set by the backend directly)
     const refreshTokenCookie = req.cookies.get("refresh_token")?.value ?? sessionRefreshToken;

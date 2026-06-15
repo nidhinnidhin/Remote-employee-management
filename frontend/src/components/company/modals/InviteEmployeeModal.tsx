@@ -48,8 +48,13 @@ const InviteEmployeeModal = ({
 
     try {
       await onInvite(form);
-    } catch (err) {
-      setError("Failed to send invite. Please try again.");
+    } catch (err: any) {
+      const backendMessage =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err?.message ||
+        "Failed to send invite. Please try again.";
+      setError(backendMessage);
     } finally {
       setIsSending(false);
     }

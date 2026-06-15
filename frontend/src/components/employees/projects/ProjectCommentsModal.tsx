@@ -2,11 +2,26 @@
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Comment, CommentEntityType } from "@/shared/types/company/projects/comment.type";
-import { getCommentsAction, addCommentAction } from "@/actions/employee/project/comment.actions";
+import {
+  getCommentsAction,
+  addCommentAction,
+  toggleCommentReactionAction,
+} from "@/actions/employee/project/comment.actions";
 import { toast } from "sonner";
-import { Loader2, Send, MessageSquare, CornerDownRight, Paperclip, X, Eye, FileText } from "lucide-react";
+import {
+  Loader2,
+  Send,
+  MessageSquare,
+  CornerDownRight,
+  Paperclip,
+  X,
+  Eye,
+  FileText,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import BaseModal from "@/components/ui/BaseModal";
+import { useAuthStore } from "@/store/auth.store";
+import { CommentReactionBar } from "@/components/employees/comments/CommentReactionBar";
 
 interface ProjectCommentsModalProps {
   isOpen: boolean;
@@ -29,18 +44,18 @@ export default function ProjectCommentsModal({
   entityType,
   title = "Comments",
 }: ProjectCommentsModalProps) {
+  const { userId } = useAuthStore();
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [replyTo, setReplyTo] = useState<{ id: string; name?: string } | null>(null);
-  
   const [attachments, setAttachments] = useState<AttachedFile[]>([]);
+  const [togglingReaction, setTogglingReaction] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // Instantly snaps scroll to the bottom maximum boundary
   const scrollToBottom = useCallback((behavior: "smooth" | "instant" = "instant") => {
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTo({
@@ -61,11 +76,9 @@ export default function ProjectCommentsModal({
     if (!skipGlobalLoading) setLoading(false);
   }, [entityId, entityType]);
 
-  // Initial Open Trigger Sequence
   useEffect(() => {
     if (isOpen) {
       fetchComments(false).then(() => {
-        // Enforce sequential ticks to handle delayed modal animation paint times
         requestAnimationFrame(() => {
           scrollToBottom("instant");
           setTimeout(() => scrollToBottom("instant"), 50);
@@ -74,41 +87,32 @@ export default function ProjectCommentsModal({
       });
       setReplyTo(null);
       setNewComment("");
-      attachments.forEach(attr => URL.revokeObjectURL(attr.previewUrl));
+      attachments.forEach((attr) => URL.revokeObjectURL(attr.previewUrl));
       setAttachments([]);
     }
   }, [isOpen, fetchComments, scrollToBottom]);
 
-  // MutationObserver: Keeps the scroll locked to the bottom instantly as nodes append
   useEffect(() => {
     if (!isOpen || !scrollContainerRef.current) return;
-
-    const observer = new MutationObserver(() => {
-      scrollToBottom("instant");
-    });
-
+    const observer = new MutationObserver(() => scrollToBottom("instant"));
     observer.observe(scrollContainerRef.current, {
       childList: true,
       subtree: true,
       characterData: true,
     });
-
     return () => observer.disconnect();
   }, [isOpen, scrollToBottom]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
-    
     Array.from(e.target.files).forEach((file) => {
       if (file.size > 5 * 1024 * 1024) {
         toast.error(`File "${file.name}" exceeds the 5MB size limit.`);
         return;
       }
-
       const previewUrl = URL.createObjectURL(file);
       setAttachments((prev) => [...prev, { name: file.name, file, previewUrl }]);
     });
-
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -122,30 +126,22 @@ export default function ProjectCommentsModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newComment.trim() && attachments.length === 0) return;
-
     setSubmitting(true);
 
     const formData = new FormData();
     formData.append("entityId", entityId);
     formData.append("entityType", entityType);
     formData.append("content", newComment.trim());
-    if (replyTo?.id) {
-      formData.append("parentId", replyTo.id);
-    }
-    attachments.forEach((attr) => {
-      formData.append("files", attr.file);
-    });
+    if (replyTo?.id) formData.append("parentId", replyTo.id);
+    attachments.forEach((attr) => formData.append("files", attr.file));
 
     const result = await addCommentAction(formData);
-
     if (result.success && result.data) {
       toast.success("Comment added successfully");
       setNewComment("");
       setReplyTo(null);
-      attachments.forEach(attr => URL.revokeObjectURL(attr.previewUrl));
+      attachments.forEach((attr) => URL.revokeObjectURL(attr.previewUrl));
       setAttachments([]);
-      
-      // Background re-fetch payload to avoid breaking UI layout skeletons
       await fetchComments(true);
       setTimeout(() => scrollToBottom("smooth"), 50);
     } else {
@@ -154,10 +150,51 @@ export default function ProjectCommentsModal({
     setSubmitting(false);
   };
 
+  // Single toggle handler — passed to each CommentReactionBar instance
+  const handleReact = useCallback(
+    async (commentId: string, emoji: string) => {
+      if (togglingReaction) return;
+      setTogglingReaction(true);
+
+      // Optimistic update
+      setComments((prev) =>
+        prev.map((c) => {
+          if ((c.id || c._id) !== commentId) return c;
+          const reactions = [...(c.reactions || [])];
+          const idx = reactions.findIndex((r) => r.emoji === emoji);
+          if (idx >= 0) {
+            const r = { ...reactions[idx], userIds: [...reactions[idx].userIds] };
+            const uIdx = r.userIds.indexOf(userId!);
+            if (uIdx >= 0) r.userIds.splice(uIdx, 1);
+            else r.userIds.push(userId!);
+            if (r.userIds.length === 0) reactions.splice(idx, 1);
+            else reactions[idx] = r;
+          } else {
+            reactions.push({ emoji, userIds: [userId!] });
+          }
+          return { ...c, reactions };
+        })
+      );
+
+      const result = await toggleCommentReactionAction(commentId, emoji);
+      if (result.success && result.data) {
+        setComments((prev) =>
+          prev.map((c) =>
+            (c.id || c._id) === commentId ? { ...c, reactions: result.data!.reactions } : c
+          )
+        );
+      } else {
+        toast.error(result.error || "Failed to toggle reaction");
+        await fetchComments(true);
+      }
+      setTogglingReaction(false);
+    },
+    [userId, togglingReaction, fetchComments]
+  );
+
   const formatDate = (dateString?: string) => {
     if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toLocaleString("en-US", {
+    return new Date(dateString).toLocaleString("en-US", {
       month: "short",
       day: "numeric",
       hour: "numeric",
@@ -173,22 +210,23 @@ export default function ProjectCommentsModal({
     return (
       <div className="mt-3 flex flex-wrap gap-2">
         {urls.map((url, idx) => {
-          const isImage = url.startsWith("data:image/") || /\.(jpeg|jpg|gif|png|webp|svg)/i.test(url);
+          const isImage =
+            url.startsWith("data:image/") || /\.(jpeg|jpg|gif|png|webp|svg)/i.test(url);
           return (
             <div
               key={idx}
               onClick={() => {
-                const newWindow = window.open();
-                if (newWindow) newWindow.document.write(`<iframe src="${url}" style="border:0; top:0; left:0; bottom:0; right:0; width:100%; height:100%;" allowfullscreen></iframe>`);
+                const win = window.open();
+                if (win) win.document.write(`<iframe src="${url}" style="border:0;top:0;left:0;bottom:0;right:0;width:100%;height:100%;" allowfullscreen></iframe>`);
               }}
               className="relative group w-16 h-16 rounded-lg overflow-hidden border border-white/10 bg-white/5 cursor-pointer hover:border-accent/40 transition-all flex items-center justify-center text-slate-400"
               title="View attachment"
             >
               {isImage ? (
-                <img 
-                  src={url} 
-                  alt="Attachment" 
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" 
+                <img
+                  src={url}
+                  alt="Attachment"
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   onLoad={() => scrollToBottom("instant")}
                 />
               ) : (
@@ -206,11 +244,10 @@ export default function ProjectCommentsModal({
 
   return (
     <BaseModal isOpen={isOpen} onClose={onClose} title={title}>
-      {/* Container wraps inner views to lock scroll parameters */}
-      <div className="flex flex-col h-[60vh] max-h-[600px] relative overflow-hidden">
-        
-        {/* Comment list container scrolls independently */}
-        <div 
+      <div className="flex flex-col h-[60vh] max-h-[600px] relative">
+
+        {/* Scrollable comment list */}
+        <div
           ref={scrollContainerRef}
           className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar pb-6"
         >
@@ -226,6 +263,7 @@ export default function ProjectCommentsModal({
           ) : (
             parentComments.map((parent) => (
               <div key={parent.id || parent._id} className="space-y-3">
+                {/* Parent comment card */}
                 <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4">
                   <div className="flex justify-between items-start mb-2">
                     <span className="text-xs font-bold text-slate-300">
@@ -234,13 +272,20 @@ export default function ProjectCommentsModal({
                     <span className="text-[10px] text-slate-500">{formatDate(parent.createdAt)}</span>
                   </div>
                   <p className="text-sm text-slate-300 leading-relaxed">{parent.content}</p>
-                  
-                  <RenderAttachments urls={parent.attachments} />
 
-                  <div className="mt-3 flex justify-end">
+                  <RenderAttachments urls={parent.attachments} />
+                
+
+                  {/* Reactions + Reply on same row */}
+                  <div className="mt-2 flex items-end justify-between gap-2">
+                    <CommentReactionBar
+                      comment={parent}
+                      userId={userId}
+                      onReact={handleReact}
+                    />
                     <button
                       onClick={() => setReplyTo({ id: (parent.id || parent._id) as string })}
-                      className="text-[11px] font-semibold text-accent/80 hover:text-accent transition-colors flex items-center gap-1"
+                      className="shrink-0 text-[11px] font-semibold text-accent/80 hover:text-accent transition-colors flex items-center gap-1 pb-0.5"
                     >
                       <CornerDownRight size={12} />
                       Reply
@@ -248,6 +293,7 @@ export default function ProjectCommentsModal({
                   </div>
                 </div>
 
+                {/* Reply / child comments */}
                 {childComments
                   .filter((child) => child.parentId === (parent.id || parent._id))
                   .map((child) => (
@@ -262,8 +308,14 @@ export default function ProjectCommentsModal({
                         <span className="text-[10px] text-slate-500">{formatDate(child.createdAt)}</span>
                       </div>
                       <p className="text-[13px] text-slate-400 leading-relaxed">{child.content}</p>
-                      
+
                       <RenderAttachments urls={child.attachments} />
+
+                      <CommentReactionBar
+                        comment={child}
+                        userId={userId}
+                        onReact={handleReact}
+                      />
                     </div>
                   ))}
               </div>
@@ -271,12 +323,15 @@ export default function ProjectCommentsModal({
           )}
         </div>
 
-        {/* Form elements stay completely fixed at the bottom wrapper */}
-        <div className="shrink-0 p-4 border-t border-white/[0.08] space-y-3 sticky bottom-0 z-10 w-full">
+        {/* Sticky bottom form */}
+        <div className="shrink-0 p-4 border-t border-white/[0.08] space-y-3 bg-transparent">
           {replyTo && (
             <div className="flex items-center justify-between px-3 py-1.5 bg-accent/10 border border-accent/20 rounded-lg">
               <span className="text-xs text-accent">Replying to comment</span>
-              <button onClick={() => setReplyTo(null)} className="text-xs text-slate-400 hover:text-white">
+              <button
+                onClick={() => setReplyTo(null)}
+                className="text-xs text-slate-400 hover:text-white"
+              >
                 Cancel
               </button>
             </div>
@@ -285,9 +340,16 @@ export default function ProjectCommentsModal({
           {attachments.length > 0 && (
             <div className="flex flex-wrap gap-2 p-2 bg-white/[0.02] border border-white/[0.05] rounded-lg">
               {attachments.map((file, i) => (
-                <div key={i} className="flex items-center gap-1.5 px-2 py-1 bg-white/5 rounded border border-white/10 text-[11px] text-slate-300">
+                <div
+                  key={i}
+                  className="flex items-center gap-1.5 px-2 py-1 bg-white/5 rounded border border-white/10 text-[11px] text-slate-300"
+                >
                   <span className="truncate max-w-[150px]">{file.name}</span>
-                  <button type="button" onClick={() => handleRemoveAttachment(i)} className="text-slate-500 hover:text-white shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveAttachment(i)}
+                    className="text-slate-500 hover:text-white shrink-0"
+                  >
                     <X size={12} />
                   </button>
                 </div>
@@ -304,7 +366,7 @@ export default function ProjectCommentsModal({
               accept="image/*,application/pdf,text/plain"
               className="hidden"
             />
-            
+
             <button
               type="button"
               disabled={submitting}
@@ -319,7 +381,7 @@ export default function ProjectCommentsModal({
             >
               <Paperclip size={16} />
             </button>
-            
+
             <div className="relative flex-1 flex items-center">
               <input
                 type="text"
@@ -334,8 +396,8 @@ export default function ProjectCommentsModal({
                 disabled={(!newComment.trim() && attachments.length === 0) || submitting}
                 className={cn(
                   "absolute right-2 p-1.5 rounded-lg transition-all",
-                  (newComment.trim() || attachments.length > 0) && !submitting 
-                    ? "bg-accent text-white hover:bg-accent/90" 
+                  (newComment.trim() || attachments.length > 0) && !submitting
+                    ? "bg-accent text-white hover:bg-accent/90"
                     : "bg-white/[0.05] text-slate-500 cursor-not-allowed"
                 )}
               >

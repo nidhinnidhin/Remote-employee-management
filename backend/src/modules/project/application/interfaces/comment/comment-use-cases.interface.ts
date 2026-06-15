@@ -19,3 +19,12 @@ export interface IGetCommentsUseCase {
     entityType: CommentEntityType,
   ): Promise<CommentEntity[]>;
 }
+
+export interface IToggleReactionUseCase {
+  execute(
+    companyId: string,
+    userId: string,
+    commentId: string,
+    emoji: string,
+  ): Promise<CommentEntity>;
+}

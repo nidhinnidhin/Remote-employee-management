@@ -17,6 +17,7 @@ import { CreateCommentDto } from '../../application/dto/comment/create-comment.d
 import type {
   IAddCommentUseCase,
   IGetCommentsUseCase,
+  IToggleReactionUseCase,
 } from '../../application/interfaces/comment/comment-use-cases.interface';
 import { CommentEntityType } from 'src/shared/enums/project/comment-entity-type.enum';
 
@@ -28,6 +29,8 @@ export class CommentController {
     private readonly _addCommentUseCase: IAddCommentUseCase,
     @Inject('IGetCommentsUseCase')
     private readonly _getCommentsUseCase: IGetCommentsUseCase,
+    @Inject('IToggleReactionUseCase')
+    private readonly _toggleReactionUseCase: IToggleReactionUseCase,
   ) {}
 
   @Post()
@@ -56,6 +59,20 @@ export class CommentController {
       req.user!.userId,
       entityId,
       entityType,
+    );
+  }
+
+  @Post(':commentId/reactions')
+  async toggleReaction(
+    @Req() req: Request,
+    @Param('commentId') commentId: string,
+    @Body('emoji') emoji: string,
+  ) {
+    return this._toggleReactionUseCase.execute(
+      req.user!.companyId!,
+      req.user!.userId,
+      commentId,
+      emoji,
     );
   }
 }
