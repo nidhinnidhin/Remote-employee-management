@@ -3,7 +3,7 @@ import { ResendOtpDto } from '../../dto/resend-otp.dto';
 import { SendEmailOtpInput } from 'src/shared/types/company/otp/send-email-otp-input.type';
 
 export interface IVerifyEmailOtpUseCase {
-    execute(input: VerifyEmailOtpDto): Promise<any>;
+    execute(input: VerifyEmailOtpDto): Promise<Record<string, unknown>>;
 }
 
 export interface IResendEmailOtpUseCase {

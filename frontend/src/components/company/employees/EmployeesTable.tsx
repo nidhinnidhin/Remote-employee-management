@@ -23,6 +23,7 @@ import { EmployeeDetailsModal } from "./EmployeeDetailsModal";
 import ActionReasonModal from "@/components/ui/ActionReasonModal";
 import { createPortal } from "react-dom";
 import { resendInvitationAction } from "@/actions/company/resend-invitation.action";
+import { useDebounce } from "@/hooks/debounce/useDebounce";
 import { cn } from "@/lib/utils";
 
 interface EmployeesTableProps {
@@ -52,6 +53,8 @@ const EmployeesTable: React.FC<EmployeesTableProps> = ({
     status: string;
   } | null>(null);
 
+  const debouncedSearch = useDebounce(searchQuery, 500);
+
   const itemsPerPage = 5;
 
   const fetchEmployees = async () => {
@@ -60,7 +63,7 @@ const EmployeesTable: React.FC<EmployeesTableProps> = ({
       const { data, total } = await getEmployeesPaginated({
         page: currentPage,
         limit: itemsPerPage,
-        search: searchQuery,
+        search: debouncedSearch,
       });
       setEmployees(data);
       setTotalEmployees(total);
@@ -76,12 +79,11 @@ const EmployeesTable: React.FC<EmployeesTableProps> = ({
     const handleScroll = () => setOpenMenuId(null);
     window.addEventListener("scroll", handleScroll, true);
     return () => window.removeEventListener("scroll", handleScroll, true);
-  }, [refreshKey, currentPage, searchQuery]);
+  }, [refreshKey, currentPage, debouncedSearch]);
 
-  // Reset to first page on search
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery]);
+  }, [debouncedSearch]);
 
   const handleStatusToggle = (employee: Employee) => {
     const newStatus = employee.isActive ? "SUSPENDED" : "ACTIVE";
@@ -168,7 +170,7 @@ const EmployeesTable: React.FC<EmployeesTableProps> = ({
             )}
           </div>
           <div className="flex flex-col min-w-0">
-            <span className="text-sm font-semibold text-slate-900 truncate tracking-tight">
+            <span className="text-sm font-semibold text-white truncate tracking-tight">
               {employee.name}
             </span>
             <span className="text-[11px] text-slate-500 truncate font-normal">
@@ -181,7 +183,7 @@ const EmployeesTable: React.FC<EmployeesTableProps> = ({
     {
       header: "Name",
       accessor: (employee) => (
-        <span className="text-slate-600 text-sm font-medium">
+        <span className="text-white text-sm font-medium">
           {employee.name || "—"}
         </span>
       ),
@@ -189,7 +191,7 @@ const EmployeesTable: React.FC<EmployeesTableProps> = ({
     {
       header: "Role",
       accessor: (employee: Employee) => (
-        <span className="inline-flex px-3 py-1 rounded-full border border-slate-200 bg-transparent text-slate-500 text-[10px] font-bold uppercase tracking-wider">
+        <span className="inline-flex px-3 py-1 rounded-full border border-slate-200 bg-transparent text-white text-[10px] font-bold uppercase tracking-wider">
           {employee.role}
         </span>
       ),

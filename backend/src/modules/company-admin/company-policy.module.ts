@@ -28,5 +28,8 @@ import { POLICY_MESSAGES } from 'src/shared/constants/messages/company-policy/co
       useClass: CompanyPolicyRepositoryImpl,
     },
   ],
+  exports: [
+    POLICY_MESSAGES.COMPANY_POLICY_REPOSITORY,
+  ],
 })
 export class CompanyPolicyModule { }

@@ -18,5 +18,5 @@ export interface IDocumentRepository {
     documentId: string,
     publicId: string,
     resourceType: CloudinaryResourceType,
-  ): Promise<any>;
+  ): Promise<unknown>;
 }

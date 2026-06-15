@@ -8,6 +8,7 @@ const DashboardHeader = () => {
             <div>
                 <h1 className="text-3xl font-bold text-accent mb-1">Dashboard</h1>
                 <p className="text-muted">Welcome to your company overview</p>
+                
             </div>
         </div>
     );

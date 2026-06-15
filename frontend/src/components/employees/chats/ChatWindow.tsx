@@ -1,4 +1,3 @@
-// src/components/employees/chats/ChatWindow.tsx
 "use client";
 
 import React, { useRef, useEffect } from "react";
@@ -27,17 +26,18 @@ export function ChatWindow({ conversation, messages }: ChatWindowProps) {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSend = (text: string) => {
-    sendMessage(conversation.id, text);
+  const handleSend = (text: string, type?: string, attachments?: any[]) => {
+    sendMessage(conversation.id, text, type, attachments);
   };
 
-  // Resolve Display Name and Avatar for Header
-  const isGroup = conversation.type === 'GROUP';
+  const isGroup = conversation.type === "GROUP";
   let displayName = conversation.name || "Direct Chat";
   let displayAvatar = conversation.avatar;
 
   if (!isGroup && conversation.participantDetails) {
-    const otherParticipant = conversation.participantDetails.find(p => p.id !== currentUserId);
+    const otherParticipant = conversation.participantDetails.find(
+      (p) => p.id !== currentUserId,
+    );
     if (otherParticipant) {
       displayName = otherParticipant.name;
       displayAvatar = otherParticipant.avatar;
@@ -46,19 +46,31 @@ export function ChatWindow({ conversation, messages }: ChatWindowProps) {
 
   return (
     <div className="flex flex-col h-full bg-[rgb(var(--color-bg))]">
-      {/* ── Chat Header ─────────────────────────────────────────── */}
+      {/* Header */}
       <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.05] bg-white/[0.01] shrink-0">
-        <div 
-          className={cn("flex items-center gap-3", isGroup && "cursor-pointer hover:opacity-80 transition-all")}
+        <div
+          className={cn(
+            "flex items-center gap-3",
+            isGroup && "cursor-pointer hover:opacity-80 transition-all",
+          )}
           onClick={() => isGroup && setIsDetailOpen(true)}
         >
           <div className="relative">
-            <AvatarCircle name={displayName} avatar={displayAvatar} size={38} isGroup={isGroup} />
+            <AvatarCircle
+              name={displayName}
+              avatar={displayAvatar}
+              size={38}
+              isGroup={isGroup}
+            />
           </div>
           <div>
-            <h3 className="text-[13px] font-black text-white tracking-wide">{displayName}</h3>
+            <h3 className="text-[13px] font-black text-white tracking-wide">
+              {displayName}
+            </h3>
             <p className="text-[10px] font-semibold text-slate-500">
-              {isGroup ? `${conversation.participants.length} members` : 'Active now'}
+              {isGroup
+                ? `${conversation.participants.length} members`
+                : "Active now"}
             </p>
           </div>
         </div>
@@ -76,38 +88,49 @@ export function ChatWindow({ conversation, messages }: ChatWindowProps) {
         </div>
       </div>
 
-      {/* ── Message List ────────────────────────────────────────── */}
+      {/* Messages */}
       <div className="flex-1 overflow-y-auto px-5 py-5 space-y-1 [scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,0.06)_transparent]">
         {messages.map((msg, i) => {
           const isMe = msg.senderId === currentUserId;
           const prevMsg = messages[i - 1];
-          const showAvatar = !isMe && (!prevMsg || prevMsg.senderId !== msg.senderId);
+          const showAvatar =
+            !isMe && (!prevMsg || prevMsg.senderId !== msg.senderId);
 
           return (
-              <ChatMessageBubble
-                key={msg.id}
-                message={msg}
-                isMe={isMe}
-                showAvatar={showAvatar}
-                senderName={isMe ? "Me" : (conversation.participantDetails?.find(p => p.id === msg.senderId)?.name || displayName)}
-                senderAvatar={conversation.participantDetails?.find(p => p.id === msg.senderId)?.avatar}
-              />
+            <ChatMessageBubble
+              key={msg.id}
+              message={msg}
+              isMe={isMe}
+              showAvatar={showAvatar}
+              senderName={
+                isMe
+                  ? "Me"
+                  : conversation.participantDetails?.find(
+                      (p) => p.id === msg.senderId,
+                    )?.name || displayName
+              }
+              senderAvatar={
+                conversation.participantDetails?.find(
+                  (p) => p.id === msg.senderId,
+                )?.avatar
+              }
+            />
           );
         })}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* ── Input Bar ───────────────────────────────────────────── */}
-      <ChatInputBar 
-        onSend={handleSend} 
+      {/* Input */}
+      <ChatInputBar
+        onSend={handleSend}
         onTyping={() => sendTyping(conversation.id)}
         onStopTyping={() => stopTyping(conversation.id)}
       />
 
       {isGroup && (
-        <GroupDetailModal 
-          isOpen={isDetailOpen} 
-          onClose={() => setIsDetailOpen(false)} 
+        <GroupDetailModal
+          isOpen={isDetailOpen}
+          onClose={() => setIsDetailOpen(false)}
           conversation={conversation}
         />
       )}

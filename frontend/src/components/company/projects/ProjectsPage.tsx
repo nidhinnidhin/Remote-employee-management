@@ -23,6 +23,7 @@ import {
 import { toast } from "sonner";
 import { PROJECT_MESSAGES } from "@/shared/constants/messages/project.messages";
 import { cn } from "@/lib/utils";
+import { useDebounce } from "@/hooks/debounce/useDebounce";
 
 const ProjectsPage = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -30,6 +31,7 @@ const ProjectsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalProjects, setTotalProjects] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearch = useDebounce(searchQuery, 500);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -43,7 +45,7 @@ const ProjectsPage = () => {
       const result = await searchProjectsAction({
         page: currentPage,
         limit: itemsPerPage,
-        search: searchQuery,
+        search: debouncedSearch,
       });
 
       if (result.success && result.data) {
@@ -63,12 +65,11 @@ const ProjectsPage = () => {
 
   useEffect(() => {
     fetchProjects();
-  }, [currentPage, searchQuery]);
+  }, [currentPage, debouncedSearch]);
 
-  // Reset to first page on search
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery]);
+  }, [debouncedSearch]);
 
   const handleEdit = (project: Project) => {
     setSelectedProject(project);
@@ -98,9 +99,9 @@ const ProjectsPage = () => {
     <AdminLayoutWrapper>
       <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-12">
         {/* ── HEADER HERO SECTION ── */}
-        <ProjectsHeader 
-          onAdd={() => setIsCreateModalOpen(true)} 
-          onSearch={setSearchQuery} 
+        <ProjectsHeader
+          onAdd={() => setIsCreateModalOpen(true)}
+          onSearch={setSearchQuery}
         />
 
         {/* ── BENTO STATS ── */}
@@ -114,13 +115,15 @@ const ProjectsPage = () => {
             },
             {
               label: "Active Nodes",
-              value: (projects || []).filter((p) => p.status === "Active").length,
+              value: (projects || []).filter((p) => p.status === "Active")
+                .length,
               icon: Clock,
               color: "text-accent",
             },
             {
               label: "Completed",
-              value: (projects || []).filter((p) => p.status === "Completed").length,
+              value: (projects || []).filter((p) => p.status === "Completed")
+                .length,
               icon: CheckCircle2,
               color: "text-emerald-500",
             },

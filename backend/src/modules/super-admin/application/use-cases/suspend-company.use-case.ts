@@ -4,6 +4,7 @@ import { CompanyStatus } from 'src/shared/enums/company/company-status.enum';
 import type { IEmailService } from 'src/shared/services/email/interfaces/iemail.service';
 import type { IUserRepository } from 'src/modules/auth/domain/repositories/iuser.repository';
 import { UserRole } from 'src/shared/enums/user/user-role.enum';
+import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 
 import type { ISuspendCompanyUseCase } from '../interfaces/super-admin-use-cases.interface';
 
@@ -39,7 +40,7 @@ export class SuspendCompanyUseCase implements ISuspendCompanyUseCase {
                 admin.email,
                 `${admin.firstName} ${admin.lastName}`,
                 company.name,
-                status as any,
+                status as unknown as UserStatus.ACTIVE | UserStatus.SUSPENDED,
                 reason || 'No reason provided'
             )
         );

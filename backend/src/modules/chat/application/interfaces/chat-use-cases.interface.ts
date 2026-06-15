@@ -2,7 +2,6 @@
 import { SendMessageDto } from '../dto/send-message.dto';
 import { CreateConversationDto } from '../dto/create-conversation.dto';
 import { MessageEntity } from '../../domain/entities/message.entity';
-import { ConversationEntity } from '../../domain/entities/conversation.entity';
 import { ConversationResponseDto } from '../dto/conversation-response.dto';
 
 export interface ISendMessageUseCase {

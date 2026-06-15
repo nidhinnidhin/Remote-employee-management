@@ -5,7 +5,6 @@ export default async function SuperAdminProtectedLayout({
 }: {
     children: React.ReactNode;
 }) {
-    // This will redirect to /super-admin/login if not authenticated
     await requireSuperAdminAuth();
 
     return <>{children}</>;

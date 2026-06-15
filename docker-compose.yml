@@ -1,54 +1,27 @@
 services:
-  frontend:
-    build:
-      context: ./frontend
-      target: deps
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-      - /app/.next
-    environment:
-      - NODE_ENV=development
-      - WATCHPACK_POLLING=true
-      - API_URL_INTERNAL=http://backend:4000/api
-      - BACKEND_URL_INTERNAL=http://backend:4000
-    env_file:
-      - ./frontend/.env
-    command: pnpm dev
-    depends_on:
-      backend:
-        condition: service_healthy
-
   backend:
-    image: node:22
-    working_dir: /app
-    ports:
-      - "4000:4000"
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
-    environment:
-      - NODE_ENV=development
-      - PORT=4000
-      - CHOKIDAR_USEPOLLING=true
-      - REDIS_URL=redis://redis:6379
+    image: nidhintech/nexus-backend:latest
+    command: pnpm run start
     env_file:
       - ./backend/.env
-    command: sh -c "corepack enable && corepack prepare pnpm@10.12.4 --activate && pnpm install && pnpm exec nest start --watch"
-    tty: true
-    healthcheck:
-      test: ["CMD-SHELL", "node -e \"require('net').connect(4000,'localhost').on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))\""]
-      interval: 10s
-      timeout: 5s
-      retries: 15
-      start_period: 120s
+    restart: unless-stopped
     depends_on:
-      redis:
-        condition: service_started
+      - redis
+    ports:
+      - "4000:4000"
 
+  frontend:
+    image: nidhintech/nexus-frontend:latest
+    command: pnpm start
+    env_file:
+      - ./frontend/.env
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+  
   redis:
     image: redis:7-alpine
+    restart: unless-stopped
     ports:
-      - "6380:6379"
+      - "6379:6379"
+    

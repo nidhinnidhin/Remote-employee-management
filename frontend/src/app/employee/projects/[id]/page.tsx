@@ -216,6 +216,9 @@ export default function EmployeeProjectDetailPage() {
                 <span className="text-accent">Project Details</span>
               </div>
               <div className="flex items-center gap-4">
+                <span className="text-[12px] font-black tracking-widest uppercase text-accent bg-accent/10 border border-accent/20 px-2 py-1 rounded mt-1">
+                  PRJ-{project?.projectNumber || 'NEW'}
+                </span>
                 <h1 className="text-3xl font-black text-white tracking-tighter">
                   {project?.name}
                 </h1>

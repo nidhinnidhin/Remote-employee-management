@@ -11,6 +11,7 @@ interface AdminAttendanceFiltersProps {
   startDate: string;
   endDate: string;
   status: string;
+  mode?: "attendance" | "leave"; // Mode to determine which status options to show
   onEmployeeChange: (id: string) => void;
   onSearchChange: (search: string) => void;
   onStartDateChange: (val: string) => void;
@@ -27,6 +28,7 @@ export const AdminAttendanceFilters: React.FC<AdminAttendanceFiltersProps> = ({
   startDate,
   endDate,
   status,
+  mode = "attendance",
   onEmployeeChange,
   onSearchChange,
   onStartDateChange,
@@ -103,10 +105,22 @@ export const AdminAttendanceFilters: React.FC<AdminAttendanceFiltersProps> = ({
               onChange={(e) => onStatusChange(e.target.value)}
               className="w-full h-11 pl-10 pr-10 rounded-xl border border-white/10 bg-transparent text-xs font-medium text-slate-200 focus:border-accent/40 focus:ring-1 focus:ring-accent/40 outline-none transition-all appearance-none cursor-pointer hover:border-white/20"
             >
-              <option value="" className="bg-[#0e1116]">All Shift Statuses</option>
-              <option value="WORKING" className="bg-[#0e1116]">Active Shift</option>
-              <option value="BREAK" className="bg-[#0e1116]">On Break</option>
-              <option value="COMPLETED" className="bg-[#0e1116]">Finished</option>
+              <option value="" className="bg-[#0e1116]">All Statuses</option>
+              {mode === "attendance" ? (
+                <>
+                  <option value="WORKING" className="bg-[#0e1116]">Working</option>
+                  <option value="BREAK" className="bg-[#0e1116]">On Break</option>
+                  <option value="COMPLETED" className="bg-[#0e1116]">Completed</option>
+                  <option value="ABSENT" className="bg-[#0e1116]">Absent</option>
+                </>
+              ) : (
+                <>
+                  <option value="PENDING" className="bg-[#0e1116]">Pending</option>
+                  <option value="APPROVED" className="bg-[#0e1116]">Approved</option>
+                  <option value="REJECTED" className="bg-[#0e1116]">Rejected</option>
+                  <option value="CANCELLED" className="bg-[#0e1116]">Cancelled</option>
+                </>
+              )}
             </select>
             <ChevronDown
               size={14}

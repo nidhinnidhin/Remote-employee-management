@@ -7,7 +7,15 @@ import { setRefreshTokenCookie, setAccessTokenCookie } from "@/lib/auth/cookies"
 import { COOKIE_KEYS } from "@/shared/constants/temp/cookie-keys";
 import { API_ROUTES } from "@/constants/api.routes";
 
-export async function onboardAction(payload: any): Promise<AuthActionResult> {
+export interface OnboardPayload {
+  userId: string;
+  companyName?: string;
+  industry?: string;
+  companySize?: string;
+  [key: string]: unknown;
+}
+
+export async function onboardAction(payload: OnboardPayload): Promise<AuthActionResult> {
     try {
         const session = await getSession();
 
@@ -37,11 +45,12 @@ export async function onboardAction(payload: any): Promise<AuthActionResult> {
             success: true,
             data: response.data,
         };
-    } catch (error: any) {
+    } catch (error: unknown) {
+        const err = error as { response?: { data?: { message?: string } }; message?: string };
         console.error("[onboardAction] Error:", error);
         return {
             success: false,
-            error: error.response?.data?.message || error.message || "Onboarding failed",
+            error: err.response?.data?.message || err.message || "Onboarding failed",
         };
     }
 }
@@ -53,10 +62,11 @@ export async function getOnboardingStatusAction(userId: string): Promise<AuthAct
             success: true,
             data: response.data,
         };
-    } catch (error: any) {
+    } catch (error: unknown) {
+        const err = error as { response?: { data?: { message?: string } }; message?: string };
         return {
             success: false,
-            error: error.response?.data?.message || "Failed to fetch status",
+            error: err.response?.data?.message || "Failed to fetch status",
         };
     }
 }
@@ -71,7 +81,8 @@ export async function finalizeOnboardingAction(userId: string): Promise<AuthActi
             return { success: true, data: response.data };
         }
         return { success: false, error: "Failed to finalize onboarding" };
-    } catch (error: any) {
-        return { success: false, error: error.response?.data?.message || "Finalization failed" };
+    } catch (error: unknown) {
+        const err = error as { response?: { data?: { message?: string } }; message?: string };
+        return { success: false, error: err.response?.data?.message || "Finalization failed" };
     }
 }

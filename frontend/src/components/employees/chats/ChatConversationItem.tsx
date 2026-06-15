@@ -52,7 +52,6 @@ export function ChatConversationItem({ conversation, isSelected, onClick }: Chat
         <AvatarCircle name={displayName} avatar={displayAvatar} size={44} isGroup={isGroup} />
       </div>
 
-      {/* Text content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between mb-0.5">
           <span className={cn(

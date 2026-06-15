@@ -1,9 +1,21 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ProjectDocument, ProjectSchema } from './infrastructure/database/mongoose/schemas/project.schema';
-import { UserStoryDocument, UserStorySchema } from './infrastructure/database/mongoose/schemas/user-story.schema';
-import { TaskDocument, TaskSchema } from './infrastructure/database/mongoose/schemas/task.schema';
-import { SprintDocument, SprintSchema } from './infrastructure/database/mongoose/schemas/sprint.schema';
+import {
+  ProjectDocument,
+  ProjectSchema,
+} from './infrastructure/database/mongoose/schemas/project.schema';
+import {
+  UserStoryDocument,
+  UserStorySchema,
+} from './infrastructure/database/mongoose/schemas/user-story.schema';
+import {
+  TaskDocument,
+  TaskSchema,
+} from './infrastructure/database/mongoose/schemas/task.schema';
+import {
+  SprintDocument,
+  SprintSchema,
+} from './infrastructure/database/mongoose/schemas/sprint.schema';
 import { MongoProjectRepository } from './infrastructure/database/repositories/mongo-project.repository';
 import { MongoUserStoryRepository } from './infrastructure/database/repositories/mongo-user-story.repository';
 import { MongoTaskRepository } from './infrastructure/database/repositories/mongo-task.repository';
@@ -39,20 +51,46 @@ import { SprintController } from './presentation/controllers/sprint.controller';
 import { AuthModule } from '../auth/presentation/auth/auth.module';
 import { SubscriptionModule } from '../subscription/subscription.module';
 import { ChatModule } from '../chat/chat.module';
+import { NotificationModule } from '../notification/notification.module';
+import {
+  CommentDocument,
+  CommentSchema,
+} from './infrastructure/database/mongoose/schemas/comment.schema';
+import { MongoCommentRepository } from './infrastructure/database/repositories/mongo-comment.repository';
+import { AddCommentUseCase } from './application/use-cases/comment/add-comment.usecase';
+import { GetCommentsUseCase } from './application/use-cases/comment/get-comments.usecase';
+import { CommentController } from './presentation/controllers/comment.controller';
+import {
+  UserDocument,
+  UserSchema,
+} from '../auth/infrastructure/database/mongoose/schemas/userSchema';
+
+// 🔹 Import ActivityLogsModule
+import { ActivityLogsModule } from '../activity-logs/activity-logs.module';
 
 @Module({
   imports: [
     AuthModule,
     SubscriptionModule,
     ChatModule,
+    NotificationModule,
+    forwardRef(() => ActivityLogsModule), // 🔹 Added with forwardRef
     MongooseModule.forFeature([
       { name: ProjectDocument.name, schema: ProjectSchema },
       { name: UserStoryDocument.name, schema: UserStorySchema },
       { name: TaskDocument.name, schema: TaskSchema },
       { name: SprintDocument.name, schema: SprintSchema },
+      { name: CommentDocument.name, schema: CommentSchema },
+      { name: UserDocument.name, schema: UserSchema },
     ]),
   ],
-  controllers: [ProjectController, StoryController, TaskController, SprintController],
+  controllers: [
+    ProjectController,
+    StoryController,
+    TaskController,
+    SprintController,
+    CommentController,
+  ],
   providers: [
     // Repositories
     {
@@ -71,10 +109,22 @@ import { ChatModule } from '../chat/chat.module';
       provide: 'ISprintRepository',
       useClass: MongoSprintRepository,
     },
+    {
+      provide: 'ICommentRepository',
+      useClass: MongoCommentRepository,
+    },
     // Project Use Cases
     {
       provide: 'ICreateProjectUseCase',
       useClass: CreateProjectUseCase,
+    },
+    {
+      provide: 'IAddCommentUseCase',
+      useClass: AddCommentUseCase,
+    },
+    {
+      provide: 'IGetCommentsUseCase',
+      useClass: GetCommentsUseCase,
     },
     {
       provide: 'IGetProjectUseCase',
@@ -171,7 +221,9 @@ import { ChatModule } from '../chat/chat.module';
       provide: 'IDeleteSprintUseCase',
       useClass: DeleteSprintUseCase,
     },
+    // AddCommentUseCase,
+    // GetCommentsUseCase,
   ],
-  exports: ['IProjectRepository'],
+  exports: ['IProjectRepository', 'ICommentRepository'],
 })
 export class ProjectModule {}

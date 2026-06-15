@@ -10,7 +10,7 @@ export class GetTodayAttendanceUseCase implements IGetTodayAttendanceUseCase {
     private readonly _attendanceRepository: IAttendanceRepository,
   ) {}
 
-  async execute(userId: string, companyId: string): Promise<AttendanceEntity | null> {
+  async execute(userId: string, _companyId: string): Promise<AttendanceEntity | null> {
     const now = new Date();
     const dateStr = now.toISOString().split('T')[0]; // "YYYY-MM-DD"
     return this._attendanceRepository.findByUserAndDate(userId, dateStr);

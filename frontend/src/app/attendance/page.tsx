@@ -8,18 +8,21 @@ import { AttendanceFilters } from "@/components/employees/attendance/AttendanceF
 import { AttendanceTable } from "@/components/employees/attendance/AttendanceTable";
 import { AttendanceDetailsModal } from "@/components/employees/attendance/AttendanceDetailsModal";
 import { toast } from "sonner";
+import { useDebounce } from "@/hooks/debounce/useDebounce";
 
 export default function EmployeeAttendancePage() {
   const [logs, setLogs] = useState<AttendanceLog[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
-  const [limit] = useState(5);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [status, setStatus] = useState("");
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 500);
   const [loading, setLoading] = useState(false);
   const [selectedLog, setSelectedLog] = useState<AttendanceLog | null>(null);
+
+  const limit = 5;
 
   const fetchLogs = useCallback(async () => {
     try {
@@ -30,7 +33,7 @@ export default function EmployeeAttendancePage() {
         startDate: startDate || undefined,
         endDate: endDate || undefined,
         status: status || undefined,
-        search: search || undefined,
+        search: debouncedSearch || undefined,
       });
       setLogs(res.data);
       setTotal(res.total);
@@ -40,7 +43,7 @@ export default function EmployeeAttendancePage() {
     } finally {
       setLoading(false);
     }
-  }, [page, limit, startDate, endDate, status, search]);
+  }, [page, limit, startDate, endDate, status, debouncedSearch]);
 
   useEffect(() => {
     fetchLogs();
@@ -53,8 +56,15 @@ export default function EmployeeAttendancePage() {
     setSearch("");
     setPage(1);
   };
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch]);
 
   const totalPages = Math.ceil(total / limit);
+
+  useEffect(() => {
+    fetchLogs();
+  }, [fetchLogs]);
 
   return (
     <DashboardLayout>
@@ -68,7 +78,9 @@ export default function EmployeeAttendancePage() {
             <div className="flex items-center gap-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
               <span>{total} Historical Records</span>
               <span className="w-1 h-1 rounded-full bg-slate-800" />
-              <span>Page {page} of {totalPages || 1}</span>
+              <span>
+                Page {page} of {totalPages || 1}
+              </span>
             </div>
           </div>
         </div>
@@ -91,10 +103,7 @@ export default function EmployeeAttendancePage() {
             setStatus(val);
             setPage(1);
           }}
-          onSearchChange={(val) => {
-            setSearch(val);
-            setPage(1);
-          }}
+          onSearchChange={setSearch}
           onClearFilters={handleClearFilters}
           onRefresh={fetchLogs}
         />

@@ -1,7 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { IProjectRepository } from '../../../domain/repositories/project.repository.interface';
 import { ISearchProjectsUseCase } from '../../interfaces/project/project-use-cases.interface';
-import { ProjectEntity } from '../../../domain/entities/project.entity';
 import { SearchProjectsDto } from '../../dto/project/search-projects.dto';
 import { FilterQuery } from 'mongoose';
 import { ProjectDocument } from '../../../infrastructure/database/mongoose/schemas/project.schema';

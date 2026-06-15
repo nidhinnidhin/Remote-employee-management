@@ -16,6 +16,7 @@ export interface UserStory {
   id: string;
   companyId: string;
   projectId: string;
+  storyNumber: number;
   title: string;
   description: string;
   status: UserStoryStatus;

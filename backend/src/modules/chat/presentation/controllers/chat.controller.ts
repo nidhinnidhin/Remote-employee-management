@@ -1,18 +1,36 @@
-import { Controller, Post, Get, Patch, Delete, Body, Param, Query, UseGuards, Inject, Req, UseInterceptors, UploadedFile, BadRequestException, HttpCode, HttpStatus } from '@nestjs/common';
+// src/modules/chat/presentation/controllers/chat.controller.ts
+import {
+  Controller,
+  Post,
+  Get,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+  Inject,
+  Req,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import type { Request } from 'express';
+import type { AuthenticatedRequest } from 'src/shared/types/express/authenticated-request.interface';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import { ApiResponse } from 'src/common/response/api-response.util';
 import { CreateConversationDto } from '../../application/dto/create-conversation.dto';
-import type { 
-  ICreateConversationUseCase, 
-  IGetUserConversationsUseCase, 
+import type {
+  ICreateConversationUseCase,
+  IGetUserConversationsUseCase,
   IGetConversationMessagesUseCase,
   IUpdateConversationUseCase,
   IDeleteConversationUseCase,
   ILeaveConversationUseCase,
   IEditMessageUseCase,
-  IDeleteMessageUseCase
+  IDeleteMessageUseCase,
 } from '../../application/interfaces/chat-use-cases.interface';
 import { ChatGateway } from '../gateways/chat.gateway';
 import type { ICloudinaryService } from 'src/shared/services/cloudinary/interfaces/icloudinary.service';
@@ -44,112 +62,132 @@ export class ChatController {
   ) {}
 
   @Post('conversations')
-  async createConversation(@Req() req: Request, @Body() dto: CreateConversationDto) {
-    const { companyId, userId } = req.user as any;
-    const conversation = await this._createConversationUseCase.execute(companyId, userId, dto);
-    
+  async createConversation(
+    @Req() req: AuthenticatedRequest,
+    @Body() dto: CreateConversationDto,
+  ) {
+    const { companyId, userId } = req.user;
+    const conversation = await this._createConversationUseCase.execute(
+      companyId,
+      userId,
+      dto,
+    );
     this._chatGateway.notifyConversationUpdate(conversation);
-    
-    return ApiResponse.success(conversation, 'Conversation created successfully');
+    return ApiResponse.success(
+      conversation,
+      'Conversation created successfully',
+    );
   }
 
   @Get('conversations')
-  async getUserConversations(@Req() req: Request) {
-    const { companyId, userId } = req.user as any;
-    const conversations = await this._getUserConversationsUseCase.execute(companyId, userId);
-    return ApiResponse.success(conversations, 'Conversations retrieved successfully');
+  async getUserConversations(@Req() req: AuthenticatedRequest) {
+    const { companyId, userId } = req.user;
+    const conversations = await this._getUserConversationsUseCase.execute(
+      companyId,
+      userId,
+    );
+    return ApiResponse.success(
+      conversations,
+      'Conversations retrieved successfully',
+    );
   }
 
   @Get('conversations/:id/messages')
   async getMessages(
-    @Req() req: Request,
+    @Req() req: AuthenticatedRequest,
     @Param('id') conversationId: string,
     @Query('limit') limit?: number,
     @Query('before') before?: string,
   ) {
-    const { userId } = req.user as any;
+    const { userId } = req.user;
     const messages = await this._getConversationMessagesUseCase.execute(
       conversationId,
       limit ? Number(limit) : undefined,
       before ? new Date(before) : undefined,
-      userId
+      userId,
     );
     return ApiResponse.success(messages, 'Messages retrieved successfully');
   }
 
   @Patch('conversations/:id')
   async updateConversation(
-    @Req() req: Request,
+    @Req() req: AuthenticatedRequest,
     @Param('id') id: string,
-    @Body() dto: { name?: string, avatar?: string, participants?: string[], admins?: string[] }
+    @Body()
+    dto: {
+      name?: string;
+      avatar?: string;
+      participants?: string[];
+      admins?: string[];
+    },
   ) {
-    const { userId } = req.user as any;
-    const conversation = await this._updateConversationUseCase.execute(id, userId, dto);
-    
+    const { userId } = req.user;
+    const conversation = await this._updateConversationUseCase.execute(
+      id,
+      userId,
+      dto,
+    );
     this._chatGateway.notifyConversationUpdate(conversation);
-    
-    return ApiResponse.success(conversation, 'Conversation updated successfully');
+    return ApiResponse.success(
+      conversation,
+      'Conversation updated successfully',
+    );
   }
 
   @Delete('conversations/:id')
-  async deleteConversation(@Req() req: Request, @Param('id') id: string) {
-    const { userId } = req.user as any;
-    
+  async deleteConversation(@Req() req: AuthenticatedRequest, @Param('id') id: string) {
+    const { userId } = req.user;
     await this._deleteConversationUseCase.execute(id, userId);
-    
     this._chatGateway.notifyConversationDeletion(id);
-    
     return ApiResponse.success(null, 'Conversation deleted successfully');
   }
 
   @Post('conversations/:id/leave')
   @HttpCode(HttpStatus.OK)
-  async leaveConversation(@Req() req: Request, @Param('id') id: string) {
-    const { userId } = req.user as any;
+  async leaveConversation(@Req() req: AuthenticatedRequest, @Param('id') id: string) {
+    const { userId } = req.user;
     await this._leaveConversationUseCase.execute(id, userId);
-    
     this._chatGateway.notifyUserLeft(id, userId);
-    
     return ApiResponse.success(null, 'Left conversation successfully');
   }
 
   @Patch('messages/:id')
   async editMessage(
-    @Req() req: Request,
+    @Req() req: AuthenticatedRequest,
     @Param('id') id: string,
-    @Body('content') content: string
+    @Body('content') content: string,
   ) {
-    const { userId } = req.user as any;
+    const { userId } = req.user;
     const message = await this._editMessageUseCase.execute(id, userId, content);
-    
-    // Notify room
     this._chatGateway.notifyMessageUpdate(message);
-    
     return ApiResponse.success(message, 'Message edited successfully');
   }
 
   @Delete('messages/:id')
   async deleteMessage(
-    @Req() req: Request,
+    @Req() req: AuthenticatedRequest,
     @Param('id') id: string,
-    @Query('type') type: 'me' | 'everyone'
+    @Query('type') type: 'me' | 'everyone',
   ) {
-    const { userId } = req.user as any;
+    const { userId } = req.user;
     const message = await this._deleteMessageUseCase.execute(id, userId, type);
-    
+
     if (type === 'everyone') {
-        this._chatGateway.notifyMessageDeletion(message.conversationId, id);
+      this._chatGateway.notifyMessageDeletion(message.conversationId, id);
     } else {
-        this._chatGateway.notifyMessageDeletedForMe(message.conversationId, id, userId);
+      this._chatGateway.notifyMessageDeletedForMe(
+        message.conversationId,
+        id,
+        userId,
+      );
     }
-    
     return ApiResponse.success(null, 'Message deleted successfully');
   }
 
-  @Post('upload-image')
+  @Post('upload-attachment')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadGroupImage(
-    @Req() req: Request,
+  async uploadChatAttachment(
+    @Req() req: AuthenticatedRequest,
     @UploadedFile() file: Express.Multer.File,
   ) {
     if (!file) {
@@ -161,8 +199,37 @@ export class ChatController {
       CLOUDINARY_PATH.UPLOAD_CHAT_PATH,
     );
 
-    return ApiResponse.success({
-      imageUrl: uploadResult.secure_url,
-    }, 'Group image uploaded successfully');
+    return ApiResponse.success(
+      {
+        fileUrl: uploadResult.secure_url,
+        publicId: uploadResult.public_id,
+        fileName: file.originalname,
+        fileSize: file.size,
+      },
+      'Chat binary resource uploaded successfully',
+    );
+  }
+
+  @Post('upload-image')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadGroupImage(
+    @Req() req: AuthenticatedRequest,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+
+    const uploadResult = await this._cloudinaryService.uploadFile(
+      file,
+      CLOUDINARY_PATH.UPLOAD_CHAT_PATH,
+    );
+
+    return ApiResponse.success(
+      {
+        imageUrl: uploadResult.secure_url,
+      },
+      'Group image uploaded successfully',
+    );
   }
 }

@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useProfileStore } from "@/store/profile.store";
+import { FileText } from "lucide-react";
 
 const navigationGroups = [
   // ... (rest of the file)
@@ -64,11 +65,6 @@ const navigationGroups = [
         href: FRONTEND_ROUTES.EMPLOYEE.LEAVES,
       },
       { icon: Users2, label: "Department", href: FRONTEND_ROUTES.EMPLOYEE.TEAMS },
-      {
-        icon: Search,
-        label: "Directory",
-        href: FRONTEND_ROUTES.EMPLOYEE.DIRECTORY,
-      },
     ],
   },
   {
@@ -84,26 +80,21 @@ const navigationGroups = [
         label: "Discussions",
         href: FRONTEND_ROUTES.EMPLOYEE.DISCUSSIONS,
       },
-      {
-        icon: Megaphone,
-        label: "Announcements",
-        href: FRONTEND_ROUTES.EMPLOYEE.ANNOUNCEMENTS,
-      },
     ],
   },
   {
     title: "Growth & Policy",
     items: [
-      {
-        icon: LineChart,
-        label: "Performance",
-        href: FRONTEND_ROUTES.EMPLOYEE.PERFORMANCE,
-      },
-      { icon: Heart, label: "Mood Check", href: FRONTEND_ROUTES.EMPLOYEE.MOOD },
+      
       {
         icon: ShieldCheck,
         label: "Company Policy",
         href: FRONTEND_ROUTES.EMPLOYEE.POLICY,
+      },
+      {
+        icon: FileText,
+        label: "Activity Logs",
+        href: FRONTEND_ROUTES.EMPLOYEE.LOGS,
       },
     ],
   },

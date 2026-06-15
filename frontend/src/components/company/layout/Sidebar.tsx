@@ -38,22 +38,19 @@ const navigationGroups = [
     items: [
       { label: "Departments", icon: Building2, href: FRONTEND_ROUTES.COMPANY.DEPARTMENTS },
       { label: "Projects", icon: FolderOpen, href: FRONTEND_ROUTES.COMPANY.PROJECTS },
-      { label: "Tasks", icon: CheckSquare, href: FRONTEND_ROUTES.COMPANY.TASKS },
     ],
   },
   {
     title: "Communication",
     items: [
-      { label: "Discussion Pools", icon: MessageSquare, href: FRONTEND_ROUTES.COMPANY.DISCUSSIONS },
+      { label: "Meeting", icon: MessageSquare, href: FRONTEND_ROUTES.COMPANY.DISCUSSIONS },
       { label: "Attendance & Leave", icon: CalendarDays, href: FRONTEND_ROUTES.COMPANY.ATTENDANCE },
     ],
   },
   {
     title: "Organization",
     items: [
-      { label: "Subscription", icon: CreditCard, href: FRONTEND_ROUTES.COMPANY.SUBSCRIPTION },
-      { label: "Company Profile", icon: Building, href: FRONTEND_ROUTES.COMPANY.PROFILE },
-      { label: "Audit Logs", icon: FileText, href: FRONTEND_ROUTES.COMPANY.AUDIT_LOGS },
+      { label: "Activity Logs", icon: FileText, href: FRONTEND_ROUTES.COMPANY.AUDIT_LOGS },
       { label: "Company Policy", icon: Shield, href: FRONTEND_ROUTES.ADMIN.COMPANY_POLICY },
     ],
   },
@@ -109,8 +106,6 @@ const Sidebar: React.FC<SidebarProps> = ({
           </button>
         </div>
 
-        {/* Desktop Collapse Toggle - Float style from reference */}
-        {/* Desktop Collapse Toggle */}
         <button
           onClick={toggleCollapse}
           className={cn(

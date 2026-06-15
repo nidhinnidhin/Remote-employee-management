@@ -21,17 +21,26 @@ const StatCard: React.FC<StatCardProps> = ({
     </div>
 );
 
-const DashboardStats = () => {
-    const stats = [
-        { label: "Total Employees", value: "45" },
-        { label: "Total Departments", value: "5" },
-        { label: "Active Projects", value: "12" },
-        { label: "Pending Tasks", value: "8" },
+interface DashboardStatsProps {
+    stats: {
+        totalEmployees: number;
+        totalDepartments: number;
+        activeProjects: number;
+        pendingLeaves: number;
+    }
+}
+
+const DashboardStats: React.FC<DashboardStatsProps> = ({ stats }) => {
+    const statItems = [
+        { label: "Total Employees", value: stats.totalEmployees },
+        { label: "Total Departments", value: stats.totalDepartments },
+        { label: "Active Projects", value: stats.activeProjects },
+        { label: "Pending Leaves", value: stats.pendingLeaves },
     ];
 
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            {stats.map((stat, index) => (
+            {statItems.map((stat, index) => (
                 <StatCard key={index} label={stat.label} value={stat.value} />
             ))}
         </div>

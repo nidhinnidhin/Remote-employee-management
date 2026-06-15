@@ -7,6 +7,7 @@ export class UserStoryEntity {
     public readonly id: string,
     public readonly companyId: string,
     public readonly projectId: string,
+    public readonly storyNumber: number, // --- ADDED THIS ---
     public readonly title: string,
     public readonly status: UserStoryStatus,
     public readonly priority: UserStoryPriority,

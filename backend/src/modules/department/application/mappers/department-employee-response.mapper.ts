@@ -1,10 +1,10 @@
 import { DepartmentEntity } from '../../domain/entities/department.entity';
 
 export class DepartmentResponseMapper {
-  static toEnrichedResponse(department: DepartmentEntity, employeeMap: Map<string, any>) {
+  static toEnrichedResponse(department: DepartmentEntity, employeeMap: Map<string, { id: string; name: string; email: string; avatar?: string }>) {
     const populatedEmployees = (department.employeeIds || [])
       .map((id) => employeeMap.get(id))
-      .filter((e): e is any => !!e)
+      .filter((e): e is { id: string; name: string; email: string; avatar?: string } => !!e)
       .map((e) => ({
         id: e.id,
         name: e.name,

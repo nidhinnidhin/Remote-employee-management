@@ -6,7 +6,6 @@ import {
   MaxLength,
   Matches,
   IsIn,
-  IsPhoneNumber,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 

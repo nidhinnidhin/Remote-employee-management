@@ -3,7 +3,6 @@ import { SubscriptionPlans } from "@/components/super-admin/subscriptions/Subscr
 import { requireSuperAdminAuth } from "@/lib/auth/super-admin-auth";
 
 export default async function SubscriptionsPage() {
-  // Ensure user is authenticated as super admin
   await requireSuperAdminAuth();
 
   return (

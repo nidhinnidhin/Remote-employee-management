@@ -24,10 +24,10 @@ export class ApiErrorModel implements IApiResponse<null> {
   message: string;
   data: null;
   statusCode: number;
-  errors: any;
+  errors: unknown;
   meta: IApiMeta;
 
-  constructor(message: string, statusCode: number = 500, errors: any = null, meta?: Partial<IApiMeta>) {
+  constructor(message: string, statusCode: number = 500, errors: unknown = null, meta?: Partial<IApiMeta>) {
     this.success = false;
     this.message = message;
     this.data = null;

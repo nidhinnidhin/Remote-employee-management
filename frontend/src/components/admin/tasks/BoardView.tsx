@@ -1,15 +1,30 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { Layout, Loader2, Sparkles, Filter, Search, Plus, Timer, CheckCircle2 } from "lucide-react";
+import {
+  Layout,
+  Loader2,
+  Sparkles,
+  Filter,
+  Search,
+  Plus,
+  Timer,
+  CheckCircle2,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Task, TaskStatus } from "@/shared/types/company/projects/task.type";
 import { Employee } from "@/shared/types/company/employees/employee-listing.type";
-import { UserStory, UserStoryPriority } from "@/shared/types/company/projects/user-story.type";
+import {
+  UserStory,
+  UserStoryPriority,
+} from "@/shared/types/company/projects/user-story.type";
 import { getStoriesByProjectAction } from "@/actions/company/projects/story.actions";
 import { getTasksByStoryAction } from "@/actions/company/projects/task.actions";
 import { getEmployees } from "@/services/company/employee-management.service";
-import { getSprintsByProjectAction, updateSprintAction } from "@/actions/company/projects/sprint.actions";
+import {
+  getSprintsByProjectAction,
+  updateSprintAction,
+} from "@/actions/company/projects/sprint.actions";
 import { Sprint } from "@/shared/types/company/projects/sprint.type";
 import { toast } from "sonner";
 import KanbanBoard from "./KanbanBoard";
@@ -22,7 +37,10 @@ interface BoardViewProps {
   projectMembers?: string[];
 }
 
-const BoardView: React.FC<BoardViewProps> = ({ projectId, projectMembers = [] }) => {
+const BoardView: React.FC<BoardViewProps> = ({
+  projectId,
+  projectMembers = [],
+}) => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [stories, setStories] = useState<UserStory[]>([]);
@@ -54,20 +72,25 @@ const BoardView: React.FC<BoardViewProps> = ({ projectId, projectMembers = [] })
 
       if (employeesData) {
         // Filter employees to only show those assigned to the project AND active
-        const filteredEmployees = (employeesData as Employee[]).filter(emp => {
-          const isMember = projectMembers.length > 0 
-            ? projectMembers.includes(emp.id) || projectMembers.includes((emp as any)._id)
-            : true;
-          return isMember && emp.isActive;
-        });
+        const filteredEmployees = (employeesData as Employee[]).filter(
+          (emp) => {
+            const isMember =
+              projectMembers.length > 0
+                ? projectMembers.includes(emp.id) ||
+                  projectMembers.includes((emp as any)._id)
+                : true;
+            return isMember && emp.isActive;
+          },
+        );
         setEmployees(filteredEmployees);
       }
 
       // 2. Find Active Sprint
-      const active = sprintsResult.success && sprintsResult.data 
-        ? sprintsResult.data.find(s => s.status === 'ACTIVE') 
-        : null;
-      
+      const active =
+        sprintsResult.success && sprintsResult.data
+          ? sprintsResult.data.find((s) => s.status === "ACTIVE")
+          : null;
+
       setActiveSprint(active || null);
 
       if (!active) {
@@ -78,8 +101,8 @@ const BoardView: React.FC<BoardViewProps> = ({ projectId, projectMembers = [] })
       }
 
       // 3. Filter Stories for Active Sprint
-      const activeStories = storiesResult.data.filter(story => 
-        active.issueIds.includes(story.id)
+      const activeStories = storiesResult.data.filter((story) =>
+        active.issueIds.includes(story.id),
       );
       setStories(activeStories);
 
@@ -120,7 +143,7 @@ const BoardView: React.FC<BoardViewProps> = ({ projectId, projectMembers = [] })
     setCompleting(true);
     try {
       const result = await updateSprintAction(activeSprint.id, {
-        status: 'COMPLETED'
+        status: "COMPLETED",
       });
 
       if (result.success) {
@@ -139,12 +162,14 @@ const BoardView: React.FC<BoardViewProps> = ({ projectId, projectMembers = [] })
 
   const filteredTasks = useMemo(() => {
     return tasks.filter((task) => {
-      const matchesSearch = !searchQuery || 
+      const matchesSearch =
+        !searchQuery ||
         task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         task.description.toLowerCase().includes(searchQuery.toLowerCase());
-      
+
       const matchesStatus = !statusFilter || task.status === statusFilter;
-      const matchesPriority = !priorityFilter || task.priority === priorityFilter;
+      const matchesPriority =
+        !priorityFilter || task.priority === priorityFilter;
 
       return matchesSearch && matchesStatus && matchesPriority;
     });
@@ -209,7 +234,9 @@ const BoardView: React.FC<BoardViewProps> = ({ projectId, projectMembers = [] })
             <p className="text-[10px] p-2 font-black text-muted uppercase tracking-widest">
               Visualizing {filteredTasks.length}{" "}
               {filteredTasks.length === 1 ? "task" : "tasks"}
-              {searchQuery || statusFilter || priorityFilter ? " (filtered)" : ""}
+              {searchQuery || statusFilter || priorityFilter
+                ? " (filtered)"
+                : ""}
             </p>
           </div>
         </div>
@@ -217,9 +244,9 @@ const BoardView: React.FC<BoardViewProps> = ({ projectId, projectMembers = [] })
         <div className="flex flex-col md:flex-row items-center gap-3">
           {/* Search Input */}
           <div className="relative group w-full md:w-64">
-            <Search 
-              size={14} 
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted group-focus-within:text-accent transition-colors" 
+            <Search
+              size={14}
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted group-focus-within:text-accent transition-colors"
             />
             <input
               type="text"
@@ -231,26 +258,30 @@ const BoardView: React.FC<BoardViewProps> = ({ projectId, projectMembers = [] })
           </div>
 
           {/* Status Filter */}
-          <select 
+          <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             className="w-full md:w-auto bg-white/[0.02] border border-white/10 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-400 focus:outline-none focus:border-accent/40 transition-all cursor-pointer hover:bg-white/5"
           >
             <option value="">Status</option>
-            {Object.values(TaskStatus).map(status => (
-              <option key={status} value={status}>{status}</option>
+            {Object.values(TaskStatus).map((status) => (
+              <option key={status} value={status}>
+                {status}
+              </option>
             ))}
           </select>
 
           {/* Priority Filter */}
-          <select 
+          <select
             value={priorityFilter}
             onChange={(e) => setPriorityFilter(e.target.value)}
             className="w-full md:w-auto bg-white/[0.02] border border-white/10 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-400 focus:outline-none focus:border-accent/40 transition-all cursor-pointer hover:bg-white/5"
           >
             <option value="">Priority</option>
-            {Object.values(UserStoryPriority).map(p => (
-              <option key={p} value={p}>{p}</option>
+            {Object.values(UserStoryPriority).map((p) => (
+              <option key={p} value={p}>
+                {p}
+              </option>
             ))}
           </select>
 
@@ -266,7 +297,6 @@ const BoardView: React.FC<BoardViewProps> = ({ projectId, projectMembers = [] })
           )}
         </div>
       </div>
-
       <KanbanBoard
         tasks={filteredTasks}
         employees={employees}

@@ -5,12 +5,13 @@ import { ProjectEntity } from '../../../domain/entities/project.entity';
 import type { IProjectRepository } from '../../../domain/repositories/project.repository.interface';
 import { ProjectDocument } from '../mongoose/schemas/project.schema';
 import { BaseRepository } from 'src/shared/repositories/base.repository';
-import { LeanProjectDocument, ProjectMapper } from 'src/modules/project/application/mappers/project.mapper';
+import { LeanProjectDocument, ProjectMapper } from 'src/modules/project/application/mappers/project/project.mapper';
+
 
 @Injectable()
-export class MongoProjectRepository 
-  extends BaseRepository<ProjectDocument, ProjectEntity> 
-  implements IProjectRepository 
+export class MongoProjectRepository
+  extends BaseRepository<ProjectDocument, ProjectEntity>
+  implements IProjectRepository
 {
   constructor(
     @InjectModel(ProjectDocument.name)
@@ -19,7 +20,9 @@ export class MongoProjectRepository
     super(_projectModel);
   }
 
-  protected toEntity(projectDoc: ProjectDocument | LeanProjectDocument): ProjectEntity {
+  protected toEntity(
+    projectDoc: ProjectDocument | LeanProjectDocument,
+  ): ProjectEntity {
     return ProjectMapper.toDomain(projectDoc);
   }
 
@@ -27,11 +30,14 @@ export class MongoProjectRepository
     const persistenceData = ProjectMapper.toPersistence(project);
     return this.save({
       ...persistenceData,
-      isDeleted: false, 
+      isDeleted: false,
     } as Partial<ProjectDocument>);
   }
 
-  async findByIdAndCompany(id: string, companyId: string): Promise<ProjectEntity | null> {
+  async findByIdAndCompany(
+    id: string,
+    companyId: string,
+  ): Promise<ProjectEntity | null> {
     if (!Types.ObjectId.isValid(id)) return null;
     return this.findOne({ _id: id, companyId, isDeleted: false });
   }
@@ -41,8 +47,10 @@ export class MongoProjectRepository
       .find({ companyId, isDeleted: false })
       .lean()
       .exec();
-      
-    return docs.map((doc) => this.toEntity(doc as unknown as LeanProjectDocument));
+
+    return docs.map((doc) =>
+      this.toEntity(doc as unknown as LeanProjectDocument),
+    );
   }
 
   async updateProject(
@@ -51,7 +59,7 @@ export class MongoProjectRepository
     project: Partial<ProjectEntity>,
   ): Promise<ProjectEntity | null> {
     if (!Types.ObjectId.isValid(id)) return null;
-    
+
     const doc = await this.model
       .findOneAndUpdate(
         { _id: id, companyId, isDeleted: false },
@@ -60,17 +68,55 @@ export class MongoProjectRepository
       )
       .lean()
       .exec();
-      
+
     return doc ? this.toEntity(doc as unknown as LeanProjectDocument) : null;
   }
 
   async softDeleteProject(id: string, companyId: string): Promise<boolean> {
     if (!Types.ObjectId.isValid(id)) return false;
-    
+
     const result = await this.model
       .updateOne({ _id: id, companyId }, { $set: { isDeleted: true } })
       .exec();
-      
+
     return result.modifiedCount > 0;
+  }
+
+  async incrementAndGetStoryCounter(
+    projectId: string,
+    companyId: string,
+  ): Promise<number> {
+    const updatedProject = await this._projectModel
+      .findOneAndUpdate(
+        { _id: new Types.ObjectId(projectId), companyId },
+        { $inc: { storyCounter: 1 } }, // Atomically increments count by 1
+        { new: true, useFindAndModify: false }, // Returns the newly updated project instance
+      )
+      .exec();
+
+    if (!updatedProject) {
+      throw new Error('Project tracking verification failed');
+    }
+
+    return updatedProject.storyCounter;
+  }
+
+  async incrementAndGetTaskCounter(
+    projectId: string,
+    companyId: string,
+  ): Promise<number> {
+    const updatedProject = await this._projectModel
+      .findOneAndUpdate(
+        { _id: new Types.ObjectId(projectId), companyId },
+        { $inc: { taskCounter: 1 } },
+        { new: true, useFindAndModify: false },
+      )
+      .exec();
+
+    if (!updatedProject) {
+      throw new Error('Project tracking verification failed');
+    }
+
+    return updatedProject.taskCounter;
   }
 }

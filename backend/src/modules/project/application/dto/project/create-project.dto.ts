@@ -1,4 +1,13 @@
-import { IsString, IsEnum, IsDateString, IsNotEmpty, MinLength, MaxLength, IsArray, IsOptional, IsUUID } from 'class-validator';
+import {
+  IsString,
+  IsEnum,
+  IsDateString,
+  IsNotEmpty,
+  MinLength,
+  MaxLength,
+  IsArray,
+  IsOptional,
+} from 'class-validator';
 import { ProjectStatus } from 'src/shared/enums/project/project-status.enum';
 
 export class CreateProjectDto {

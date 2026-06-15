@@ -6,6 +6,10 @@ import type { ICreateTaskUseCase } from '../../interfaces/task/task-use-cases.in
 import { CreateTaskDto } from '../../dto/task/create-task.dto';
 import { TaskEntity } from '../../../domain/entities/task.entity';
 import { TaskStatus } from 'src/shared/enums/project/task-status.enum';
+import type { ICreateNotificationUseCase } from 'src/modules/notification/application/interfaces/notification-use-cases.interface';
+import { NotificationType } from 'src/modules/notification/domain/entities/notification.entity';
+import type { ICreateActivityLogUseCase } from 'src/modules/activity-logs/application/interfaces/activity-log-use-cases.interface';
+import { ActivityAction } from 'src/modules/activity-logs/domain/entities/activity-log.entity';
 
 @Injectable()
 export class CreateTaskUseCase implements ICreateTaskUseCase {
@@ -16,7 +20,12 @@ export class CreateTaskUseCase implements ICreateTaskUseCase {
     private readonly _storyRepository: IUserStoryRepository,
     @Inject('IProjectRepository')
     private readonly _projectRepository: IProjectRepository,
-  ) {}
+    @Inject('ICreateNotificationUseCase')
+    private readonly _createNotificationUseCase: ICreateNotificationUseCase,
+
+    @Inject('ICreateActivityLogUseCase')
+    private readonly _createLogUseCase: ICreateActivityLogUseCase,
+  ) { }
 
   async execute(
     companyId: string,
@@ -39,8 +48,14 @@ export class CreateTaskUseCase implements ICreateTaskUseCase {
       throw new NotFoundException('User story not found');
     }
 
+    const nextTaskNumber = await this._projectRepository.incrementAndGetTaskCounter(
+      taskDto.projectId,
+      companyId,
+    );
+
     const task = {
       ...taskDto,
+      taskNumber: nextTaskNumber,
       dueDate: taskDto.dueDate ? new Date(taskDto.dueDate) : undefined,
       companyId,
       createdBy: adminId,
@@ -51,6 +66,30 @@ export class CreateTaskUseCase implements ICreateTaskUseCase {
       isDeleted: false,
     };
 
-    return this._taskRepository.create(task as Partial<TaskEntity>);
+    const createdTask = await this._taskRepository.create(task as Partial<TaskEntity>);
+
+    if (createdTask.assignedTo && createdTask.assignedTo !== adminId) {
+      try {
+        await this._createNotificationUseCase.execute(companyId, {
+          recipientId: createdTask.assignedTo,
+          type: NotificationType.TASK_ASSIGNED,
+          message: `You have been assigned to task: ${createdTask.title}`,
+        });
+      } catch (error) {
+        console.error(`Failed to send notification to ${createdTask.assignedTo}:`, error);
+      }
+    }
+
+    await this._createLogUseCase.execute({
+      companyId,
+      userId: adminId,
+      userRole: 'COMPANY_ADMIN', 
+      action: ActivityAction.CREATE,
+      details: `Created sub-task "${createdTask.title}" inside User Story: "${story.title}" (Project: ${project.name}).`,
+    }).catch((err) => {
+      console.error('[CreateTaskUseCase] Activity log failed:', err.message);
+    });
+
+    return createdTask;
   }
 }

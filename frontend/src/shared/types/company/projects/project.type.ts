@@ -1,6 +1,7 @@
 export interface Project {
   _id: string;
   id?: string; // Standardize for code that uses .id
+  projectNumber: number;
   name: string;
   description?: string;
   startDate?: string;

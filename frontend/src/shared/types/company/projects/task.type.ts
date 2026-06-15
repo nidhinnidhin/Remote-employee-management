@@ -12,6 +12,7 @@ export interface Task {
   companyId: string;
   projectId: string;
   storyId: string;
+  taskNumber: number;
   title: string;
   description: string;
   status: TaskStatus;
@@ -23,6 +24,8 @@ export interface Task {
   estimatedHours: number;
   actualHours?: number;
   dueDate: string;
+  startedAt?: string;
+  completedAt?: string;
   attachments: string[];
   links: string[];
   createdAt: string;

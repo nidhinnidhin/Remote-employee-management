@@ -5,6 +5,7 @@ export class ProjectEntity {
     public readonly id: string,
     public readonly companyId: string,
     public readonly name: string,
+    public readonly projectNumber: number,
     public readonly status: ProjectStatus,
     public readonly createdBy: string,
     public readonly description?: string,
@@ -14,5 +15,6 @@ export class ProjectEntity {
     public readonly updatedAt?: Date,
     public readonly isDeleted: boolean = false,
     public readonly members: string[] = [],
+    public readonly taskCounter: number = 0,
   ) {}
 }

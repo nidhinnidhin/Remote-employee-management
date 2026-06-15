@@ -17,20 +17,21 @@ export class AttendanceMapper {
       ),
     );
 
-    const userIdStr = doc.userId
-      ? (typeof doc.userId === 'object' && doc.userId !== null && '_id' in doc.userId && (doc.userId as any)._id
-        ? (doc.userId as any)._id.toString()
-        : doc.userId.toString())
+    const userRecord = doc.userId as unknown as Record<string, unknown> | null;
+    const userIdStr = userRecord
+      ? (typeof userRecord === 'object' && userRecord !== null && '_id' in userRecord && userRecord._id
+        ? String(userRecord._id)
+        : String(doc.userId))
       : '';
 
-    const employeeName = doc.userId && typeof doc.userId === 'object' && doc.userId !== null
-      ? ('name' in doc.userId
-        ? (doc.userId as any).name
-        : `${(doc.userId as any).firstName || ''} ${(doc.userId as any).lastName || ''}`.trim())
+    const employeeName = userRecord && typeof userRecord === 'object' && userRecord !== null
+      ? ('name' in userRecord
+        ? String(userRecord.name)
+        : `${userRecord.firstName || ''} ${userRecord.lastName || ''}`.trim())
       : undefined;
 
-    const employeeEmail = doc.userId && typeof doc.userId === 'object' && doc.userId !== null && 'email' in doc.userId
-      ? (doc.userId as any).email
+    const employeeEmail = userRecord && typeof userRecord === 'object' && userRecord !== null && 'email' in userRecord
+      ? String(userRecord.email)
       : undefined;
 
     const idStr = doc._id ? doc._id.toString() : '';
@@ -47,13 +48,13 @@ export class AttendanceMapper {
       activities,
       doc.totalWorkMinutes,
       doc.totalBreakMinutes,
-      (doc as any).createdAt,
-      (doc as any).updatedAt,
+      (doc as unknown as { createdAt: Date }).createdAt,
+      (doc as unknown as { updatedAt: Date }).updatedAt,
       employeeName,
       employeeEmail,
-      (doc as any).lateReason,
-      (doc as any).approvalStatus || null,
-      (doc as any).adminRemarks,
+      (doc as unknown as { lateReason?: string }).lateReason,
+      (doc as unknown as { approvalStatus?: 'PENDING' | 'APPROVED' | 'REJECTED' }).approvalStatus || null,
+      (doc as unknown as { adminRemarks?: string }).adminRemarks,
     );
   }
 

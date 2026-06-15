@@ -16,8 +16,10 @@ export const DepartmentAccordion: React.FC<DepartmentAccordionProps> = ({
   department,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  // Track failed image URLs dynamically to prevent broken image crashes
+  const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
+  const [teamImageFailed, setTeamImageFailed] = useState(false);
 
-  // Common team image as requested
   const commonTeamImage =
     "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=200&h=200&auto=format&fit=crop";
 
@@ -35,13 +37,23 @@ export const DepartmentAccordion: React.FC<DepartmentAccordionProps> = ({
         className="w-full flex items-center justify-between p-5 hover:bg-white/[0.02] transition-colors"
       >
         <div className="flex items-center gap-5 min-w-0">
-          <div className="relative w-14 h-14 rounded-2xl overflow-hidden shrink-0 shadow-lg">
-            <Image
-              src={commonTeamImage}
-              alt="Team"
-              fill
-              className="object-cover"
-            />
+          <div className="relative w-14 h-14 rounded-2xl overflow-hidden shrink-0 shadow-lg bg-white/[0.04] flex items-center justify-center">
+            {commonTeamImage && !teamImageFailed ? (
+              <Image
+                src={commonTeamImage}
+                alt="Team"
+                fill
+                className="object-cover"
+                onError={() => setTeamImageFailed(true)}
+              />
+            ) : (
+              <span 
+                className="text-sm font-bold uppercase"
+                style={{ color: "rgb(var(--color-text-muted))" }}
+              >
+                {department.name ? department.name.charAt(0) : "D"}
+              </span>
+            )}
           </div>
           <div className="text-left min-w-0">
             <h3
@@ -63,23 +75,39 @@ export const DepartmentAccordion: React.FC<DepartmentAccordionProps> = ({
 
               {/* Member Avatars Stack */}
               <div className="flex -space-x-2 overflow-hidden items-center ml-1">
-                {department.employeeIds.slice(0, 5).map((member) => (
-                  <div
-                    key={member.id}
-                    className="relative w-7 h-7 rounded-full border-2 overflow-hidden border-surface"
-                    style={{ borderColor: "rgb(var(--color-surface))" }}
-                  >
-                    <Image
-                      src={member.avatar}
-                      alt={member.name}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                ))}
+                {department.employeeIds.slice(0, 5).map((member) => {
+                  const hasValidAvatar = member.avatar && !failedImages[member.id];
+
+                  return (
+                    <div
+                      key={member.id}
+                      className="relative w-7 h-7 rounded-full border-2 overflow-hidden flex items-center justify-center text-[10px] font-bold uppercase shadow-sm bg-white/[0.08]"
+                      style={{ 
+                        borderColor: "rgb(var(--color-surface))",
+                        color: "rgb(var(--color-text-muted))"
+                      }}
+                    >
+                      {hasValidAvatar ? (
+                        <Image
+                          src={member.avatar}
+                          alt={member.name}
+                          fill
+                          className="object-cover"
+                          onError={() => {
+                            setFailedImages(prev => ({ ...prev, [member.id]: true }));
+                          }}
+                        />
+                      ) : (
+                        <span>
+                          {member.name ? member.name.charAt(0) : "M"}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
                 {department.employeeIds.length > 5 && (
                   <div
-                    className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] border-2 font-bold"
+                    className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] border-2 font-bold z-10"
                     style={{
                       backgroundColor: "rgb(var(--color-accent))",
                       borderColor: "rgb(var(--color-surface))",

@@ -6,7 +6,7 @@ export const documentFileFilter: MulterOptions['fileFilter'] = (
   file,
   callback,
 ) => {
-  if (!ALLOWED_DOCUMENT_MIME_TYPES.includes(file.mimetype as any)) {
+  if (!ALLOWED_DOCUMENT_MIME_TYPES.includes(file.mimetype as unknown as typeof ALLOWED_DOCUMENT_MIME_TYPES[number])) {
     return callback(new BadRequestException('Invalid file type'), false);
   }
   callback(null, true);

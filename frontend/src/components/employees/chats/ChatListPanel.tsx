@@ -1,4 +1,3 @@
-// src/components/employees/chats/ChatListPanel.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -11,6 +10,7 @@ import { chatService } from "@/services/employee/chat/chat.service";
 import { useChatStore } from "@/store/chat.store";
 import { useAuthStore } from "@/store/auth.store";
 import { AvatarCircle } from "./AvatarCircle";
+import { useDebounce } from "@/hooks/debounce/useDebounce";
 
 interface ChatListPanelProps {
   conversations: Conversation[];
@@ -27,6 +27,7 @@ export function ChatListPanel({
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const debouncedSearch = useDebounce(searchQuery, 500);
   const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"ALL" | "DIRECT" | "GROUP">("ALL");
 
@@ -41,14 +42,18 @@ export function ChatListPanel({
 
   useEffect(() => {
     const search = async () => {
-      if (searchQuery.trim().length < 2) {
+      if (debouncedSearch.trim().length < 2) {
         setSearchResults([]);
         return;
       }
+
       setIsSearching(true);
+
       try {
-        const employees = await chatService.searchEmployees(searchQuery);
+        const employees = await chatService.searchEmployees(debouncedSearch);
+
         const { userId } = useAuthStore.getState();
+
         setSearchResults(employees.filter((emp) => emp.id !== userId));
       } catch (error) {
         console.error("Search failed", error);
@@ -56,9 +61,9 @@ export function ChatListPanel({
         setIsSearching(false);
       }
     };
-    const timer = setTimeout(search, 500);
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
+
+    search();
+  }, [debouncedSearch]);
 
   const handleStartChat = async (employeeId: string) => {
     try {
@@ -158,9 +163,7 @@ export function ChatListPanel({
           )}
         </div>
 
-        {/* --- LIST SECTION --- */}
         <div className="flex-1 overflow-y-auto px-2 custom-scrollbar">
-          {/* Global Search Results Overlay */}
           {searchResults.length > 0 && (
             <div className="mb-6 animate-in fade-in slide-in-from-top-2">
               <p className="px-4 py-2 text-[9px] font-black uppercase tracking-[0.2em] text-accent/60">

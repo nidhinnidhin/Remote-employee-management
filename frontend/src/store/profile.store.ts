@@ -65,10 +65,11 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
     try {
       const response = await api.get<UserProfile>(API_ROUTES.AUTH.PROFILE.ME);
       set({ userProfile: response.data, isLoading: false });
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { message?: string } }; message?: string };
       console.error("[profileStore] Fetch Error:", err);
       set({ 
-        error: err.response?.data?.message || err.message || "Failed to fetch profile", 
+        error: e.response?.data?.message || e.message || "Failed to fetch profile", 
         isLoading: false 
       });
     }

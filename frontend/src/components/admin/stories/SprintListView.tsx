@@ -13,12 +13,21 @@ import {
   ChevronRight,
   Edit3,
   Trash2,
+  Video,
+  CalendarClock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Button from "@/components/ui/Button";
 import { Sprint } from "@/shared/types/company/projects/sprint.type";
-import { getStoriesByProjectAction, searchStoriesAction } from "@/actions/company/projects/story.actions";
-import { UserStory, UserStoryPriority, UserStoryStatus } from "@/shared/types/company/projects/user-story.type";
+import {
+  getStoriesByProjectAction,
+  searchStoriesAction,
+} from "@/actions/company/projects/story.actions";
+import {
+  UserStory,
+  UserStoryPriority,
+  UserStoryStatus,
+} from "@/shared/types/company/projects/user-story.type";
 import Pagination from "@/components/ui/Pagination";
 import { getSprintsByProjectAction } from "@/actions/company/projects/sprint.actions";
 import { getEmployees } from "@/services/company/employee-management.service";
@@ -34,6 +43,9 @@ import DeleteSprintConfirmationModal from "./modals/DeleteSprintConfirmationModa
 import DeleteSprintOptionsModal from "./modals/DeleteSprintOptionsModal";
 import EditStoryModal from "./modals/EditStoryModal";
 import DeleteStoryConfirmation from "./modals/DeleteStoryConfirmation";
+import InstantMeetingModal from "../meetings/modals/InstantMeetingModal";
+import ScheduleMeetingModal from "../meetings/modals/ScheduleMeetingModal";
+import { useDebounce } from "@/hooks/debounce/useDebounce";
 
 interface SprintListViewProps {
   projectId: string;
@@ -46,6 +58,7 @@ const SprintListView: React.FC<SprintListViewProps> = ({ projectId }) => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearch = useDebounce(searchQuery, 500);
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [priorityFilter, setPriorityFilter] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -55,54 +68,67 @@ const SprintListView: React.FC<SprintListViewProps> = ({ projectId }) => {
   const [sprintToEdit, setSprintToEdit] = useState<Sprint | null>(null);
   const [sprintToDelete, setSprintToDelete] = useState<Sprint | null>(null);
   const [showDeleteOptions, setShowDeleteOptions] = useState(false);
-  const [selectedStoryForEdit, setSelectedStoryForEdit] = useState<UserStory | null>(null);
-  const [selectedStoryForDelete, setSelectedStoryForDelete] = useState<UserStory | null>(null);
+  const [selectedStoryForEdit, setSelectedStoryForEdit] =
+    useState<UserStory | null>(null);
+  const [selectedStoryForDelete, setSelectedStoryForDelete] =
+    useState<UserStory | null>(null);
 
-  const fetchData = useCallback(async (isSilent = false) => {
-    if (!isSilent) setLoading(true);
-    try {
-      const [sprintsResult, storiesResult, tasksResult, employeesData] = await Promise.all([
-        getSprintsByProjectAction(projectId),
-        searchStoriesAction({
-          projectId,
-          search: searchQuery || undefined,
-          status: (statusFilter as any) || undefined,
-          priority: (priorityFilter as any) || undefined,
-          // Remove isInBacklog filter to ensure we get all stories that might be in sprints
-          page: 1, 
-          limit: 100, // Large limit for now to ensure all sprint stories are caught
-        }),
-        getTasksByProjectAction(projectId),
-        getEmployees(),
-      ]);
+  const [showInstantMeeting, setShowInstantMeeting] = useState(false);
+  const [showScheduleMeeting, setShowScheduleMeeting] = useState(false);
+  const [isMeetDropdownOpen, setIsMeetDropdownOpen] = useState(false);
 
-      if (sprintsResult.success && sprintsResult.data) {
-        setSprints(sprintsResult.data);
-      } else {
-        toast.error(sprintsResult.error || "Failed to load sprints");
+  const fetchData = useCallback(
+    async (isSilent = false) => {
+      if (!isSilent) setLoading(true);
+      try {
+        const [sprintsResult, storiesResult, tasksResult, employeesData] =
+          await Promise.all([
+            getSprintsByProjectAction(projectId),
+            searchStoriesAction({
+              projectId,
+              search: debouncedSearch || undefined,
+              status: (statusFilter as any) || undefined,
+              priority: (priorityFilter as any) || undefined,
+              page: 1,
+              limit: 100,
+            }),
+            getTasksByProjectAction(projectId),
+            getEmployees(),
+          ]);
+
+        if (sprintsResult.success && sprintsResult.data) {
+          setSprints(sprintsResult.data);
+        } else {
+          toast.error(sprintsResult.error || "Failed to load sprints");
+        }
+
+        if (storiesResult.success && storiesResult.data) {
+          setStories(storiesResult.data.data);
+        } else {
+          toast.error(storiesResult.error || "Failed to load stories");
+        }
+
+        if (tasksResult.success && tasksResult.data) {
+          setTasks(tasksResult.data);
+        }
+
+        setEmployees(employeesData);
+      } catch (error) {
+        toast.error("An unexpected error occurred while loading sprint data");
+      } finally {
+        setLoading(false);
       }
-
-      if (storiesResult.success && storiesResult.data) {
-        setStories(storiesResult.data.data);
-      } else {
-        toast.error(storiesResult.error || "Failed to load stories");
-      }
-
-      if (tasksResult.success && tasksResult.data) {
-        setTasks(tasksResult.data);
-      }
-
-      setEmployees(employeesData);
-    } catch (error) {
-      toast.error("An unexpected error occurred while loading sprint data");
-    } finally {
-      setLoading(false);
-    }
-  }, [projectId, searchQuery, statusFilter, priorityFilter]);
+    },
+    [projectId, debouncedSearch, statusFilter, priorityFilter],
+  );
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch]);
 
   const getStatusStyles = (status: string) => {
     switch (status) {
@@ -147,7 +173,8 @@ const SprintListView: React.FC<SprintListViewProps> = ({ projectId }) => {
           No Cycles Found
         </h3>
         <p className="text-slate-500 text-xs max-w-[260px] leading-relaxed font-medium">
-          The roadmap registry is empty. Initialize a sprint from the backlog to begin tracking.
+          The roadmap registry is empty. Initialize a sprint from the backlog to
+          begin tracking.
         </p>
       </div>
     );
@@ -155,7 +182,6 @@ const SprintListView: React.FC<SprintListViewProps> = ({ projectId }) => {
 
   return (
     <div className="flex flex-col gap-6 p-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      
       {/* --- REFINED COMPACT HEADER --- */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-white/[0.05] pb-5">
         <div className="flex items-center gap-3">
@@ -187,27 +213,74 @@ const SprintListView: React.FC<SprintListViewProps> = ({ projectId }) => {
             />
           </div>
 
-          <select 
+          <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             className="bg-white/[0.02] border border-white/10 rounded-xl px-4 h-10 text-[10px] font-black uppercase tracking-widest text-slate-400 focus:outline-none focus:border-accent/40 transition-all cursor-pointer hover:bg-white/5"
           >
             <option value="">All Statuses</option>
-            {Object.values(UserStoryStatus).map(status => (
-              <option key={status} value={status}>{status}</option>
+            {Object.values(UserStoryStatus).map((status) => (
+              <option key={status} value={status}>
+                {status}
+              </option>
             ))}
           </select>
 
-          <select 
+          <select
             value={priorityFilter}
             onChange={(e) => setPriorityFilter(e.target.value)}
             className="bg-white/[0.02] border border-white/10 rounded-xl px-4 h-10 text-[10px] font-black uppercase tracking-widest text-slate-400 focus:outline-none focus:border-accent/40 transition-all cursor-pointer hover:bg-white/5"
           >
             <option value="">All Priorities</option>
-            {Object.values(UserStoryPriority).map(p => (
-              <option key={p} value={p}>{p}</option>
+            {Object.values(UserStoryPriority).map((p) => (
+              <option key={p} value={p}>
+                {p}
+              </option>
             ))}
           </select>
+
+          {/* MEET BUTTON WITH DROPDOWN */}
+          <div className="relative">
+            <Button
+              onClick={() => setIsMeetDropdownOpen(!isMeetDropdownOpen)}
+              className="h-10 px-5 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 hover:bg-indigo-500/20 transition-all flex items-center gap-2 font-black text-[10px] uppercase tracking-widest"
+            >
+              <Video size={14} />
+              Meet
+            </Button>
+
+            {isMeetDropdownOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setIsMeetDropdownOpen(false)}
+                />
+                <div className="absolute right-0 mt-2 w-48 bg-[#0f1115] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                  <button
+                    onClick={() => {
+                      setIsMeetDropdownOpen(false);
+                      setShowInstantMeeting(true);
+                    }}
+                    className="w-full text-left px-4 py-3 text-xs font-bold text-slate-300 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-2"
+                  >
+                    <Video size={14} className="text-orange-500" />
+                    Instant Meeting
+                  </button>
+                  <div className="h-px bg-white/5 w-full" />
+                  <button
+                    onClick={() => {
+                      setIsMeetDropdownOpen(false);
+                      setShowScheduleMeeting(true);
+                    }}
+                    className="w-full text-left px-4 py-3 text-xs font-bold text-slate-300 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-2"
+                  >
+                    <CalendarClock size={14} className="text-blue-500" />
+                    Schedule Meeting
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
@@ -215,82 +288,107 @@ const SprintListView: React.FC<SprintListViewProps> = ({ projectId }) => {
         {sprints
           .sort((a, b) => {
             const statusOrder = { ACTIVE: 0, PLANNED: 1, COMPLETED: 2 };
-            return statusOrder[a.status as keyof typeof statusOrder] - statusOrder[b.status as keyof typeof statusOrder];
+            return (
+              statusOrder[a.status as keyof typeof statusOrder] -
+              statusOrder[b.status as keyof typeof statusOrder]
+            );
           })
           .map((sprint) => {
             const sprintAddedStories = stories
               .filter((s) => {
                 const sId = s.id || (s as any)._id;
-                return sprint.issueIds.some(id => id.toString() === sId?.toString());
+                return sprint.issueIds.some(
+                  (id) => id.toString() === sId?.toString(),
+                );
               })
-              .map(s => ({ ...s, id: s.id || (s as any)._id }));
+              .map((s) => ({ ...s, id: s.id || (s as any)._id }));
 
-          return (
-            <div
-              key={sprint.id}
-              className="group relative border border-white/[0.06] bg-white/[0.01] rounded-2xl transition-all duration-300 hover:bg-white/[0.02] hover:border-white/[0.1] overflow-hidden"
-            >
-              {/* Top Accent Gradient highlight */}
+            return (
               <div
-                className={cn(
-                  "absolute top-0 left-0 right-0 h-[1px] opacity-60",
-                  `bg-gradient-to-r ${getStatusGradient(sprint.status)}`
-                )}
-              />
+                key={sprint.id}
+                className="group relative border border-white/[0.06] bg-white/[0.01] rounded-2xl transition-all duration-300 hover:bg-white/[0.02] hover:border-white/[0.1] overflow-hidden"
+              >
+                {/* Top Accent Gradient highlight */}
+                <div
+                  className={cn(
+                    "absolute top-0 left-0 right-0 h-[1px] opacity-60",
+                    `bg-gradient-to-r ${getStatusGradient(sprint.status)}`,
+                  )}
+                />
 
-              {/* Card Header */}
-              <div className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
-                <div className="flex items-start gap-4">
-                  <div className={cn(
-                    "p-2.5 rounded-xl border shrink-0",
-                    getStatusStyles(sprint.status)
-                  )}>
-                    <Timer size={16} strokeWidth={3} />
-                  </div>
-                  
-                  <div>
-                    <div className="flex items-center gap-3 mb-1.5">
-                      <h3 className="text-sm font-black text-white uppercase tracking-tight">
-                        {sprint.name}
-                      </h3>
-                      <span className={cn(
-                        "px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest border",
-                        getStatusStyles(sprint.status)
-                      )}>
-                        {sprint.status}
-                      </span>
-                    </div>
-
-                    {/* Metadata Pills */}
-                    <div className="flex items-center gap-4 text-[10px] text-slate-500 font-bold uppercase tracking-widest">
-                      <span className="flex items-center gap-1.5">
-                        <Hash size={12} className="text-orange-500/40" />
-                        {sprintAddedStories.length} Objectives
-                      </span>
-                      {/* Total Story Points */}
-                      <span className="flex items-center gap-1.5 border-l border-white/10 pl-4">
-                        <Target size={12} className="text-accent/40" />
-                        {sprintAddedStories.reduce((sum, s) => sum + (s.storyPoints || 0), 0)} Points
-                      </span>
-                      {sprint.startDate && (
-                        <span className="flex items-center gap-1.5 border-l border-white/10 pl-4">
-                          <Calendar size={12} className="text-emerald-500/40" />
-                          {new Date(sprint.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                          {sprint.endDate && (
-                            <>
-                              <ChevronRight size={10} className="mx-0.5 text-slate-700" />
-                              {new Date(sprint.endDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                            </>
-                          )}
-                        </span>
+                {/* Card Header */}
+                <div className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+                  <div className="flex items-start gap-4">
+                    <div
+                      className={cn(
+                        "p-2.5 rounded-xl border shrink-0",
+                        getStatusStyles(sprint.status),
                       )}
+                    >
+                      <Timer size={16} strokeWidth={3} />
+                    </div>
+
+                    <div>
+                      <div className="flex items-center gap-3 mb-1.5">
+                        <h3 className="text-sm font-black text-white uppercase tracking-tight">
+                          {sprint.name}
+                        </h3>
+                        <span
+                          className={cn(
+                            "px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest border",
+                            getStatusStyles(sprint.status),
+                          )}
+                        >
+                          {sprint.status}
+                        </span>
+                      </div>
+
+                      {/* Metadata Pills */}
+                      <div className="flex items-center gap-4 text-[10px] text-slate-500 font-bold uppercase tracking-widest">
+                        <span className="flex items-center gap-1.5">
+                          <Hash size={12} className="text-orange-500/40" />
+                          {sprintAddedStories.length} Objectives
+                        </span>
+                        {/* Total Story Points */}
+                        <span className="flex items-center gap-1.5 border-l border-white/10 pl-4">
+                          <Target size={12} className="text-accent/40" />
+                          {sprintAddedStories.reduce(
+                            (sum, s) => sum + (s.storyPoints || 0),
+                            0,
+                          )}{" "}
+                          Points
+                        </span>
+                        {sprint.startDate && (
+                          <span className="flex items-center gap-1.5 border-l border-white/10 pl-4">
+                            <Calendar
+                              size={12}
+                              className="text-emerald-500/40"
+                            />
+                            {new Date(sprint.startDate).toLocaleDateString(
+                              undefined,
+                              { month: "short", day: "numeric" },
+                            )}
+                            {sprint.endDate && (
+                              <>
+                                <ChevronRight
+                                  size={10}
+                                  className="mx-0.5 text-slate-700"
+                                />
+                                {new Date(sprint.endDate).toLocaleDateString(
+                                  undefined,
+                                  { month: "short", day: "numeric" },
+                                )}
+                              </>
+                            )}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="flex items-center gap-3 self-end md:self-auto">
-                   {/* Action Buttons */}
-                   <div className="flex items-center gap-1 border-r border-white/10 pr-3 mr-1">
+                  <div className="flex items-center gap-3 self-end md:self-auto">
+                    {/* Action Buttons */}
+                    <div className="flex items-center gap-1 border-r border-white/10 pr-3 mr-1">
                       <button
                         onClick={() => setSprintToEdit(sprint)}
                         className="p-2 rounded-lg text-slate-500 hover:text-white hover:bg-white/5 transition-all"
@@ -305,73 +403,76 @@ const SprintListView: React.FC<SprintListViewProps> = ({ projectId }) => {
                       >
                         <Trash2 size={15} />
                       </button>
-                   </div>
+                    </div>
 
-                   {sprint.status === 'PLANNED' && (
-                     <Button
-                       onClick={() => setSprintToStart(sprint)}
-                       className="h-10 px-6 rounded-xl bg-emerald-500 text-[#08090a] font-black text-[10px] uppercase tracking-widest shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 active:scale-95 transition-all flex items-center gap-2"
-                     >
-                       <Play size={12} strokeWidth={4} />
-                       Start Sprint
-                     </Button>
-                   )}
-                </div>
-              </div>
-
-              {/* Burndown Chart for Active Sprint */}
-              {sprint.status === 'ACTIVE' && (
-                <div className="px-6 pb-2">
-                  <SprintBurndown 
-                    sprint={sprint} 
-                    tasks={tasks.filter(t => {
-                      const tStoryId = t.storyId?.toString();
-                      return sprintAddedStories.some(s => {
-                        const sId = s.id || (s as any)._id;
-                        return sId?.toString() === tStoryId;
-                      });
-                    })} 
-                  />
-                </div>
-              )}
-
-              {/* Sprint Goal - Compact Bar */}
-              {sprint.goal && (
-                <div className="px-6 py-2.5 bg-white/[0.005] border-y border-white/[0.03]">
-                  <div className="flex items-start gap-2.5 ml-12">
-                    <Target size={12} className="text-orange-500/50 mt-0.5 shrink-0" />
-                    <p className="text-[11px] text-slate-400 font-medium italic opacity-80 leading-relaxed">
-                      "{sprint.goal}"
-                    </p>
+                    {sprint.status === "PLANNED" && (
+                      <Button
+                        onClick={() => setSprintToStart(sprint)}
+                        className="h-10 px-6 rounded-xl bg-emerald-500 text-[#08090a] font-black text-[10px] uppercase tracking-widest shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 active:scale-95 transition-all flex items-center gap-2"
+                      >
+                        <Play size={12} strokeWidth={4} />
+                        Start Sprint
+                      </Button>
+                    )}
                   </div>
                 </div>
-              )}
 
-              {/* Stories List (Darkened Container) */}
-              <div className="p-3 bg-black/20">
-                {sprintAddedStories.length > 0 ? (
-                  <div className="flex flex-col gap-1.5">
-                    {sprintAddedStories.map((story) => (
-                      <StoryCard
-                        key={story.id}
-                        story={story}
-                        employees={employees}
-                        onEdit={() => setSelectedStoryForEdit(story)}
-                        onDelete={() => setSelectedStoryForDelete(story)}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="py-8 flex flex-col items-center justify-center bg-white/[0.01] rounded-xl border border-dashed border-white/[0.05]">
-                    <p className="text-[9px] font-black text-slate-600 uppercase tracking-[0.2em]">
-                      Registry Empty: No items assigned
-                    </p>
+                {/* Burndown Chart for Active Sprint */}
+                {sprint.status === "ACTIVE" && (
+                  <div className="px-6 pb-2">
+                    <SprintBurndown
+                      sprint={sprint}
+                      tasks={tasks.filter((t) => {
+                        const tStoryId = t.storyId?.toString();
+                        return sprintAddedStories.some((s) => {
+                          const sId = s.id || (s as any)._id;
+                          return sId?.toString() === tStoryId;
+                        });
+                      })}
+                    />
                   </div>
                 )}
+
+                {/* Sprint Goal - Compact Bar */}
+                {sprint.goal && (
+                  <div className="px-6 py-2.5 bg-white/[0.005] border-y border-white/[0.03]">
+                    <div className="flex items-start gap-2.5 ml-12">
+                      <Target
+                        size={12}
+                        className="text-orange-500/50 mt-0.5 shrink-0"
+                      />
+                      <p className="text-[11px] text-slate-400 font-medium italic opacity-80 leading-relaxed">
+                        "{sprint.goal}"
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Stories List (Darkened Container) */}
+                <div className="p-3 bg-black/20">
+                  {sprintAddedStories.length > 0 ? (
+                    <div className="flex flex-col gap-1.5">
+                      {sprintAddedStories.map((story) => (
+                        <StoryCard
+                          key={story.id}
+                          story={story}
+                          employees={employees}
+                          onEdit={() => setSelectedStoryForEdit(story)}
+                          onDelete={() => setSelectedStoryForDelete(story)}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="py-8 flex flex-col items-center justify-center bg-white/[0.01] rounded-xl border border-dashed border-white/[0.05]">
+                      <p className="text-[9px] font-black text-slate-600 uppercase tracking-[0.2em]">
+                        Registry Empty: No items assigned
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
       </div>
 
       <StartSprintModal
@@ -418,6 +519,18 @@ const SprintListView: React.FC<SprintListViewProps> = ({ projectId }) => {
         onClose={() => setSelectedStoryForDelete(null)}
         onSuccess={fetchData}
         story={selectedStoryForDelete}
+      />
+
+      <InstantMeetingModal
+        isOpen={showInstantMeeting}
+        onClose={() => setShowInstantMeeting(false)}
+        employees={employees}
+      />
+
+      <ScheduleMeetingModal
+        isOpen={showScheduleMeeting}
+        onClose={() => setShowScheduleMeeting(false)}
+        employees={employees}
       />
     </div>
   );

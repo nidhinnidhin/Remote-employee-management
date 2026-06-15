@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit, Inject } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common'; // Fixed: Removed unused OnModuleInit import
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import type { IUserRepository } from 'src/modules/auth/domain/repositories/iuser.repository';
@@ -16,7 +16,7 @@ export class SuperAdminSeedService implements ISuperAdminSeedService {
     @Inject(LOGGER_SERVICE) private readonly logger: ILogger,
     @Inject('IUserRepository') private readonly userRepository: IUserRepository,
     private readonly _configService: ConfigService,
-  ) { }
+  ) {}
 
   async onModuleInit() {
     this.logger.log('Initializing Super Admin Seeder...');
@@ -39,21 +39,25 @@ export class SuperAdminSeedService implements ISuperAdminSeedService {
       this.logger.log(`Checking existing Super Admin user: ${email}...`);
 
       if (existingUser) {
-        this.logger.log(`Found existing user with Role: ${existingUser.role}, Phone: ${existingUser.phone}`);
+        this.logger.log(
+          `Found existing user with Role: ${existingUser.role}, Phone: ${existingUser.phone}`,
+        );
         if (
           existingUser.role !== UserRole.SUPER_ADMIN ||
           existingUser.phone === UserRole.SUPER_ADMIN
         ) {
-          this.logger.warn(
-            `User ${email} has incorrect fields. FIXING NOW...`,
-          );
+          this.logger.warn(`User ${email} has incorrect fields. FIXING NOW...`);
           await this.userRepository.updateUserFieldsByEmail(email, {
             role: UserRole.SUPER_ADMIN,
             phone: '0000000000',
           });
-          this.logger.log(`Super Admin ${email} fields updated successfully in database.`);
+          this.logger.log(
+            `Super Admin ${email} fields updated successfully in database.`,
+          );
         } else {
-          this.logger.log(`Super Admin ${email} already has correct role and phone.`);
+          this.logger.log(
+            `Super Admin ${email} already has correct role and phone.`,
+          );
         }
         return;
       }
@@ -74,18 +78,22 @@ export class SuperAdminSeedService implements ISuperAdminSeedService {
         '0000000000',
         passwordHash,
         UserStatus.ACTIVE,
-        undefined, // title
-        new Date(), // createdAt
-        new Date(), // updatedAt
+        undefined,
+        new Date(),
+        new Date(),
         companyId,
       );
 
       await this.userRepository.create(newUser);
       this.logger.log(`Super Admin ${email} created successfully.`);
     } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error occurred';
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
       this.logger.error(
-        `Failed to seed Super Admin: ${error.message}`,
-        error.stack,
+        `Failed to seed Super Admin: ${errorMessage}`,
+        errorStack,
       );
     }
   }
