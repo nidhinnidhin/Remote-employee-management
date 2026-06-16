@@ -5,7 +5,7 @@ import { API_ROUTES } from "@/constants/api.routes";
 // On the server: resolves to http://backend:4000/api (Docker internal network).
 // In the browser: process.env.API_URL_INTERNAL is undefined → falls back to localhost.
 export const clientApi = axios.create({
-  baseURL: process.env.API_URL_INTERNAL || "http://localhost:4000/api",
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api",
   withCredentials: true,
 });
 
