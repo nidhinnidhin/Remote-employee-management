@@ -29,6 +29,9 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/nexus-frontend:latest
+          build-args: |
+            NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
+            NEXT_PUBLIC_RAZORPAY_KEY_ID=${{ secrets.NEXT_PUBLIC_RAZORPAY_KEY_ID }}
 
       - name: Deploy Frontend
         uses: appleboy/ssh-action@v1.0.3

@@ -4,8 +4,8 @@ import { getRedirectForRole } from "@/lib/auth/auth-constants";
 import { API_ROUTES } from "@/constants/api.routes";
 import { FRONTEND_ROUTES } from "@/constants/frontend.routes";
 
-const BACKEND_URL = process.env.API_URL_INTERNAL || "http://localhost:4000/api";
-
+const BACKEND_URL = process.env.API_URL_INTERNAL;
+console.log('---------------------------env', BACKEND_URL)
 /**
  * Attempt to silently refresh the access token using the refresh_token cookie
  * OR the refresh token stored in the iron-session (whichever is available).
