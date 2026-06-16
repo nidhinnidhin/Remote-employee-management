@@ -11,6 +11,7 @@ export async function setRefreshTokenCookie(token: string) {
     httpOnly: true,
     secure: isProd,
     sameSite: "none",
+    domain: isProd ? ".nidhintech.site" : undefined,
     maxAge: REFRESH_TOKEN_MAX_AGE,
   });
 }
@@ -22,6 +23,7 @@ export async function setAccessTokenCookie(token: string) {
     httpOnly: true,
     secure: isProd,
     sameSite: "none",
+    domain: isProd ? ".nidhintech.site" : undefined,
     maxAge: ACCESS_TOKEN_MAX_AGE,
   });
 }

@@ -25,6 +25,7 @@ export const sessionOptions: SessionOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "none",
+    domain: process.env.NODE_ENV === "production" ? ".nidhintech.site" : undefined,
     path: "/",
   },
 };

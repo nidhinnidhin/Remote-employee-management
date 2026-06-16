@@ -7,7 +7,11 @@ import { API_ROUTES } from "@/constants/api.routes";
 export const clientApi = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api",
   withCredentials: true,
-});
+  // Ensure Next.js patched fetch sends credentials
+  fetchOptions: {
+    credentials: "include",
+  },
+} as any);
 
 clientApi.interceptors.response.use(
   (res) => {
@@ -26,7 +30,7 @@ clientApi.interceptors.response.use(
     return res;
   },
   async (err) => {
-    console.log("url",err.config,API_ROUTES.AUTH.REFRESH,)
+    console.log("url", err.config, API_ROUTES.AUTH.REFRESH,)
     const originalRequest = err.config;
     console.log("CLIENT API ERROR:", {
       url: originalRequest?.url,

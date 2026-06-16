@@ -12,6 +12,8 @@ export async function getServerApi() {
     throw new Error("Unauthorized");
   }
 
+  console.log("access token",session.accessToken)
+
   const api = axios.create({
     baseURL: BASE_URL,
     headers: {
