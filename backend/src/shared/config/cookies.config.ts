@@ -9,7 +9,7 @@ export const INVITE_SESSION_COOKIE_NAME = COOKIE_NAMES.INVITE_SESSION;
 export const ACCESS_TOKEN_COOKIE_OPTIONS: CookieOptions = {
   httpOnly: true,
   secure: false, // true in production (https)
-  sameSite: 'lax',
+  sameSite: 'none',
   path: '/',
   maxAge: 1000 * 60 * 15, // 15 minutescvghfg
 };
@@ -21,7 +21,7 @@ export const REFRESH_TOKEN_COOKIE_NAME = COOKIE_NAMES.REFRESH_TOKEN;
 export const REFRESH_TOKEN_COOKIE_OPTIONS: CookieOptions = {
   httpOnly: true,
   secure: false,
-  sameSite: 'lax',
+  sameSite: 'none',
   path: '/',
   maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
 };
@@ -31,7 +31,7 @@ export const REFRESH_TOKEN_COOKIE_OPTIONS: CookieOptions = {
 export const INVITE_SESSION_COOKIE_OPTIONS: CookieOptions = {
   httpOnly: true,
   secure: false,
-  sameSite: 'lax',
+  sameSite: 'none',
   path: '/',
   maxAge: 1000 * 60 * 10, // 10 minutes
 };

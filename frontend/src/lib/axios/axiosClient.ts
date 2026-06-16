@@ -13,6 +13,7 @@ clientApi.interceptors.response.use(
   (res) => {
     // Standard response handling: Automatically unwrap 'data' ONLY if it's a standardized wrapper
     // This provides 100% backward compatibility with zero code changes needed in components.
+
     if (
       res.data &&
       typeof res.data === 'object' &&
@@ -25,6 +26,7 @@ clientApi.interceptors.response.use(
     return res;
   },
   async (err) => {
+    console.log("url",err.config,API_ROUTES.AUTH.REFRESH,)
     const originalRequest = err.config;
     console.log("CLIENT API ERROR:", {
       url: originalRequest?.url,

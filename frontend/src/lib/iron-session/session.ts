@@ -12,11 +12,11 @@ export interface SessionData {
 
 const sessionPassword = process.env.SESSION_SECRET || ""
 
-// if (!sessionPassword || sessionPassword.length < 32) {
-//   throw new Error(
-//     'SESSION_SECRET env variable is missing or less than 32 characters'
-//   );
-// }
+if (!sessionPassword || sessionPassword.length < 32) {
+  throw new Error(
+    'SESSION_SECRET env variable is missing or less than 32 characters'
+  );
+}
 
 export const sessionOptions: SessionOptions = {
   cookieName: "app_session",

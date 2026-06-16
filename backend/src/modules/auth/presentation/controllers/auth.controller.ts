@@ -154,6 +154,8 @@ export class AuthController {
   ) {
     const refreshToken = req.cookies?.[REFRESH_TOKEN_COOKIE_NAME];
 
+    console.log(refreshToken,"refresh token ")
+
     if (!refreshToken) {
       throw new UnauthorizedException(AUTH_MESSAGES.MISSING_REFRESH_TOKEN);
     }
