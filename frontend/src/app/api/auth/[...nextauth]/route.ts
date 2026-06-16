@@ -42,7 +42,7 @@ const handler = NextAuth({
         }),
       });
 
-      console.log("Backend response status:", res.status);
+      console.log("Backendfh response status:", res.status);
 
       if (!res.ok) {
         const data = await res.json();
