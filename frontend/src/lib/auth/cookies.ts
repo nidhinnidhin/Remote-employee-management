@@ -10,7 +10,7 @@ export async function setRefreshTokenCookie(token: string) {
   (await cookies()).set(COOKIE_KEYS.REFRESH_TOKEN, token, {
     httpOnly: true,
     secure: isProd,
-    sameSite: "lax",
+    sameSite: "none",
     maxAge: REFRESH_TOKEN_MAX_AGE,
   });
 }
@@ -21,7 +21,7 @@ export async function setAccessTokenCookie(token: string) {
   (await cookies()).set(COOKIE_KEYS.ACCESS_TOKEN, token, {
     httpOnly: true,
     secure: isProd,
-    sameSite: "lax",
+    sameSite: "none",
     maxAge: ACCESS_TOKEN_MAX_AGE,
   });
 }
