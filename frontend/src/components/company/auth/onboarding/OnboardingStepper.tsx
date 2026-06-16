@@ -148,6 +148,12 @@ const OnboardingStepper: React.FC = () => {
                 });
 
                 if (result.success) {
+                    if (result.data?.company?.id) {
+                        setOnboardingData(prev => ({
+                            ...prev,
+                            company: { ...prev.company, id: result.data.company.id }
+                        }));
+                    }
                     setCurrentStep(2);
                 } else {
                     setErrors({ form: result.error || "Failed to save company details" });
