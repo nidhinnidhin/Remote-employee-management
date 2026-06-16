@@ -25,9 +25,16 @@ const ForgotPasswordOtpModal = ({
 
   useEffect(() => {
     if (isOpen) {
-      startTimer(60);
+      startTimer(300); // 5 minutes to match backend OTP TTL
     }
   }, [isOpen]);
+
+  // Clear OTP boxes and refocus box 1 whenever an error is set
+  useEffect(() => {
+    if (error) {
+      setOtp("");
+    }
+  }, [error]);
 
   const handleVerify = async () => {
     if (otp.length !== 6) {
@@ -45,7 +52,9 @@ const ForgotPasswordOtpModal = ({
 
     try {
       await onVerified(otp);
+      // on success the parent closes the modal, no cleanup needed
     } catch (err: any) {
+      // error useEffect will clear the boxes automatically
       setError(err.message || OTP_MESSAGES.OTP_INVALID);
     } finally {
       setLoading(false);
@@ -57,7 +66,7 @@ const ForgotPasswordOtpModal = ({
       setResending(true);
       setError("");
       await onResend();
-      startTimer(60); // Reset timer to 60s
+      startTimer(300); // Reset timer to 5 minutes
       setOtp("");
     } catch (err: any) {
       setError(err.message || "Failed to resend OTP");

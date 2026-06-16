@@ -29,8 +29,20 @@ export class MongoCompanyRepository
     return CompanyMapper.toDomain(companyDoc);
   }
 
-  async findAllWithEmployeeCount(): Promise<CompanyEntity[]> {
+  async findAllWithEmployeeCount(search?: string, status?: string): Promise<CompanyEntity[]> {
+    const matchStage: any = {};
+    if (status) {
+      matchStage.status = status;
+    }
+    if (search) {
+      matchStage.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+      ];
+    }
+
     const companyDocs = await this.model.aggregate([
+      { $match: matchStage },
       { $sort: { createdAt: -1 } },
       {
         $addFields: {
@@ -53,6 +65,30 @@ export class MongoCompanyRepository
     ]);
 
     return companyDocs.map((doc: LeanCompanyDocument) => this.toEntity(doc));
+  }
+
+  async getStats(): Promise<{ totalCompanies: number; activeCompanies: number; suspendedCompanies: number }> {
+    const stats = await this.model.aggregate([
+      {
+        $facet: {
+          total: [{ $count: "count" }],
+          active: [
+            { $match: { status: CompanyStatus.ACTIVE } },
+            { $count: "count" }
+          ],
+          suspended: [
+            { $match: { status: CompanyStatus.SUSPENDED } },
+            { $count: "count" }
+          ]
+        }
+      }
+    ]);
+
+    return {
+      totalCompanies: stats[0]?.total[0]?.count || 0,
+      activeCompanies: stats[0]?.active[0]?.count || 0,
+      suspendedCompanies: stats[0]?.suspended[0]?.count || 0,
+    };
   }
 
   async updateStatus(id: string, status: CompanyStatus): Promise<void> {

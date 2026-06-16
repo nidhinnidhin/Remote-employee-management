@@ -2,6 +2,7 @@ import { clientApi } from "@/lib/axios/axiosClient";
 import { CompanyRow } from "@/shared/types/superadmin/companies/companiesColumns";
 import React from "react";
 import ActionReasonModal from "@/components/ui/ActionReasonModal";
+import CompanyDetailModal from "./CompanyDetailModal";
 
 export const RowActions = ({
   row,
@@ -18,6 +19,7 @@ export const RowActions = ({
     openUp: false,
   });
   const [isReasonModalOpen, setIsReasonModalOpen] = React.useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = React.useState(false);
   const buttonRef = React.useRef<HTMLButtonElement>(null);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
 
@@ -153,7 +155,7 @@ export const RowActions = ({
           <button
             role="menuitem"
             onClick={() => {
-              console.log("View details", row.id);
+              setIsDetailModalOpen(true);
               setOpen(false);
             }}
             className="
@@ -241,6 +243,13 @@ export const RowActions = ({
         description={`Please provide a reason for ${row.status === "ACTIVE" ? "suspending" : "activating"} ${row.name}. This reason will be emailed to the primary company administrator.`}
         actionLabel={row.status === "ACTIVE" ? "Suspend" : "Activate"}
         actionColor={row.status === "ACTIVE" ? "danger" : "success"}
+      />
+
+      {/* Detail Modal */}
+      <CompanyDetailModal 
+        isOpen={isDetailModalOpen} 
+        onClose={() => setIsDetailModalOpen(false)} 
+        company={row} 
       />
     </>
   );

@@ -18,34 +18,12 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   const navigation = [
-    {
-      name: "Dashboard",
-      href: FRONTEND_ROUTES.SUPER_ADMIN.DASHBOARD,
-      icon: LayoutDashboard,
-    },
     { name: "Companies", href: FRONTEND_ROUTES.SUPER_ADMIN.COMPANIES, icon: Building2 },
     {
       name: "Subscription Plans",
       href: FRONTEND_ROUTES.SUPER_ADMIN.SUBSCRIPTIONS,
       icon: CreditCard,
     },
-    { name: "Global Users", href: FRONTEND_ROUTES.SUPER_ADMIN.USERS, icon: Users },
-    {
-      name: "Billing & Payments",
-      href: FRONTEND_ROUTES.SUPER_ADMIN.BILLING,
-      icon: Receipt,
-    },
-    {
-      name: "Support Tickets",
-      href: FRONTEND_ROUTES.SUPER_ADMIN.SUPPORT,
-      icon: MessageSquare,
-    },
-    {
-      name: "Platform Settings",
-      href: FRONTEND_ROUTES.SUPER_ADMIN.SETTINGS,
-      icon: Settings,
-    },
-    { name: "System Logs", href: FRONTEND_ROUTES.SUPER_ADMIN.LOGS, icon: FileText },
   ];
 
   return (

@@ -5,6 +5,7 @@ import type { ISuperAdminSeedService } from './services/isuper-admin-seed.servic
 import { AuthModule } from '../auth/presentation/auth/auth.module';
 import { ListCompaniesUseCase } from './application/use-cases/list-companies-use-case';
 import { SuspendCompanyUseCase } from './application/use-cases/suspend-company.use-case';
+import { GetCompanyStatsUseCase } from './application/use-cases/get-company-stats.use-case';
 import { MongoCompanyRepository } from './infrastructure/repositories/mongo-company.repository';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CompanyDocument, CompanySchema } from '../auth/infrastructure/database/mongoose/schemas/company.schema';
@@ -25,6 +26,10 @@ import { CompanyDocument, CompanySchema } from '../auth/infrastructure/database/
     {
       provide: 'ISuspendCompanyUseCase',
       useClass: SuspendCompanyUseCase,
+    },
+    {
+      provide: 'IGetCompanyStatsUseCase',
+      useClass: GetCompanyStatsUseCase,
     },
     {
       provide: 'ISuperAdminSeedService',

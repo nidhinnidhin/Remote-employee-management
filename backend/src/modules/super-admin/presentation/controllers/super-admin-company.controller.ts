@@ -1,5 +1,5 @@
-import { Controller, Get, Patch, Param, Body, Inject, UseGuards } from '@nestjs/common';
-import type { IListCompaniesUseCase, ISuspendCompanyUseCase } from '../../application/interfaces/super-admin-use-cases.interface';
+import { Controller, Get, Patch, Param, Body, Inject, UseGuards, Query } from '@nestjs/common';
+import type { IListCompaniesUseCase, ISuspendCompanyUseCase, IGetCompanyStatsUseCase } from '../../application/interfaces/super-admin-use-cases.interface';
 import { SuperAdminGuard } from 'src/shared/guards/super-admin.guard';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import { CompanyStatus } from 'src/shared/enums/company/company-status.enum';
@@ -12,11 +12,22 @@ export class SuperAdminCompanyController {
     private readonly _listCompaniesUseCase: IListCompaniesUseCase,
     @Inject('ISuspendCompanyUseCase')
     private readonly _suspendCompanyUseCase: ISuspendCompanyUseCase,
+    @Inject('IGetCompanyStatsUseCase')
+    private readonly _getCompanyStatsUseCase: IGetCompanyStatsUseCase,
   ) { }
 
+  @Get('stats')
+  async getStats() {
+    const stats = await this._getCompanyStatsUseCase.execute();
+    return { data: stats };
+  }
+
   @Get()
-  async listCompanies() {
-    const companies = await this._listCompaniesUseCase.execute();
+  async listCompanies(
+    @Query('search') search?: string,
+    @Query('status') status?: string,
+  ) {
+    const companies = await this._listCompaniesUseCase.execute(search, status);
 
     return {
       data: companies.map((company) => ({

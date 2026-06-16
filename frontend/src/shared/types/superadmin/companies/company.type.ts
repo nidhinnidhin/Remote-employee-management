@@ -9,3 +9,9 @@ export interface CompanyApi {
   employeeCount: number;
   status: string;
 }
+
+export interface CompanyStats {
+  totalCompanies: number;
+  activeCompanies: number;
+  suspendedCompanies: number;
+}

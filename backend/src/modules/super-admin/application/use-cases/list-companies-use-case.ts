@@ -11,7 +11,7 @@ export class ListCompaniesUseCase implements IListCompaniesUseCase {
     private readonly _companyRepository: ICompanyRepository,
   ) { }
 
-  async execute(): Promise<CompanyEntity[]> {
-    return this._companyRepository.findAll();
+  async execute(search?: string, status?: string): Promise<CompanyEntity[]> {
+    return this._companyRepository.findAllWithEmployeeCount(search, status);
   }
 }

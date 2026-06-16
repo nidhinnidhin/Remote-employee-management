@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 interface OtpInputProps {
   length?: number;
@@ -11,6 +11,13 @@ interface OtpInputProps {
 
 const OtpInput = ({ length = 6, value, onChange, error }: OtpInputProps) => {
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
+
+  // Auto-focus first box when value is externally reset to empty
+  useEffect(() => {
+    if (value === "") {
+      inputsRef.current[0]?.focus();
+    }
+  }, [value]);
 
   const handleChange = (index: number, inputValue: string) => {
     // Allow only numbers
@@ -46,9 +53,9 @@ const OtpInput = ({ length = 6, value, onChange, error }: OtpInputProps) => {
 
     onChange(pasted);
 
-    pasted.split("").forEach((_, i) => {
-      inputsRef.current[i]?.focus();
-    });
+    // Focus the last filled box after paste
+    const lastIndex = Math.min(pasted.length, length) - 1;
+    setTimeout(() => inputsRef.current[lastIndex]?.focus(), 0);
   };
 
   return (
@@ -67,8 +74,9 @@ const OtpInput = ({ length = 6, value, onChange, error }: OtpInputProps) => {
             onChange={(e) => handleChange(index, e.target.value)}
             onKeyDown={(e) => handleKeyDown(index, e)}
             onPaste={handlePaste}
-            className={`w-12 h-14 text-center text-xl font-bold field-input transition-all duration-200 ${error ? "border-danger" : ""
-              } focus:outline-none`}
+            className={`w-12 h-14 text-center text-xl font-bold field-input transition-all duration-200 ${
+              error ? "border-danger" : ""
+            } focus:outline-none`}
           />
         ))}
       </div>

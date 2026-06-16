@@ -141,7 +141,7 @@ const AdminRegistrationForm: React.FC<AdminRegistrationFormProps> = ({
       if (result.success || result.message === "OTP sent to your email") {
         localStorage.setItem(
           LOCAL_STORAGE_KEYS.OTP_TIMER_EXPIRY_KEY,
-          (Date.now() + 60000).toString(),
+          (Date.now() + 300000).toString(),
         );
         setShowOtpModal(true);
       } else {

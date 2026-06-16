@@ -24,7 +24,8 @@ export const FRONTEND_ROUTES = {
             BASE: "/admin/auth",
             SET_PASSWORD: "/admin/auth/set-password",
             INVALID: "/admin/auth/invite-invalid",
-        }
+        },
+        PROFILE: "/admin/profile",
     },
     COMPANY: {
         DEPARTMENTS: "/admin/departments",

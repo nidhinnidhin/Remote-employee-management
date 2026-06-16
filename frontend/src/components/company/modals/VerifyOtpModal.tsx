@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import BaseModal from "@/components/ui/BaseModal";
 import Button from "../../ui/Button";
-import FormInput from "@/components/ui/FormInput";
 import { OTP_MESSAGES } from "@/shared/constants/messages/otp.messages";
 import { OtpModalProps } from "@/shared/types/otp/otp-modal-props.type";
 import { useOtpTimer } from "@/hooks/otp/use-otp-timer";
@@ -23,6 +22,15 @@ const OtpModal = ({
 
   const { remaining, expired, startTimer } = useOtpTimer();
 
+  // When a server error arrives (wrong OTP, expired, etc.), clear the
+  // boxes and refocus box 1 so the user can immediately type the correct code.
+  useEffect(() => {
+    if (error) {
+      setOtp("");        // triggers OtpInput's own useEffect → focuses box 1
+      setLocalError(""); // dismiss any "must be 6 digits" notice
+    }
+  }, [error]);
+
   const handleVerify = async () => {
     if (otp.length !== 6) {
       setLocalError(OTP_MESSAGES.OTP_DIGIT_ERROR);
@@ -31,11 +39,13 @@ const OtpModal = ({
 
     setLocalError("");
     await onVerify(otp);
+    // otp is NOT pre-cleared here; the useEffect above handles it if an
+    // error comes back from the parent. On success the modal closes anyway.
   };
 
   const handleResend = async () => {
     await onResend(); // backend call
-    startTimer(60); // restart timer ONLY after success
+    startTimer(300);  // restart 5-minute timer after resend
     setOtp("");
     setLocalError("");
   };
@@ -65,7 +75,11 @@ const OtpModal = ({
       <OtpInput
         length={6}
         value={otp}
-        onChange={setOtp}
+        onChange={(val) => {
+          setOtp(val);
+          // clear local "6-digit" hint once user starts typing
+          if (localError) setLocalError("");
+        }}
         error={localError || error}
       />
 
@@ -76,7 +90,7 @@ const OtpModal = ({
             <span className="font-semibold text-accent">{remaining}s</span>
           </p>
         ) : (
-          <p className="text-danger">OTP expired</p>
+          <p className="text-danger">OTP expired. Please resend.</p>
         )}
       </div>
 
@@ -87,9 +101,6 @@ const OtpModal = ({
           </Button>
         </div>
       )}
-
-      {/* {localError && <p className="text-red-500 mt-2">{localError}</p>} */}
-      {/* {error && <p className="text-red-500 mt-2">{error}</p>} */}
     </BaseModal>
   );
 };

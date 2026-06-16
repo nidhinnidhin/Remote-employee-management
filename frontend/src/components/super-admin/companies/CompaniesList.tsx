@@ -7,13 +7,14 @@ import CompaniesStats from "./CompaniesStats";
 import CompaniesFilter from "./CompaniesFilter";
 import CompaniesTable from "./CompaniesTable";
 
-import { CompanyApi } from "@/shared/types/superadmin/companies/company.type";
+import { CompanyApi, CompanyStats as CompanyStatsType } from "@/shared/types/superadmin/companies/company.type";
 import { CompanyRow } from "@/shared/types/superadmin/companies/companiesColumns";
 import { formatDateISO } from "@/lib/date/date-format";
 import { useRouter } from "next/navigation";
 
 type CompaniesListingProps = {
   initialCompanies: CompanyApi[];
+  initialStats: CompanyStatsType;
 };
 
 const mapApiToRow = (company: CompanyApi): CompanyRow => ({
@@ -32,11 +33,9 @@ const mapApiToRow = (company: CompanyApi): CompanyRow => ({
 
 export default function CompaniesListing({
   initialCompanies,
+  initialStats,
 }: CompaniesListingProps) {
   const router = useRouter();
-  const [companies] = useState<CompanyRow[]>(
-    initialCompanies.map(mapApiToRow)
-  );
 
   const handleRefresh = () => {
     router.refresh();
@@ -46,7 +45,7 @@ export default function CompaniesListing({
   return (
     <SuperAdminLayout>
       <CompaniesHeader />
-      <CompaniesStats />
+      <CompaniesStats stats={initialStats} />
       <CompaniesFilter />
 
       <CompaniesTable

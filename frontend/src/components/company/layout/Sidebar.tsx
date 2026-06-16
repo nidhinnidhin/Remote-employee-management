@@ -171,23 +171,25 @@ const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Bottom Profile Section - SaaS Classic */}
         <div className="p-4 border-t" style={{ borderTopColor: "rgb(var(--color-sidebar-border) / 0.1)" }}>
-          <div className={cn(
-            "flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition-colors group cursor-pointer",
-            isCollapsed && "justify-center"
-          )}>
-            <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-[10px] font-bold text-indigo-700 uppercase shrink-0">
-              AD
+          <Link href={FRONTEND_ROUTES.ADMIN.PROFILE || "/admin/profile"}>
+            <div className={cn(
+              "flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition-colors group cursor-pointer",
+              isCollapsed && "justify-center"
+            )}>
+              <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-[10px] font-bold text-indigo-700 uppercase shrink-0">
+                AD
+              </div>
+              {!isCollapsed && (
+                <>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-bold truncate">Admin User</p>
+                    <p className="text-[10px] opacity-50 truncate font-medium">Company Manager</p>
+                  </div>
+                  <Settings2 size={14} className="opacity-40 group-hover:opacity-100 transition-opacity" />
+                </>
+              )}
             </div>
-            {!isCollapsed && (
-              <>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-bold truncate">Admin User</p>
-                  <p className="text-[10px] opacity-50 truncate font-medium">Company Manager</p>
-                </div>
-                <Settings2 size={14} className="opacity-40 group-hover:opacity-100 transition-opacity" />
-              </>
-            )}
-          </div>
+          </Link>
         </div>
       </aside>
     </>
