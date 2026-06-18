@@ -44,8 +44,7 @@ export function useChat() {
         }
 
         addMessage(message.conversationId, message);
-
-        // Safely extract the optional type parameter from message object
+        // Safely extract the optional type parameter from message objectdsfg
         const msgType = (message as Message & { type?: string }).type || "TEXT";
 
         const lastMessageText =
