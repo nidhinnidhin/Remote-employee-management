@@ -4,16 +4,54 @@ import { useProfileStore } from '@/store/profile.store';
 import { io, Socket } from 'socket.io-client';
 import { MeetingSocketEvents } from '@/shared/types/company/meeting-socket.type';
 
-// API_URL_INTERNAL is undefined in the browser (server-only var) → falls back to localhost:4000
-const BACKEND_URL = (process.env.API_URL_INTERNAL || "http://localhost:4000/api").replace(/\/api$/, "");
+// CRITICAL FIX: Use NEXT_PUBLIC_API_URL so the browser resolves the real backend host in production.
+// API_URL_INTERNAL is a server-side-only variable and is ALWAYS undefined in the browser,
+// which caused the socket to silently connect to localhost:4000 instead of the AWS backend.
+const BACKEND_URL = (
+  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
+).replace(/\/api$/, '');
 
-const ICE_SERVERS = {
-  iceServers: [
+// Build ICE server list including optional TURN relay servers.
+// STUN-only configuration fails for peers behind symmetric NAT (common in AWS / mobile networks).
+// To enable TURN, set these env vars in your frontend .env:
+//   NEXT_PUBLIC_TURN_URL=turn:your-turn-server.com:3478
+//   NEXT_PUBLIC_TURN_USERNAME=your_username
+//   NEXT_PUBLIC_TURN_CREDENTIAL=your_password
+function buildIceServers(): RTCIceServer[] {
+  const servers: RTCIceServer[] = [
     { urls: 'stun:stun.l.google.com:19302' },
     { urls: 'stun:stun1.l.google.com:19302' },
     { urls: 'stun:global.stun.twilio.com:3478' },
-  ],
-};
+  ];
+
+  const turnUrl = process.env.NEXT_PUBLIC_TURN_URL;
+  const turnUsername = process.env.NEXT_PUBLIC_TURN_USERNAME;
+  const turnCredential = process.env.NEXT_PUBLIC_TURN_CREDENTIAL;
+
+  if (turnUrl && turnUsername && turnCredential) {
+    servers.push(
+      { urls: turnUrl, username: turnUsername, credential: turnCredential },
+    );
+    // Also add TURNS (TLS) variant for networks that block UDP
+    const turnsUrl = turnUrl.replace(/^turn:/, 'turns:').replace(/:3478$/, ':5349');
+    if (turnsUrl !== turnUrl) {
+      servers.push({ urls: turnsUrl, username: turnUsername, credential: turnCredential });
+    }
+  } else {
+    console.warn(
+      '[Meeting] No TURN server configured (NEXT_PUBLIC_TURN_URL / TURN_USERNAME / TURN_CREDENTIAL). ' +
+      'WebRTC may fail for users behind NAT in production/AWS deployments.',
+    );
+  }
+
+  return servers;
+}
+
+// Shape sent by the backend for participants already in the room when a new user joins.
+interface ExistingParticipant {
+  socketId: string;
+  userId: string;
+}
 
 export function useMeeting(meetingId: string) {
   const { accessToken, userId } = useAuthStore();
@@ -36,20 +74,19 @@ export function useMeeting(meetingId: string) {
   const peerConnections = useRef<Record<string, RTCPeerConnection>>({});
   const localStreamRef = useRef<MediaStream | null>(null);
   const screenStreamRef = useRef<MediaStream | null>(null);
-
-  const log = (msg: string, data?: unknown) => {
-    console.log(`[Meeting] ${msg}`, data ?? '');
-    setEventLog(prev => [...prev.slice(-6), `${new Date().toLocaleTimeString()} ${msg}`]);
-  };
+  // ICE candidates that arrive before a peer connection's remote description is set are queued here.
+  const pendingCandidatesRef = useRef<Record<string, RTCIceCandidateInit[]>>({});
 
   // ─── Create WebRTC peer connection ────────────────────────────────────────────
   const createPeerConnection = useCallback((targetSocketId: string): RTCPeerConnection => {
+    // Close any stale connection for this peer
     if (peerConnections.current[targetSocketId]) {
       peerConnections.current[targetSocketId].close();
     }
 
-    const pc = new RTCPeerConnection(ICE_SERVERS);
+    const pc = new RTCPeerConnection({ iceServers: buildIceServers() });
 
+    // Add all local tracks so the remote peer can receive our media
     const stream = localStreamRef.current;
     if (stream) {
       stream.getTracks().forEach(track => pc.addTrack(track, stream));
@@ -68,12 +105,12 @@ export function useMeeting(meetingId: string) {
     pc.ontrack = (event) => {
       const incoming = event.streams[0];
       if (!incoming) return;
-      log(`Got remote track from ${targetSocketId}`);
+      console.log(`[Meeting] Got remote track from ${targetSocketId}`);
       setRemoteStreams(prev => ({ ...prev, [targetSocketId]: incoming }));
     };
 
     pc.onconnectionstatechange = () => {
-      log(`PC state with ${targetSocketId}: ${pc.connectionState}`);
+      console.log(`[Meeting] PC state with ${targetSocketId}: ${pc.connectionState}`);
       if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') {
         setRemoteStreams(prev => {
           const next = { ...prev };
@@ -94,13 +131,30 @@ export function useMeeting(meetingId: string) {
     let socket: Socket;
     let destroyed = false;
 
+    // Apply ICE candidates that arrived before setRemoteDescription was called.
+    // This fixes the common race condition where ICE candidates are silently dropped.
+    const applyPendingCandidates = async (socketId: string, pc: RTCPeerConnection) => {
+      const pending = pendingCandidatesRef.current[socketId];
+      if (!pending || pending.length === 0) return;
+      console.log(`[Meeting] Applying ${pending.length} queued ICE candidates for ${socketId}`);
+      delete pendingCandidatesRef.current[socketId];
+      for (const candidate of pending) {
+        try {
+          await pc.addIceCandidate(new RTCIceCandidate(candidate));
+        } catch (e) {
+          console.error('[Meeting] Error adding queued ICE candidate', e);
+        }
+      }
+    };
+
     const cleanup = () => {
       destroyed = true;
-      log('Cleanup: stopping media and closing connections');
+      console.log('[Meeting] Cleanup: stopping media and closing connections');
       localStreamRef.current?.getTracks().forEach(t => t.stop());
       screenStreamRef.current?.getTracks().forEach(t => t.stop());
       Object.values(peerConnections.current).forEach(pc => pc.close());
       peerConnections.current = {};
+      pendingCandidatesRef.current = {};
       if (socket) {
         socket.emit(MeetingSocketEvents.LEAVE_MEETING, meetingId);
         socket.disconnect();
@@ -109,21 +163,22 @@ export function useMeeting(meetingId: string) {
     };
 
     const init = async () => {
-      // Step 1: Get camera/mic (allow failure – still join audio-only)
+      // Step 1: Get camera/mic (allow failure – user can still join audio/video-only)
       let stream: MediaStream | null = null;
       try {
         stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         if (destroyed) { stream.getTracks().forEach(t => t.stop()); return; }
         localStreamRef.current = stream;
         setLocalStream(stream);
-        log('Got local media');
+        console.log('[Meeting] Got local media');
       } catch (err) {
         console.warn('[Meeting] getUserMedia failed, joining without media:', err);
       }
 
       if (destroyed) return;
 
-      // Step 2: Create socket
+      // Step 2: Create socket using the correct public backend URL
+      console.log(`[Meeting] Connecting socket to: ${BACKEND_URL}/meeting`);
       socket = io(`${BACKEND_URL}/meeting`, {
         auth: { token: accessToken },
         transports: ['websocket', 'polling'],
@@ -133,24 +188,23 @@ export function useMeeting(meetingId: string) {
       socketRef.current = socket;
 
       // Step 3: Register ALL event handlers BEFORE the socket connects
-      // (socket.io queues events and calls them once connected)
+      // (socket.io queues them and calls them once connected)
 
       socket.on('connect', () => {
         if (destroyed) return;
-        log(`Socket connected: ${socket.id}`);
+        console.log(`[Meeting] Socket connected: ${socket.id}`);
         setIsSocketConnected(true);
-        // Join the room immediately after connecting
         socket.emit(MeetingSocketEvents.JOIN_MEETING, meetingId);
-        log(`Emitted JOIN_MEETING for room ${meetingId}`);
+        console.log(`[Meeting] Emitted JOIN_MEETING for room ${meetingId}`);
       });
 
       socket.on('disconnect', (reason) => {
-        log(`Socket disconnected: ${reason}`);
+        console.log(`[Meeting] Socket disconnected: ${reason}`);
         setIsSocketConnected(false);
       });
 
       socket.on('connect_error', (err) => {
-        log(`Socket connect_error: ${err.message}`);
+        console.error(`[Meeting] Socket connect_error: ${err.message}`, err);
       });
 
       // ─── USER_JOINED_MEETING ────────────────────────────────────────────────
@@ -158,43 +212,66 @@ export function useMeeting(meetingId: string) {
         userId: string;
         socketId: string;
         meetingId: string;
-        existingParticipants: string[];
+        // Updated backend sends {socketId, userId}[]; older backend sent string[].
+        // We handle both for backward compatibility.
+        existingParticipants: Array<ExistingParticipant | string>;
       }) => {
         if (destroyed) return;
-        log(`USER_JOINED_MEETING: socketId=${payload.socketId} userId=${payload.userId} existing=${JSON.stringify(payload.existingParticipants)}`);
+        console.log(
+          `[Meeting] USER_JOINED_MEETING: socketId=${payload.socketId} userId=${payload.userId}`,
+          `existing=${JSON.stringify(payload.existingParticipants)}`,
+        );
 
         const { userId: joinedUserId, socketId: joinedSocketId, existingParticipants } = payload;
 
         if (!joinedSocketId) {
-          console.error('[Meeting] Missing socketId in USER_JOINED_MEETING payload! Backend may need restart.');
+          console.error('[Meeting] Missing socketId in USER_JOINED_MEETING payload!');
           return;
         }
 
         const mySocketId = socket.id;
 
         if (joinedSocketId === mySocketId) {
-          // I just joined — initiate connections to everyone already here
-          log(`I joined. Existing participants: ${existingParticipants.join(', ')}`);
-          for (const existingId of existingParticipants) {
-            setParticipants(prev => prev.includes(existingId) ? prev : [...prev, existingId]);
+          // I just joined — normalise the existing participants list and initiate connections
+          const normalised: ExistingParticipant[] = existingParticipants.map(p =>
+            typeof p === 'string' ? { socketId: p, userId: '' } : p,
+          );
+
+          console.log(
+            `[Meeting] I joined. Initiating offers to ${normalised.length} existing participant(s).`,
+          );
+
+          for (const existing of normalised) {
+            const { socketId: existingSocketId, userId: existingUserId } = existing;
+
+            setParticipants(prev =>
+              prev.includes(existingSocketId) ? prev : [...prev, existingSocketId],
+            );
+            // Set the userId mapping immediately so names resolve without waiting for the answer
+            if (existingUserId) {
+              setParticipantUserIds(prev => ({ ...prev, [existingSocketId]: existingUserId }));
+            }
+
             try {
-              const pc = createPeerConnection(existingId);
+              const pc = createPeerConnection(existingSocketId);
               const offer = await pc.createOffer();
               await pc.setLocalDescription(offer);
               socket.emit(MeetingSocketEvents.WEBRTC_OFFER, {
-                targetSocketId: existingId,
+                targetSocketId: existingSocketId,
                 meetingId,
                 sdp: offer,
               });
-              log(`Sent offer to ${existingId}`);
+              console.log(`[Meeting] Sent offer to ${existingSocketId}`);
             } catch (e) {
-              console.error(`[Meeting] Failed to create offer for ${existingId}`, e);
+              console.error(`[Meeting] Failed to create offer for ${existingSocketId}`, e);
             }
           }
-        } else if (joinedSocketId !== mySocketId) {
-          // Someone else joined — add them to participants list
-          log(`New participant joined: ${joinedSocketId} (user: ${joinedUserId})`);
-          setParticipants(prev => prev.includes(joinedSocketId) ? prev : [...prev, joinedSocketId]);
+        } else {
+          // Someone else joined — add them to our participant list
+          console.log(`[Meeting] New participant joined: ${joinedSocketId} (user: ${joinedUserId})`);
+          setParticipants(prev =>
+            prev.includes(joinedSocketId) ? prev : [...prev, joinedSocketId],
+          );
           setParticipantUserIds(prev => ({ ...prev, [joinedSocketId]: joinedUserId }));
         }
       });
@@ -202,13 +279,14 @@ export function useMeeting(meetingId: string) {
       // ─── USER_LEFT_MEETING ──────────────────────────────────────────────────
       socket.on(MeetingSocketEvents.USER_LEFT_MEETING, ({ socketId: leftId }: { socketId: string }) => {
         if (destroyed) return;
-        log(`USER_LEFT_MEETING: ${leftId}`);
+        console.log(`[Meeting] USER_LEFT_MEETING: ${leftId}`);
         setParticipants(prev => prev.filter(id => id !== leftId));
         setRemoteStreams(prev => { const n = { ...prev }; delete n[leftId]; return n; });
         setParticipantUserIds(prev => { const n = { ...prev }; delete n[leftId]; return n; });
         setRemoteScreenSharers(prev => { const n = { ...prev }; delete n[leftId]; return n; });
         peerConnections.current[leftId]?.close();
         delete peerConnections.current[leftId];
+        delete pendingCandidatesRef.current[leftId];
       });
 
       // ─── WEBRTC_OFFER ───────────────────────────────────────────────────────
@@ -216,12 +294,14 @@ export function useMeeting(meetingId: string) {
         fromSocketId, fromUserId, sdp
       }: { fromSocketId: string; fromUserId: string; sdp: RTCSessionDescriptionInit }) => {
         if (destroyed) return;
-        log(`WEBRTC_OFFER from ${fromSocketId}`);
+        console.log(`[Meeting] WEBRTC_OFFER from ${fromSocketId}`);
         setParticipants(prev => prev.includes(fromSocketId) ? prev : [...prev, fromSocketId]);
         setParticipantUserIds(prev => ({ ...prev, [fromSocketId]: fromUserId }));
         try {
           const pc = createPeerConnection(fromSocketId);
           await pc.setRemoteDescription(new RTCSessionDescription(sdp));
+          // Apply any ICE candidates that arrived before this offer was processed
+          await applyPendingCandidates(fromSocketId, pc);
           const answer = await pc.createAnswer();
           await pc.setLocalDescription(answer);
           socket.emit(MeetingSocketEvents.WEBRTC_ANSWER, {
@@ -229,7 +309,7 @@ export function useMeeting(meetingId: string) {
             meetingId,
             sdp: answer,
           });
-          log(`Sent answer to ${fromSocketId}`);
+          console.log(`[Meeting] Sent answer to ${fromSocketId}`);
         } catch (e) {
           console.error('[Meeting] Error handling offer', e);
         }
@@ -240,12 +320,14 @@ export function useMeeting(meetingId: string) {
         fromSocketId, fromUserId, sdp
       }: { fromSocketId: string; fromUserId: string; sdp: RTCSessionDescriptionInit }) => {
         if (destroyed) return;
-        log(`WEBRTC_ANSWER from ${fromSocketId}`);
+        console.log(`[Meeting] WEBRTC_ANSWER from ${fromSocketId}`);
         setParticipantUserIds(prev => ({ ...prev, [fromSocketId]: fromUserId }));
         const pc = peerConnections.current[fromSocketId];
         if (pc && pc.signalingState !== 'stable') {
           try {
             await pc.setRemoteDescription(new RTCSessionDescription(sdp));
+            // Apply any ICE candidates that arrived before the answer was processed
+            await applyPendingCandidates(fromSocketId, pc);
           } catch (e) {
             console.error('[Meeting] Error setting remote description for answer', e);
           }
@@ -258,12 +340,20 @@ export function useMeeting(meetingId: string) {
       }: { fromSocketId: string; candidate: RTCIceCandidateInit }) => {
         if (destroyed) return;
         const pc = peerConnections.current[fromSocketId];
-        if (pc) {
+        if (pc && pc.remoteDescription) {
+          // Remote description is ready – apply the candidate immediately
           try {
             await pc.addIceCandidate(new RTCIceCandidate(candidate));
           } catch (e) {
             console.error('[Meeting] Error adding ICE candidate', e);
           }
+        } else {
+          // Queue the candidate to be applied after setRemoteDescription
+          if (!pendingCandidatesRef.current[fromSocketId]) {
+            pendingCandidatesRef.current[fromSocketId] = [];
+          }
+          pendingCandidatesRef.current[fromSocketId].push(candidate);
+          console.log(`[Meeting] Queued ICE candidate from ${fromSocketId} (remote desc not yet set)`);
         }
       });
 
@@ -336,9 +426,12 @@ export function useMeeting(meetingId: string) {
     if (!socket) return;
 
     if (isScreenSharing && screenStreamRef.current) {
+      // ── Stop sharing ──
       screenStreamRef.current.getTracks().forEach(t => t.stop());
+      screenStreamRef.current = null;          // keep ref in sync
       setScreenStream(null);
       setIsScreenSharing(false);
+      // Restore the camera video track for all peers
       const original = localStreamRef.current?.getVideoTracks()[0];
       if (original) {
         Object.values(peerConnections.current).forEach(pc => {
@@ -355,12 +448,16 @@ export function useMeeting(meetingId: string) {
         audio: false,
       });
       const screenTrack = display.getVideoTracks()[0];
+      screenStreamRef.current = display;       // keep ref in sync so stop-button works
       setScreenStream(display);
       setIsScreenSharing(true);
+      // Replace camera track with screen track for all existing peers
       Object.values(peerConnections.current).forEach(pc => {
         pc.getSenders().find(s => s.track?.kind === 'video')?.replaceTrack(screenTrack);
       });
+      // Handle user stopping share via browser's native "Stop sharing" button
       screenTrack.onended = () => {
+        screenStreamRef.current = null;
         setScreenStream(null);
         setIsScreenSharing(false);
         const original = localStreamRef.current?.getVideoTracks()[0];

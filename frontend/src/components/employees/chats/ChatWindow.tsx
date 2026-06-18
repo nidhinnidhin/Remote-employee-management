@@ -74,18 +74,6 @@ export function ChatWindow({ conversation, messages }: ChatWindowProps) {
             </p>
           </div>
         </div>
-
-        <div className="flex items-center gap-1">
-          <button className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/[0.06] transition-all">
-            <Video size={17} />
-          </button>
-          <button className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/[0.06] transition-all">
-            <Phone size={16} />
-          </button>
-          <button className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/[0.06] transition-all">
-            <MoreVertical size={17} />
-          </button>
-        </div>
       </div>
 
       {/* Messages */}

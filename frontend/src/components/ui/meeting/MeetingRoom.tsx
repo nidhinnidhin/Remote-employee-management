@@ -3,7 +3,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useMeeting } from "@/hooks/meeting/useMeeting";
 import { Mic, MicOff, Video, VideoOff, MonitorUp, PhoneOff, UserX, XOctagon, AlertTriangle } from "lucide-react";
-import Button from "@/components/ui/Button";
 import { endMeetingAction } from "@/actions/meeting/meeting.actions";
 import { Meeting } from "@/shared/types/company/meeting.type";
 import { useAuthStore } from "@/store/auth.store";
@@ -240,66 +239,77 @@ export default function MeetingRoom({ meeting }: MeetingRoomProps) {
 
       {/* CONTROLS BAR */}
       <div className="mt-4 pt-4 border-t border-white/[0.05] flex items-center justify-center gap-3 md:gap-4 shrink-0 z-30">
-        <Button
+        {/* ── Microphone ── */}
+        <button
+          type="button"
           onClick={() => toggleAudio()}
+          title={isMuted ? 'Unmute' : 'Mute'}
           className={cn(
-            "w-12 h-12 md:w-16 md:h-16 rounded-2xl flex items-center justify-center transition-all shadow-xl",
-            (isMuted ?? false)
-              ? "bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-rose-500/20"
+            "w-12 h-12 md:w-16 md:h-16 rounded-2xl flex items-center justify-center transition-all shadow-xl cursor-pointer select-none",
+            isMuted
+              ? "bg-rose-500/10 text-rose-400 border border-rose-500/30 hover:bg-rose-500/20"
               : "bg-white/5 text-white border border-white/10 hover:bg-white/10"
           )}
         >
-          {(isMuted ?? false) ? (
+          {isMuted ? (
             <MicOff className="w-6 h-6 md:w-7 md:h-7" strokeWidth={2.5} />
           ) : (
             <Mic className="w-6 h-6 md:w-7 md:h-7" strokeWidth={2.5} />
           )}
-        </Button>
+        </button>
 
-        <Button
+        {/* ── Camera ── */}
+        <button
+          type="button"
           onClick={toggleVideo}
+          title={isVideoOff ? 'Turn on camera' : 'Turn off camera'}
           className={cn(
-            "w-12 h-12 md:w-16 md:h-16 rounded-2xl flex items-center justify-center transition-all shadow-xl",
-            (isVideoOff ?? false)
-              ? "bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-rose-500/20"
+            "w-12 h-12 md:w-16 md:h-16 rounded-2xl flex items-center justify-center transition-all shadow-xl cursor-pointer select-none",
+            isVideoOff
+              ? "bg-rose-500/10 text-rose-400 border border-rose-500/30 hover:bg-rose-500/20"
               : "bg-white/5 text-white border border-white/10 hover:bg-white/10"
           )}
         >
-          {(isVideoOff ?? false) ? (
+          {isVideoOff ? (
             <VideoOff className="w-6 h-6 md:w-7 md:h-7" strokeWidth={2.5} />
           ) : (
             <Video className="w-6 h-6 md:w-7 md:h-7" strokeWidth={2.5} />
           )}
-        </Button>
+        </button>
 
-        <Button
+        {/* ── Screen Share ── */}
+        <button
+          type="button"
           onClick={toggleScreenShare}
+          title={isScreenSharing ? 'Stop sharing' : 'Share screen'}
           className={cn(
-            "w-12 h-12 md:w-16 md:h-16 rounded-2xl transition-all flex items-center justify-center shadow-xl",
-            (isScreenSharing ?? false)
-              ? "bg-blue-500 text-white shadow-blue-500/20 hover:bg-blue-600"
-              : "bg-blue-500/10 text-blue-500 border border-blue-500/20 hover:bg-blue-500/20"
+            "w-12 h-12 md:w-16 md:h-16 rounded-2xl flex items-center justify-center transition-all shadow-xl cursor-pointer select-none",
+            isScreenSharing
+              ? "bg-blue-500 text-white shadow-blue-500/30 hover:bg-blue-600"
+              : "bg-blue-500/10 text-blue-400 border border-blue-500/30 hover:bg-blue-500/20"
           )}
         >
           <MonitorUp className="w-6 h-6 md:w-7 md:h-7" strokeWidth={2.5} />
-        </Button>
+        </button>
 
         {isCreator ? (
-          <Button
+          <button
+            type="button"
             onClick={() => setShowEndConfirmation(true)}
-            className="h-12 md:h-16 px-6 md:px-8 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-black uppercase tracking-widest text-[11px] md:text-xs flex items-center justify-center gap-2.5 md:gap-3 shadow-xl shadow-rose-600/20 transition-all ml-2 md:ml-4"
+            className="h-12 md:h-16 px-6 md:px-8 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-black uppercase tracking-widest text-[11px] md:text-xs flex items-center justify-center gap-2.5 md:gap-3 shadow-xl shadow-rose-600/20 transition-all ml-2 md:ml-4 cursor-pointer select-none"
           >
-            <XOctagon className="w-5 h-5 md:w-5.5 md:h-5.5" strokeWidth={2.5} />
+            <XOctagon className="w-5 h-5" strokeWidth={2.5} />
             End Meeting
-          </Button>
+          </button>
         ) : (
-          <Button
+          <button
+            type="button"
             onClick={handleLeave}
-            className="h-12 md:h-16 px-6 md:px-8 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-black uppercase tracking-widest text-[11px] md:text-xs flex items-center justify-center gap-2.5 md:gap-3 shadow-xl shadow-rose-500/20 transition-all ml-2 md:ml-4"
+            className="h-12 md:h-16 px-6 md:px-8 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-black uppercase tracking-widest text-[11px] md:text-xs flex items-center justify-center gap-2.5 md:gap-3 shadow-xl shadow-rose-500/20 transition-all ml-2 md:ml-4 cursor-pointer select-none"
           >
-            <PhoneOff className="w-5 h-5 md:w-5.5 md:h-5.5" strokeWidth={2.5} />
+            <PhoneOff className="w-5 h-5" strokeWidth={2.5} />
             Leave
-          </Button>
+          </button>
         )}
       </div>
 

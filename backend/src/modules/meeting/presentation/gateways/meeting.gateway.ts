@@ -37,6 +37,8 @@ export class MeetingGateway
   ) {}
 
   private readonly roomParticipants = new Map<string, Set<string>>();
+  // Maps socket ID → user ID so we can attach userIds to existingParticipants on join
+  private readonly socketUserMap = new Map<string, string>();
 
   notifyMeetingEnded(meetingId: string) {
     this.server.to(meetingId).emit(SocketEvents.MEETING_ENDED, meetingId);
@@ -75,6 +77,9 @@ export class MeetingGateway
         companyId: payload.companyId,
       };
 
+      // Track socket → user mapping so we can resolve names for late-joining participants
+      this.socketUserMap.set(client.id, userId);
+
       void client.join(`user_${userId}`);
       this.logger.log(
         `Client connected to meeting ns: ${client.id} (User: ${userId})`,
@@ -88,6 +93,8 @@ export class MeetingGateway
 
   handleDisconnect(client: AuthenticatedSocket) {
     this.logger.log(`Client disconnected from meeting ns: ${client.id}`);
+    // Clean up the socket → user mapping
+    this.socketUserMap.delete(client.id);
     this.roomParticipants.forEach((participants, meetingId) => {
       if (participants.has(client.id)) {
         participants.delete(client.id);
@@ -128,13 +135,21 @@ export class MeetingGateway
       `Client ${client.id} (User: ${client.user.userId}) joined meeting room: ${meetingId}. Existing: [${existingSocketIds.join(', ')}]`,
     );
 
+    // Send existing participants with their userId so the new joiner can resolve names immediately
+    const existingParticipants = existingSocketIds.map((socketId) => ({
+      socketId,
+      userId: this.socketUserMap.get(socketId) ?? '',
+    }));
+
+    // Tell the newly-joined client who is already in the room (with userIds)
     client.emit(SocketEvents.USER_JOINED_MEETING, {
       userId: client.user.userId,
       socketId: client.id,
       meetingId,
-      existingParticipants: existingSocketIds,
+      existingParticipants,
     });
 
+    // Tell everyone else that a new participant arrived (no existingParticipants needed)
     client.to(meetingId).emit(SocketEvents.USER_JOINED_MEETING, {
       userId: client.user.userId,
       socketId: client.id,
