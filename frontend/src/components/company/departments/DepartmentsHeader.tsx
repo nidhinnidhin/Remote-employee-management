@@ -3,10 +3,6 @@
 import { Plus, Search } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
-/**
- * Header for the Departments & Teams page.
- * Includes page title, subtitle, and primary action button.
- */
 interface DepartmentsHeaderProps {
   onAdd: () => void;
   onSearch: (query: string) => void;

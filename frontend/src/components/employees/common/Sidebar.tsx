@@ -28,6 +28,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useProfileStore } from "@/store/profile.store";
 import { FileText } from "lucide-react";
+import Image from "next/image";
 
 const navigationGroups = [
   // ... (rest of the file)
@@ -64,7 +65,11 @@ const navigationGroups = [
         label: "Leaves",
         href: FRONTEND_ROUTES.EMPLOYEE.LEAVES,
       },
-      { icon: Users2, label: "Department", href: FRONTEND_ROUTES.EMPLOYEE.TEAMS },
+      {
+        icon: Users2,
+        label: "Department",
+        href: FRONTEND_ROUTES.EMPLOYEE.TEAMS,
+      },
     ],
   },
   {
@@ -85,7 +90,6 @@ const navigationGroups = [
   {
     title: "Growth & Policy",
     items: [
-      
       {
         icon: ShieldCheck,
         label: "Company Policy",
@@ -165,18 +169,19 @@ export function Sidebar({ className }: { className?: string }) {
         </button>
 
         {/* Logo Section */}
-        <div className="h-16 flex items-center px-6 border-b border-white/[0.04] overflow-hidden shrink-0">
-          <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center mr-3 shrink-0">
-            <LayoutGrid size={18} className="text-white" strokeWidth={2.5} />
-          </div>
+        <div className="h-16 flex items-center px-6 overflow-hidden shrink-0">
           {!isCollapsed && (
-            <motion.span
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="font-black text-sm tracking-tighter text-white uppercase whitespace-nowrap"
-            >
-              Nexus <span className="text-accent">Portal</span>
-            </motion.span>
+            <Image
+              src="/images/stafflow-employee-logo.png"
+              alt="Stafflow"
+              width={200}
+              height={60}
+              priority
+              className={cn(
+                "transition-all duration-300 object-contain",
+                isCollapsed ? "w-10 h-10" : "w-40 h-auto",
+              )}
+            />
           )}
         </div>
 
@@ -251,16 +256,23 @@ export function Sidebar({ className }: { className?: string }) {
               <div className="w-8 h-8 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center text-[10px] font-bold text-white uppercase shrink-0">
                 {userProfile?.firstName && userProfile?.lastName
                   ? `${userProfile.firstName[0]}${userProfile.lastName[0]}`
-                  : userProfile?.firstName ? userProfile.firstName[0] : "JD"}
+                  : userProfile?.firstName
+                    ? userProfile.firstName[0]
+                    : "JD"}
               </div>
               {!isCollapsed && (
                 <>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-bold text-white truncate">
-                      {isLoading ? "..." : `${userProfile?.firstName || ""} ${userProfile?.lastName || ""}`.trim() || "Employee"}
+                      {isLoading
+                        ? "..."
+                        : `${userProfile?.firstName || ""} ${userProfile?.lastName || ""}`.trim() ||
+                          "Employee"}
                     </p>
                     <p className="text-[10px] text-slate-500 font-medium truncate">
-                      {userProfile?.title || userProfile?.role?.replace(/_/g, " ") || "Member"}
+                      {userProfile?.title ||
+                        userProfile?.role?.replace(/_/g, " ") ||
+                        "Member"}
                     </p>
                   </div>
                   <Settings2

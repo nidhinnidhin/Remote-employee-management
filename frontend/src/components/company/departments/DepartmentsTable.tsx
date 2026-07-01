@@ -45,10 +45,21 @@ const DepartmentsTable = ({
   const [isRemoveMemberOpen, setIsRemoveMemberOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<any | null>(null);
   const [formMode, setFormMode] = useState<"CREATE" | "EDIT">("CREATE");
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
   const [expandedDepts, setExpandedDepts] = useState<Record<string, boolean>>(
     {},
   );
+
+  const getInitials = (name: string) => {
+    if (!name) return "";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
 
   const toggleDept = (id: string) => {
     setExpandedDepts((prev) => ({
@@ -153,18 +164,24 @@ const DepartmentsTable = ({
   }, [debouncedSearch]);
 
   if (loading) {
-    return <div className="p-6 text-sm text-muted bg-transparent">Loading departments...</div>;
+    return (
+      <div className="p-6 text-sm text-muted bg-transparent">
+        Loading departments...
+      </div>
+    );
   }
 
   if (!departments.length) {
-    return <div className="p-6 text-sm text-muted bg-transparent">No departments found.</div>;
+    return (
+      <div className="p-6 text-sm text-muted bg-transparent">
+        No departments found.
+      </div>
+    );
   }
 
   return (
     <>
-      {/* Container altered to fully transparent variant wrapper */}
       <div className="overflow-hidden bg-transparent border border-[rgb(var(--color-border-subtle))] rounded-2xl w-full">
-        {/* Header Block with background cleaned to plain translucent layout line */}
         <div className="grid grid-cols-[1fr_100px_80px] px-6 py-4 border-b border-[rgb(var(--color-border-subtle))] bg-white/[0.01]">
           <span className="text-[10px] font-bold text-muted uppercase tracking-widest px-8">
             Department Name
@@ -180,7 +197,6 @@ const DepartmentsTable = ({
         <div className="divide-y divide-[rgb(var(--color-border-subtle))]/30">
           {departments.map((dept) => (
             <div key={dept.id} className="group transition-colors duration-200">
-              {/* Department Row */}
               <div
                 className="grid grid-cols-[1fr_100px_80px] items-center px-6 py-4 hover:bg-white/5 cursor-pointer relative transition-all"
                 onClick={() => toggleDept(dept.id)}
@@ -214,7 +230,6 @@ const DepartmentsTable = ({
                 </div>
               </div>
 
-              {/* Actions Dropdown Portal */}
               {openMenuId === dept.id &&
                 menuAnchor &&
                 createPortal(
@@ -263,7 +278,6 @@ const DepartmentsTable = ({
                   document.body,
                 )}
 
-              {/* Expanded Section - Employee List */}
               {expandedDepts[dept.id] && (
                 <div className="bg-transparent border-t border-white/5 p-4 animate-in slide-in-from-top-2 duration-300">
                   <div className="flex items-center justify-between mb-4 px-2">
@@ -291,21 +305,26 @@ const DepartmentsTable = ({
                           className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] hover:border-white/10 transition-all cursor-default group/emp"
                         >
                           <div className="relative flex-shrink-0">
-                            <div className="h-10 w-10 rounded-full overflow-hidden border border-white/10 ring-2 ring-black/20 bg-white/5 flex items-center justify-center">
-                              <Image
-                                src={
-                                  employee.avatar ||
-                                  `https://ui-avatars.com/api/?name=${encodeURIComponent(employee.name)}&background=random`
-                                }
-                                alt={employee.name}
-                                width={40}
-                                height={40}
-                                sizes="40px"
-                                className="w-full h-full object-cover"
-                                onError={(e: any) => {
-                                  e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(employee.name)}`;
-                                }}
-                              />
+                            {/* Handled Profile Image conditionally fallback to CSS initials avatar wrapper */}
+                            <div className="h-10 w-10 rounded-full overflow-hidden border border-white/10 ring-2 ring-black/20 bg-white/5 flex items-center justify-center text-[12px] font-bold text-primary tracking-wider select-none">
+                              {employee.avatar && !imageErrors[employee.id] ? (
+                                <Image
+                                  src={employee.avatar}
+                                  alt={employee.name}
+                                  width={40}
+                                  height={40}
+                                  sizes="40px"
+                                  className="w-full h-full object-cover"
+                                  onError={() =>
+                                    setImageErrors((prev) => ({
+                                      ...prev,
+                                      [employee.id]: true,
+                                    }))
+                                  }
+                                />
+                              ) : (
+                                getInitials(employee.name)
+                              )}
                             </div>
 
                             {/* Status Dot */}
@@ -340,7 +359,6 @@ const DepartmentsTable = ({
                               <MoreVertical size={14} />
                             </button>
 
-                            {/* Member Specific Dropdown Menu */}
                             {openMenuId === `member-${employee.id}` &&
                               menuAnchor &&
                               createPortal(
@@ -440,7 +458,6 @@ const DepartmentsTable = ({
         />
       </div>
 
-      {/* Pagination Block Container completely converted to a transparent context item layout */}
       <div className="flex items-center justify-center mt-6 w-full bg-transparent">
         <Pagination
           currentPage={currentPage}

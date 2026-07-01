@@ -65,8 +65,15 @@ const EmployeesTable: React.FC<EmployeesTableProps> = ({
         limit: itemsPerPage,
         search: debouncedSearch,
       });
-      setEmployees(data);
-      setTotalEmployees(total);
+      
+      const onlyEmployees = data.filter(
+        (user) => user.role !== "COMPANY_ADMIN"
+      );
+      
+      setEmployees(onlyEmployees);
+      
+      setTotalEmployees(total - (data.length - onlyEmployees.length));
+
     } catch (error) {
       toast.error("Failed to load employees");
     } finally {

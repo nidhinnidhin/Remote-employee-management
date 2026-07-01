@@ -2,7 +2,6 @@
 
 import { Filter, UserPlus, Users, Search } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import EmployeeStats from "./EmployeeStats";
 import Button from "../../ui/Button";
 import InviteEmployeeModal from "../modals/InviteEmployeeModal";
 import { InviteEmployeePayload } from "@/shared/types/company/employees/auth/invite-employee-payload.type";
@@ -83,8 +82,6 @@ const Header: React.FC<HeaderProps> = ({ onInviteSuccess, onSearch }) => {
           </Button>
         </div>
       </div>
-
-      <EmployeeStats />
 
       <InviteEmployeeModal
         isOpen={isInviteOpen}

@@ -78,16 +78,16 @@ const AdminRegistrationForm: React.FC<AdminRegistrationFormProps> = ({
     const firstName = formData.firstName.trim();
     if (!firstName) {
       validationErrors.firstName = "First name is required";
-    } else if (!/^[a-zA-Z\s-]{2,50}$/.test(firstName)) {
-      validationErrors.firstName = "First name contains invalid characters";
+    } else if (!/^(?=.*[a-zA-Z])[a-zA-Z\s-]{2,50}$/.test(firstName)) {
+      validationErrors.firstName = "First name must contain letters and be between 2-50 characters";
     }
 
     // 2. Last Name Validation
     const lastName = formData.lastName.trim();
     if (!lastName) {
       validationErrors.lastName = "Last name is required";
-    } else if (!/^[a-zA-Z\s-]{2,50}$/.test(lastName)) {
-      validationErrors.lastName = "Last name contains invalid characters";
+    } else if (!/^(?=.*[a-zA-Z])[a-zA-Z\s-]{2,50}$/.test(lastName)) {
+      validationErrors.lastName = "Last name must contain letters and be between 2-50 characters";
     }
 
     // 3. Email Validation

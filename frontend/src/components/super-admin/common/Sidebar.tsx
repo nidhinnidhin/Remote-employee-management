@@ -13,12 +13,17 @@ import {
   Settings,
   FileText,
 } from "lucide-react";
+import Image from "next/image";
 
 export default function Sidebar() {
   const pathname = usePathname();
 
   const navigation = [
-    { name: "Companies", href: FRONTEND_ROUTES.SUPER_ADMIN.COMPANIES, icon: Building2 },
+    {
+      name: "Companies",
+      href: FRONTEND_ROUTES.SUPER_ADMIN.COMPANIES,
+      icon: Building2,
+    },
     {
       name: "Subscription Plans",
       href: FRONTEND_ROUTES.SUPER_ADMIN.SUBSCRIPTIONS,
@@ -33,14 +38,15 @@ export default function Sidebar() {
         className="h-16 flex items-center px-6"
         style={{ borderBottom: "1px solid rgb(var(--color-sidebar-border))" }}
       >
-        <div className="flex items-center gap-2">
-          <div
-            className="p-1.5 rounded-lg"
-            style={{ backgroundColor: "rgb(var(--color-accent))" }}
-          >
-            <span className="text-white font-bold text-lg">IH</span>
-          </div>
-          <span className="sidebar-logo-text text-lg">IssueHub</span>
+        <div className="flex items-center justify-center w-full">
+          <Image
+            src="/images/stafflow-logo.png"
+            alt="Staffflow"
+            width={200}
+            height={70}
+            priority
+            // className="h-10 w-auto object-contain"
+          />
         </div>
       </div>
 
@@ -55,8 +61,9 @@ export default function Sidebar() {
             <Link
               key={item.name}
               href={item.href}
-              className={`sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive ? "active" : ""
-                }`}
+              className={`sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                isActive ? "active" : ""
+              }`}
             >
               <Icon size={20} strokeWidth={1.5} />
               {item.name}

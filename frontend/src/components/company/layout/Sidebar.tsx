@@ -19,39 +19,72 @@ import {
   ChevronRight,
   X,
   Shield,
-  Settings2
+  Settings2,
 } from "lucide-react";
 import { SidebarProps } from "@/shared/types/company/layout/sidebar-props.type";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 // Reference-style grouping for the Admin Sidebar
 const navigationGroups = [
   {
     title: "Overview",
     items: [
-      { label: "Dashboard", icon: LayoutDashboard, href: FRONTEND_ROUTES.ADMIN.DASHBOARD },
-      { label: "Employees", icon: Users, href: FRONTEND_ROUTES.ADMIN.EMPLOYEES },
+      {
+        label: "Dashboard",
+        icon: LayoutDashboard,
+        href: FRONTEND_ROUTES.ADMIN.DASHBOARD,
+      },
+      {
+        label: "Employees",
+        icon: Users,
+        href: FRONTEND_ROUTES.ADMIN.EMPLOYEES,
+      },
     ],
   },
   {
     title: "Management",
     items: [
-      { label: "Departments", icon: Building2, href: FRONTEND_ROUTES.COMPANY.DEPARTMENTS },
-      { label: "Projects", icon: FolderOpen, href: FRONTEND_ROUTES.COMPANY.PROJECTS },
+      {
+        label: "Departments",
+        icon: Building2,
+        href: FRONTEND_ROUTES.COMPANY.DEPARTMENTS,
+      },
+      {
+        label: "Projects",
+        icon: FolderOpen,
+        href: FRONTEND_ROUTES.COMPANY.PROJECTS,
+      },
     ],
   },
   {
     title: "Communication",
     items: [
-      { label: "Meeting", icon: MessageSquare, href: FRONTEND_ROUTES.COMPANY.DISCUSSIONS },
-      { label: "Attendance & Leave", icon: CalendarDays, href: FRONTEND_ROUTES.COMPANY.ATTENDANCE },
+      {
+        label: "Meeting",
+        icon: MessageSquare,
+        href: FRONTEND_ROUTES.COMPANY.DISCUSSIONS,
+      },
+      {
+        label: "Attendance & Leave",
+        icon: CalendarDays,
+        href: FRONTEND_ROUTES.COMPANY.ATTENDANCE,
+      },
     ],
   },
   {
     title: "Organization",
     items: [
-      { label: "Activity Logs", icon: FileText, href: FRONTEND_ROUTES.COMPANY.AUDIT_LOGS },
-      { label: "Company Policy", icon: Shield, href: FRONTEND_ROUTES.ADMIN.COMPANY_POLICY },
+      {
+        label: "Activity Logs",
+        icon: FileText,
+        href: FRONTEND_ROUTES.COMPANY.AUDIT_LOGS,
+      },
+      {
+        label: "Company Policy",
+        icon: Shield,
+        href: FRONTEND_ROUTES.ADMIN.COMPANY_POLICY,
+      },
     ],
   },
 ];
@@ -81,27 +114,35 @@ const Sidebar: React.FC<SidebarProps> = ({
           isMobileOpen ? "translate-x-0" : "-translate-x-full",
           "lg:translate-x-0",
           isCollapsed ? "lg:w-20" : "lg:w-64",
-          "w-64"
+          "w-64",
         )}
       >
         {/* Header - Aligned with Reference */}
         <div
           className="h-16 flex items-center justify-between px-6 border-b"
-          style={{ borderBottomColor: "rgb(var(--color-sidebar-border) / 0.1)" }}
+          style={{
+            borderBottomColor: "rgb(var(--color-sidebar-border) / 0.1)",
+          }}
         >
           <div className="flex items-center min-w-0">
-            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/20">
-              <Building2 size={18} className="text-white" strokeWidth={2.5} />
-            </div>
-            {!isCollapsed && (
-              <span className="ml-3 font-black text-sm tracking-tighter uppercase truncate text-sidebar-text">
-                Workspace <span className="opacity-60">Admin</span>
-              </span>
-            )}
+            <Image
+              src="/images/stafflow-logo.png"
+              alt="Stafflow"
+              width={200}
+              height={60}
+              priority
+              className={cn(
+                "transition-all duration-300 object-contain",
+                isCollapsed ? "w-10 h-10" : "w-40 h-auto",
+              )}
+            />
           </div>
 
           {/* Mobile Close */}
-          <button onClick={closeMobileSidebar} className="lg:hidden p-1 text-sidebar-text/60">
+          <button
+            onClick={closeMobileSidebar}
+            className="lg:hidden p-1 text-sidebar-text/60"
+          >
             <X size={20} />
           </button>
         </div>
@@ -112,14 +153,22 @@ const Sidebar: React.FC<SidebarProps> = ({
             "hidden lg:flex items-center justify-center absolute -right-3 top-12 z-[60]",
             "w-6 h-6 rounded-full border border-white/10 transition-all duration-300 group",
             "bg-[#08090a] shadow-[0_0_10px_rgba(0,0,0,0.5)] hover:shadow-indigo-500/20",
-            "hover:scale-110 hover:border-indigo-500/50"
+            "hover:scale-110 hover:border-indigo-500/50",
           )}
         >
-          <div className={cn(
-            "transition-colors",
-            isCollapsed ? "text-indigo-500" : "text-slate-500 group-hover:text-white"
-          )}>
-            {isCollapsed ? <ChevronRight size={12} strokeWidth={3} /> : <ChevronLeft size={12} strokeWidth={3} />}
+          <div
+            className={cn(
+              "transition-colors",
+              isCollapsed
+                ? "text-indigo-500"
+                : "text-slate-500 group-hover:text-white",
+            )}
+          >
+            {isCollapsed ? (
+              <ChevronRight size={12} strokeWidth={3} />
+            ) : (
+              <ChevronLeft size={12} strokeWidth={3} />
+            )}
           </div>
         </button>
 
@@ -141,7 +190,9 @@ const Sidebar: React.FC<SidebarProps> = ({
                     href={item.href}
                     className={cn(
                       "sidebar-link group flex items-center justify-between px-3 py-2 rounded-lg transition-all duration-200",
-                      isActive ? "active font-bold" : "opacity-70 hover:opacity-100"
+                      isActive
+                        ? "active font-bold"
+                        : "opacity-70 hover:opacity-100",
                     )}
                     title={isCollapsed ? item.label : ""}
                   >
@@ -149,7 +200,9 @@ const Sidebar: React.FC<SidebarProps> = ({
                       <item.icon
                         size={18}
                         strokeWidth={isActive ? 2.5 : 1.5}
-                        className={cn(isActive ? "text-indigo-500" : "text-sidebar-text/60")}
+                        className={cn(
+                          isActive ? "text-indigo-500" : "text-sidebar-text/60",
+                        )}
                       />
                       {!isCollapsed && (
                         <span className="text-[13px] tracking-tight whitespace-nowrap overflow-hidden">
@@ -170,12 +223,17 @@ const Sidebar: React.FC<SidebarProps> = ({
         </nav>
 
         {/* Bottom Profile Section - SaaS Classic */}
-        <div className="p-4 border-t" style={{ borderTopColor: "rgb(var(--color-sidebar-border) / 0.1)" }}>
+        <div
+          className="p-4 border-t"
+          style={{ borderTopColor: "rgb(var(--color-sidebar-border) / 0.1)" }}
+        >
           <Link href={FRONTEND_ROUTES.ADMIN.PROFILE || "/admin/profile"}>
-            <div className={cn(
-              "flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition-colors group cursor-pointer",
-              isCollapsed && "justify-center"
-            )}>
+            <div
+              className={cn(
+                "flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition-colors group cursor-pointer",
+                isCollapsed && "justify-center",
+              )}
+            >
               <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-[10px] font-bold text-indigo-700 uppercase shrink-0">
                 AD
               </div>
@@ -183,9 +241,14 @@ const Sidebar: React.FC<SidebarProps> = ({
                 <>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-bold truncate">Admin User</p>
-                    <p className="text-[10px] opacity-50 truncate font-medium">Company Manager</p>
+                    <p className="text-[10px] opacity-50 truncate font-medium">
+                      Company Manager
+                    </p>
                   </div>
-                  <Settings2 size={14} className="opacity-40 group-hover:opacity-100 transition-opacity" />
+                  <Settings2
+                    size={14}
+                    className="opacity-40 group-hover:opacity-100 transition-opacity"
+                  />
                 </>
               )}
             </div>

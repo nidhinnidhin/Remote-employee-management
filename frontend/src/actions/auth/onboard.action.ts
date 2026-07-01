@@ -1,7 +1,7 @@
 "use server";
 
 import { getSession } from "@/lib/iron-session/getSession";
-import { clientApi as api } from "@/lib/axios/axiosClient";
+import { serverActionApi as api } from "@/lib/axios/axiosServer";
 import { AuthActionResult } from "@/shared/types/company/auth/company-login/login-response.type";
 import { setRefreshTokenCookie, setAccessTokenCookie } from "@/lib/auth/cookies";
 import { COOKIE_KEYS } from "@/shared/constants/temp/cookie-keys";

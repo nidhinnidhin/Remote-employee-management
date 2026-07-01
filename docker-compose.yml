@@ -10,31 +10,19 @@ services:
     ports:
       - "4000:4000"
 
-  # frontend:
-  #   image: nidhintech/nexus-frontend:latest
-  #   command: pnpm start
-  #   env_file:
-  #     - ./frontend/.env
-  #   restart: unless-stopped
-  #   ports:
-  #     - "3001:3000"
-
   frontend:
-  build:
-    context: ./frontend
-    args:
-      NEXT_PUBLIC_API_URL: https://stafflow-api.nidhintech.site/api
-      NEXT_PUBLIC_RAZORPAY_KEY_ID: rzp_test_SlhJwHElHKOoQI
-
-  image: nidhintech/nexus-frontend:latest
-
-  env_file:
-    - ./frontend/.env
-
-  restart: unless-stopped
-
-  ports:
-    - "3000:3000"
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: https://stafflow-api.nidhintech.site/api
+        # NEXT_PUBLIC_API_URL: http://localhost:4000/api
+        NEXT_PUBLIC_RAZORPAY_KEY_ID: rzp_test_SlhJwHElHKOoQI
+    image: nidhintech/nexus-frontend:latest
+    env_file:
+      - ./frontend/.env
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
 
   redis:
     image: redis:7-alpine

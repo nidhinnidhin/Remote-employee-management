@@ -26,7 +26,11 @@ async function bootstrap() {
   app.use(cookieParser());
 
   app.enableCors({
-    origin: true,
+    origin: [
+      'http://localhost:3000',           // local Docker / dev
+      'https://stafflow.nidhintech.site', // production frontend
+      process.env.FRONTEND_URL,          // from .env (fallback)
+    ].filter(Boolean) as string[],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
     allowedHeaders: 'Content-Type, Accept, Authorization',

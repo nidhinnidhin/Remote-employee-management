@@ -1,20 +1,36 @@
-import { getSession } from "@/lib/iron-session/getSession";
+import { getIronSession } from "iron-session";
+import { SessionData, sessionOptions } from "@/lib/iron-session/session";
 import { NextRequest, NextResponse } from "next/server";
 import { getRedirectForRole } from "@/lib/auth/auth-constants";
 import { API_ROUTES } from "@/constants/api.routes";
 import { FRONTEND_ROUTES } from "@/constants/frontend.routes";
 
-const BACKEND_URL = process.env.API_URL_INTERNAL;
+const BACKEND_URL = process.env.API_URL_INTERNAL || "http://backend:4000/api";
 console.log('---------------------------env', BACKEND_URL)
+console.log('PROXY ENV DEBUG:', {
+    LOCAL_DEV: process.env.LOCAL_DEV,
+    NODE_ENV: process.env.NODE_ENV,
+    HAS_SESSION_SECRET: !!process.env.SESSION_SECRET,
+    SESSION_SECRET_LENGTH: process.env.SESSION_SECRET ? process.env.SESSION_SECRET.length : 0
+});
+
 /**
  * Attempt to silently refresh the access token using the refresh_token cookie
  * OR the refresh token stored in the iron-session (whichever is available).
  * Returns the new access token string, or null if the refresh failed.
  */
-async function tryRefreshToken(req: NextRequest, sessionRefreshToken?: string): Promise<string | null> {
+async function tryRefreshToken(
+    req: NextRequest,
+    sessionRefreshToken?: string
+): Promise<string | null> {
     // Prefer the raw httpOnly cookie from the browser (set by the backend directly)
-    const refreshTokenCookie = req.cookies.get("refresh_token")?.value ?? sessionRefreshToken;
-    if (!refreshTokenCookie) return null;
+    const refreshTokenCookie =
+        req.cookies.get("refresh_token")?.value ?? sessionRefreshToken;
+
+    if (!refreshTokenCookie) {
+        console.log("PROXY: No refresh token available (cookie or session).");
+        return null;
+    }
 
     try {
         const refreshResponse = await fetch(
@@ -28,20 +44,32 @@ async function tryRefreshToken(req: NextRequest, sessionRefreshToken?: string): 
             }
         );
 
-        if (!refreshResponse.ok) return null;
+        if (!refreshResponse.ok) {
+            console.log(
+                "PROXY: Backend refresh returned non-ok status:",
+                refreshResponse.status
+            );
+            return null;
+        }
 
         const body = await refreshResponse.json();
-        // The backend returns { success: true, data: { accessToken } }
+        // The backend returns { success: true, data: { accessToken } } OR { accessToken }
         const newAccessToken = body?.data?.accessToken ?? body?.accessToken;
         return newAccessToken ?? null;
-    } catch {
+    } catch (err) {
+        console.error("PROXY: tryRefreshToken fetch error:", err);
         return null;
     }
 }
 
 export async function proxy(req: NextRequest) {
-    const session = await getSession();
     const { pathname } = req.nextUrl;
+
+    // ── Read session from the incoming request ────────────────────────────────
+    // iron-session v8 (3-arg form): reads from req, writes to res.
+    // We build a temporary response just to read the session.
+    const readRes = new NextResponse();
+    const session = await getIronSession<SessionData>(req, readRes, sessionOptions);
 
     console.log("PROXY:", {
         pathname,
@@ -131,12 +159,35 @@ export async function proxy(req: NextRequest) {
                 const newAccessToken = await tryRefreshToken(req, session.refreshToken);
 
                 if (newAccessToken) {
-                    // Refresh succeeded — update the session with the new token
-                    console.log("PROXY: Refresh successful, continuing request.");
-                    session.accessToken = newAccessToken;
-                    await session.save();
-                    // Let the request proceed; client-side axios will use the new cookie on next call
-                    return NextResponse.next();
+                    console.log("PROXY: Refresh successful, updating session and continuing.");
+
+                    // ✅ KEY FIX: use the 3-arg getIronSession(req, nextRes, options) form.
+                    //
+                    // In Next.js middleware we CANNOT write to the session by calling
+                    // session.save() on the session that was built from req.cookies — the
+                    // middleware response headers for Set-Cookie are silently dropped for the
+                    // encrypted `app_session` cookie.
+                    //
+                    // The correct pattern is:
+                    //   1. Create a NextResponse.next() that will be returned.
+                    //   2. Build a *new* iron-session against (req, thatResponse, options).
+                    //   3. Populate the session fields and call save() on it.
+                    //   4. iron-session appends Set-Cookie to thatResponse's headers.
+                    //   5. The browser receives the updated app_session cookie and all
+                    //      subsequent requests carry the new (valid) access token.
+                    const nextRes = NextResponse.next();
+                    const outSession = await getIronSession<SessionData>(req, nextRes, sessionOptions);
+
+                    outSession.accessToken = newAccessToken;
+                    outSession.refreshToken = session.refreshToken;
+                    outSession.userId = session.userId;
+                    outSession.role = session.role;
+                    outSession.email = session.email;
+                    outSession.companyId = session.companyId;
+                    outSession.isOnboarded = session.isOnboarded;
+                    await outSession.save();
+
+                    return nextRes;
                 }
 
                 // Refresh also failed — the user must log in again

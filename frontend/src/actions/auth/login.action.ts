@@ -5,7 +5,7 @@ import {
   setRefreshTokenCookie,
   setAccessTokenCookie,
 } from "@/lib/auth/cookies";
-import { clientApi as api } from "@/lib/axios/axiosClient";
+import { serverActionApi as api } from "@/lib/axios/axiosServer";
 import { getRedirectForRole } from "@/lib/auth/auth-constants";
 import { redirect } from "next/navigation";
 import {

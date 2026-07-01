@@ -11,6 +11,7 @@ import {
 } from "@/shared/types/superadmin/auth/login-form-data.type";
 import { loginAction } from "@/actions/auth/login.action";
 import { validateAdminLogin } from "@/lib/validations/client/auth/login-validation";
+import { getRedirectForRole } from "@/lib/auth/auth-constants";
 
 export default function SuperAdminLoginForm() {
   const [formData, setFormData] = useState<AdminLoginFormData>({
@@ -54,7 +55,11 @@ export default function SuperAdminLoginForm() {
         return;
       }
 
-      // Role-based redirect is handled by loginAction
+      if (result?.success && result.data?.user) {
+        const redirectUrl = getRedirectForRole(result.data.user.role);
+        router.push(redirectUrl);
+        return;
+      }
     } catch (err: any) {
       setErrors({ form: err.message || AUTH_MESSAGES.LOGIN_FAILED });
     } finally {

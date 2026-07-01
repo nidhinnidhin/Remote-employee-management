@@ -1,0 +1,28 @@
+# Local development overrides
+# Usage: docker compose -f docker-compose.yml -f docker-compose.local.yml up --build
+#
+# This file overrides the production docker-compose.yml for local development.
+# It replaces the production AWS API URL with localhost:4000 and injects
+# LOCAL_DEV=true so cookie code skips domain/secure/sameSite=none restrictions.
+
+services:
+  frontend:
+    image: nexus-frontend-local   # separate local image tag — never overwrites production
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:4000/api
+        NEXT_PUBLIC_RAZORPAY_KEY_ID: rzp_test_SlhJwHElHKOoQI
+    env_file:
+      - ./frontend/.env
+    environment:
+      # LOCAL_DEV=true bypasses production cookie settings (domain, secure, sameSite:none)
+      # The frontend Dockerfile hardcodes ENV NODE_ENV=production in its production stage.
+      # Next.js standalone server.js also re-enforces NODE_ENV=production at startup.
+      # So we CANNOT rely on NODE_ENV to detect local — LOCAL_DEV is our safe alternative.
+      LOCAL_DEV: "true"
+
+  backend:
+    image: nexus-backend-local    # separate local image tag — never overwrites production
+    # backend/.env already has NODE_ENV=development so backend cookies are already correct.
+    # No extra overrides needed here.

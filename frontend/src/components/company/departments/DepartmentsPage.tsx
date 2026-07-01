@@ -3,7 +3,6 @@
 import React from "react";
 import AdminLayoutWrapper from "../layout/AdminLayoutWrapper";
 import DepartmentsHeader from "./DepartmentsHeader";
-import DepartmentsStats from "./DepartmentsStats";
 import DepartmentsTable from "./DepartmentsTable";
 import ActionSidebar from "./ActionSidebar";
 
@@ -25,7 +24,6 @@ const DepartmentsPage = () => {
           onAdd={() => setIsAddModalOpen(true)} 
           onSearch={setSearchQuery}
         /> 
-        <DepartmentsStats />
         <div className="grid grid-cols-1 gap-6 pb-10">
           <div className="flex flex-col gap-6 min-w-0">
              <DepartmentsTable 

@@ -62,16 +62,16 @@ export const validateStepTwo = (formData: StepTwoFormData): StepTwoErrors => {
   const firstName = formData.firstName.trim();
   if (!firstName) {
     errors.firstName = "First name is required";
-  } else if (!/^[a-zA-Z\s-]{2,50}$/.test(firstName)) {
-    errors.firstName = "First name contains invalid characters";
+  } else if (!/^(?=.*[a-zA-Z])[a-zA-Z\s-]{2,50}$/.test(firstName)) {
+    errors.firstName = "First name must contain letters and be between 2-50 characters";
   }
 
   // Last Name
   const lastName = formData.lastName.trim();
   if (!lastName) {
     errors.lastName = "Last name is required";
-  } else if (!/^[a-zA-Z\s-]{2,50}$/.test(lastName)) {
-    errors.lastName = "Last name contains invalid characters";
+  } else if (!/^(?=.*[a-zA-Z])[a-zA-Z\s-]{2,50}$/.test(lastName)) {
+    errors.lastName = "Last name must contain letters and be between 2-50 characters";
   }
 
   // Email
@@ -101,7 +101,7 @@ export const validateStepTwo = (formData: StepTwoFormData): StepTwoErrors => {
     errors.password = "Password must contain at least one lowercase letter";
   } else if (!/[0-9]/.test(password)) {
     errors.password = "Password must contain at least one number";
-  } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+  } else if (!/[lor!@#$%^&*(),.?":{}|<>]/.test(password)) {
     errors.password = "Password must contain at least one special character";
   }
 
