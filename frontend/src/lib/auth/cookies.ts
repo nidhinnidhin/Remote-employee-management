@@ -33,9 +33,21 @@ export async function setAccessTokenCookie(token: string) {
 }
 
 export async function clearRefreshTokenCookie() {
-  (await cookies()).delete(COOKIE_KEYS.REFRESH_TOKEN);
+  (await cookies()).delete({
+    name: COOKIE_KEYS.REFRESH_TOKEN,
+    domain: isProd ? ".nidhintech.site" : undefined,
+    secure: isProd,
+    sameSite: SAME_SITE,
+    path: "/",
+  });
 }
 
 export async function clearAccessTokenCookie() {
-  (await cookies()).delete(COOKIE_KEYS.ACCESS_TOKEN);
+  (await cookies()).delete({
+    name: COOKIE_KEYS.ACCESS_TOKEN,
+    domain: isProd ? ".nidhintech.site" : undefined,
+    secure: isProd,
+    sameSite: SAME_SITE,
+    path: "/",
+  });
 }

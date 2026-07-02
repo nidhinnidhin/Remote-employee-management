@@ -173,7 +173,7 @@ export class AuthController {
   }
 
   @Post('logout')
-  @UseGuards(JwtAuthGuard) // 🔹 Fixed: Applied guard so req.user gets parsed before processing logs
+  @UseGuards(JwtAuthGuard) 
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const user = req.user as { userId: string, id: string, role: string, companyId: string };
 

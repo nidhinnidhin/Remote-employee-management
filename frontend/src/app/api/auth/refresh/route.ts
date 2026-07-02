@@ -37,8 +37,7 @@ export async function POST(req: NextRequest) {
       console.log("[/api/auth/refresh] Backend refresh failed:", backendResponse.status, errorBody);
 
       // Clear the stale session on permanent failure
-      session.accessToken = undefined;
-      await session.save();
+      session.destroy();
 
       return NextResponse.json(
         { message: "Refresh failed", detail: errorBody },

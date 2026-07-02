@@ -135,7 +135,8 @@ export async function proxy(req: NextRequest) {
 
             if (req.nextUrl.searchParams.get("error") === "suspended") {
                 const resp = NextResponse.next();
-                resp.cookies.delete("app_session");
+                const failSession = await getIronSession<SessionData>(req, resp, sessionOptions);
+                failSession.destroy();
                 return resp;
             }
 
@@ -196,7 +197,8 @@ export async function proxy(req: NextRequest) {
                     ? FRONTEND_ROUTES.SUPER_ADMIN.LOGIN
                     : FRONTEND_ROUTES.AUTH.LOGIN;
                 const redirResponse = NextResponse.redirect(new URL(loginPath, req.url));
-                redirResponse.cookies.delete("app_session");
+                const failSession = await getIronSession<SessionData>(req, redirResponse, sessionOptions);
+                failSession.destroy();
                 return redirResponse;
             }
 
@@ -205,7 +207,8 @@ export async function proxy(req: NextRequest) {
                 const isBlocked = data.message?.includes("blocked") || data.message?.includes("Blocked");
                 const errorType = isBlocked ? "blocked" : "suspended";
                 const redirResponse = NextResponse.redirect(new URL(`${FRONTEND_ROUTES.AUTH.LOGIN}?error=${errorType}`, req.url));
-                redirResponse.cookies.delete("app_session");
+                const failSession = await getIronSession<SessionData>(req, redirResponse, sessionOptions);
+                failSession.destroy();
                 return redirResponse;
             }
         } catch (error) {

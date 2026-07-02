@@ -24,9 +24,9 @@ export async function logoutAction() {
     session.destroy();
 
     // 3️⃣ Clear access and refresh cookies from client-side if they still exist
-    const cookieStore = await cookies();
-    cookieStore.delete(COOKIE_KEYS.ACCESS_TOKEN);
-    cookieStore.delete(COOKIE_KEYS.REFRESH_TOKEN);
+    const { clearAccessTokenCookie, clearRefreshTokenCookie } = await import("@/lib/auth/cookies");
+    await clearAccessTokenCookie();
+    await clearRefreshTokenCookie();
 
     // 4️⃣ Redirect based on role
     if (role === "SUPER_ADMIN") {
