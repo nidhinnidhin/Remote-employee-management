@@ -7,6 +7,7 @@ import { OTP_MESSAGES } from "@/shared/constants/messages/otp.messages";
 import { OtpModalProps } from "@/shared/types/otp/otp-modal-props.type";
 import { useOtpTimer } from "@/hooks/otp/use-otp-timer";
 import OtpInput from "@/components/ui/OtpInput";
+import { LOCAL_STORAGE_KEYS } from "@/shared/constants/temp/local-storage-keys";
 
 const OtpModal = ({
   isOpen,
@@ -22,12 +23,23 @@ const OtpModal = ({
 
   const { remaining, expired, startTimer } = useOtpTimer();
 
-  // When a server error arrives (wrong OTP, expired, etc.), clear the
-  // boxes and refocus box 1 so the user can immediately type the correct code.
+  // 1. Automatically start a 60-second timer when the modal opens (only if none running)
+  useEffect(() => {
+    if (isOpen) {
+      // ✅ Fix: use LOCAL_STORAGE_KEYS constant (value: "otp_expiry_time") not
+      //    the literal string "OTP_TIMER_EXPIRY_KEY" which is the constant NAME.
+      const activeExpiry = localStorage.getItem(LOCAL_STORAGE_KEYS.OTP_TIMER_EXPIRY_KEY);
+      if (!activeExpiry) {
+        startTimer(60);
+      }
+    }
+  }, [isOpen]);
+
+  // 2. When a server error arrives, show it but do NOT clear the OTP.
+  //    Clearing the OTP forces the user to re-type all 6 digits on every failed attempt.
   useEffect(() => {
     if (error) {
-      setOtp("");        // triggers OtpInput's own useEffect → focuses box 1
-      setLocalError(""); // dismiss any "must be 6 digits" notice
+      setLocalError(""); // clear any previous local validation message
     }
   }, [error]);
 
@@ -39,16 +51,17 @@ const OtpModal = ({
 
     setLocalError("");
     await onVerify(otp);
-    // otp is NOT pre-cleared here; the useEffect above handles it if an
-    // error comes back from the parent. On success the modal closes anyway.
   };
 
   const handleResend = async () => {
-    await onResend(); // backend call
-    startTimer(300);  // restart 5-minute timer after resend
+    await onResend();
+    startTimer(60);
     setOtp("");
     setLocalError("");
   };
+
+  // Combine server error and local validation error into one display value
+  const displayError = localError || error || "";
 
   return (
     <BaseModal
@@ -65,7 +78,10 @@ const OtpModal = ({
           <Button
             variant="primary"
             onClick={handleVerify}
-            disabled={loading || expired}
+            // ✅ Fix: removed `|| expired` — the backend has its own TTL.
+            //    The UI countdown is only informational. Blocking submit once the
+            //    frontend timer expires prevents users from verifying a still-valid OTP.
+            disabled={loading}
           >
             {loading ? "Verifying..." : "Verify"}
           </Button>
@@ -77,11 +93,16 @@ const OtpModal = ({
         value={otp}
         onChange={(val) => {
           setOtp(val);
-          // clear local "6-digit" hint once user starts typing
           if (localError) setLocalError("");
         }}
-        error={localError || error}
+        error={displayError}
       />
+
+      {displayError && (
+        <p className="mt-2 text-sm text-center text-red-500 font-medium">
+          {displayError}
+        </p>
+      )}
 
       <div className="mt-3 text-sm text-center">
         {!expired ? (
@@ -90,7 +111,7 @@ const OtpModal = ({
             <span className="font-semibold text-accent">{remaining}s</span>
           </p>
         ) : (
-          <p className="text-danger">OTP expired. Please resend.</p>
+          <p className="text-red-500">OTP expired. Please resend.</p>
         )}
       </div>
 

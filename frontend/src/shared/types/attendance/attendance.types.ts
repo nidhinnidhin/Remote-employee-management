@@ -23,4 +23,13 @@ export interface AttendanceLog {
   lateReason?: string;
   approvalStatus?: 'PENDING' | 'APPROVED' | 'REJECTED' | null;
   adminRemarks?: string;
+  earlyOutReason?: string;
+  earlyOutApprovalStatus?: 'PENDING' | 'APPROVED' | 'REJECTED' | null;
+  earlyOutAdminRemarks?: string;
+  pendingBreakRequest?: {
+    breakType: 'TEA' | 'LUNCH' | 'EVENING_TEA';
+    reason: string;
+    status: 'PENDING' | 'APPROVED' | 'REJECTED';
+    adminRemarks?: string;
+  } | null;
 }

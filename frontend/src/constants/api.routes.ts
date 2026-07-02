@@ -113,6 +113,10 @@ export const API_ROUTES = {
     ADMIN_LOGS: "/attendance/admin/logs",
     DETAIL: (id: string) => `/attendance/logs/${id}`,
     DECIDE_REQUEST: "/attendance/admin/decide-request",
+    DECIDE_EARLY_OUT: "/attendance/admin/decide-early-out",
+    DECIDE_BREAK: "/attendance/admin/decide-break",
+    REQUEST_EARLY_OUT: "/attendance/request-early-out",
+    REQUEST_BREAK: "/attendance/request-break",
   },
   LEAVES: {
     APPLY: "/leaves/apply",

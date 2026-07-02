@@ -8,6 +8,7 @@ import SubscriptionStep from "./SubscriptionStep";
 import ConfirmationStep from "./ConfirmationStep";
 import { onboardAction, getOnboardingStatusAction, finalizeOnboardingAction } from "@/actions/auth/onboard.action";
 import { ArrowRight, ArrowLeft, Check, Loader2, Rocket } from "lucide-react";
+import type { SubscriptionPlan } from "@/shared/types/superadmin/subscription/subscription.type";
 
 const steps = [
     { title: "Organization", number: 1 },
@@ -34,8 +35,16 @@ const OnboardingStepper: React.FC = () => {
         subscription: {
             planId: "",
             planName: "Professional",
+        },
+        user: {
+            firstName: "",
+            lastName: "",
+            email: "",
         }
     });
+
+    // Stores the full plan object so ConfirmationStep can show price, features, etc.
+    const [selectedPlanDetails, setSelectedPlanDetails] = useState<SubscriptionPlan | null>(null);
 
     React.useEffect(() => {
         const userIdFromUrl = searchParams.get("userId");
@@ -77,6 +86,17 @@ const OnboardingStepper: React.FC = () => {
                     }));
                 }
 
+                if (user) {
+                    setOnboardingData(prev => ({
+                        ...prev,
+                        user: {
+                            firstName: user.firstName || "",
+                            lastName: user.lastName || "",
+                            email: user.email || "",
+                        }
+                    }));
+                }
+
                 // Map backend step to stepper number
                 const stepMap: Record<string, number> = {
                     'ORGANIZATION': 1,
@@ -106,24 +126,47 @@ const OnboardingStepper: React.FC = () => {
         }
     };
 
-    const handleSubscriptionChange = (planId: string, planName: string) => {
+    const handleSubscriptionChange = (planId: string, planName: string, planDetails?: SubscriptionPlan) => {
         setOnboardingData(prev => ({
             ...prev,
             subscription: { planId, planName }
         }));
+        if (planDetails) setSelectedPlanDetails(planDetails);
     };
 
     const validateStep = (step: number) => {
         const newErrors: any = {};
         if (step === 1) {
-            if (!onboardingData.company.name) newErrors.name = "Company name is required";
-            if (!onboardingData.company.email) {
-                newErrors.email = "Company email is required";
-            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(onboardingData.company.email)) {
-                newErrors.email = "Please enter a valid email address";
+            const name = onboardingData.company.name.trim();
+
+            if (!name) {
+                newErrors.name = "Company name is required";
+            } else if (name.length < 2) {
+                newErrors.name = "Company name must be at least 2 characters";
+            } else if (name.length > 100) {
+                newErrors.name = "Company name must not exceed 100 characters";
+            } else if (!/^[a-zA-Z0-9\s.,&'-]+$/.test(name)) {
+                newErrors.name = "Company name contains invalid characters";
+            } else if (/^[^a-zA-Z0-9]+$/.test(name)) {
+                newErrors.name = "Company name must contain at least one letter or number";
             }
-            if (!onboardingData.company.size) newErrors.size = "Please select employee size";
-            if (!onboardingData.company.industry) newErrors.industry = "Please select industry";
+
+            if (!onboardingData.company.email) {
+                newErrors.email = "Business email is required";
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(onboardingData.company.email)) {
+                newErrors.email = "Please enter a valid business email address";
+            }
+
+            if (!onboardingData.company.size) newErrors.size = "Please select team size";
+            if (!onboardingData.company.industry) newErrors.industry = "Please select an industry";
+
+            // Website is optional — but if filled, it must look like a URL
+            if (onboardingData.company.website) {
+                const website = onboardingData.company.website.trim();
+                if (!/^https?:\/\/.+\..+/.test(website)) {
+                    newErrors.website = "Please enter a valid URL (e.g. https://acme.com)";
+                }
+            }
         }
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -281,7 +324,12 @@ const OnboardingStepper: React.FC = () => {
                             )}
 
                             {currentStep === 3 && (
-                                <ConfirmationStep />
+                                <ConfirmationStep
+                                    company={onboardingData.company}
+                                    plan={selectedPlanDetails}
+                                    planName={onboardingData.subscription.planName}
+                                    user={onboardingData.user}
+                                />
                             )}
 
                             {errors.form && (

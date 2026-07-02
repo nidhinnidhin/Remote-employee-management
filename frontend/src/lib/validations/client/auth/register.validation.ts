@@ -81,12 +81,14 @@ export const validateStepTwo = (formData: StepTwoFormData): StepTwoErrors => {
     errors.email = "Invalid email format";
   }
 
-  // Phone (10 digits only)
-  const normalizedPhone = formData.phone.replace(/\D/g, "");
-  if (!normalizedPhone) {
+  // Phone (Strict 10 digits only, no symbols/spaces, no all-zeros)
+  const phone = formData.phone;
+  if (!phone) {
     errors.phone = "Phone number is required";
-  } else if (normalizedPhone.length !== 10) {
-    errors.phone = "Phone number must be exactly 10 digits";
+  } else if (!/^\d{10}$/.test(phone)) {
+    errors.phone = "Phone number must be exactly 10 digits and contain only numbers";
+  } else if (parseInt(phone, 10) === 0) {
+    errors.phone = "Invalid phone number sequence";
   }
 
   // Password

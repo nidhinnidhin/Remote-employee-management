@@ -17,6 +17,16 @@ interface AdminAttendanceTableProps {
     status: "APPROVED" | "REJECTED",
     remarks: string
   ) => Promise<void>;
+  onDecideEarlyOutRequest: (
+    attendanceId: string,
+    status: "APPROVED" | "REJECTED",
+    remarks: string
+  ) => Promise<void>;
+  onDecideBreakRequest: (
+    attendanceId: string,
+    status: "APPROVED" | "REJECTED",
+    remarks: string
+  ) => Promise<void>;
 }
 
 export const AdminAttendanceTable: React.FC<AdminAttendanceTableProps> = ({
@@ -27,6 +37,8 @@ export const AdminAttendanceTable: React.FC<AdminAttendanceTableProps> = ({
   onPageChange,
   onSelectLog,
   onDecideRequest,
+  onDecideEarlyOutRequest,
+  onDecideBreakRequest,
 }) => {
   const [expandedLogId, setExpandedLogId] = useState<string | null>(null);
   const [adminRemarks, setAdminRemarks] = useState("");
@@ -36,6 +48,32 @@ export const AdminAttendanceTable: React.FC<AdminAttendanceTableProps> = ({
     try {
       setSubmitting(true);
       await onDecideRequest(logId, decisionStatus, adminRemarks);
+      setExpandedLogId(null);
+      setAdminRemarks("");
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDecideEarlyOut = async (logId: string, decisionStatus: "APPROVED" | "REJECTED") => {
+    try {
+      setSubmitting(true);
+      await onDecideEarlyOutRequest(logId, decisionStatus, adminRemarks);
+      setExpandedLogId(null);
+      setAdminRemarks("");
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDecideBreak = async (logId: string, decisionStatus: "APPROVED" | "REJECTED") => {
+    try {
+      setSubmitting(true);
+      await onDecideBreakRequest(logId, decisionStatus, adminRemarks);
       setExpandedLogId(null);
       setAdminRemarks("");
     } catch (e) {
@@ -182,6 +220,44 @@ export const AdminAttendanceTable: React.FC<AdminAttendanceTableProps> = ({
                             )}
                           </div>
                         )}
+                        {log.earlyOutApprovalStatus && (
+                          <div className="flex flex-col gap-1 text-[10px] mt-1">
+                            {log.earlyOutApprovalStatus === "PENDING" && (
+                              <span className="text-amber-400 font-bold uppercase tracking-wider text-[8px] bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20 w-fit whitespace-nowrap">
+                                Early Out: Pending
+                              </span>
+                            )}
+                            {log.earlyOutApprovalStatus === "APPROVED" && (
+                              <span className="text-emerald-400 font-bold uppercase tracking-wider text-[8px] bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 w-fit whitespace-nowrap">
+                                Early Out: Approved
+                              </span>
+                            )}
+                            {log.earlyOutApprovalStatus === "REJECTED" && (
+                              <span className="text-rose-400 font-bold uppercase tracking-wider text-[8px] bg-rose-500/10 px-1.5 py-0.5 rounded border border-rose-500/20 w-fit whitespace-nowrap">
+                                Early Out: Rejected
+                              </span>
+                            )}
+                          </div>
+                        )}
+                        {log.pendingBreakRequest && (
+                          <div className="flex flex-col gap-1 text-[10px] mt-1">
+                            {log.pendingBreakRequest.status === "PENDING" && (
+                              <span className="text-amber-400 font-bold uppercase tracking-wider text-[8px] bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20 w-fit whitespace-nowrap">
+                                Break: Pending
+                              </span>
+                            )}
+                            {log.pendingBreakRequest.status === "APPROVED" && (
+                              <span className="text-emerald-400 font-bold uppercase tracking-wider text-[8px] bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 w-fit whitespace-nowrap">
+                                Break: Approved
+                              </span>
+                            )}
+                            {log.pendingBreakRequest.status === "REJECTED" && (
+                              <span className="text-rose-400 font-bold uppercase tracking-wider text-[8px] bg-rose-500/10 px-1.5 py-0.5 rounded border border-rose-500/20 w-fit whitespace-nowrap">
+                                Break: Rejected
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </td>
                     <td className="px-6 py-3.5 text-left text-sm font-semibold tabular-nums text-rose-400 whitespace-nowrap">
@@ -198,7 +274,7 @@ export const AdminAttendanceTable: React.FC<AdminAttendanceTableProps> = ({
                     </td>
                     <td className="px-6 py-3.5 text-right">
                       <div className="flex items-center justify-end gap-2 whitespace-nowrap">
-                        {log.approvalStatus === "PENDING" && (
+                        {(log.approvalStatus === "PENDING" || log.earlyOutApprovalStatus === "PENDING" || log.pendingBreakRequest?.status === "PENDING") && (
                           <button
                             onClick={() => {
                               if (isExpanded) {
@@ -232,58 +308,125 @@ export const AdminAttendanceTable: React.FC<AdminAttendanceTableProps> = ({
                   {isExpanded && (
                     <tr className="bg-amber-500/[0.02] border-b border-white/[0.06]">
                       <td colSpan={8} className="px-8 py-6">
-                        <div className="flex flex-col md:flex-row gap-8 items-start justify-between max-w-[1200px] mx-auto">
-                          <div className="space-y-4 max-w-md text-left w-full">
-                            <div>
-                              <span className="inline-block px-2 py-0.5 rounded text-[9px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20 uppercase tracking-widest">
-                                Late Clock-In Appeal
-                              </span>
-                              <h4 className="text-base font-bold text-white mt-1.5">Reviewing Request</h4>
+                        <div className="flex flex-col gap-6 max-w-[1200px] mx-auto">
+                          
+                          {/* LATE CHECK-IN REVIEW */}
+                          {log.approvalStatus === "PENDING" && (
+                            <div className="flex flex-col md:flex-row gap-8 items-start justify-between border-b border-white/[0.04] pb-6">
+                              <div className="space-y-4 max-w-md text-left w-full">
+                                <div>
+                                  <span className="inline-block px-2 py-0.5 rounded text-[9px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20 uppercase tracking-widest">
+                                    Late Clock-In Request
+                                  </span>
+                                  <h4 className="text-base font-bold text-white mt-1.5">Reviewing Request</h4>
+                                </div>
+                                <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.04] space-y-1.5">
+                                  <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500 block">
+                                    Employee's Stated Reason
+                                  </span>
+                                  <p className="text-xs text-amber-300 italic font-medium leading-relaxed break-words">
+                                    "{log.lateReason}"
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="flex-1 w-full md:max-w-md space-y-4 text-left">
+                                <div className="space-y-2">
+                                  <label className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block">
+                                    Administrative Remarks
+                                  </label>
+                                  <textarea
+                                    value={adminRemarks}
+                                    onChange={(e) => setAdminRemarks(e.target.value)}
+                                    disabled={submitting}
+                                    className="w-full min-h-[50px] p-2 text-xs bg-[#08090a]/45 border border-white/10 rounded-xl focus:border-accent/40 focus:ring-1 focus:ring-accent/40 text-slate-200 outline-none resize-none transition-all"
+                                  />
+                                </div>
+                                <div className="flex gap-3">
+                                  <button onClick={() => handleDecide(log.id, "APPROVED")} disabled={submitting} className="flex-1 h-8 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-[10px] font-bold uppercase">Approve</button>
+                                  <button onClick={() => handleDecide(log.id, "REJECTED")} disabled={submitting} className="flex-1 h-8 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-bold uppercase">Reject</button>
+                                </div>
+                              </div>
                             </div>
-                            <p className="text-xs text-slate-400 leading-relaxed">
-                              This employee clocked in late and is blocked from active shift tracking and break logging until this appeal is resolved.
-                            </p>
-                            <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.04] space-y-1.5">
-                              <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500 block">
-                                Employee's Stated Reason
-                              </span>
-                              <p className="text-xs text-amber-300 italic font-medium leading-relaxed break-words">
-                                "{log.lateReason}"
-                              </p>
-                            </div>
-                          </div>
+                          )}
 
-                          <div className="flex-1 w-full md:max-w-md space-y-4 text-left">
-                            <div className="space-y-2">
-                              <label className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block">
-                                Administrative Remarks / Directives
-                              </label>
-                              <textarea
-                                value={adminRemarks}
-                                onChange={(e) => setAdminRemarks(e.target.value)}
-                                disabled={submitting}
-                                placeholder="e.g. Approved. Please make up the lost time / Rejected due to absence of dynamic policy parameters."
-                                className="w-full min-h-[90px] p-3 text-xs bg-[#08090a]/45 border border-white/10 rounded-xl focus:border-accent/40 focus:ring-1 focus:ring-accent/40 text-slate-200 placeholder-slate-600 outline-none resize-none transition-all"
-                              />
+                          {/* EARLY CLOCK-OUT REVIEW */}
+                          {log.earlyOutApprovalStatus === "PENDING" && (
+                            <div className="flex flex-col md:flex-row gap-8 items-start justify-between border-b border-white/[0.04] pb-6">
+                              <div className="space-y-4 max-w-md text-left w-full">
+                                <div>
+                                  <span className="inline-block px-2 py-0.5 rounded text-[9px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20 uppercase tracking-widest">
+                                    Early Clock-Out Appeal
+                                  </span>
+                                  <h4 className="text-base font-bold text-white mt-1.5">Reviewing Request</h4>
+                                </div>
+                                <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.04] space-y-1.5">
+                                  <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500 block">
+                                    Employee's Stated Reason
+                                  </span>
+                                  <p className="text-xs text-amber-300 italic font-medium leading-relaxed break-words">
+                                    "{log.earlyOutReason}"
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="flex-1 w-full md:max-w-md space-y-4 text-left">
+                                <div className="space-y-2">
+                                  <label className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block">
+                                    Administrative Remarks
+                                  </label>
+                                  <textarea
+                                    value={adminRemarks}
+                                    onChange={(e) => setAdminRemarks(e.target.value)}
+                                    disabled={submitting}
+                                    className="w-full min-h-[50px] p-2 text-xs bg-[#08090a]/45 border border-white/10 rounded-xl focus:border-accent/40 focus:ring-1 focus:ring-accent/40 text-slate-200 outline-none resize-none transition-all"
+                                  />
+                                </div>
+                                <div className="flex gap-3">
+                                  <button onClick={() => handleDecideEarlyOut(log.id, "APPROVED")} disabled={submitting} className="flex-1 h-8 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-[10px] font-bold uppercase">Approve</button>
+                                  <button onClick={() => handleDecideEarlyOut(log.id, "REJECTED")} disabled={submitting} className="flex-1 h-8 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-bold uppercase">Reject</button>
+                                </div>
+                              </div>
                             </div>
+                          )}
 
-                            <div className="flex gap-3">
-                              <button
-                                onClick={() => handleDecide(log.id, "APPROVED")}
-                                disabled={submitting}
-                                className="flex-1 h-10 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-slate-950 text-xs font-bold uppercase tracking-wider transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
-                              >
-                                Approve Check-In
-                              </button>
-                              <button
-                                onClick={() => handleDecide(log.id, "REJECTED")}
-                                disabled={submitting}
-                                className="flex-1 h-10 rounded-xl bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white text-xs font-bold uppercase tracking-wider transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
-                              >
-                                Reject Check-In
-                              </button>
+                          {/* BREAK REVIEW */}
+                          {log.pendingBreakRequest?.status === "PENDING" && (
+                            <div className="flex flex-col md:flex-row gap-8 items-start justify-between pb-2">
+                              <div className="space-y-4 max-w-md text-left w-full">
+                                <div>
+                                  <span className="inline-block px-2 py-0.5 rounded text-[9px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20 uppercase tracking-widest">
+                                    Out-of-Window Break Appeal
+                                  </span>
+                                  <h4 className="text-base font-bold text-white mt-1.5">Reviewing Request</h4>
+                                </div>
+                                <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.04] space-y-1.5">
+                                  <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500 block">
+                                    Employee's Stated Reason
+                                  </span>
+                                  <p className="text-xs text-amber-300 italic font-medium leading-relaxed break-words">
+                                    "{log.pendingBreakRequest.reason}"
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="flex-1 w-full md:max-w-md space-y-4 text-left">
+                                <div className="space-y-2">
+                                  <label className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block">
+                                    Administrative Remarks
+                                  </label>
+                                  <textarea
+                                    value={adminRemarks}
+                                    onChange={(e) => setAdminRemarks(e.target.value)}
+                                    disabled={submitting}
+                                    className="w-full min-h-[50px] p-2 text-xs bg-[#08090a]/45 border border-white/10 rounded-xl focus:border-accent/40 focus:ring-1 focus:ring-accent/40 text-slate-200 outline-none resize-none transition-all"
+                                  />
+                                </div>
+                                <div className="flex gap-3">
+                                  <button onClick={() => handleDecideBreak(log.id, "APPROVED")} disabled={submitting} className="flex-1 h-8 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-[10px] font-bold uppercase">Approve</button>
+                                  <button onClick={() => handleDecideBreak(log.id, "REJECTED")} disabled={submitting} className="flex-1 h-8 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-bold uppercase">Reject</button>
+                                </div>
+                              </div>
                             </div>
-                          </div>
+                          )}
+
                         </div>
                       </td>
                     </tr>

@@ -1,12 +1,5 @@
-import Landing from "@/components/company/landing/landing";
-import { Metadata } from "next";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-    title: "Employee management tool",
-};
-
-const LoginPage = () => {
-    return <Landing />;
-};
-
-export default LoginPage;
+export default function AuthPage() {
+  redirect("/auth/login");
+}

@@ -69,3 +69,32 @@ export const getMyLogs = async (
   const response = await api.get(API_ROUTES.ATTENDANCE.MY_LOGS, { params });
   return response.data;
 };
+
+export const requestEarlyOut = async (
+  reason: string,
+  api: AxiosInstance = clientApi
+): Promise<ClockInResult> => {
+  try {
+    const response = await api.post(API_ROUTES.ATTENDANCE.REQUEST_EARLY_OUT, { reason });
+    return { success: true, data: response.data };
+  } catch (err: unknown) {
+    const e = err as { response?: { data?: { message?: string } }; message?: string };
+    const errMsg = e.response?.data?.message || e.message || "Failed to submit early out request.";
+    return { success: false, error: errMsg };
+  }
+};
+
+export const requestBreak = async (
+  breakType: 'TEA' | 'LUNCH' | 'EVENING_TEA',
+  reason: string,
+  api: AxiosInstance = clientApi
+): Promise<ClockInResult> => {
+  try {
+    const response = await api.post(API_ROUTES.ATTENDANCE.REQUEST_BREAK, { breakType, reason });
+    return { success: true, data: response.data };
+  } catch (err: unknown) {
+    const e = err as { response?: { data?: { message?: string } }; message?: string };
+    const errMsg = e.response?.data?.message || e.message || "Failed to submit break request.";
+    return { success: false, error: errMsg };
+  }
+};

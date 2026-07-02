@@ -8,7 +8,7 @@ import { toast } from "sonner";
 
 interface SubscriptionStepProps {
   selectedPlan: string;
-  onSelect: (planId: string, planName: string) => void;
+  onSelect: (planId: string, planName: string, planDetails?: SubscriptionPlan) => void;
   companyId: string;
   userId: string;
   onPaymentSuccess: () => void;
@@ -62,7 +62,7 @@ const SubscriptionStep: React.FC<SubscriptionStepProps> = ({
   };
 
   const handleSubscribe = async (plan: SubscriptionPlan) => {
-    onSelect(plan.id, plan.name);
+    onSelect(plan.id, plan.name, plan); // Pass full plan so parent can build summary
     setIsProcessing(true);
 
     try {

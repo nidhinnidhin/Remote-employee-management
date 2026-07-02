@@ -9,13 +9,36 @@ import { LeaveDurationType, LeaveBalance } from "@/types/leave.types";
 import { toast } from "sonner";
 import { applyLeaveAction } from "@/actions/employee/leave.actions";
 
+interface BookedLeavePeriod {
+  startDate: string; // YYYY-MM-DD
+  endDate: string;   // YYYY-MM-DD
+}
+
 interface ApplyLeaveModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
   availableLeaveTypes: string[];
   balances: LeaveBalance[];
+  bookedLeaves?: BookedLeavePeriod[];
 }
+
+interface FormErrors {
+  leaveType?: string;
+  otherLeaveType?: string;
+  startDate?: string;
+  endDate?: string;
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
+  reason?: string;
+}
+
+const validatePhoneNumber = (phone: string): boolean => {
+  const numericRegex = /^\d{10}$/;
+  if (!numericRegex.test(phone)) return false;
+  if (/^0{10}$/.test(phone)) return false;
+  return true;
+};
 
 export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
   isOpen,
@@ -23,6 +46,7 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
   onSuccess,
   availableLeaveTypes,
   balances,
+  bookedLeaves = [],
 }) => {
   const [loading, setLoading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -33,11 +57,18 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
     otherLeaveType: "",
     startDate: "",
     endDate: "",
-    durationType: LeaveDurationType.FULL_DAY, // Locked to Full Day by default
+    durationType: LeaveDurationType.FULL_DAY,
     reason: "",
     emergencyContactName: "",
     emergencyContactPhone: "",
   });
+
+  const [errors, setErrors] = useState<FormErrors>({});
+
+  const todayStr = useMemo(() => {
+    const today = new Date();
+    return today.toISOString().split("T")[0];
+  }, []);
 
   const dynamicLeaveTypes = useMemo(() => {
     if (balances && balances.length > 0) {
@@ -58,12 +89,10 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
     ];
   }, [dynamicLeaveTypes]);
 
-  // Duration options restricted strictly to Full Day
   const durationOptions = [
     { label: "Full Day", value: LeaveDurationType.FULL_DAY },
   ];
 
-  // Reset form states completely when opening/closing the modal safely
   useEffect(() => {
     if (isOpen) {
       setFormData({
@@ -76,6 +105,7 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
         emergencyContactName: "",
         emergencyContactPhone: "",
       });
+      setErrors({});
       setSelectedFiles([]);
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
@@ -90,12 +120,62 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
     if (!formData.startDate || !formData.endDate) return 0;
     const start = new Date(formData.startDate);
     const end = new Date(formData.endDate);
+    if (start > end) return 0;
     const diffTime = Math.abs(end.getTime() - start.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-    return isNaN(diffDays) ? 0 : diffDays;
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
   };
 
   const totalDaysRequested = calculateTotalDays();
+
+  useEffect(() => {
+    const newErrors: FormErrors = {};
+
+    if (formData.startDate) {
+      if (formData.startDate < todayStr) {
+        newErrors.startDate = "Start date cannot be a past date.";
+      }
+    }
+
+    if (formData.endDate) {
+      if (formData.endDate < todayStr) {
+        newErrors.endDate = "End date cannot be a past date.";
+      }
+      if (formData.startDate && formData.endDate < formData.startDate) {
+        newErrors.endDate = "End date cannot be earlier than the start date.";
+      }
+    }
+
+    if (formData.startDate && !newErrors.startDate) {
+      const rangeEnd = formData.endDate && !newErrors.endDate
+        ? formData.endDate
+        : formData.startDate; // treat as single-day when endDate not yet set
+
+      const startReq = new Date(formData.startDate);
+      const endReq = new Date(rangeEnd);
+
+      const conflictingLeave = bookedLeaves.find((leave) => {
+        const existingStart = new Date(leave.startDate);
+        const existingEnd = new Date(leave.endDate);
+        return startReq <= existingEnd && endReq >= existingStart;
+      });
+
+      if (conflictingLeave) {
+        const msg = "You already have a leave request for this date — only one leave per day is allowed.";
+        newErrors.startDate = msg;
+        if (formData.endDate && !newErrors.endDate) {
+          newErrors.endDate = "Dates conflict with an existing leave request.";
+        }
+      }
+    }
+
+    if (formData.emergencyContactPhone) {
+      if (!validatePhoneNumber(formData.emergencyContactPhone)) {
+        newErrors.emergencyContactPhone = "Must be a valid 10-digit number (cannot be all 0s).";
+      }
+    }
+
+    setErrors(newErrors);
+  }, [formData.startDate, formData.endDate, formData.emergencyContactPhone, todayStr, bookedLeaves]);
 
   const balanceValidation = useMemo<{
     status: "ok" | "warning" | "exceeded" | "blocked";
@@ -110,7 +190,7 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
     if (allocated === 0)
       return {
         status: "blocked",
-        message: `No "${leaveLabel}" leaves allocated under the current company policy.`,
+        message: `No "${leaveLabel}" leaves allocated under current company policy.`,
       };
     if (available <= 0)
       return {
@@ -120,7 +200,7 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
     if (totalDaysRequested > available)
       return {
         status: "exceeded",
-        message: `Requesting ${totalDaysRequested} day(s) exceeds your available "${leaveLabel}" balance of ${available} day(s). Company policy limit: ${allocated} days.`,
+        message: `Requesting ${totalDaysRequested} day(s) exceeds your available "${leaveLabel}" balance of ${available} day(s).`,
       };
     if (available - totalDaysRequested <= 1 && totalDaysRequested > 0)
       return {
@@ -132,35 +212,27 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
 
   const isBlocked =
     balanceValidation.status === "blocked" ||
-    balanceValidation.status === "exceeded";
+    balanceValidation.status === "exceeded" ||
+    Object.keys(errors).length > 0;
 
   const usagePercent =
     currentBalance && currentBalance.allocated > 0
-      ? Math.min(
-          100,
-          Math.round(
-            ((currentBalance.consumed + currentBalance.pending) /
-              currentBalance.allocated) *
-              100
-          )
-        )
+      ? Math.min(100, Math.round(((currentBalance.consumed + currentBalance.pending) / currentBalance.allocated) * 100))
       : 0;
 
   const projectedPercent =
     currentBalance && currentBalance.allocated > 0
-      ? Math.min(
-          100,
-          Math.round(
-            ((currentBalance.consumed + currentBalance.pending + totalDaysRequested) /
-              currentBalance.allocated) *
-              100
-          )
-        )
+      ? Math.min(100, Math.round(((currentBalance.consumed + currentBalance.pending + totalDaysRequested) / currentBalance.allocated) * 100))
       : 0;
 
   const handleDropdownChange = (field: keyof typeof formData) => (e: any) => {
     const val = e?.target ? e.target.value : e;
     setFormData((prev) => ({ ...prev, [field]: val }));
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const cleanedValue = e.target.value.replace(/\D/g, "").slice(0, 10);
+    setFormData((prev) => ({ ...prev, emergencyContactPhone: cleanedValue }));
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -173,27 +245,31 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
     e.preventDefault();
 
     if (!formData.leaveType) {
-      toast.error("Please select a valid Leave Type");
+      setErrors(prev => ({ ...prev, leaveType: "Please select a leave type" }));
+      return;
+    }
+    if (!formData.startDate) {
+      setErrors(prev => ({ ...prev, startDate: "Start date is required" }));
+      return;
+    }
+    if (!formData.endDate) {
+      setErrors(prev => ({ ...prev, endDate: "End date is required" }));
+      return;
+    }
+    if (Object.keys(errors).length > 0) {
+      toast.error("Please correct the validation errors below.");
       return;
     }
     if (isBlocked) {
-      toast.error(balanceValidation.message || "Leave quota exceeded per company policy.");
+      toast.error(balanceValidation.message || "Action blocked by policy limit constraints.");
       return;
     }
-    if (!formData.startDate || !formData.endDate) {
-      toast.error("Start and end dates are required");
-      return;
-    }
-    if (new Date(formData.startDate) > new Date(formData.endDate)) {
-      toast.error("End date cannot be before start date");
-      return;
-    }
-    if (!formData.emergencyContactName.trim() || !formData.emergencyContactPhone.trim()) {
-      toast.error("Emergency contact details are required");
+    if (!formData.emergencyContactName.trim()) {
+      setErrors(prev => ({ ...prev, emergencyContactName: "Contact name is required" }));
       return;
     }
     if (!formData.reason.trim()) {
-      toast.error("Reason is required");
+      setErrors(prev => ({ ...prev, reason: "Reason is required" }));
       return;
     }
 
@@ -230,7 +306,7 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
     <BaseModal isOpen={isOpen} onClose={onClose} title="Apply for Leave" maxWidth="max-w-2xl">
       <form onSubmit={handleSubmit} className="space-y-5">
 
-        {/* ── Live Balance Preview Panel ── */}
+        {/* Live Balance Preview Panel */}
         {currentBalance && (
           <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-4 space-y-3 animate-in fade-in duration-200">
             <div className="flex items-center justify-between">
@@ -289,7 +365,7 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
                   />
                 )}
               </div>
-              {totalDaysRequested > 0 && (
+              {totalDaysRequested > 0 && !errors.startDate && !errors.endDate && (
                 <p className="text-[10px] text-slate-500">
                   Requesting <strong className="text-slate-200">{totalDaysRequested} day(s)</strong>
                   {" · "}Remaining after approval:{" "}
@@ -310,16 +386,10 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
           </div>
         )}
 
-        {/* ── Validation Alert Banner ── */}
-        {balanceValidation.message && (
-          <div
-            className={`flex items-start gap-3 px-4 py-3 rounded-xl border text-[13px] font-medium ${
-              isBlocked
-                ? "bg-red-500/10 border-red-500/30 text-red-400"
-                : "bg-amber-500/10 border-amber-500/30 text-amber-300"
-            }`}
-          >
-            <span className="mt-0.5 shrink-0 text-base leading-none">{isBlocked ? "🚫" : "⚠️"}</span>
+        {/* Balance Warning Banner */}
+        {balanceValidation.message && (balanceValidation.status === "blocked" || balanceValidation.status === "exceeded") && (
+          <div className="flex items-start gap-3 px-4 py-3 rounded-xl border text-[13px] font-medium bg-red-500/10 border-red-500/30 text-red-400">
+            <span className="mt-0.5 shrink-0 text-base leading-none">🚫</span>
             {balanceValidation.message}
           </div>
         )}
@@ -336,6 +406,8 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
               required
               variant="company"
             />
+            {errors.leaveType && <p className="text-xs text-red-400 mt-1 ml-1">{errors.leaveType}</p>}
+            
             {formData.leaveType === "OTHER" && (
               <div className="mt-2 animate-in fade-in slide-in-from-top-1 duration-200">
                 <FormInput
@@ -351,53 +423,94 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
             )}
           </div>
 
-          <FormDropdown
-            label="Duration"
-            name="durationType"
-            options={durationOptions}
-            value={formData.durationType}
-            onChange={handleDropdownChange("durationType")}
-            required
-            variant="company"
-          />
+          <div>
+            <FormDropdown
+              label="Duration"
+              name="durationType"
+              options={durationOptions}
+              value={formData.durationType}
+              onChange={handleDropdownChange("durationType")}
+              required
+              variant="company"
+            />
+          </div>
 
-          <FormInput
-            label="Start Date"
-            name="startDate"
-            type="date"
-            value={formData.startDate}
-            onChange={(e: any) => setFormData({ ...formData, startDate: e.target.value })}
-            required
-          />
+          <div>
+            <FormInput
+              label="Start Date"
+              name="startDate"
+              type="date"
+              min={todayStr}
+              value={formData.startDate}
+              onChange={(e: any) => setFormData({ ...formData, startDate: e.target.value })}
+              required
+            />
+            {errors.startDate && <p className="text-xs text-red-400 mt-1 ml-1">{errors.startDate}</p>}
+          </div>
 
-          <FormInput
-            label="End Date"
-            name="endDate"
-            type="date"
-            value={formData.endDate}
-            onChange={(e: any) => setFormData({ ...formData, endDate: e.target.value })}
-            required
-          />
+          <div>
+            <FormInput
+              label="End Date"
+              name="endDate"
+              type="date"
+              min={formData.startDate || todayStr}
+              value={formData.endDate}
+              onChange={(e: any) => setFormData({ ...formData, endDate: e.target.value })}
+              required
+            />
+            {errors.endDate && <p className="text-xs text-red-400 mt-1 ml-1">{errors.endDate}</p>}
+          </div>
 
-          <FormInput
-            label="Emergency Contact Name"
-            name="emergencyContactName"
-            type="text"
-            placeholder="Name of contact person"
-            value={formData.emergencyContactName}
-            onChange={(e: any) => setFormData({ ...formData, emergencyContactName: e.target.value })}
-            required
-          />
+          {/* Booked Leave Dates Info Banner */}
+          {bookedLeaves.length > 0 && (
+            <div className="col-span-full flex items-start gap-2.5 px-3 py-3 rounded-xl bg-amber-500/10 border border-amber-500/20 animate-in fade-in duration-200">
+              <span className="text-amber-400 mt-0.5 text-sm shrink-0">📅</span>
+              <div className="min-w-0">
+                <p className="text-[10px] font-black uppercase tracking-widest text-amber-400 mb-1.5">
+                  Already Booked — One Leave Per Day Is Allowed
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {bookedLeaves.map((leave, i) => (
+                    <span
+                      key={i}
+                      className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500/15 border border-amber-500/25 text-amber-300"
+                    >
+                      {leave.startDate === leave.endDate
+                        ? leave.startDate
+                        : `${leave.startDate} → ${leave.endDate}`}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
 
-          <FormInput
-            label="Emergency Contact Phone"
-            name="emergencyContactPhone"
-            type="tel"
-            placeholder="Phone number"
-            value={formData.emergencyContactPhone}
-            onChange={(e: any) => setFormData({ ...formData, emergencyContactPhone: e.target.value })}
-            required
-          />
+          <div>
+            <FormInput
+              label="Emergency Contact Name"
+              name="emergencyContactName"
+              type="text"
+              placeholder="Name of contact person"
+              value={formData.emergencyContactName}
+              onChange={(e: any) => setFormData({ ...formData, emergencyContactName: e.target.value })}
+              required
+            />
+            {errors.emergencyContactName && <p className="text-xs text-red-400 mt-1 ml-1">{errors.emergencyContactName}</p>}
+          </div>
+
+          <div>
+            <FormInput
+              label="Emergency Contact Phone"
+              name="emergencyContactPhone"
+              type="text"
+              placeholder="10 digit phone number"
+              value={formData.emergencyContactPhone}
+              onChange={handlePhoneChange}
+              maxLength={10}
+              required
+            />
+            {errors.emergencyContactPhone && <p className="text-xs text-red-400 mt-1 ml-1">{errors.emergencyContactPhone}</p>}
+          </div>
         </div>
 
         <div>
@@ -412,6 +525,7 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
             onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
             required
           />
+          {errors.reason && <p className="text-xs text-red-400 mt-1 ml-1">{errors.reason}</p>}
         </div>
 
         <div>
@@ -443,8 +557,8 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
             type="submit"
             variant="primary"
             isLoading={loading}
-            disabled={isBlocked || !formData.leaveType || loading}
-            title={isBlocked ? balanceValidation.message : undefined}
+            disabled={isBlocked || loading}
+            title={isBlocked ? "Please fix form errors before submitting." : undefined}
           >
             Submit Request
           </Button>

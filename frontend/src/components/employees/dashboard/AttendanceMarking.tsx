@@ -24,11 +24,15 @@ import {
   startBreak,
   endBreak,
   getTodayAttendance,
+  requestEarlyOut,
+  requestBreak,
 } from "@/services/employee/attendance/attendance.service";
 import { getCompanyPolicies } from "@/services/employee/policy/company-policy.service";
 
 import { AttendanceState, BreakLimit, TimelineEvent } from "./types";
 import { LateClockInModal } from "./LateClockInModal";
+import { EarlyClockOutModal } from "./EarlyClockOutModal";
+import { BreakRequestModal } from "./BreakRequestModal";
 import { WorkspaceHeader } from "./WorkspaceHeader";
 import { MetricCards } from "./MetricCards";
 import { ActivityTimeline } from "./ActivityTimeline";
@@ -74,6 +78,15 @@ export function AttendanceMarking() {
   const [backendAdminRemarks, setBackendAdminRemarks] = useState<string | null>(
     null,
   );
+
+  const [showEarlyOutModal, setShowEarlyOutModal] = useState(false);
+  const [earlyOutApprovalStatus, setEarlyOutApprovalStatus] = useState<"PENDING" | "APPROVED" | "REJECTED" | null>(null);
+  const [earlyOutReason, setEarlyOutReason] = useState<string | null>(null);
+  const [earlyOutAdminRemarks, setEarlyOutAdminRemarks] = useState<string | null>(null);
+
+  const [showBreakRequestModal, setShowBreakRequestModal] = useState(false);
+  const [pendingBreakType, setPendingBreakType] = useState<AttendanceState | null>(null);
+  const [backendPendingBreakRequest, setBackendPendingBreakRequest] = useState<any>(null);
 
   const [liveShiftSeconds, setLiveShiftSeconds] = useState<number>(0);
   const [liveBreakSeconds, setLiveBreakSeconds] = useState<number>(0);
@@ -178,6 +191,12 @@ export function AttendanceMarking() {
         setBackendLateReason(log.lateReason || null);
         setBackendAdminRemarks(log.adminRemarks || null);
 
+        setEarlyOutApprovalStatus(log.earlyOutApprovalStatus || null);
+        setEarlyOutReason(log.earlyOutReason || null);
+        setEarlyOutAdminRemarks(log.earlyOutAdminRemarks || null);
+
+        setBackendPendingBreakRequest(log.pendingBreakRequest || null);
+
         if (log.status === "COMPLETED") {
           setStatus("COMPLETED");
           setCurrentBreakStart(null);
@@ -258,6 +277,10 @@ export function AttendanceMarking() {
         setBackendApprovalStatus(null);
         setBackendLateReason(null);
         setBackendAdminRemarks(null);
+        setEarlyOutApprovalStatus(null);
+        setEarlyOutReason(null);
+        setEarlyOutAdminRemarks(null);
+        setBackendPendingBreakRequest(null);
       }
     } catch (e: any) {
       console.error("Attendance synchronization tracking error:", e);
@@ -459,7 +482,14 @@ export function AttendanceMarking() {
       await syncWithBackend(true);
     } catch (e: any) {
       console.error(e);
-      toast.error(e.response?.data?.message || "Failed to start break.");
+      const errMsg = e.response?.data?.message || "Failed to start break.";
+      if (errMsg === "OUT_OF_WINDOW_BREAK_REQUIRED" || (Array.isArray(errMsg) && errMsg.includes("OUT_OF_WINDOW_BREAK_REQUIRED"))) {
+        setPendingBreakType(breakType);
+        setShowBreakRequestModal(true);
+        toast.info("This break is outside the scheduled policy time. Please submit a request.");
+      } else {
+        toast.error(errMsg);
+      }
     } finally {
       setLoading(false);
     }
@@ -488,7 +518,52 @@ export function AttendanceMarking() {
       await syncWithBackend(true);
     } catch (e: any) {
       console.error(e);
-      toast.error(e.response?.data?.message || "Failed to Clock Out.");
+      const errMsg = e.response?.data?.message || "Failed to Clock Out.";
+      if (errMsg === "EARLY_CLOCK_OUT_REQUIRED" || (Array.isArray(errMsg) && errMsg.includes("EARLY_CLOCK_OUT_REQUIRED"))) {
+        setShowConfirmClockOut(false);
+        setShowEarlyOutModal(true);
+        toast.info("You are attempting to end your shift early. Please submit a request.");
+      } else {
+        toast.error(errMsg);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEarlyOutRequestSubmit = async (reason: string) => {
+    try {
+      setLoading(true);
+      const res = await requestEarlyOut(reason);
+      if (res.success) {
+        toast.success("Early clock-out request submitted to admin!");
+        setShowEarlyOutModal(false);
+        await syncWithBackend(true);
+      } else {
+        toast.error(res.error || "Failed to submit request.");
+      }
+    } catch (e: any) {
+      console.error(e);
+      toast.error("Failed to submit request.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBreakRequestSubmit = async (breakType: "TEA" | "LUNCH" | "EVENING_TEA", reason: string) => {
+    try {
+      setLoading(true);
+      const res = await requestBreak(breakType, reason);
+      if (res.success) {
+        toast.success("Break request submitted to admin!");
+        setShowBreakRequestModal(false);
+        await syncWithBackend(true);
+      } else {
+        toast.error(res.error || "Failed to submit request.");
+      }
+    } catch (e: any) {
+      console.error(e);
+      toast.error("Failed to submit request.");
     } finally {
       setLoading(false);
     }
@@ -620,6 +695,82 @@ export function AttendanceMarking() {
               <RefreshCcw size={14} />
             )}
             Re-Check Status
+          </button>
+        </div>
+      ) : earlyOutApprovalStatus === "PENDING" ? (
+        <div className="p-8 rounded-2xl border border-amber-500/20 bg-white/[0.01] backdrop-blur-md space-y-6 max-w-2xl mx-auto text-center relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-[45px] pointer-events-none" />
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-16 h-16 rounded-full bg-amber-500/10 text-amber-400 flex items-center justify-center">
+              <Hourglass size={32} className="animate-pulse" />
+            </div>
+            <div className="space-y-1">
+              <span className="inline-block px-2.5 py-0.5 rounded-full text-[9px] font-black bg-amber-500/10 text-amber-400 border border-amber-500/20 uppercase tracking-widest">
+                Awaiting Verification
+              </span>
+              <h3 className="text-xl font-black text-white mt-2">
+                Awaiting Early Departure Approval
+              </h3>
+            </div>
+            <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+              Your early clock-out request has been submitted to the company administrator.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.04] text-left space-y-1">
+            <span className="text-[9px] font-black uppercase tracking-wider text-slate-500">
+              Reason Provided
+            </span>
+            <p className="text-xs text-slate-300 italic">
+              "{earlyOutReason}"
+            </p>
+          </div>
+
+          <button
+            onClick={() => syncWithBackend()}
+            disabled={loading}
+            className="h-11 px-8 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black uppercase tracking-wider transition-all inline-flex items-center gap-2 active:scale-[0.98] disabled:opacity-50"
+          >
+            {loading ? <Loader2 size={14} className="animate-spin" /> : <RefreshCcw size={14} />}
+            Check Status
+          </button>
+        </div>
+      ) : backendPendingBreakRequest?.status === "PENDING" ? (
+        <div className="p-8 rounded-2xl border border-amber-500/20 bg-white/[0.01] backdrop-blur-md space-y-6 max-w-2xl mx-auto text-center relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-[45px] pointer-events-none" />
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-16 h-16 rounded-full bg-amber-500/10 text-amber-400 flex items-center justify-center">
+              <Hourglass size={32} className="animate-pulse" />
+            </div>
+            <div className="space-y-1">
+              <span className="inline-block px-2.5 py-0.5 rounded-full text-[9px] font-black bg-amber-500/10 text-amber-400 border border-amber-500/20 uppercase tracking-widest">
+                Awaiting Verification
+              </span>
+              <h3 className="text-xl font-black text-white mt-2">
+                Awaiting Break Request Approval
+              </h3>
+            </div>
+            <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+              Your out-of-window break request has been submitted to the company administrator.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.04] text-left space-y-1">
+            <span className="text-[9px] font-black uppercase tracking-wider text-slate-500">
+              Reason Provided
+            </span>
+            <p className="text-xs text-slate-300 italic">
+              "{backendPendingBreakRequest.reason}"
+            </p>
+          </div>
+
+          <button
+            onClick={() => syncWithBackend()}
+            disabled={loading}
+            className="h-11 px-8 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black uppercase tracking-wider transition-all inline-flex items-center gap-2 active:scale-[0.98] disabled:opacity-50"
+          >
+            {loading ? <Loader2 size={14} className="animate-spin" /> : <RefreshCcw size={14} />}
+            Check Status
           </button>
         </div>
       ) : (
@@ -977,6 +1128,19 @@ export function AttendanceMarking() {
         onClose={() => setShowLateModal(false)}
         onSubmit={handleLateRequestSubmit}
         loading={loading}
+      />
+      <EarlyClockOutModal
+        isOpen={showEarlyOutModal}
+        onClose={() => setShowEarlyOutModal(false)}
+        onSubmit={handleEarlyOutRequestSubmit}
+        loading={loading}
+      />
+      <BreakRequestModal
+        isOpen={showBreakRequestModal}
+        onClose={() => setShowBreakRequestModal(false)}
+        onSubmit={handleBreakRequestSubmit}
+        loading={loading}
+        breakType={pendingBreakType}
       />
     </div>
   );

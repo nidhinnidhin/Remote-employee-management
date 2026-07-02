@@ -55,6 +55,10 @@ export class AttendanceMapper {
       (doc as unknown as { lateReason?: string }).lateReason,
       (doc as unknown as { approvalStatus?: 'PENDING' | 'APPROVED' | 'REJECTED' }).approvalStatus || null,
       (doc as unknown as { adminRemarks?: string }).adminRemarks,
+      (doc as unknown as { earlyOutReason?: string }).earlyOutReason,
+      (doc as unknown as { earlyOutApprovalStatus?: 'PENDING' | 'APPROVED' | 'REJECTED' }).earlyOutApprovalStatus || null,
+      (doc as unknown as { earlyOutAdminRemarks?: string }).earlyOutAdminRemarks,
+      (doc as unknown as { pendingBreakRequest?: any }).pendingBreakRequest || null,
     );
   }
 
@@ -77,6 +81,10 @@ export class AttendanceMapper {
       lateReason: entity.lateReason || undefined,
       approvalStatus: entity.approvalStatus || undefined,
       adminRemarks: entity.adminRemarks || undefined,
+      earlyOutReason: entity.earlyOutReason || undefined,
+      earlyOutApprovalStatus: entity.earlyOutApprovalStatus || undefined,
+      earlyOutAdminRemarks: entity.earlyOutAdminRemarks || undefined,
+      pendingBreakRequest: entity.pendingBreakRequest || undefined,
     } as Partial<AttendanceDocument>;
   }
 }

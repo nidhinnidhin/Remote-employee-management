@@ -211,13 +211,6 @@ const BoardView: React.FC<BoardViewProps> = ({
           The Kanban board requires at least one User Story to track tasks.
           Please define a requirement in the Backlog first.
         </p>
-        <Button
-          variant="primary"
-          className="shadow-2xl shadow-accent/20 px-10 py-4 h-auto text-xs uppercase tracking-widest font-black"
-          onClick={() => (window.location.hash = "backlog")}
-        >
-          Return to Backlog
-        </Button>
       </div>
     );
   }

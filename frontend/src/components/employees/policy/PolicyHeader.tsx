@@ -9,7 +9,7 @@ export function PolicyHeader() {
         Company Policy
       </h1>
       <p className="text-secondary text-sm font-medium">
-        Internal policies and guidelines for all IT employees
+        Internal policies and guidelines for all employees
       </p>
     </div>
   );

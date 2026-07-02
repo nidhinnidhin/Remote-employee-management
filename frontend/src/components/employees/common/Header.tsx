@@ -15,17 +15,6 @@ export const Header: React.FC = () => {
     return (
         <header className="h-16 flex items-center justify-between px-4 md:px-8 border-b border-white/[0.05] bg-bg/50 backdrop-blur-md sticky top-0 z-30">
             <div className="flex-1 flex justify-end items-center gap-4">
-                {/* Search - Desktop only */}
-                <div className="hidden md:block relative max-w-xs w-full">
-                    <input
-                        type="text"
-                        placeholder="Search tasks, projects..."
-                        className="field-input w-full pl-10 pr-4 py-1.5 text-xs rounded-full bg-white/5 border-white/10"
-                    />
-                    <Search
-                        className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted"
-                    />
-                </div>
 
                 {/* Notifications */}
                 <NotificationDropdown />

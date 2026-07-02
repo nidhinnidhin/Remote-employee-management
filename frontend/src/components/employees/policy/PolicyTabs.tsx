@@ -2,20 +2,8 @@
 
 import React, { useRef, useState, useEffect } from "react";
 import {
-  Building2,
-  Briefcase,
-  UserCheck,
   Clock,
   CalendarDays,
-  Home,
-  ShieldCheck,
-  Lock,
-  TrendingUp,
-  GraduationCap,
-  Github,
-  HeartHandshake,
-  Scale,
-  LogOut,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -23,20 +11,8 @@ import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
 export const POLICY_TABS = [
-  { id: "overview", label: "Overview", icon: Building2 },
-  { id: "employment", label: "Employment", icon: Briefcase },
-  { id: "conduct", label: "Conduct", icon: UserCheck },
   { id: "working-hours", label: "Hours", icon: Clock },
   { id: "leave-policy", label: "Leave", icon: CalendarDays },
-  { id: "remote-work", label: "Remote", icon: Home },
-  { id: "it-security", label: "Security", icon: ShieldCheck },
-  { id: "data-privacy", label: "Privacy", icon: Lock },
-  { id: "performance", label: "Growth", icon: TrendingUp },
-  { id: "learning", label: "Learning", icon: GraduationCap },
-  { id: "open-source", label: "OSS", icon: Github },
-  { id: "anti-harassment", label: "Safety", icon: HeartHandshake },
-  { id: "disciplinary", label: "Legal", icon: Scale },
-  { id: "exit", label: "Exit", icon: LogOut },
 ];
 
 interface PolicyTabsProps {

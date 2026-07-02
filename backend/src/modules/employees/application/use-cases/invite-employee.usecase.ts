@@ -30,15 +30,18 @@ export class InviteEmployeeUseCase implements IInviteEmployeeUseCase {
     let employee;
 
     if (existing) {
-      if (existing.inviteStatus === InviteStatus.USED) {
-        throw new ConflictException(EMPLOYEE_MESSAGES.EMPLOYEE_ALREADY_ACTIVE);
+      if (existing.companyId !== inviteEmployeeDto.companyId) {
+        throw new ConflictException("This email is already registered with another company.");
       }
 
-      // Re-invite: Update existing pending employee
+      if (existing.inviteStatus === InviteStatus.USED || existing.isActive || existing.role === 'COMPANY_ADMIN') {
+        throw new ConflictException("This user is already an active member of your company.");
+      }
+
+      // Re-invite: Update existing pending employee in the SAME company
       await this._employeeRepo.updateEmployee(existing.id, {
         name: inviteEmployeeDto.name,
         role: inviteEmployeeDto.role,
-        companyId: inviteEmployeeDto.companyId,
       });
       employee = existing;
     } else {

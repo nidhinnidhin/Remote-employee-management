@@ -24,34 +24,6 @@ const Header: React.FC<HeaderProps> = ({ onMobileMenuDatas }) => {
       {/* Spacer / Search */}
       <div className="flex-1 flex justify-end gap-x-4 lg:gap-x-6">
         <div className="flex items-center gap-x-4">
-          {/* Search */}
-          <div className="hidden sm:block relative">
-            <input
-              type="text"
-              placeholder="Search..."
-              className="field-input w-64 pl-10 pr-4 py-1.5 text-sm bg-white/5 border-white/10 rounded-full"
-            />
-            <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
-              style={{ color: "rgb(var(--color-text-muted))" }}
-            />
-          </div>
-
-          {/* Notifications */}
-          <button
-            className="-m-2.5 p-2.5 relative transition-colors"
-            style={{ color: "rgb(var(--color-text-secondary))" }}
-          >
-            <span className="sr-only">View notifications</span>
-            <Bell size={20} />
-            <span
-              className="absolute top-2 right-2 w-2 h-2 rounded-full border"
-              style={{
-                backgroundColor: "rgb(var(--color-danger))",
-                borderColor: "rgb(var(--color-nav-bg))",
-              }}
-            />
-          </button>
 
           {/* User Profile */}
           <div className="pl-4 border-l border-white/10">

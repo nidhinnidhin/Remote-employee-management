@@ -16,6 +16,8 @@ import { EmployeeGuard } from 'src/shared/guards/employee.guard';
 import { ClockInDto } from '../../application/dto/clock-in.dto';
 import { BreakStartDto } from '../../application/dto/break-start.dto';
 import { ListLogsDto } from '../../application/dto/list-logs.dto';
+import { RequestEarlyOutDto } from '../../application/dto/request-early-out.dto';
+import { RequestBreakDto } from '../../application/dto/request-break.dto';
 import type {
   IClockInUseCase,
   IClockOutUseCase,
@@ -26,6 +28,10 @@ import type {
   IListAdminLogsUseCase,
   IGetAttendanceDetailUseCase,
   IDecideLateClockInUseCase,
+  IDecideEarlyOutRequestUseCase,
+  IDecideBreakRequestUseCase,
+  IRequestEarlyOutUseCase,
+  IRequestBreakUseCase,
 } from '../../application/interfaces/attendance-use-cases.interface';
 
 @Controller('attendance')
@@ -50,6 +56,14 @@ export class AttendanceController {
     private readonly _getAttendanceDetailUseCase: IGetAttendanceDetailUseCase,
     @Inject('IDecideLateClockInUseCase')
     private readonly _decideLateClockInUseCase: IDecideLateClockInUseCase,
+    @Inject('IDecideEarlyOutRequestUseCase')
+    private readonly _decideEarlyOutRequestUseCase: IDecideEarlyOutRequestUseCase,
+    @Inject('IDecideBreakRequestUseCase')
+    private readonly _decideBreakRequestUseCase: IDecideBreakRequestUseCase,
+    @Inject('IRequestEarlyOutUseCase')
+    private readonly _requestEarlyOutUseCase: IRequestEarlyOutUseCase,
+    @Inject('IRequestBreakUseCase')
+    private readonly _requestBreakUseCase: IRequestBreakUseCase,
   ) {}
 
   @Post('clock-in')
@@ -83,6 +97,22 @@ export class AttendanceController {
     const userId = req.user!.userId;
     const companyId = req.user!.companyId!;
     return this._breakEndUseCase.execute(userId, companyId);
+  }
+
+  @Post('request-early-out')
+  @UseGuards(EmployeeGuard)
+  async requestEarlyOut(@Req() req: Request, @Body() dto: RequestEarlyOutDto) {
+    const userId = req.user!.userId;
+    const companyId = req.user!.companyId!;
+    return this._requestEarlyOutUseCase.execute(userId, companyId, dto);
+  }
+
+  @Post('request-break')
+  @UseGuards(EmployeeGuard)
+  async requestBreak(@Req() req: Request, @Body() dto: RequestBreakDto) {
+    const userId = req.user!.userId;
+    const companyId = req.user!.companyId!;
+    return this._requestBreakUseCase.execute(userId, companyId, dto);
   }
 
   @Get('today')
@@ -125,5 +155,25 @@ export class AttendanceController {
   ) {
     const companyId = req.user!.companyId!;
     return this._decideLateClockInUseCase.execute(companyId, dto);
+  }
+
+  @Post('admin/decide-early-out')
+  @UseGuards(CompanyAdminGuard)
+  async decideEarlyOutRequest(
+    @Req() req: Request,
+    @Body() dto: { attendanceId: string; decision: 'APPROVED' | 'REJECTED'; adminRemarks?: string }
+  ) {
+    const companyId = req.user!.companyId!;
+    return this._decideEarlyOutRequestUseCase.execute(companyId, dto);
+  }
+
+  @Post('admin/decide-break')
+  @UseGuards(CompanyAdminGuard)
+  async decideBreakRequest(
+    @Req() req: Request,
+    @Body() dto: { attendanceId: string; decision: 'APPROVED' | 'REJECTED'; adminRemarks?: string }
+  ) {
+    const companyId = req.user!.companyId!;
+    return this._decideBreakRequestUseCase.execute(companyId, dto);
   }
 }

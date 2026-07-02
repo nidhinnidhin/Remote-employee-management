@@ -1,9 +1,12 @@
-import React from 'react'
+import Landing from "@/components/company/landing/landing";
+import { Metadata } from "next";
 
-const Home = () => {
-  return (
-    <div>Home</div>
-  )
-}
+export const metadata: Metadata = {
+    title: "Employee management tool",
+};
 
-export default Home
+const LoginPage = () => {
+    return <Landing />;
+};
+
+export default LoginPage;

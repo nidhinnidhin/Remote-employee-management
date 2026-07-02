@@ -2,12 +2,17 @@ import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import type { IAttendanceRepository } from '../../domain/repositories/iattendance.repository';
 import { IClockOutUseCase } from '../interfaces/attendance-use-cases.interface';
 import { AttendanceEntity, AttendanceActivityEntity } from '../../domain/entities/attendance.entity';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { CompanyPolicy } from 'src/modules/company-admin/infrastructure/schema/company-policy.schema';
 
 @Injectable()
 export class ClockOutUseCase implements IClockOutUseCase {
   constructor(
     @Inject('IAttendanceRepository')
     private readonly _attendanceRepository: IAttendanceRepository,
+    @InjectModel(CompanyPolicy.name)
+    private readonly _companyPolicyModel: Model<CompanyPolicy>,
   ) {}
 
   async execute(userId: string, _companyId: string): Promise<AttendanceEntity> {
@@ -24,6 +29,27 @@ export class ClockOutUseCase implements IClockOutUseCase {
     }
 
     const now = new Date();
+    
+    // Check if checking out early
+    const policyDoc = await this._companyPolicyModel.findOne({ companyId: activeShift.companyId }).exec();
+    const workingHoursPolicy = policyDoc?.policies?.find(p => p.type === 'WORKING_HOURS');
+    
+    if (workingHoursPolicy && workingHoursPolicy.content && workingHoursPolicy.content.workEndTime) {
+      const policyEndTime = workingHoursPolicy.content.workEndTime;
+      const istTimeStr = now.toLocaleTimeString('en-US', {
+        timeZone: 'Asia/Kolkata',
+        hour12: false,
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+      
+      if (istTimeStr < policyEndTime) {
+        if (activeShift.earlyOutApprovalStatus !== 'APPROVED') {
+          throw new BadRequestException('EARLY_CLOCK_OUT_REQUIRED');
+        }
+      }
+    }
+
     const activities = [...activeShift.activities];
     let totalBreakMinutes = activeShift.totalBreakMinutes;
 

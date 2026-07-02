@@ -30,6 +30,31 @@ export class AttendanceDocument extends Document {
   @Prop()
   adminRemarks?: string;
 
+  @Prop()
+  earlyOutReason?: string;
+
+  @Prop({ type: String, enum: ['PENDING', 'APPROVED', 'REJECTED', null], default: null })
+  earlyOutApprovalStatus?: 'PENDING' | 'APPROVED' | 'REJECTED' | null;
+
+  @Prop()
+  earlyOutAdminRemarks?: string;
+
+  @Prop({
+    type: {
+      breakType: { type: String, enum: ['TEA', 'LUNCH', 'EVENING_TEA'] },
+      reason: { type: String },
+      status: { type: String, enum: ['PENDING', 'APPROVED', 'REJECTED'] },
+      adminRemarks: { type: String }
+    },
+    default: null
+  })
+  pendingBreakRequest?: {
+    breakType: 'TEA' | 'LUNCH' | 'EVENING_TEA';
+    reason: string;
+    status: 'PENDING' | 'APPROVED' | 'REJECTED';
+    adminRemarks?: string;
+  } | null;
+
   @Prop({
     type: [
       {

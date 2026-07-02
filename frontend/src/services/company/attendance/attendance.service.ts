@@ -44,3 +44,28 @@ export const decideLateRequest = async (
   const response = await api.post(API_ROUTES.ATTENDANCE.DECIDE_REQUEST, payload);
   return response.data;
 };
+
+export const decideEarlyOutRequest = async (
+  data: DecideLateRequestDto,
+  api: AxiosInstance = clientApi
+): Promise<AttendanceLog> => {
+  const payload = {
+    ...data,
+    decision: data.status,
+  };
+  const response = await api.post(API_ROUTES.ATTENDANCE.DECIDE_EARLY_OUT, payload);
+  return response.data;
+};
+
+export const decideBreakRequest = async (
+  data: DecideLateRequestDto,
+  api: AxiosInstance = clientApi
+): Promise<AttendanceLog> => {
+  const payload = {
+    ...data,
+    decision: data.status,
+  };
+  const response = await api.post(API_ROUTES.ATTENDANCE.DECIDE_BREAK, payload);
+  return response.data;
+};
+

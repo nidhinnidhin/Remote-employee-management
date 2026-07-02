@@ -12,6 +12,10 @@ import { ListEmployeeLogsUseCase } from './application/use-cases/list-employee-l
 import { ListAdminLogsUseCase } from './application/use-cases/list-admin-logs.usecase';
 import { GetAttendanceDetailUseCase } from './application/use-cases/get-attendance-detail.usecase';
 import { DecideLateClockInUseCase } from './application/use-cases/decide-late-clockin.usecase';
+import { DecideEarlyOutRequestUseCase } from './application/use-cases/decide-early-out-request.usecase';
+import { DecideBreakRequestUseCase } from './application/use-cases/decide-break-request.usecase';
+import { RequestEarlyOutUseCase } from './application/use-cases/request-early-out.usecase';
+import { RequestBreakUseCase } from './application/use-cases/request-break.usecase';
 import { AttendanceController } from './presentation/controllers/attendance.controller';
 import { EmployeesModule } from '../employees/employees.module';
 import { CompanyPolicy, CompanyPolicySchema } from '../company-admin/infrastructure/schema/company-policy.schema';
@@ -68,6 +72,22 @@ import { UserDocument, UserSchema } from '../auth/infrastructure/database/mongoo
     {
       provide: 'IDecideLateClockInUseCase',
       useClass: DecideLateClockInUseCase,
+    },
+    {
+      provide: 'IDecideEarlyOutRequestUseCase',
+      useClass: DecideEarlyOutRequestUseCase,
+    },
+    {
+      provide: 'IDecideBreakRequestUseCase',
+      useClass: DecideBreakRequestUseCase,
+    },
+    {
+      provide: 'IRequestEarlyOutUseCase',
+      useClass: RequestEarlyOutUseCase,
+    },
+    {
+      provide: 'IRequestBreakUseCase',
+      useClass: RequestBreakUseCase,
     },
   ],
   exports: [

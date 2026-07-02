@@ -3,6 +3,7 @@
 import { WorkingHoursProps } from "@/shared/types/company/policy/working-hours.type";
 import React, { useState, useEffect } from "react";
 import { Clock, Coffee, Utensils } from "lucide-react";
+import TimePicker from "@/components/ui/TimePicker";
 
 const WorkingHoursConfiguration: React.FC<WorkingHoursProps> = ({
   onChange,
@@ -106,20 +107,16 @@ const WorkingHoursConfiguration: React.FC<WorkingHoursProps> = ({
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="text-[10px] font-black uppercase tracking-wider text-slate-500">Check-In Time</label>
-                <input
-                  type="time"
+                <TimePicker
                   value={workStartTime}
-                  onChange={(e) => setWorkStartTime(e.target.value)}
-                  className="w-full h-11 px-4 rounded-xl border border-white/10 bg-transparent text-xs font-semibold text-white focus:border-accent/40 focus:ring-1 focus:ring-accent/40 outline-none transition-colors cursor-pointer hover:border-white/20"
+                  onChange={setWorkStartTime}
                 />
               </div>
               <div className="space-y-1.5">
                 <label className="text-[10px] font-black uppercase tracking-wider text-slate-500">Check-Out Time</label>
-                <input
-                  type="time"
+                <TimePicker
                   value={workEndTime}
-                  onChange={(e) => setWorkEndTime(e.target.value)}
-                  className="w-full h-11 px-4 rounded-xl border border-white/10 bg-transparent text-xs font-semibold text-white focus:border-accent/40 focus:ring-1 focus:ring-accent/40 outline-none transition-colors cursor-pointer hover:border-white/20"
+                  onChange={setWorkEndTime}
                 />
               </div>
             </div>
@@ -134,20 +131,16 @@ const WorkingHoursConfiguration: React.FC<WorkingHoursProps> = ({
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="text-[10px] font-black uppercase tracking-wider text-slate-500">Starts At</label>
-                <input
-                  type="time"
+                <TimePicker
                   value={morningBreakStart}
-                  onChange={(e) => setMorningBreakStart(e.target.value)}
-                  className="w-full h-11 px-4 rounded-xl border border-white/10 bg-transparent text-xs font-semibold text-white focus:border-accent/40 focus:ring-1 focus:ring-accent/40 outline-none transition-colors cursor-pointer hover:border-white/20"
+                  onChange={setMorningBreakStart}
                 />
               </div>
               <div className="space-y-1.5">
                 <label className="text-[10px] font-black uppercase tracking-wider text-slate-500">Ends At</label>
-                <input
-                  type="time"
+                <TimePicker
                   value={morningBreakEnd}
-                  onChange={(e) => setMorningBreakEnd(e.target.value)}
-                  className="w-full h-11 px-4 rounded-xl border border-white/10 bg-transparent text-xs font-semibold text-white focus:border-accent/40 focus:ring-1 focus:ring-accent/40 outline-none transition-colors cursor-pointer hover:border-white/20"
+                  onChange={setMorningBreakEnd}
                 />
               </div>
             </div>
@@ -162,20 +155,16 @@ const WorkingHoursConfiguration: React.FC<WorkingHoursProps> = ({
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="text-[10px] font-black uppercase tracking-wider text-slate-500">Starts At</label>
-                <input
-                  type="time"
+                <TimePicker
                   value={lunchBreakStart}
-                  onChange={(e) => setLunchBreakStart(e.target.value)}
-                  className="w-full h-11 px-4 rounded-xl border border-white/10 bg-transparent text-xs font-semibold text-white focus:border-accent/40 focus:ring-1 focus:ring-accent/40 outline-none transition-colors cursor-pointer hover:border-white/20"
+                  onChange={setLunchBreakStart}
                 />
               </div>
               <div className="space-y-1.5">
                 <label className="text-[10px] font-black uppercase tracking-wider text-slate-500">Ends At</label>
-                <input
-                  type="time"
+                <TimePicker
                   value={lunchBreakEnd}
-                  onChange={(e) => setLunchBreakEnd(e.target.value)}
-                  className="w-full h-11 px-4 rounded-xl border border-white/10 bg-transparent text-xs font-semibold text-white focus:border-accent/40 focus:ring-1 focus:ring-accent/40 outline-none transition-colors cursor-pointer hover:border-white/20"
+                  onChange={setLunchBreakEnd}
                 />
               </div>
             </div>
@@ -190,20 +179,16 @@ const WorkingHoursConfiguration: React.FC<WorkingHoursProps> = ({
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="text-[10px] font-black uppercase tracking-wider text-slate-500">Starts At</label>
-                <input
-                  type="time"
+                <TimePicker
                   value={eveningBreakStart}
-                  onChange={(e) => setEveningBreakStart(e.target.value)}
-                  className="w-full h-11 px-4 rounded-xl border border-white/10 bg-transparent text-xs font-semibold text-white focus:border-accent/40 focus:ring-1 focus:ring-accent/40 outline-none transition-colors cursor-pointer hover:border-white/20"
+                  onChange={setEveningBreakStart}
                 />
               </div>
               <div className="space-y-1.5">
                 <label className="text-[10px] font-black uppercase tracking-wider text-slate-500">Ends At</label>
-                <input
-                  type="time"
+                <TimePicker
                   value={eveningBreakEnd}
-                  onChange={(e) => setEveningBreakEnd(e.target.value)}
-                  className="w-full h-11 px-4 rounded-xl border border-white/10 bg-transparent text-xs font-semibold text-white focus:border-accent/40 focus:ring-1 focus:ring-accent/40 outline-none transition-colors cursor-pointer hover:border-white/20"
+                  onChange={setEveningBreakEnd}
                 />
               </div>
             </div>

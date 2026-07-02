@@ -112,6 +112,41 @@ export class BreakStartUseCase implements IBreakStartUseCase {
       );
     }
 
+    // CHECK WINDOW POLICY
+    const workingHoursPolicy = policyDoc?.policies?.find(p => p.type === 'WORKING_HOURS');
+    let windowStartStr = '';
+    let windowEndStr = '';
+    if (workingHoursPolicy && workingHoursPolicy.content) {
+      const content = workingHoursPolicy.content;
+      if (breakTypeLabel === 'TEA') {
+        windowStartStr = content.morningBreakStart || '';
+        windowEndStr = content.morningBreakEnd || '';
+      } else if (breakTypeLabel === 'LUNCH') {
+        windowStartStr = content.lunchBreakStart || '';
+        windowEndStr = content.lunchBreakEnd || '';
+      } else if (breakTypeLabel === 'EVENING_TEA') {
+        windowStartStr = content.eveningBreakStart || '';
+        windowEndStr = content.eveningBreakEnd || '';
+      }
+    }
+
+    if (windowStartStr && windowEndStr) {
+      const istTimeStr = now.toLocaleTimeString('en-US', {
+        timeZone: 'Asia/Kolkata',
+        hour12: false,
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+
+      if (istTimeStr < windowStartStr || istTimeStr > windowEndStr) {
+        const hasApproval = activeShift.pendingBreakRequest?.breakType === breakTypeLabel && 
+                            activeShift.pendingBreakRequest?.status === 'APPROVED';
+        if (!hasApproval) {
+          throw new BadRequestException('OUT_OF_WINDOW_BREAK_REQUIRED');
+        }
+      }
+    }
+
     activities.push(new AttendanceActivityEntity(
       'BREAK_START',
       breakTypeLabel,

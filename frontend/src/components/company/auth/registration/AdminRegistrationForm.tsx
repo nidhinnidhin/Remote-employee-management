@@ -97,12 +97,14 @@ const AdminRegistrationForm: React.FC<AdminRegistrationFormProps> = ({
       validationErrors.email = "Invalid email format";
     }
 
-    // 4. Phone Validation (10 digits only)
-    const normalizedPhone = formData.phone.replace(/\D/g, "");
-    if (!formData.phone) {
+    // 4. Phone Validation (Strict 10 digits only, no letters, no symbols, no all-zeros)
+    const phone = formData.phone;
+    if (!phone) {
       validationErrors.phone = "Phone number is required";
-    } else if (normalizedPhone.length !== 10) {
-      validationErrors.phone = "Phone number must be exactly 10 digits";
+    } else if (!/^\d{10}$/.test(phone)) {
+      validationErrors.phone = "Phone number must be exactly 10 digits and contain only numbers";
+    } else if (parseInt(phone, 10) === 0) {
+      validationErrors.phone = "Invalid phone number sequence";
     }
 
     // 5. Password Checklist Validation
@@ -141,7 +143,7 @@ const AdminRegistrationForm: React.FC<AdminRegistrationFormProps> = ({
       if (result.success || result.message === "OTP sent to your email") {
         localStorage.setItem(
           LOCAL_STORAGE_KEYS.OTP_TIMER_EXPIRY_KEY,
-          (Date.now() + 300000).toString(),
+          (Date.now() + 60000).toString(),
         );
         setShowOtpModal(true);
       } else {

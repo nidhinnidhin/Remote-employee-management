@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import type { ILeaveRequestRepository } from '../../domain/repositories/ileave-request.repository';
 import type { ICompanyPolicyRepository } from '../../../company-admin/domain/repositories/company-policy.repository';
 import {
@@ -58,6 +58,19 @@ export class ApplyLeaveUseCase implements IApplyLeaveUseCase {
           String(leave.leaveType).trim().toUpperCase(),
       )
       .reduce((sum, l) => sum + l.totalDays, 0);
+
+    const newStartDate = new Date(leave.startDate).getTime();
+    const newEndDate = new Date(leave.endDate).getTime();
+
+    for (const existing of existingLeaves) {
+      const existingStart = new Date(existing.startDate).getTime();
+      const existingEnd = new Date(existing.endDate).getTime();
+
+      // Check for overlap: A <= D and B >= C
+      if (newStartDate <= existingEnd && newEndDate >= existingStart) {
+        throw new BadRequestException('A leave request already exists for one or more of the selected dates.');
+      }
+    }
 
     const remainingDays = allocatedDays - consumedDays;
     console.log(remainingDays);

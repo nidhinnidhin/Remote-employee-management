@@ -26,5 +26,14 @@ export class AttendanceEntity {
     public readonly lateReason?: string,
     public readonly approvalStatus?: 'PENDING' | 'APPROVED' | 'REJECTED' | null,
     public readonly adminRemarks?: string,
+    public readonly earlyOutReason?: string,
+    public readonly earlyOutApprovalStatus?: 'PENDING' | 'APPROVED' | 'REJECTED' | null,
+    public readonly earlyOutAdminRemarks?: string,
+    public readonly pendingBreakRequest?: {
+      breakType: 'TEA' | 'LUNCH' | 'EVENING_TEA';
+      reason: string;
+      status: 'PENDING' | 'APPROVED' | 'REJECTED';
+      adminRemarks?: string;
+    } | null,
   ) {}
 }

@@ -24,6 +24,7 @@ export function useOtpTimer() {
       if (diff <= 0) {
         setExpired(true);
         setRemaining(0);
+        localStorage.removeItem(STORAGE_KEY); 
       } else {
         setExpired(false);
         setRemaining(diff);

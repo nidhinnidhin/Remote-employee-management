@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import AdminLayoutWrapper from "@/components/company/layout/AdminLayoutWrapper";
-import { getAdminLogs, decideLateRequest } from "@/services/company/attendance/attendance.service";
+import { getAdminLogs, decideLateRequest, decideEarlyOutRequest, decideBreakRequest } from "@/services/company/attendance/attendance.service";
 import { getEmployees } from "@/services/company/employee-management.service";
 import { AttendanceLog } from "@/shared/types/attendance/attendance.types";
 import { Employee } from "@/shared/types/company/employees/employee-listing.type";
@@ -151,6 +151,46 @@ export default function AdminAttendancePage() {
     }
   };
 
+  const handleDecideEarlyOutRequest = async (
+    attendanceId: string,
+    decisionStatus: "APPROVED" | "REJECTED",
+    remarks: string
+  ) => {
+    try {
+      await decideEarlyOutRequest({
+        attendanceId,
+        status: decisionStatus,
+        adminRemarks: remarks || undefined,
+      });
+      toast.success(`Successfully ${decisionStatus.toLowerCase()} early clock-out request.`);
+      fetchLogs();
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e?.response?.data?.message || "Failed to submit decision.");
+      throw e;
+    }
+  };
+
+  const handleDecideBreakRequest = async (
+    attendanceId: string,
+    decisionStatus: "APPROVED" | "REJECTED",
+    remarks: string
+  ) => {
+    try {
+      await decideBreakRequest({
+        attendanceId,
+        status: decisionStatus,
+        adminRemarks: remarks || undefined,
+      });
+      toast.success(`Successfully ${decisionStatus.toLowerCase()} break request.`);
+      fetchLogs();
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e?.response?.data?.message || "Failed to submit decision.");
+      throw e;
+    }
+  };
+
   const handleDecideLeaveRequest = async (id: string, decisionStatus: "APPROVED" | "REJECTED", remarks: string) => {
     try {
       let res;
@@ -263,6 +303,8 @@ export default function AdminAttendancePage() {
             onPageChange={setPage}
             onSelectLog={setSelectedLog}
             onDecideRequest={handleDecideRequest}
+            onDecideEarlyOutRequest={handleDecideEarlyOutRequest}
+            onDecideBreakRequest={handleDecideBreakRequest}
           />
         ) : (
           <AdminLeaveTable
