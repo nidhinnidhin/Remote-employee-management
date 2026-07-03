@@ -2,13 +2,13 @@
 
 import React, { useState, useRef } from "react";
 import {
-  Pencil,
   Mail,
   MapPin,
   Phone,
   Calendar,
   Camera,
   Briefcase,
+  Building2,
 } from "lucide-react";
 import { clientApi } from "@/lib/axios/axiosClient";
 import { API_ROUTES } from "@/constants/api.routes";
@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 interface ProfileHeaderProps {
   name?: string;
   title?: string;
+  companyName?: string | null;
   department?: string;
   departments?: string[];
   email?: string;
@@ -31,6 +32,7 @@ interface ProfileHeaderProps {
 export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   name = "User Name",
   title = "Position",
+  companyName = "",
   department = "",
   departments = [],
   email = "",
@@ -58,7 +60,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       setUploading(true);
       const res = await clientApi.post(
         API_ROUTES.AUTH.PROFILE.UPLOAD_IMAGE,
-        formData,
+        formData
       );
       onAvatarUploaded?.(res.data.imageUrl);
     } catch (error) {
@@ -99,7 +101,6 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               </div>
             )}
 
-            {/* Hover Overlay */}
             <div
               className={cn(
                 "absolute inset-0 bg-black/60 flex flex-col items-center justify-center gap-2 transition-opacity duration-300",
@@ -130,9 +131,17 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         {/* --- Content Section --- */}
         <div className="flex-1 text-center md:text-left">
           <div className="mb-4">
-            <h1 className="text-3xl font-black text-white tracking-tighter uppercase mb-1">
+            <h1 className="text-3xl font-black text-white tracking-tighter uppercase mb-0.5">
               {name}
             </h1>
+            
+            {Boolean(companyName) && (
+              <div className="flex items-center justify-center md:justify-start gap-1.5 mb-2 text-slate-400 font-semibold text-sm">
+                <Building2 size={14} className="text-accent" />
+                <span>{companyName}</span>
+              </div>
+            )}
+
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
               <span className="flex items-center gap-2 text-sm font-bold text-accent">
                 <Briefcase size={14} strokeWidth={2.5} />
@@ -155,16 +164,6 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-6 border-t border-white/[0.04]">
             {[
               { icon: Mail, label: "Email Address", value: email },
-              {
-                icon: Phone,
-                label: "Phone Contact",
-                value: phone || "Not Provided",
-              },
-              {
-                icon: MapPin,
-                label: "Office Location",
-                value: address || "Remote",
-              },
               { icon: Calendar, label: "Date Joined", value: joinedDate },
             ].map((item, i) => (
               <div key={i} className="space-y-1.5">

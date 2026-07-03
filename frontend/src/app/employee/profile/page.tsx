@@ -1,4 +1,3 @@
-// app/employees/profile/page.tsx (or pages equivalent)
 import { getSession } from "@/lib/iron-session/getSession";
 import { getServerApi } from "@/lib/axios/axiosServer";
 import { redirect } from "next/navigation";
@@ -15,6 +14,7 @@ export interface UserProfile {
   phone: string;
   profileImageUrl?: string;
   companyId: string;
+  companyName?: string | null;
   department: string;
   departments?: string[];
   title?: string;
@@ -24,7 +24,6 @@ export interface UserProfile {
   createdAt: string;
   updatedAt: string;
 
-  // 🔥 ADD ALL PROFILE FIELDS
   dateOfBirth?: string;
   gender?: string;
   maritalStatus?: string;

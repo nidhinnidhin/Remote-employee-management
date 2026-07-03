@@ -11,6 +11,7 @@ export interface UserProfile {
   phone: string;
   profileImageUrl?: string;
   companyId: string;
+  companyName?: string | null;
   department: string;
   departments?: string[];
   title?: string;

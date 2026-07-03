@@ -5,6 +5,7 @@ export class UserProfileResponseMapper {
   static toEnrichedProfile(
     user: UserEntity,
     departments: string[],
+    companyName: string | null, // 👈 1. Accept parameter argument configuration details
   ): EnrichedUserProfile {
     return {
       id: user.id,
@@ -16,6 +17,7 @@ export class UserProfileResponseMapper {
       status: user.status,
       title: user.title,
       companyId: user.companyId,
+      companyName: companyName, // 👈 2. Set key matching outbound JSON parameters
       inviteStatus: user.inviteStatus,
       hasPassword: user.hasPassword,
       isOnboarded: user.isOnboarded,

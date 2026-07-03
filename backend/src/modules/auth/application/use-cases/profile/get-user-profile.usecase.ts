@@ -8,8 +8,6 @@ import { UserStatus } from 'src/shared/enums/user/user-status.enum';
 import { isValidObjectId } from 'mongoose';
 import { IGetUserProfileUseCase } from '../../interfaces/profile/profile-use-case.interface';
 import { EnrichedUserProfile } from 'src/shared/types/profile/enriched-user-profile.type';
-
-// 1. Add the import for your new mapper
 import { UserProfileResponseMapper } from '../../mappers/profile/user-profile-response-mapper';
 
 @Injectable()
@@ -34,15 +32,22 @@ export class GetUserProfileUseCase implements IGetUserProfileUseCase {
       throw new ForbiddenException(AUTH_MESSAGES.USER_BLOCKED);
     }
 
+    let companyName: string | null = null; // 👈 1. Create holder variable
+
     if (user.companyId) {
       await this.checkCompanySuspension(user.companyId);
+      
+      // 👈 2. Retrieve the company domain model structure
+      const company = await this._companyRepository.findById(user.companyId);
+      if (company) {
+        companyName = company.name; // Assumes your CompanyEntity profile defines a 'name' field
+      }
     }
 
     const departments = await this._departmentRepository.findAllByEmployeeId(userId);
     const departmentNames = departments.map(d => d.name);
 
-    // 2. Replace the JSON.parse hack with your mapper
-    return UserProfileResponseMapper.toEnrichedProfile(user, departmentNames);
+    return UserProfileResponseMapper.toEnrichedProfile(user, departmentNames, companyName);
   }
 
   private async checkCompanySuspension(

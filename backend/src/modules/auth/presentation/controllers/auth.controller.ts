@@ -53,7 +53,6 @@ export class AuthController {
     @Inject('ICookieHelperService')
     private readonly _cookieHelperService: ICookieHelperService,
 
-    // 🔹 Inject Log UseCase
     @Inject('ICreateActivityLogUseCase')
     private readonly _createLogUseCase: ICreateActivityLogUseCase,
   ) {}

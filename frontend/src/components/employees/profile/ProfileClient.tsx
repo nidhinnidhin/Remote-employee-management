@@ -7,7 +7,9 @@ import ProfileTabs, {
 } from "@/components/employees/profile/ProfileTabs";
 import PersonalInfoForm from "@/components/employees/profile/PersonalInfoForm";
 import EmptyTab from "@/components/employees/profile/EmptyTab";
+
 import { UserProfile } from "@/app/employee/profile/page";
+
 import { ProfileHeader } from "./ProfileHeader";
 import { SkillsForm } from "./SkillsForm";
 import DocumentVault from "./DocumentsForm";
@@ -15,10 +17,9 @@ import { formatDate } from "@/lib/date/date-format";
 import { useProfileStore } from "@/store/profile.store";
 
 export default function ProfileClient({ user: initialUser }: { user: UserProfile }) {
-  const { userProfile, fetchProfile } = useProfileStore();
+  const { userProfile } = useProfileStore();
   const [activeTab, setActiveTab] = useState<ProfileTab>("personal-info");
 
-  // Sync prop to store on mount if store is empty
   React.useEffect(() => {
     if (!userProfile) {
       useProfileStore.getState().setProfile(initialUser);
@@ -26,8 +27,7 @@ export default function ProfileClient({ user: initialUser }: { user: UserProfile
   }, [initialUser, userProfile]);
 
   const user = userProfile || initialUser;
-
-  // ✅ IMPORTANT — Avatar state
+  console.log('userrrrrrrrrr-------',user)
   const [avatarUrl, setAvatarUrl] = useState(user.profileImageUrl ?? "");
 
   const renderTabContent = () => {
@@ -37,12 +37,10 @@ export default function ProfileClient({ user: initialUser }: { user: UserProfile
       case "skills-bio":
         return <SkillsForm initialSkills={user.skills ?? []} />;
       case "documents":
-      case "documents":
         return <DocumentVault />;
     }
   };
 
-  // ✅ Construct Address String
   const fullAddress = [
     user.streetAddress,
     user.city,
@@ -57,6 +55,7 @@ export default function ProfileClient({ user: initialUser }: { user: UserProfile
         <ProfileHeader
           name={`${user.firstName || ""} ${user.lastName || ""}`.trim()}
           title={user.title || user.role || "Employee"}
+          companyName={user.companyName || ""} 
           department={user.department}
           departments={user.departments || []}
           email={user.email}

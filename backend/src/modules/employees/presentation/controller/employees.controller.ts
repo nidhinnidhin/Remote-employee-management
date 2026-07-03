@@ -101,7 +101,6 @@ export class EmployeesController {
   ) {
     const { employeeId } = await this._verifyInviteUseCase.execute(token);
 
-    // Create temp session
     const { rawToken: sessionId } = generateSecureToken();
     const redisKey = `invite:temp:${sessionId}`;
 
@@ -136,13 +135,11 @@ export class EmployeesController {
       throw new UnauthorizedException(EMPLOYEE_MESSAGES.INVITE_SESSION_EXPIRED);
     }
 
-    // 1️⃣ Set password
     const employee = await this._setPasswordUseCase.execute(
       employeeId,
       password,
     );
 
-    // 2️⃣ Generate JWT tokens
     const accessToken = this._jwtService.generateAccessToken({
       userId: employee.id,
       role: employee.role,
@@ -153,7 +150,6 @@ export class EmployeesController {
       userId: employee.id,
     });
 
-    // 3️⃣ Store JWTs in cookies
     res.cookie(
       ACCESS_TOKEN_COOKIE_NAME,
       accessToken,
@@ -166,7 +162,6 @@ export class EmployeesController {
       REFRESH_TOKEN_COOKIE_OPTIONS,
     );
 
-    // 4️⃣ Cleanup temp invite session
     await this._redisService.del(redisKey);
     res.clearCookie(INVITE_SESSION_COOKIE_NAME);
 
@@ -185,7 +180,6 @@ export class EmployeesController {
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   async findOne(@Req() req: Request, @Param('id') id: string) {
-    // Basic check: employee should belong to the same company
     const employee = await this._employeeRepo.findById(id);
     if (!employee || employee.companyId !== req.user?.companyId) {
       throw new UnauthorizedException(EMPLOYEE_MESSAGES.EMPLOYEE_NOT_FOUND);
@@ -201,7 +195,6 @@ export class EmployeesController {
     @Body('status') status: UserStatus,
     @Body('reason') reason?: string,
   ) {
-    // Basic check: employee should belong to the same company
     const employee = await this._employeeRepo.findById(id);
     if (!employee || employee.companyId !== req.user?.companyId) {
       throw new UnauthorizedException(EMPLOYEE_MESSAGES.EMPLOYEE_NOT_FOUND);

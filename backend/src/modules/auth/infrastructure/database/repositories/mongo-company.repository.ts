@@ -5,7 +5,7 @@ import { BaseRepository } from 'src/shared/repositories/base.repository';
 import { ICompanyRepository } from '../../../domain/repositories/icompany.repository';
 import { CompanyEntity } from '../../../domain/entities/company.entity';
 import { CompanyDocument } from '../mongoose/schemas/company.schema';
-import { CompanyMapper } from 'src/modules/auth/application/mappers/company.mapper'; // Adjust path as needed
+import { CompanyMapper } from 'src/modules/auth/application/mappers/company.mapper';
 
 @Injectable()
 export class MongoCompanyRepository
@@ -23,8 +23,14 @@ export class MongoCompanyRepository
     return CompanyMapper.toDomain(companyDoc);
   }
 
+  // 👇 Added findById implementation
+  async findById(id: string): Promise<CompanyEntity | null> {
+    if (!Types.ObjectId.isValid(id)) return null;
+    const doc = await this._companyModel.findById(id).exec();
+    return doc ? this.toEntity(doc) : null;
+  }
+
   async create(company: CompanyEntity): Promise<CompanyEntity> {
-    // Delegate to the Mapper for the payload
     const persistenceData = CompanyMapper.toPersistence(company);
     return this.save(persistenceData);
   }

@@ -12,6 +12,7 @@ import {
   MessageSquare,
   Settings,
   FileText,
+  Ticket, // <-- Imported the Ticket icon here
 } from "lucide-react";
 import Image from "next/image";
 
@@ -29,13 +30,17 @@ export default function Sidebar() {
       href: FRONTEND_ROUTES.SUPER_ADMIN.SUBSCRIPTIONS,
       icon: CreditCard,
     },
+    {
+      name: "Tickets", 
+      href: FRONTEND_ROUTES.SUPER_ADMIN.TICKETS,
+      icon: Ticket,
+    },
   ];
 
   return (
     <aside className="sidebar fixed inset-y-0 left-0 w-64 hidden lg:flex flex-col z-50">
-      {/* Header */}
       <div
-        className="h-16 flex items-center px-6"
+        className="h-16 flex items-center px-6" 
         style={{ borderBottom: "1px solid rgb(var(--color-sidebar-border))" }}
       >
         <div className="flex items-center justify-center w-full">

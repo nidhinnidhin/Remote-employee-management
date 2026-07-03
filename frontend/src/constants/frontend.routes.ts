@@ -15,6 +15,7 @@ export const FRONTEND_ROUTES = {
         SUPPORT: "/super-admin/support",
         SETTINGS: "/super-admin/settings",
         LOGS: "/super-admin/logs",
+        TICKETS: "/super-admin/tickets"
     },
     ADMIN: {
         DASHBOARD: "/admin/dashboard",

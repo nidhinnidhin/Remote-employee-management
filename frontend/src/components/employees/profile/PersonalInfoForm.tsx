@@ -145,7 +145,6 @@ const InputField = ({
       />
     </div>
 
-    {/* ✅ Error message */}
     {error && <p className="text-xs text-red-500 mt-1 font-medium">{error}</p>}
   </div>
 );
@@ -299,7 +298,6 @@ const PersonalInfoForm: React.FC<{ user: UserProfile }> = ({ user }) => {
       });
 
       setSuccessMsg("Profile updated successfully.");
-      // ✅ Refresh global profile store to update Header/Sidebar immediately
       useProfileStore.getState().fetchProfile(true);
     } catch (err: any) {
       const backendErrors = err.response?.data?.errors;
