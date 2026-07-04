@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { FRONTEND_ROUTES } from "@/constants/frontend.routes";
 import {
@@ -24,14 +23,13 @@ import {
   X,
   ChevronRight,
   ChevronLeft,
+  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useProfileStore } from "@/store/profile.store";
-import { FileText } from "lucide-react";
 import Image from "next/image";
 
 const navigationGroups = [
-  // ... (rest of the file)
   {
     title: "Overview",
     items: [
@@ -106,6 +104,7 @@ const navigationGroups = [
 
 export function Sidebar({ className }: { className?: string }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false); // Mobile Drawer State
   const [isCollapsed, setIsCollapsed] = useState(false); // Desktop Collapse State
   const [isMobile, setIsMobile] = useState(false);
@@ -158,7 +157,7 @@ export function Sidebar({ className }: { className?: string }) {
           className,
         )}
       >
-        {/* Toggle Button - Integrated Functionality */}
+        {/* Toggle Button */}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
           className="hidden lg:flex items-center justify-center w-6 h-6 rounded-md border 
@@ -198,46 +197,46 @@ export function Sidebar({ className }: { className?: string }) {
               {group.items.map((item) => {
                 const isActive = pathname === item.href;
                 return (
-                  <Link
+                  <button
                     key={item.label}
-                    href={item.href}
-                    onClick={() => isMobile && setIsOpen(false)}
+                    onClick={() => {
+                      if (isMobile) setIsOpen(false);
+                      router.push(item.href);
+                    }}
                     title={isCollapsed ? item.label : ""}
+                    className={cn(
+                      "w-full group relative flex items-center px-3 py-2 rounded-lg transition-all duration-200 text-left",
+                      isActive
+                        ? "bg-accent/10 text-accent"
+                        : "text-slate-400 hover:text-slate-100 hover:bg-white/[0.03]",
+                      isCollapsed ? "justify-center" : "justify-between",
+                    )}
                   >
-                    <div
-                      className={cn(
-                        "group relative flex items-center px-3 py-2 rounded-lg transition-all duration-200",
-                        isActive
-                          ? "bg-accent/10 text-accent"
-                          : "text-slate-400 hover:text-slate-100 hover:bg-white/[0.03]",
-                        isCollapsed ? "justify-center" : "justify-between",
-                      )}
-                    >
-                      <div className="flex items-center gap-3">
-                        <item.icon
-                          size={18}
-                          strokeWidth={isActive ? 2 : 1.5}
-                          className={cn(
-                            isActive
-                              ? "text-accent"
-                              : "text-slate-500 group-hover:text-slate-300",
-                          )}
-                        />
-                        {!isCollapsed && (
-                          <span className="text-[13px] font-bold tracking-tight whitespace-nowrap">
-                            {item.label}
-                          </span>
+                    <div className="flex items-center gap-3 pointer-events-none">
+                      <item.icon
+                        size={18}
+                        strokeWidth={isActive ? 2 : 1.5}
+                        className={cn(
+                          isActive
+                            ? "text-accent"
+                            : "text-slate-500 group-hover:text-slate-300",
                         )}
-                      </div>
-
-                      {isActive && !isCollapsed && (
-                        <motion.div
-                          layoutId="activeIndicator"
-                          className="w-1 h-4 bg-accent rounded-full"
-                        />
+                      />
+                      {!isCollapsed && (
+                        <span className="text-[13px] font-bold tracking-tight whitespace-nowrap">
+                          {item.label}
+                        </span>
                       )}
                     </div>
-                  </Link>
+
+                    {isActive && !isCollapsed && (
+                      <motion.div
+                        key={`indicator-${item.label}`}
+                        layoutId="activeIndicator"
+                        className="w-1 h-4 bg-accent rounded-full"
+                      />
+                    )}
+                  </button>
                 );
               })}
             </div>
@@ -246,7 +245,10 @@ export function Sidebar({ className }: { className?: string }) {
 
         {/* Bottom Profile Section */}
         <div className="p-4 border-t border-white/[0.04] bg-white/[0.01] shrink-0">
-          <Link href={FRONTEND_ROUTES.EMPLOYEE.PROFILE}>
+          <button
+            onClick={() => router.push(FRONTEND_ROUTES.EMPLOYEE.PROFILE)}
+            className="w-full text-left focus:outline-none"
+          >
             <div
               className={cn(
                 "flex items-center gap-3 p-2 rounded-xl hover:bg-white/[0.04] transition-colors group",
@@ -282,7 +284,7 @@ export function Sidebar({ className }: { className?: string }) {
                 </>
               )}
             </div>
-          </Link>
+          </button>
         </div>
       </motion.aside>
     </>

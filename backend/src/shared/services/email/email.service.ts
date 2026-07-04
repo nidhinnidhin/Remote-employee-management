@@ -17,7 +17,7 @@ export class EmailService implements IEmailService {
       <div style="text-align:center;">
         <h2 style="color:#1e293b;margin-bottom:16px;font-size:24px;">Verify Your Email</h2>
         <p style="color:#64748b;font-size:16px;line-height:24px;margin-bottom:32px;">
-          Use the verification code below to complete your sign-in. This code is valid for <strong>10 minutes</strong>.
+          Use the verification code below to complete your sign-in. This code is valid for <strong>1 minute</strong>.
         </p>
         <div style="background:#f1f5f9;border-radius:12px;padding:24px;display:inline-block;margin-bottom:32px;">
           <span style="font-size:40px;font-weight:bold;letter-spacing:8px;color:#2563eb;font-family:monospace;">${otp}</span>
