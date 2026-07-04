@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { FRONTEND_ROUTES } from "@/constants/frontend.routes";
@@ -105,37 +105,71 @@ const navigationGroups = [
 export function Sidebar({ className }: { className?: string }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [isOpen, setIsOpen] = useState(false); // Mobile Drawer State
-  const [isCollapsed, setIsCollapsed] = useState(false); // Desktop Collapse State
+
+  // Single source of truth: isMobile derived from viewport, isOpen only matters on mobile.
+  const [isOpen, setIsOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const { userProfile, isLoading } = useProfileStore();
 
+  // --- Fix 1: debounce + single listener, and always resync isOpen when switching to desktop ---
   useEffect(() => {
     const checkMobile = () => {
       const mobile = window.innerWidth < 1024;
       setIsMobile(mobile);
-      if (!mobile) setIsOpen(false);
+      if (!mobile) {
+        // Guarantees the mobile overlay can never be left mounted once we're on desktop.
+        setIsOpen(false);
+      }
     };
+
     checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+
+    let frame: number;
+    const onResize = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(checkMobile);
+    };
+
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("resize", onResize);
+      cancelAnimationFrame(frame);
+    };
   }, []);
+
+  // --- Fix 2: always close the mobile drawer on route change, no matter how navigation happened ---
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
+
+  // --- Fix 3: centralised, memoized navigation handler so nothing stale gets captured in closures ---
+  const handleNavigate = useCallback(
+    (href: string) => {
+      setIsOpen(false);
+      router.push(href);
+    },
+    [router],
+  );
 
   return (
     <>
       {/* Mobile Trigger */}
       <div className="lg:hidden fixed top-4 left-4 z-50">
         <button
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => setIsOpen((prev) => !prev)}
           className="p-2 rounded-xl bg-[#08090a] border border-white/10 text-white shadow-2xl"
         >
           {isOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
       </div>
 
+      {/* Fix 4: overlay only ever rendered when BOTH isOpen and isMobile are true,
+          and it's removed from the tree entirely (not just visually hidden) when either flips. */}
       <AnimatePresence>
         {isOpen && isMobile && (
           <motion.div
+            key="sidebar-overlay"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -153,13 +187,15 @@ export function Sidebar({ className }: { className?: string }) {
         }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
         className={cn(
-          "fixed inset-y-0 left-0 z-40 bg-[#08090a] border-r border-white/[0.06] flex flex-col h-full lg:relative lg:translate-x-0 overflow-visible",
+          // Fix 5: sidebar itself sits above the overlay (z-50 vs overlay's z-40), so it can
+          // never end up "under" a stuck transparent layer even if state briefly desyncs.
+          "fixed inset-y-0 left-0 z-50 bg-[#08090a] border-r border-white/[0.06] flex flex-col h-full lg:relative lg:translate-x-0 overflow-visible",
           className,
         )}
       >
         {/* Toggle Button */}
         <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
+          onClick={() => setIsCollapsed((prev) => !prev)}
           className="hidden lg:flex items-center justify-center w-6 h-6 rounded-md border 
                      bg-[#08090a] border-white/10 text-slate-400 hover:text-white
                      absolute -right-3 top-20 shadow-sm z-50 transition-colors"
@@ -176,10 +212,7 @@ export function Sidebar({ className }: { className?: string }) {
               width={200}
               height={60}
               priority
-              className={cn(
-                "transition-all duration-300 object-contain",
-                isCollapsed ? "w-10 h-10" : "w-40 h-auto",
-              )}
+              className="transition-all duration-300 object-contain w-40 h-auto"
             />
           )}
         </div>
@@ -199,10 +232,8 @@ export function Sidebar({ className }: { className?: string }) {
                 return (
                   <button
                     key={item.label}
-                    onClick={() => {
-                      if (isMobile) setIsOpen(false);
-                      router.push(item.href);
-                    }}
+                    type="button"
+                    onClick={() => handleNavigate(item.href)}
                     title={isCollapsed ? item.label : ""}
                     className={cn(
                       "w-full group relative flex items-center px-3 py-2 rounded-lg transition-all duration-200 text-left",
@@ -246,7 +277,8 @@ export function Sidebar({ className }: { className?: string }) {
         {/* Bottom Profile Section */}
         <div className="p-4 border-t border-white/[0.04] bg-white/[0.01] shrink-0">
           <button
-            onClick={() => router.push(FRONTEND_ROUTES.EMPLOYEE.PROFILE)}
+            type="button"
+            onClick={() => handleNavigate(FRONTEND_ROUTES.EMPLOYEE.PROFILE)}
             className="w-full text-left focus:outline-none"
           >
             <div

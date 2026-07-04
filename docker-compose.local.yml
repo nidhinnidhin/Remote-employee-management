@@ -21,6 +21,7 @@ services:
       # Next.js standalone server.js also re-enforces NODE_ENV=production at startup.
       # So we CANNOT rely on NODE_ENV to detect local — LOCAL_DEV is our safe alternative.asd
       LOCAL_DEV: "true"
+      
 
   backend:
     image: nexus-backend-local    # separate local image tag — never overwrites production
