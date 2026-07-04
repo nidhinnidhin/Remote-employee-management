@@ -37,6 +37,7 @@ export const FRONTEND_ROUTES = {
         SUBSCRIPTION: "/company-admin/subscription",
         PROFILE: "/company-admin/profile",
         AUDIT_LOGS: "/company-admin/audit-logs",
+        TICKETS: "/admin/tickets"
     },
     EMPLOYEE: {
         DASHBOARD: "/employee/dashboard",

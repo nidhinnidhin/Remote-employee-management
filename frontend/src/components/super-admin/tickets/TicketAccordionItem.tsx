@@ -4,7 +4,8 @@ import React, { useState } from "react";
 import { TicketApi, TicketStatus } from "@/shared/types/superadmin/tickets/tickets.type";
 import { ChevronDown, Calendar, Building, Mail } from "lucide-react";
 import { formatDateISO } from "@/lib/date/date-format";
-import TicketStatusDropdown from "./TicketStatusDropdown"; // <-- Imported Dropdown Component
+import TicketStatusDropdown from "./TicketStatusDropdown"; 
+import { updateTicketStatusAction } from "@/actions/tickets/tickets.action";
 
 interface TicketAccordionItemProps {
   ticket: TicketApi;
@@ -13,20 +14,23 @@ interface TicketAccordionItemProps {
 
 export default function TicketAccordionItem({ ticket, onTicketUpdate }: TicketAccordionItemProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [ticketStatus, setTicketStatus] = useState<TicketStatus>(ticket.status);
 
   const handleStatusChange = async (newStatus: TicketStatus) => {
-    // Here you would run your API call (e.g., fetch/axios put request)
-    // Example: await fetch(`/api/super-admin/tickets/${ticket.id}`, { method: 'PATCH', body: JSON.stringify({ status: newStatus }) })
+    // Invoke NestJS endpoint via Server Action
+    const res = await updateTicketStatusAction(ticket.id, { 
+      status: newStatus,
+      statusNote: `Status updated to ${newStatus} via Super Admin console dashboard.`
+    });
     
-    setTicketStatus(newStatus);
-    
-    if (onTicketUpdate) {
-      onTicketUpdate(); // Refreshes state or metrics in parent view
+    if (res.success) {
+      if (onTicketUpdate) {
+        onTicketUpdate(); // Refreshes state arrays natively at the parent layer
+      }
+    } else {
+      alert(res.error || "Failed modification constraints lifecycle validation checks.");
     }
   };
 
-  // Priority Chip Style map
   const priorityStyles = {
     LOW: "text-muted bg-[rgb(var(--color-bg-subtle))]",
     MEDIUM: "text-blue-400 bg-blue-500/5",
@@ -34,9 +38,12 @@ export default function TicketAccordionItem({ ticket, onTicketUpdate }: TicketAc
     URGENT: "text-red-500 bg-red-500/5 font-semibold animate-pulse",
   };
 
+  const displayId = ticket.id.length > 10 
+    ? `#${ticket.id.slice(-6).toUpperCase()}` 
+    : ticket.id;
+
   return (
     <div className="border border-[rgb(var(--color-border-subtle))] rounded-xl bg-[rgb(var(--color-nav-bg))] overflow-hidden transition-all duration-200">
-      {/* Clickable Header */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full text-left px-5 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4 group hover:bg-[rgb(var(--color-bg-subtle))]/20 transition-colors"
@@ -44,13 +51,13 @@ export default function TicketAccordionItem({ ticket, onTicketUpdate }: TicketAc
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-2 mb-1.5">
             <span className="text-xs font-mono text-muted/60 bg-[rgb(var(--color-bg-subtle))] px-1.5 py-0.5 rounded border border-[rgb(var(--color-border-subtle))]">
-              {ticket.id}
+              {displayId}
             </span>
             
-            {/* Interactive Dropdown replacing the static chip badge */}
+            {/* Derived directly from the ticket prop now, ensuring total synchronization */}
             <TicketStatusDropdown 
               ticketId={ticket.id} 
-              currentStatus={ticketStatus} 
+              currentStatus={ticket.status} 
               onStatusChange={handleStatusChange} 
             />
 
@@ -63,11 +70,10 @@ export default function TicketAccordionItem({ ticket, onTicketUpdate }: TicketAc
           </h3>
         </div>
 
-        {/* Desktop inline meta information details */}
         <div className="flex items-center gap-6 text-xs text-muted/80 shrink-0 self-start md:self-auto">
           <div className="hidden sm:flex items-center gap-1.5">
             <Building size={14} />
-            <span className="truncate max-w-[120px]">{ticket.companyName}</span>
+            <span className="truncate max-w-[120px]">{ticket.companyName || "Unknown Org"}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <Calendar size={14} />
@@ -82,7 +88,6 @@ export default function TicketAccordionItem({ ticket, onTicketUpdate }: TicketAc
         </div>
       </button>
 
-      {/* Accordion Content Panel */}
       <div
         className={`transition-all duration-300 ease-in-out overflow-hidden ${
           isOpen ? "max-h-[500px] border-t border-[rgb(var(--color-border-subtle))]/50" : "max-h-0"
@@ -93,22 +98,21 @@ export default function TicketAccordionItem({ ticket, onTicketUpdate }: TicketAc
             <h4 className="text-xs font-semibold text-primary uppercase tracking-wider mb-1">
               Description
             </h4>
-            <p className="text-sm text-secondary leading-relaxed bg-[rgb(var(--color-nav-bg))] p-3.5 rounded-lg border border-[rgb(var(--color-border-subtle))]/40 whitespace-pre-wrap">
+            <p className="text-sm text-secondary leading-relaxed bg-[rgb(var(--color-nav-bg))] p-3.5 rounded-lg border border-[rgb(var(--color-border-subtle))]/40 whitespace-pre-wrap select-text">
               {ticket.description}
             </p>
           </div>
 
-          {/* Expanded responsive meta grid detail info footer view */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs pt-2 border-t border-[rgb(var(--color-border-subtle))]/30">
             <div className="flex items-center gap-2 text-muted">
               <Mail size={14} className="text-muted/60" />
               <span className="font-medium text-secondary">Created By:</span>
-              <span className="select-all">{ticket.userEmail}</span>
+              <span className="select-all">{ticket.userEmail || "System Admin Operations"}</span>
             </div>
             <div className="flex items-center gap-2 text-muted sm:justify-end">
               <Building size={14} className="text-muted/60" />
               <span className="font-medium text-secondary">Organization:</span>
-              <span>{ticket.companyName}</span>
+              <span>{ticket.companyName || "N/A"}</span>
             </div>
           </div>
         </div>

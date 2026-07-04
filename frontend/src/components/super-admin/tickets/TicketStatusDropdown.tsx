@@ -7,7 +7,7 @@ import { ChevronDown, Loader2 } from "lucide-react";
 interface TicketStatusDropdownProps {
   currentStatus: TicketStatus;
   ticketId: string;
-  onStatusChange?: (newStatus: TicketStatus) => void;
+  onStatusChange?: (newStatus: TicketStatus) => void | Promise<void>; // Explicit promise typing support
 }
 
 export default function TicketStatusDropdown({
@@ -40,7 +40,7 @@ export default function TicketStatusDropdown({
   const statusStyles = {
     OPEN: "bg-amber-500/10 text-amber-500 border-amber-500/20",
     IN_PROGRESS: "bg-blue-500/10 text-blue-500 border-blue-500/20",
-    RESOLVED: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
+    RESOLVED: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
     CLOSED: "bg-gray-500/10 text-gray-500 border-gray-500/20",
   };
 
@@ -48,12 +48,17 @@ export default function TicketStatusDropdown({
     setIsOpen(false);
     if (status === currentStatus) return;
 
-    setIsUpdating(true);
-    // Simulate API update or layout sync action
-    if (onStatusChange) {
-      await onStatusChange(status);
+    try {
+      setIsUpdating(true);
+      if (onStatusChange) {
+        // Await the asynchronous state pipeline completely before turning off loading flags
+        await onStatusChange(status);
+      }
+    } catch (error) {
+      console.error("Failed updating execution layer pipeline status:", error);
+    } finally {
+      setIsUpdating(false);
     }
-    setIsUpdating(false);
   };
 
   return (
@@ -62,7 +67,7 @@ export default function TicketStatusDropdown({
         type="button"
         disabled={isUpdating}
         onClick={(e) => {
-          e.stopPropagation(); // Prevents accordion from toggling
+          e.stopPropagation(); // Prevents accordion layout from toggling open/close
           setIsOpen(!isOpen);
         }}
         className={`flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border font-medium tracking-wide transition-colors ${
@@ -79,7 +84,7 @@ export default function TicketStatusDropdown({
 
       {isOpen && (
         <div 
-          onClick={(e) => e.stopPropagation()} // Stop accordion context trigger
+          onClick={(e) => e.stopPropagation()} // Stop accordion context trigger hierarchies
           className="absolute left-0 mt-1 w-36 origin-top-left rounded-xl bg-[rgb(var(--color-nav-bg))] border border-[rgb(var(--color-border-subtle))] shadow-lg ring-1 ring-black/5 z-30 focus:outline-none overflow-hidden"
         >
           <div className="py-1 divide-y divide-[rgb(var(--color-border-subtle))]/30">

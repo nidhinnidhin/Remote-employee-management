@@ -15,7 +15,6 @@ export default function CompaniesStats({ stats }: CompaniesStatsProps) {
       <StatsCard title="Total Companies" value={total.toString()} />
       <StatsCard title="Active" value={active.toString()} />
       <StatsCard title="Suspended" value={suspended.toString()} />
-      <StatsCard title="Total MRR" value="$0" />
     </div>
   );
 }

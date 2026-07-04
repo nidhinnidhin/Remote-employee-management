@@ -5,11 +5,12 @@ import { TicketStats } from "@/shared/types/superadmin/tickets/tickets.type";
 import { Ticket, AlertCircle, Clock, CheckCircle2 } from "lucide-react";
 
 export default function TicketsStats({ stats }: { stats: TicketStats }) {
+  // Defensive fallbacks prevent layout breakage if metric counts are missing mid-flight
   const cards = [
-    { label: "Total Tickets", value: stats.total, icon: Ticket, color: "text-blue-500 bg-blue-500/10" },
-    { label: "Open Issues", value: stats.open, icon: AlertCircle, color: "text-amber-500 bg-amber-500/10" },
-    { label: "In Progress", value: stats.inProgress, icon: Clock, color: "text-purple-500 bg-purple-500/10" },
-    { label: "Resolved", value: stats.resolved, icon: CheckCircle2, color: "text-emerald-500 bg-emerald-500/10" },
+    { label: "Total Tickets", value: stats?.total || 0, icon: Ticket, color: "text-blue-500 bg-blue-500/10" },
+    { label: "Open Issues", value: stats?.open || 0, icon: AlertCircle, color: "text-amber-500 bg-amber-500/10" },
+    { label: "In Progress", value: stats?.inProgress || 0, icon: Clock, color: "text-purple-500 bg-purple-500/10" },
+    { label: "Resolved", value: stats?.resolved || 0, icon: CheckCircle2, color: "text-emerald-500 bg-emerald-500/10" },
   ];
 
   return (

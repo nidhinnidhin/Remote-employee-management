@@ -20,6 +20,7 @@ import {
   X,
   Shield,
   Settings2,
+  Ticket, // <-- Imported the Ticket icon here
 } from "lucide-react";
 import { SidebarProps } from "@/shared/types/company/layout/sidebar-props.type";
 import { cn } from "@/lib/utils";
@@ -84,6 +85,16 @@ const navigationGroups = [
         label: "Company Policy",
         icon: Shield,
         href: FRONTEND_ROUTES.ADMIN.COMPANY_POLICY,
+      },
+    ],
+  },
+  {
+    title: "Support", // <-- Added new Support group for reporting issues
+    items: [
+      {
+        label: "Tickets",
+        icon: Ticket,
+        href: FRONTEND_ROUTES.COMPANY.TICKETS || "/admin/tickets", 
       },
     ],
   },

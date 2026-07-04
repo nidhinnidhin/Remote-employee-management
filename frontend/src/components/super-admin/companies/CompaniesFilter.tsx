@@ -50,10 +50,6 @@ export default function CompaniesFilter() {
           <option value="ACTIVE">Active</option>
           <option value="SUSPENDED">Suspended</option>
         </select>
-        <button className="flex items-center gap-2 px-4 py-2 bg-surface-raised border border-border-subtle rounded-lg text-sm text-secondary hover:opacity-80 transition-opacity shadow-sm font-medium">
-          <Filter className="w-4 h-4" />
-          Filters
-        </button>
       </div>
     </div>
   );

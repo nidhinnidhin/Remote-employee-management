@@ -89,12 +89,21 @@ export const API_ROUTES = {
       REMOVE_PARTICIPANT: (id: string, participantId: string) =>
         `/meetings/${id}/participants/${participantId}`,
     },
+    TICKETS: {
+      BASE: "/tickets",
+      MY: "/tickets/my",
+      BY_ID: (id: string) => `/tickets/${id}`,
+    },
   },
   SUPER_ADMIN: {
     COMPANIES: "/super-admin/companies",
     SUBSCRIPTIONS: {
       BASE: "/subscription-plans",
       BY_ID: (id: string) => `/subscription-plans/${id}`,
+    },
+    TICKETS: {
+      BASE: "/tickets",
+      STATUS: (id: string) => `/tickets/${id}/status`,
     },
   },
   SUBSCRIPTIONS: {
