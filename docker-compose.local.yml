@@ -19,7 +19,7 @@ services:
       # LOCAL_DEV=true bypasses production cookie settings (domain, secure, sameSite:none)
       # The frontend Dockerfile hardcodes ENV NODE_ENV=production in its production stage.
       # Next.js standalone server.js also re-enforces NODE_ENV=production at startup.
-      # So we CANNOT rely on NODE_ENV to detect local — LOCAL_DEV is our safe alternative.
+      # So we CANNOT rely on NODE_ENV to detect local — LOCAL_DEV is our safe alternative.asd
       LOCAL_DEV: "true"
 
   backend:
