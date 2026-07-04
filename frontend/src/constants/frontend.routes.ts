@@ -57,6 +57,6 @@ export const FRONTEND_ROUTES = {
         REPORTS: "/reports",
         SETTINGS: "/settings",
         CHATS: "/chats",
-        LOGS: "/employee/logs",
+        LOGS: "/employee/activitylog",
     },
 } as const;
