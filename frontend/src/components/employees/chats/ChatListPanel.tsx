@@ -82,7 +82,7 @@ export function ChatListPanel({
 
   return (
     <>
-      <div className="flex flex-col h-full w-full bg-[#030712]">
+      <div className="flex flex-col h-full w-full ">
         {/* --- HEADER SECTION --- */}
         <div className="px-5 pt-6 pb-4 shrink-0">
           <div className="flex items-center justify-between mb-6">

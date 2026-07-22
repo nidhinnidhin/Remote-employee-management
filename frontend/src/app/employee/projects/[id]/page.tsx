@@ -330,7 +330,7 @@ export default function EmployeeProjectDetailPage() {
               />
             ) : (
               <div className="flex flex-col items-center justify-center py-20 bg-white/[0.01] border border-dashed border-white/[0.06] rounded-[2rem]">
-                <p className="text-slate-500 text-sm font-medium">No tasks found matching your criteria.</p>
+                <p className="text-slate-500 text-sm font-medium">No tasks assigned to you.</p>
                 <button 
                   onClick={() => { setSearchQuery(""); setStatusFilter(""); setPriorityFilter(""); }}
                   className="mt-4 text-accent text-[10px] font-black uppercase tracking-widest hover:underline"
@@ -359,7 +359,7 @@ export default function EmployeeProjectDetailPage() {
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-20 bg-white/[0.01] border border-dashed border-white/[0.06] rounded-[2rem]">
-                  <p className="text-slate-500 text-sm font-medium">No objectives found matching your criteria.</p>
+                  <p className="text-slate-500 text-sm font-medium">No objectives found.</p>
                 </div>
               )}
             </div>
