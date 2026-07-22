@@ -72,11 +72,19 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
     return today.toISOString().split("T")[0];
   }, []);
 
+  // Earliest selectable date is always tomorrow
+  const tomorrowStr = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    return d.toISOString().split("T")[0];
+  }, []);
+
+
   const dynamicLeaveTypes = useMemo(() => {
-    if (balances && balances.length > 0) {
-      return balances.map((b) => b.leaveType);
-    }
-    return availableLeaveTypes;
+    const rawTypes = balances && balances.length > 0
+      ? balances.map((b) => b.leaveType)
+      : availableLeaveTypes;
+    return Array.from(new Set(rawTypes.map((t) => t?.trim()).filter(Boolean)));
   }, [balances, availableLeaveTypes]);
 
   const leaveTypeOptions = useMemo(() => {
@@ -118,6 +126,14 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
     return balances.find((b) => b.leaveType === formData.leaveType);
   }, [balances, formData.leaveType]);
 
+  // Latest selectable date = today + allocated days for selected leave type (or 365 as fallback)
+  const maxDateStr = useMemo(() => {
+    const allocatedDays = currentBalance?.allocated ?? 365;
+    const d = new Date();
+    d.setDate(d.getDate() + allocatedDays);
+    return d.toISOString().split("T")[0];
+  }, [currentBalance]);
+
   const calculateTotalDays = (): number => {
     if (!formData.startDate || !formData.endDate) return 0;
     const start = new Date(formData.startDate);
@@ -131,18 +147,29 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
 
   useEffect(() => {
     const newErrors: FormErrors = {};
+    const allocatedDays = currentBalance?.allocated ?? 365;
 
     if (formData.startDate) {
-      if (formData.startDate < todayStr) {
-        newErrors.startDate = "Start date cannot be a past date.";
+      // Block today and past
+      if (formData.startDate <= todayStr) {
+        newErrors.startDate = "You can only apply for future dates. Same-day and past leave applications are not allowed.";
+      }
+      // Block dates beyond allocated days window
+      else if (formData.startDate > maxDateStr) {
+        newErrors.startDate = `You can only apply up to ${allocatedDays} day(s) in advance (until ${maxDateStr}).`;
       }
     }
 
     if (formData.endDate) {
-      if (formData.endDate < todayStr) {
-        newErrors.endDate = "End date cannot be a past date.";
+      // Block today and past
+      if (formData.endDate <= todayStr) {
+        newErrors.endDate = "End date cannot be today or a past date.";
       }
-      if (formData.startDate && formData.endDate < formData.startDate) {
+      // Block dates beyond allocated days window
+      else if (formData.endDate > maxDateStr) {
+        newErrors.endDate = `End date cannot be beyond ${maxDateStr} (${allocatedDays}-day advance limit).`;
+      }
+      else if (formData.startDate && formData.endDate < formData.startDate) {
         newErrors.endDate = "End date cannot be earlier than the start date.";
       }
     }
@@ -150,7 +177,7 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
     if (formData.startDate && !newErrors.startDate) {
       const rangeEnd = formData.endDate && !newErrors.endDate
         ? formData.endDate
-        : formData.startDate; // treat as single-day when endDate not yet set
+        : formData.startDate;
 
       const startReq = new Date(formData.startDate);
       const endReq = new Date(rangeEnd);
@@ -177,7 +204,7 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
     }
 
     setErrors(prev => JSON.stringify(prev) === JSON.stringify(newErrors) ? prev : newErrors);
-  }, [formData.startDate, formData.endDate, formData.emergencyContactPhone, todayStr, bookedLeaves]);
+  }, [formData.startDate, formData.endDate, formData.emergencyContactPhone, todayStr, maxDateStr, bookedLeaves, currentBalance]);
 
   const balanceValidation = useMemo<{
     status: "ok" | "warning" | "exceeded" | "blocked";
@@ -442,7 +469,8 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
               label="Start Date"
               name="startDate"
               type="date"
-              min={todayStr}
+              min={tomorrowStr}
+              max={maxDateStr}
               value={formData.startDate}
               onChange={(e: any) => setFormData({ ...formData, startDate: e.target.value })}
               required
@@ -455,7 +483,8 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
               label="End Date"
               name="endDate"
               type="date"
-              min={formData.startDate || todayStr}
+              min={formData.startDate || tomorrowStr}
+              max={maxDateStr}
               value={formData.endDate}
               onChange={(e: any) => setFormData({ ...formData, endDate: e.target.value })}
               required

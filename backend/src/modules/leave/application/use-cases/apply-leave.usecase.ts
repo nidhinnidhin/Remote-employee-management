@@ -43,6 +43,37 @@ export class ApplyLeaveUseCase implements IApplyLeaveUseCase {
       }
     }
 
+    // ─── Date window validation ────────────────────────────────────────────
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const startDate = new Date(leave.startDate);
+    startDate.setHours(0, 0, 0, 0);
+    const endDate = new Date(leave.endDate);
+    endDate.setHours(0, 0, 0, 0);
+
+    // Block same-day and past dates
+    if (startDate <= today) {
+      throw new BadRequestException(
+        'Leave applications must be for future dates. Same-day and backdated leaves are not allowed.',
+      );
+    }
+
+    // Block dates beyond the advance booking window (allocated days from today)
+    if (allocatedDays > 0) {
+      const maxAllowedDate = new Date(today);
+      maxAllowedDate.setDate(today.getDate() + allocatedDays);
+      if (startDate > maxAllowedDate || endDate > maxAllowedDate) {
+        throw new BadRequestException(
+          `You can only apply for leave up to ${allocatedDays} day(s) in advance based on your leave policy.`,
+        );
+      }
+    }
+    // ──────────────────────────────────────────────────────────────────────
+
     const currentYear = new Date().getFullYear();
     const existingLeaves =
       await this._leaveRequestRepository.findByEmployeeIdAndYear(
