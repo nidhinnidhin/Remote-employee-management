@@ -50,7 +50,7 @@ export default function ProfileClient({ user: initialUser }: { user: UserProfile
   ].filter(Boolean).join(", ");
 
   return (
-    <DashboardLayout>
+    <div className="w-full">
       <div className="flex flex-col gap-4 p-4 sm:p-6 max-w-5xl mx-auto w-full">
         <ProfileHeader
           name={`${user.firstName || ""} ${user.lastName || ""}`.trim()}
@@ -70,6 +70,6 @@ export default function ProfileClient({ user: initialUser }: { user: UserProfile
 
         {renderTabContent()}
       </div>
-    </DashboardLayout>
+    </div>
   );
 }

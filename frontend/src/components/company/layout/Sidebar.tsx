@@ -9,18 +9,15 @@ import {
   Users,
   Building2,
   FolderOpen,
-  CheckSquare,
   MessageSquare,
   CalendarDays,
-  CreditCard,
-  Building,
   FileText,
   ChevronLeft,
   ChevronRight,
   X,
   Shield,
   Settings2,
-  Ticket, // <-- Imported the Ticket icon here
+  Ticket,
 } from "lucide-react";
 import { SidebarProps } from "@/shared/types/company/layout/sidebar-props.type";
 import { cn } from "@/lib/utils";
@@ -36,16 +33,16 @@ const navigationGroups = [
         icon: LayoutDashboard,
         href: FRONTEND_ROUTES.ADMIN.DASHBOARD,
       },
-      {
-        label: "Employees",
-        icon: Users,
-        href: FRONTEND_ROUTES.ADMIN.EMPLOYEES,
-      },
     ],
   },
   {
     title: "Management",
     items: [
+      {
+        label: "Employees",
+        icon: Users,
+        href: FRONTEND_ROUTES.ADMIN.EMPLOYEES,
+      },
       {
         label: "Departments",
         icon: Building2,
@@ -89,12 +86,12 @@ const navigationGroups = [
     ],
   },
   {
-    title: "Support", // <-- Added new Support group for reporting issues
+    title: "Support",
     items: [
       {
         label: "Tickets",
         icon: Ticket,
-        href: FRONTEND_ROUTES.COMPANY.TICKETS || "/admin/tickets", 
+        href: FRONTEND_ROUTES.COMPANY.TICKETS || "/admin/tickets",
       },
     ],
   },
@@ -222,7 +219,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                       )}
                     </div>
 
-                    {/* Active Indicator (Reference Style) */}
+                    {/* Active Indicator */}
                     {!isCollapsed && isActive && (
                       <div className="w-1 h-4 bg-indigo-500 rounded-full" />
                     )}
@@ -233,7 +230,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           ))}
         </nav>
 
-        {/* Bottom Profile Section - SaaS Classic */}
+        {/* Bottom Profile Section */}
         <div
           className="p-4 border-t"
           style={{ borderTopColor: "rgb(var(--color-sidebar-border) / 0.1)" }}

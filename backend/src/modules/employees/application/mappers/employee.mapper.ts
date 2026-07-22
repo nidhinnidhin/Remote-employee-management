@@ -23,6 +23,7 @@ export class EmployeeMapper {
       (userDoc.inviteStatus as InviteStatus) || InviteStatus.PENDING,
       userDoc.companyId,
       userDoc.profileImageUrl,
+      userDoc.createdAt ? new Date(userDoc.createdAt).toISOString().split('T')[0] : undefined,
     );
   }
 

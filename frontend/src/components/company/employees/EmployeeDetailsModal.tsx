@@ -5,7 +5,7 @@ import BaseModal from "@/components/ui/BaseModal";
 import Button from "@/components/ui/Button";
 import { Employee } from "@/shared/types/company/employees/employee-listing.type";
 import Image from "next/image";
-import { Mail, Phone, Building2, ShieldCheck, Calendar, BadgeCheck, X } from "lucide-react";
+import { Mail, Phone, Building2, ShieldCheck, Calendar, BadgeCheck, X, User, Globe, Linkedin, MapPin, Heart, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface EmployeeDetailsModalProps {
@@ -17,6 +17,33 @@ interface EmployeeDetailsModalProps {
 export function EmployeeDetailsModal({ employee, isOpen, onClose }: EmployeeDetailsModalProps) {
   if (!employee) return null;
 
+  const hasPersonalInfo = !!(
+    employee.gender ||
+    employee.bloodGroup ||
+    employee.nationality ||
+    employee.maritalStatus ||
+    employee.timeZone
+  );
+
+  const hasAddress = !!(
+    employee.streetAddress ||
+    employee.city ||
+    employee.state ||
+    employee.country ||
+    employee.zipCode
+  );
+
+  const hasEmergencyContact = !!(
+    employee.emergencyContactName ||
+    employee.emergencyContactPhone ||
+    employee.emergencyContactRelation
+  );
+
+  const hasOnlinePresence = !!(
+    employee.linkedInUrl ||
+    employee.personalWebsite
+  );
+
   return (
     <BaseModal
       isOpen={isOpen}
@@ -26,7 +53,7 @@ export function EmployeeDetailsModal({ employee, isOpen, onClose }: EmployeeDeta
       description="View full organizational details and access permissions."
       maxWidth="max-w-2xl"
     >
-      <div className="space-y-7 py-2">
+      <div className="space-y-7 py-2 max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar">
         {/* --- IDENTITY HEADER SECTION --- */}
         <div className="flex items-center gap-5 p-5 rounded-xl bg-white/[0.02] border border-white/10 relative overflow-hidden">
           {/* Decorative background accent */}
@@ -73,6 +100,16 @@ export function EmployeeDetailsModal({ employee, isOpen, onClose }: EmployeeDeta
             </div>
           </div>
         </div>
+
+        {/* --- BIO SECTION --- */}
+        {employee.bio && (
+          <div className="space-y-2.5 p-4 rounded-xl bg-white/[0.01] border border-white/[0.04]">
+            <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500">
+              Biography
+            </span>
+            <p className="text-xs text-slate-300 leading-relaxed font-normal">{employee.bio}</p>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
           {/* --- EMPLOYMENT DETAILS SECTION --- */}
@@ -130,7 +167,7 @@ export function EmployeeDetailsModal({ employee, isOpen, onClose }: EmployeeDeta
               <InfoItem
                 icon={<Phone size={16} />}
                 label="Phone Number"
-                value={employee.joinDate || "Not provided"} // Temporary mapping from your code
+                value={employee.phone || "Not provided"}
               />
               <InfoItem
                 icon={<BadgeCheck size={16} />}
@@ -145,6 +182,183 @@ export function EmployeeDetailsModal({ employee, isOpen, onClose }: EmployeeDeta
             </div>
           </div>
         </div>
+
+        {/* --- PERSONAL INFORMATION SECTION --- */}
+        {hasPersonalInfo && (
+          <div className="space-y-4 border-t border-white/[0.04] pt-6">
+            <div className="flex items-center gap-2 px-1 border-l-2 border-accent/30 pl-3">
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
+                Personal Information
+              </span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              {employee.gender && (
+                <InfoItem icon={<User size={16} />} label="Gender" value={employee.gender} />
+              )}
+              {employee.bloodGroup && (
+                <InfoItem icon={<Heart size={16} />} label="Blood Group" value={employee.bloodGroup} />
+              )}
+              {employee.nationality && (
+                <InfoItem icon={<Globe size={16} />} label="Nationality" value={employee.nationality} />
+              )}
+              {employee.maritalStatus && (
+                <InfoItem icon={<User size={16} />} label="Marital Status" value={employee.maritalStatus} />
+              )}
+              {employee.timeZone && (
+                <InfoItem icon={<Globe size={16} />} label="TimeZone" value={employee.timeZone} />
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* --- ADDRESS SECTION --- */}
+        {hasAddress && (
+          <div className="space-y-4 border-t border-white/[0.04] pt-6">
+            <div className="flex items-center gap-2 px-1 border-l-2 border-accent/30 pl-3">
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
+                Address
+              </span>
+            </div>
+            <div className="p-4 rounded-xl bg-white/[0.01] border border-white/[0.04] flex items-start gap-3">
+              <div className="p-2 rounded-md bg-white/[0.03] text-slate-500">
+                <MapPin size={16} />
+              </div>
+              <div className="space-y-1">
+                {employee.streetAddress && (
+                  <p className="text-sm text-slate-200 font-medium">{employee.streetAddress}</p>
+                )}
+                <p className="text-xs text-slate-400">
+                  {[employee.city, employee.state, employee.country, employee.zipCode]
+                    .filter(Boolean)
+                    .join(", ")}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* --- EMERGENCY CONTACT SECTION --- */}
+        {hasEmergencyContact && (
+          <div className="space-y-4 border-t border-white/[0.04] pt-6">
+            <div className="flex items-center gap-2 px-1 border-l-2 border-accent/30 pl-3">
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
+                Emergency Contact
+              </span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {employee.emergencyContactName && (
+                <InfoItem icon={<User size={16} />} label="Contact Name" value={employee.emergencyContactName} />
+              )}
+              {employee.emergencyContactPhone && (
+                <InfoItem icon={<Phone size={16} />} label="Contact Phone" value={employee.emergencyContactPhone} />
+              )}
+              {employee.emergencyContactRelation && (
+                <InfoItem icon={<Building2 size={16} />} label="Relation" value={employee.emergencyContactRelation} />
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* --- SKILLS SECTION --- */}
+        {employee.skills && employee.skills.length > 0 && (
+          <div className="space-y-3 border-t border-white/[0.04] pt-6">
+            <div className="flex items-center gap-2 px-1 border-l-2 border-accent/30 pl-3">
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
+                Skills & Expertise
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-2 pt-1">
+              {employee.skills.map((skill, index) => (
+                <span
+                  key={index}
+                  className="px-3 py-1.5 rounded-lg bg-white/[0.02] border border-white/[0.06] text-xs font-medium text-slate-300 hover:border-accent/30 hover:text-accent transition-colors"
+                >
+                  {skill}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* --- DOCUMENTS SECTION --- */}
+        {employee.documents && employee.documents.length > 0 && (
+          <div className="space-y-3 border-t border-white/[0.04] pt-6">
+            <div className="flex items-center gap-2 px-1 border-l-2 border-accent/30 pl-3">
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
+                Attached Documents
+              </span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+              {employee.documents.map((doc, index) => (
+                <a
+                  key={index}
+                  href={doc.fileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-3.5 rounded-xl bg-white/[0.01] border border-white/[0.04] hover:bg-white/[0.03] hover:border-white/10 transition-all group"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="p-2 rounded-lg bg-white/[0.03] text-slate-500 group-hover:text-accent group-hover:bg-accent/10 transition-all">
+                      <FileText size={16} />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-slate-200 truncate">{doc.name}</p>
+                      <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">{doc.category}</p>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-black text-accent uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity pl-2 shrink-0">
+                    View
+                  </span>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* --- ONLINE PRESENCE SECTION --- */}
+        {hasOnlinePresence && (
+          <div className="space-y-4 border-t border-white/[0.04] pt-6">
+            <div className="flex items-center gap-2 px-1 border-l-2 border-accent/30 pl-3">
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
+                Online Presence
+              </span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {employee.linkedInUrl && (
+                <a
+                  href={employee.linkedInUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 p-3.5 rounded-xl bg-[#0077b5]/5 border border-[#0077b5]/10 hover:bg-[#0077b5]/10 hover:border-[#0077b5]/30 transition-all group"
+                >
+                  <div className="p-2 rounded-lg bg-[#0077b5]/10 text-[#0077b5]">
+                    <Linkedin size={16} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">LinkedIn Profile</p>
+                    <p className="text-xs font-medium text-slate-200 truncate">{employee.linkedInUrl}</p>
+                  </div>
+                </a>
+              )}
+              {employee.personalWebsite && (
+                <a
+                  href={employee.personalWebsite}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 p-3.5 rounded-xl bg-accent/5 border border-accent/10 hover:bg-accent/10 hover:border-accent/30 transition-all group"
+                >
+                  <div className="p-2 rounded-lg bg-accent/10 text-accent">
+                    <Globe size={16} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Personal Website</p>
+                    <p className="text-xs font-medium text-slate-200 truncate">{employee.personalWebsite}</p>
+                  </div>
+                </a>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* --- FOOTER ACTIONS --- */}
         <div className="flex items-center justify-end gap-4 pt-6 mt-2 border-t border-white/[0.06]">
