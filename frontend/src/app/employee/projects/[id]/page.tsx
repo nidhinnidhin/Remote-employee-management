@@ -34,7 +34,6 @@ import {
   ArrowDownWideNarrow,
   Clock,
 } from "lucide-react";
-import { DashboardLayout } from "@/components/employees/dashboard/DashboardLayout";
 import Link from "next/link";
 import { FRONTEND_ROUTES } from "@/constants/frontend.routes";
 import { cn } from "@/lib/utils";
@@ -182,19 +181,19 @@ export default function EmployeeProjectDetailPage() {
 
   if (isLoading && !project) {
     return (
-      <DashboardLayout>
+      <>
         <div className="flex flex-col items-center justify-center py-40 gap-4 h-[calc(100vh-8rem)]">
           <Loader2 size={40} className="animate-spin text-accent" />
           <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">
             Loading Workspace...
           </p>
         </div>
-      </DashboardLayout>
+      </>
     );
   }
 
   return (
-    <DashboardLayout>
+    <>
       <div
         className={cn(
           "flex flex-col transition-opacity duration-300",
@@ -367,6 +366,6 @@ export default function EmployeeProjectDetailPage() {
           )}
         </div>
       </div>
-    </DashboardLayout>
+    </>
   );
 }

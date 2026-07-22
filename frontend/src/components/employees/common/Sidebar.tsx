@@ -179,17 +179,11 @@ export function Sidebar({ className }: { className?: string }) {
         )}
       </AnimatePresence>
 
-      <motion.aside
-        initial={false}
-        animate={{
-          x: isMobile ? (isOpen ? 0 : "-100%") : 0,
-          width: isMobile ? "256px" : isCollapsed ? "80px" : "256px",
-        }}
-        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      <aside
         className={cn(
-          // Fix 5: sidebar itself sits above the overlay (z-50 vs overlay's z-40), so it can
-          // never end up "under" a stuck transparent layer even if state briefly desyncs.
-          "fixed inset-y-0 left-0 z-50 bg-[#08090a] border-r border-white/[0.06] flex flex-col h-full lg:relative lg:translate-x-0 overflow-visible",
+          "fixed inset-y-0 left-0 z-50 bg-[#08090a] border-r border-white/[0.06] flex flex-col h-full lg:relative overflow-visible transition-all duration-300 ease-in-out",
+          isMobile ? (isOpen ? "translate-x-0" : "-translate-x-full") : "translate-x-0",
+          isMobile ? "w-[256px]" : isCollapsed ? "w-[80px]" : "w-[256px]",
           className,
         )}
       >
@@ -261,9 +255,8 @@ export function Sidebar({ className }: { className?: string }) {
                     </div>
 
                     {isActive && !isCollapsed && (
-                      <motion.div
+                      <div
                         key={`indicator-${item.label}`}
-                        layoutId="activeIndicator"
                         className="w-1 h-4 bg-accent rounded-full"
                       />
                     )}
@@ -318,7 +311,7 @@ export function Sidebar({ className }: { className?: string }) {
             </div>
           </button>
         </div>
-      </motion.aside>
+      </aside>
     </>
   );
 }

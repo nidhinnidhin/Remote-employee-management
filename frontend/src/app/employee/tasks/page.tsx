@@ -7,7 +7,6 @@ import { Task, MyTasksResponse } from "@/shared/types/company/projects/task.type
 import { Project } from "@/shared/types/company/projects/project.type";
 import EmployeeKanbanBoard from "@/components/employees/tasks/EmployeeKanbanBoard";
 import { Loader2, RefreshCcw, Layers } from "lucide-react";
-import { DashboardLayout } from "@/components/employees/dashboard/DashboardLayout";
 import { cn } from "@/lib/utils";
 import { getSprintsByProjectAction } from "@/actions/company/projects/sprint.actions";
 import { Sprint } from "@/shared/types/company/projects/sprint.type";
@@ -93,7 +92,7 @@ export default function EmployeeTasksPage() {
   }, [projects, tasks]);
 
   return (
-    <DashboardLayout>
+    <>
       <div className="flex flex-col w-full min-h-screen animate-in fade-in duration-700">
         
         {/* SaaS Header Dashboard Console layout */}
@@ -170,6 +169,6 @@ export default function EmployeeTasksPage() {
           )}
         </div>
       </div>
-    </DashboardLayout>
+    </>
   );
 }

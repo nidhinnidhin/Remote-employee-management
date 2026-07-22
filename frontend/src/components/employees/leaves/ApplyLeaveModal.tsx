@@ -40,13 +40,15 @@ const validatePhoneNumber = (phone: string): boolean => {
   return true;
 };
 
+const EMPTY_BOOKED_LEAVES: BookedLeavePeriod[] = [];
+
 export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
   isOpen,
   onClose,
   onSuccess,
   availableLeaveTypes,
   balances,
-  bookedLeaves = [],
+  bookedLeaves = EMPTY_BOOKED_LEAVES,
 }) => {
   const [loading, setLoading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -174,7 +176,7 @@ export const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({
       }
     }
 
-    setErrors(newErrors);
+    setErrors(prev => JSON.stringify(prev) === JSON.stringify(newErrors) ? prev : newErrors);
   }, [formData.startDate, formData.endDate, formData.emergencyContactPhone, todayStr, bookedLeaves]);
 
   const balanceValidation = useMemo<{

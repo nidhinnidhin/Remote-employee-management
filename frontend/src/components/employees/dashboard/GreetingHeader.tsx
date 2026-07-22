@@ -52,7 +52,7 @@ export function GreetingHeader() {
           </span>
         </div>
         <p className="text-sm text-slate-500 font-medium">
-          Here is what’s happening with your projects today.
+          Here is what’s happening with your projects todayyyyyyyyyyyyy.
         </p>
       </div>
 

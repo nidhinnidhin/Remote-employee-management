@@ -10,18 +10,20 @@ services:
     image: nexus-frontend-local   # separate local image tag — never overwrites production
     build:
       context: ./frontend
+      target: deps
       args:
         NEXT_PUBLIC_API_URL: http://localhost:4000/api
         NEXT_PUBLIC_RAZORPAY_KEY_ID: rzp_test_SlhJwHElHKOoQI
+    command: pnpm run dev
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
     env_file:
       - ./frontend/.env
     environment:
       # LOCAL_DEV=true bypasses production cookie settings (domain, secure, sameSite:none)
-      # The frontend Dockerfile hardcodes ENV NODE_ENV=production in its production stage.
-      # Next.js standalone server.js also re-enforces NODE_ENV=production at startup.
-      # So we CANNOT rely on NODE_ENV to detect local — LOCAL_DEV is our safe alternative.asd
       LOCAL_DEV: "true"
-      
 
   backend:
     image: nexus-backend-local    # separate local image tag — never overwrites production

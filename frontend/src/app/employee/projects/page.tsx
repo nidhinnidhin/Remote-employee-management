@@ -1,4 +1,3 @@
-import { DashboardLayout } from "@/components/employees/dashboard/DashboardLayout";
 import { requireRole } from "@/lib/auth/unified-auth";
 import EmployeeProjectList from "@/components/employees/projects/EmployeeProjectList";
 import { fetchMyTasksAction } from "@/actions/company/projects/task.actions";
@@ -21,10 +20,10 @@ export default async function EmployeeProjectsPage() {
     : [];
 
   return (
-    <DashboardLayout>
+    <>
       <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 h-full">
         <EmployeeProjectList tasks={tasks} userId={userId || ""} />
       </div>
-    </DashboardLayout>
+    </>
   );
 }

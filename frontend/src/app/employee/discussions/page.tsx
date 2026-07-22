@@ -1,5 +1,4 @@
 import { requireRole } from "@/lib/auth/unified-auth";
-import { DashboardLayout } from "@/components/employees/dashboard/DashboardLayout";
 import EmployeeDiscussionsClient from "@/components/employees/discussions/EmployeeDiscussionsClient";
 
 export const metadata = {
@@ -11,8 +10,8 @@ export default async function EmployeeDiscussionsPage() {
   await requireRole("EMPLOYEE");
 
   return (
-    <DashboardLayout>
+    <>
       <EmployeeDiscussionsClient />
-    </DashboardLayout>
+    </>
   );
 }

@@ -123,7 +123,7 @@ export const LeaveDashboard: React.FC = () => {
           <div>
             <h1 className="text-xl font-bold text-primary">Leave Management</h1>
             <p className="text-muted text-sm mt-0.5">
-              Track your leave balance and apply for time off
+              Track your leave balance and apply for time of
             </p>
           </div>
         </div>

@@ -1,7 +1,6 @@
 // src/lib/socket/socket.client.ts
 import { io, Socket } from 'socket.io-client';
 
-// API_URL_INTERNAL is undefined in the browser (server-only var) → falls back to localhost:4000
 const BACKEND_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api").replace(/\/api$/, "");
 
 class SocketClient {
