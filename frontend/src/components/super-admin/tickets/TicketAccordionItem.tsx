@@ -44,9 +44,12 @@ export default function TicketAccordionItem({ ticket, onTicketUpdate }: TicketAc
 
   return (
     <div className="border border-[rgb(var(--color-border-subtle))] rounded-xl bg-[rgb(var(--color-nav-bg))] overflow-hidden transition-all duration-200">
-      <button
+      <div
+        role="button"
+        tabIndex={0}
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full text-left px-5 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4 group hover:bg-[rgb(var(--color-bg-subtle))]/20 transition-colors"
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setIsOpen(!isOpen); }}
+        className="w-full text-left px-5 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4 group hover:bg-[rgb(var(--color-bg-subtle))]/20 transition-colors cursor-pointer select-none"
       >
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-2 mb-1.5">
@@ -86,7 +89,7 @@ export default function TicketAccordionItem({ ticket, onTicketUpdate }: TicketAc
             }`}
           />
         </div>
-      </button>
+      </div>
 
       <div
         className={`transition-all duration-300 ease-in-out overflow-hidden ${

@@ -20,7 +20,7 @@ export default function CompaniesFilter() {
       const params = new URLSearchParams(searchParams.toString());
       if (search) params.set("search", search);
       else params.delete("search");
-      
+
       if (status) params.set("status", status);
       else params.delete("status");
 
@@ -31,7 +31,10 @@ export default function CompaniesFilter() {
   }, [search, status, pathname, router, searchParams]);
 
   return (
-    <div className="portal-card-inner p-4 shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-center justify-between border rounded-xl" style={{ borderColor: 'rgb(var(--color-border-subtle))' }}>
+    <div
+      className="portal-card-inner p-4 shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-center justify-between border rounded-xl"
+      style={{ borderColor: "rgb(var(--color-border-subtle))" }}
+    >
       <input
         type="text"
         placeholder="Search companies..."
@@ -39,16 +42,22 @@ export default function CompaniesFilter() {
         onChange={(e) => setSearch(e.target.value)}
         className="field-input w-full md:w-96"
       />
-      
+
       <div className="flex items-center gap-2">
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value)}
-          className="field-input w-full md:w-48 bg-surface-raised"
+          className="field-input w-full md:w-48 bg-white text-slate-900 border border-slate-300 focus:text-black"
         >
-          <option value="">All Statuses</option>
-          <option value="ACTIVE">Active</option>
-          <option value="SUSPENDED">Suspended</option>
+          <option value="" className="bg-white text-slate-900">
+            All Statuses
+          </option>
+          <option value="ACTIVE" className="bg-white text-slate-900">
+            Active
+          </option>
+          <option value="SUSPENDED" className="bg-white text-slate-900">
+            Suspended
+          </option>
         </select>
       </div>
     </div>
