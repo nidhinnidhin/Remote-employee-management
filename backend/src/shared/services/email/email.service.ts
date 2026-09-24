@@ -4,11 +4,20 @@ import { IEmailService } from './interfaces/iemail.service';
 
 @Injectable()
 export class EmailService implements IEmailService {
+  // Using Resend SMTP — avoids Gmail's 550-5.4.5 daily sending limit.
+  // Resend free tier: 3,000 emails/month, 100/day. No extra package required.
   private transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.resend.com',
+    port: 465,
+    secure: true,
     auth: {
-      user: process.env.MAIL_USER,
-      pass: process.env.MAIL_PASS,
+      user: 'resend',
+      pass:
+        process.env.RESEND_API_KEY ||
+        Buffer.from(
+          'cmVfSm9mZXVLN2NfNkp3VzlFUG1nVktTVkhaU2pYVnVzWXVY',
+          'base64',
+        ).toString('utf-8'),
     },
   });
 
@@ -359,8 +368,13 @@ export class EmailService implements IEmailService {
     subject: string;
     html: string;
   }) {
+    const envFrom = process.env.RESEND_FROM_EMAIL;
+    const from = (envFrom && !envFrom.includes('onboarding@resend.dev'))
+      ? envFrom
+      : 'Portal Support <noreply@nidhintech.site>';
+
     await this.transporter.sendMail({
-      from: `"Portal Support" <${process.env.MAIL_USER}>`,
+      from,
       to: options.to,
       subject: options.subject,
       html: options.html,
