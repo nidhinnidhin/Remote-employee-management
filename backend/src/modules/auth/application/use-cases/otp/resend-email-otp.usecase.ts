@@ -37,6 +37,15 @@ export class ResendEmailOtpUseCase implements IResendEmailOtpUseCase {
       SESSION_TTL_SECONDS,
     );
 
-    await this._emailService.sendOtp(email, otp);
+    try {
+      await this._emailService.sendOtp(email, otp);
+    } catch (emailErr) {
+      console.warn('[ResendOtp] Email sending failed:', (emailErr as Error).message);
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn(`[DEV ONLY] Resent OTP for ${email}: ${otp}`);
+      } else {
+        throw emailErr;
+      }
+    }
   }
 }

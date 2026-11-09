@@ -41,6 +41,15 @@ export class SendEmailOtpUseCase implements ISendEmailOtpUseCase {
     );
 
     await this._emailOtpRepository.create(otpEntity);
-    await this._emailService.sendOtp(input.email, otp);
+    try {
+      await this._emailService.sendOtp(input.email, otp);
+    } catch (emailErr) {
+      console.warn('[SendEmailOtp] Email sending failed:', (emailErr as Error).message);
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn(`[DEV ONLY] OTP for ${input.email}: ${otp}`);
+      } else {
+        throw emailErr;
+      }
+    }
   }
 }

@@ -18,6 +18,7 @@ export interface Employee {
         resourceType: string;
         uploadedAt: string;
     }>;
+    phone?: string;
     bio?: string;
     bloodGroup?: string;
     gender?: string;

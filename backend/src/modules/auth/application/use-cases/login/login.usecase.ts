@@ -19,7 +19,7 @@ import type { ICreateActivityLogUseCase } from 'src/modules/activity-logs/applic
 import { ActivityAction } from 'src/modules/activity-logs/domain/entities/activity-log.entity';
 
 @Injectable()
-export class LoginUseCase implements ILoginUseCase {
+export class LoginUseCase implements ILoginUseCase {    
   constructor(
     @Inject('IUserRepository')
     private readonly _userRepository: IUserRepository,

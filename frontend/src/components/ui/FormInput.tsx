@@ -9,6 +9,7 @@ interface ExtendedFormInputProps extends FormInputProps {
   icon?: React.ReactNode;
   step?: string;
   min?: string;
+  max?: string;
   disabled?: boolean;
   readOnly?: boolean;
 }
@@ -25,6 +26,7 @@ const FormInput: React.FC<ExtendedFormInputProps> = ({
   icon,
   step,
   min,
+  max,
   disabled,
   readOnly,
 }) => {
@@ -54,6 +56,7 @@ const FormInput: React.FC<ExtendedFormInputProps> = ({
           placeholder={placeholder}
           step={step}
           min={min}
+          max={max}
           disabled={disabled}
           readOnly={readOnly}
           className={cn(

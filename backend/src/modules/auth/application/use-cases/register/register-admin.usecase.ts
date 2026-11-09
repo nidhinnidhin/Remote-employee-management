@@ -52,7 +52,17 @@ export class RegisterAdminUseCase implements IRegisterAdminUseCase {
       SESSION_TTL_SECONDS,
     );
 
-    await this._emailService.sendOtp(dto.email, otp);
+    try {
+      await this._emailService.sendOtp(dto.email, otp);
+    } catch (emailErr) {
+      // In development, log OTP to console if email sending fails (e.g. invalid SMTP credentials)
+      console.warn('[RegisterAdmin] Email sending failed:', (emailErr as Error).message);
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn(`[DEV ONLY] OTP for ${dto.email}: ${otp}`);
+      } else {
+        throw emailErr;
+      }
+    }
 
     await this._createLogUseCase.execute({
       companyId: null, 
